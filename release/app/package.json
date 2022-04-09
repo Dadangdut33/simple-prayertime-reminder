@@ -1,12 +1,12 @@
 {
-  "name": "electron-react-boilerplate",
-  "version": "4.5.0",
-  "description": "A foundation for scalable desktop apps",
+  "name": "prayertime-reminder",
+  "version": "1.0.0",
+  "description": "A simple prayertime reminder for desktop. Made using Electron with electron-react-boilerplate.",
   "main": "./dist/main/main.js",
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://github.com/electron-react-boilerplate"
+    "name": "Dadangdut33",
+    "email": "dadang.contact@gmail.com",
+    "url": "https://github.com/dadangdut33/prayertime-reminder"
   },
   "scripts": {
     "electron-rebuild": "node -r ts-node/register ../../.erb/scripts/electron-rebuild.js",
