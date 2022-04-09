@@ -1,7 +1,7 @@
 {
-  "name": "prayertime-reminder",
+  "name": "simple-prayertime-reminder",
   "version": "1.0.0",
-  "description": "A simple prayertime reminder for desktop. Made using Electron with electron-react-boilerplate.",
+  "description": "A simple muslim prayertime reminder for desktop. Made using Electron with electron-react-boilerplate.",
   "main": "./dist/main/main.js",
   "author": {
     "name": "Dadangdut33",
