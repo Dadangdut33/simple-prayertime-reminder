@@ -1,4 +1,5 @@
 import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
+import { Moment } from 'moment-timezone';
 import path from 'path';
 const appConfigPath = path.join(__dirname, '../../../json/config.json');
 const cacheDataPath = path.join(__dirname, '../../../json/cachedata.json');
@@ -9,12 +10,12 @@ const pathDict = {
 
 // -------------------------------------------------------------------------------------
 export interface cacheDataInterface {
-	fajr: string;
-	sunrise: string;
-	dhuhr: string;
-	asr: string;
-	maghrib: string;
-	isha: string;
+	fajr: string | Moment;
+	sunrise: string | Moment;
+	dhuhr: string | Moment;
+	asr: string | Moment;
+	maghrib: string | Moment;
+	isha: string | Moment;
 }
 
 interface reminderInterface {
@@ -122,6 +123,7 @@ export const cacheData: cacheDataInterface = {
 };
 
 // -------------------------------------------------------
+// Error and success notif, will be handled in main
 export const makeFolderIfNotExist = (path: string) => {
 	try {
 		if (!existsSync(path)) {

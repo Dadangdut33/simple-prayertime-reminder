@@ -138,8 +138,6 @@ const checkConfigOnStart = async () => {
 		}
 	} else appConfig = data as configInterface;
 
-	console.log(appConfig);
-
 	// ------------------------
 	// update prayertimes cache
 	const pt_Get = getPrayerTimes(appConfig);

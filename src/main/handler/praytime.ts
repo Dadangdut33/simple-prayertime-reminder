@@ -45,13 +45,14 @@ export const getPrayerTimes = (settings: configInterface) => {
 	};
 
 	// ----------------------------------------------------------------
+	// HH:mm -> 24h | h:mm A -> AM/PM
 	const prayerGet = new adhan.PrayerTimes(coordinates, date, params);
-	let fajrTime = Moment(prayerGet.fajr).tz(settings.timezoneOption.timezone).format('HH:mm'),
-		sunriseTime = Moment(prayerGet.sunrise).tz(settings.timezoneOption.timezone).format('HH:mm'),
-		dhuhrTime = Moment(prayerGet.dhuhr).tz(settings.timezoneOption.timezone).format('HH:mm'),
-		asrTime = Moment(prayerGet.asr).tz(settings.timezoneOption.timezone).format('HH:mm'),
-		maghribTime = Moment(prayerGet.maghrib).tz(settings.timezoneOption.timezone).format('HH:mm'),
-		ishaTime = Moment(prayerGet.isha).tz(settings.timezoneOption.timezone).format('HH:mm'),
+	let fajrTime = Moment(prayerGet.fajr).tz(settings.timezoneOption.timezone),
+		sunriseTime = Moment(prayerGet.sunrise).tz(settings.timezoneOption.timezone),
+		dhuhrTime = Moment(prayerGet.dhuhr).tz(settings.timezoneOption.timezone),
+		asrTime = Moment(prayerGet.asr).tz(settings.timezoneOption.timezone),
+		maghribTime = Moment(prayerGet.maghrib).tz(settings.timezoneOption.timezone),
+		ishaTime = Moment(prayerGet.isha).tz(settings.timezoneOption.timezone),
 		current = prayerGet.currentPrayer().toString(),
 		next = prayerGet.nextPrayer().toString();
 
