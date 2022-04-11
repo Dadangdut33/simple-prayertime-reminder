@@ -46,6 +46,7 @@ export interface configInterface {
 		maghrib: reminderInterface;
 		isha: reminderInterface;
 	};
+	geoLocAPIKey: string;
 }
 
 export interface cacheDataInterface {
@@ -106,6 +107,7 @@ export const initialConfig: configInterface = {
 			time: 0,
 		},
 	},
+	geoLocAPIKey: '', // get from https://freegeoip.app/
 };
 
 export const cacheData = {

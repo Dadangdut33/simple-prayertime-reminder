@@ -1,6 +1,8 @@
 # Simple Prayertime Reminder
 
-A simple muslim prayertime reminder app for desktop. Made using Electron with electron-react-boilerplate
+A simple muslim prayertime reminder app for desktop. Made using Electron with electron-react-boilerplate.
+
+Still WIP.
 
 
 <br>
