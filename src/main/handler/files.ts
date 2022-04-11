@@ -148,6 +148,7 @@ export const readConfig = (cfg_type: 'app' | 'cache') => {
 		data: any;
 	try {
 		data = readFileSync(pathDict[cfg_type], 'utf8');
+		data = JSON.parse(data);
 	} catch (error) {
 		success = false;
 		data = error;
