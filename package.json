@@ -261,6 +261,10 @@
         }
       }
     ],
-    "singleQuote": true
+    "tabWidth": 4,
+    "singleQuote": true,
+    "useTabs": true,
+    "jsxSingleQuote": true,
+    "printWidth": 210
   }
 }
