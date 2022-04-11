@@ -10,27 +10,21 @@
  */
 import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
-import { autoUpdater } from 'electron-updater';
-import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import { configInterface, initialConfig, writeConfig, readConfig } from './handler/files';
+import { getPrayerTimes } from './handler/praytime';
+import { onUnresponsiveWindow, errorBox } from './handler/messageBox';
+import { getLatLong, getLatLong_FromCitiesName } from './handler/getPos';
 
-export default class AppUpdater {
-	constructor() {
-		log.transports.file.level = 'info';
-		autoUpdater.logger = log;
-		autoUpdater.checkForUpdatesAndNotify();
-	}
-}
+// Global vars
+let mainWindow: BrowserWindow | null = null,
+	appConfig: configInterface;
 
-let mainWindow: BrowserWindow | null = null;
-
-ipcMain.on('ipc-example', async (event, arg) => {
-	const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-	console.log(msgTemplate(arg));
-	event.reply('ipc-example', msgTemplate('pong'));
-});
-
+// -------------------------------------------------------------------------------------
+/**
+ * Setup
+ */
 if (process.env.NODE_ENV === 'production') {
 	const sourceMapSupport = require('source-map-support');
 	sourceMapSupport.install();
@@ -80,11 +74,14 @@ const createWindow = async () => {
 
 	mainWindow.loadURL(resolveHtmlPath('index.html'));
 
+	// unresponsive
+	mainWindow.on('unresponsive', onUnresponsiveWindow);
+
 	mainWindow.on('ready-to-show', () => {
 		if (!mainWindow) {
 			throw new Error('"mainWindow" is not defined');
 		}
-		if (process.env.START_MINIMIZED) {
+		if (process.env.START_MINIMIZED === 'true') {
 			mainWindow.minimize();
 		} else {
 			mainWindow.show();
@@ -103,12 +100,47 @@ const createWindow = async () => {
 		shell.openExternal(edata.url);
 		return { action: 'deny' };
 	});
-
-	// Remove this if your app does not use auto updates
-	// eslint-disable-next-line
-	new AppUpdater();
 };
 
+const checkConfigOnStart = async () => {
+	const { success, data } = readConfig('app');
+	// fail to read config
+	if (!success) {
+		// create new one
+		appConfig = initialConfig;
+		appConfig.timezoneOption.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone; // get timezone
+
+		// get location
+		// default location is 0, 0. So if both of these methods fail, it will still works.
+		const dataPos = await getLatLong(appConfig);
+		if (!dataPos.success) {
+			// if fail, get from city name
+			const dataPosTry_2 = getLatLong_FromCitiesName(Intl.DateTimeFormat().resolvedOptions().timeZone === 'utc' ? 'utc' : Intl.DateTimeFormat().resolvedOptions().timeZone.split('/')[1]);
+
+			if (dataPosTry_2.success) {
+				appConfig.locationOption.latitude = dataPosTry_2.result[0].loc.coordinates[1];
+				appConfig.locationOption.longitude = dataPosTry_2.result[0].loc.coordinates[0];
+			}
+		} else {
+			// successfully get lat long from the api
+			appConfig.locationOption.latitude = dataPos.data.latitude;
+			appConfig.locationOption.longitude = dataPos.data.longitude;
+		}
+
+		// write config file
+		if (data.toString().includes('ENOENT')) {
+			// no config file found
+			writeConfig('app', initialConfig);
+		} else {
+			writeConfig('app', initialConfig);
+			errorBox('Failed to read config file', 'App has created a default value\nErr Details:\n' + data);
+		}
+	}
+	const test2 = getPrayerTimes(appConfig);
+	console.log(test2);
+};
+
+// -------------------------------------------------------------------------------------
 /**
  * Add event listeners...
  */
@@ -122,7 +154,8 @@ app.on('window-all-closed', () => {
 });
 
 app.whenReady()
-	.then(() => {
+	.then(async () => {
+		await checkConfigOnStart();
 		createWindow();
 		app.on('activate', () => {
 			// On macOS it's common to re-create a window in the app when the
@@ -131,3 +164,13 @@ app.whenReady()
 		});
 	})
 	.catch(console.log);
+
+// -------------------------------------------------------------------------------------
+/**
+ * IPC
+ */
+ipcMain.on('ipc-example', async (event, arg) => {
+	const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
+	console.log(msgTemplate(arg));
+	event.reply('ipc-example', msgTemplate('pong'));
+});

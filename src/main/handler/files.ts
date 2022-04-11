@@ -60,8 +60,8 @@ export interface cacheDataInterface {
 
 export const initialConfig: configInterface = {
 	locationOption: {
-		latitude: '',
-		longitude: '',
+		latitude: '0',
+		longitude: '0',
 	},
 	timezoneOption: {
 		mode: 'auto',
