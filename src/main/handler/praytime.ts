@@ -46,12 +46,12 @@ export const getPrayerTimes = (settings: configInterface) => {
 
 	// ----------------------------------------------------------------
 	const prayerGet = new adhan.PrayerTimes(coordinates, date, params);
-	let fajrTime = Moment(prayerGet.fajr).tz(settings.timezoneOption.timezone).format('h:mm A'),
-		sunriseTime = Moment(prayerGet.sunrise).tz(settings.timezoneOption.timezone).format('h:mm A'),
-		dhuhrTime = Moment(prayerGet.dhuhr).tz(settings.timezoneOption.timezone).format('h:mm A'),
-		asrTime = Moment(prayerGet.asr).tz(settings.timezoneOption.timezone).format('h:mm A'),
-		maghribTime = Moment(prayerGet.maghrib).tz(settings.timezoneOption.timezone).format('h:mm A'),
-		ishaTime = Moment(prayerGet.isha).tz(settings.timezoneOption.timezone).format('h:mm A'),
+	let fajrTime = Moment(prayerGet.fajr).tz(settings.timezoneOption.timezone).format('HH:mm'),
+		sunriseTime = Moment(prayerGet.sunrise).tz(settings.timezoneOption.timezone).format('HH:mm'),
+		dhuhrTime = Moment(prayerGet.dhuhr).tz(settings.timezoneOption.timezone).format('HH:mm'),
+		asrTime = Moment(prayerGet.asr).tz(settings.timezoneOption.timezone).format('HH:mm'),
+		maghribTime = Moment(prayerGet.maghrib).tz(settings.timezoneOption.timezone).format('HH:mm'),
+		ishaTime = Moment(prayerGet.isha).tz(settings.timezoneOption.timezone).format('HH:mm'),
 		current = prayerGet.currentPrayer().toString(),
 		next = prayerGet.nextPrayer().toString();
 
