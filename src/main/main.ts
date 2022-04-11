@@ -12,14 +12,15 @@ import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import { configInterface, initialConfig, writeConfig, readConfig } from './handler/files';
+import { configInterface, initialConfig, writeConfig, readConfig, cacheDataInterface } from './handler/files';
 import { getPrayerTimes } from './handler/praytime';
 import { onUnresponsiveWindow, errorBox } from './handler/messageBox';
 import { getLatLong, getLatLong_FromCitiesName } from './handler/getPos';
 
 // Global vars
 let mainWindow: BrowserWindow | null = null,
-	appConfig: configInterface;
+	appConfig: configInterface,
+	cacheData: cacheDataInterface;
 
 // -------------------------------------------------------------------------------------
 /**
@@ -135,9 +136,24 @@ const checkConfigOnStart = async () => {
 			writeConfig('app', initialConfig);
 			errorBox('Failed to read config file', 'App has created a default value\nErr Details:\n' + data);
 		}
-	}
-	const test2 = getPrayerTimes(appConfig);
-	console.log(test2);
+	} else appConfig = data as configInterface;
+
+	console.log(appConfig);
+
+	// ------------------------
+	// update prayertimes cache
+	const pt_Get = getPrayerTimes(appConfig);
+
+	cacheData = {
+		fajr: pt_Get.fajrTime,
+		sunrise: pt_Get.sunriseTime,
+		dhuhr: pt_Get.dhuhrTime,
+		asr: pt_Get.asrTime,
+		maghrib: pt_Get.maghribTime,
+		isha: pt_Get.ishaTime,
+	};
+
+	writeConfig('cache', cacheData);
 };
 
 // -------------------------------------------------------------------------------------
