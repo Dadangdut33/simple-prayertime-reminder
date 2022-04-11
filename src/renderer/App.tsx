@@ -1,7 +1,7 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import icon from '../../assets/icon.svg';
 import './App.css';
-import './Fonts.css';
+import './Font.css';
 
 const Hello = () => {
 	return (
