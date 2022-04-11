@@ -8,6 +8,15 @@ const pathDict = {
 };
 
 // -------------------------------------------------------------------------------------
+export interface cacheDataInterface {
+	fajr: string;
+	sunrise: string;
+	dhuhr: string;
+	asr: string;
+	maghrib: string;
+	isha: string;
+}
+
 interface reminderInterface {
 	enabled: boolean;
 	time: number;
@@ -47,15 +56,7 @@ export interface configInterface {
 		isha: reminderInterface;
 	};
 	geoLocAPIKey: string;
-}
-
-export interface cacheDataInterface {
-	fajr: string;
-	sunrise: string;
-	dhuhr: string;
-	asr: string;
-	maghrib: string;
-	isha: string;
+	updateEvery_Hours: number;
 }
 
 export const initialConfig: configInterface = {
@@ -108,9 +109,10 @@ export const initialConfig: configInterface = {
 		},
 	},
 	geoLocAPIKey: '', // get from https://freegeoip.app/
+	updateEvery_Hours: 4,
 };
 
-export const cacheData = {
+export const cacheData: cacheDataInterface = {
 	fajr: '',
 	sunrise: '',
 	dhuhr: '',

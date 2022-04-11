@@ -47,5 +47,6 @@
       "time": 0
     }
   },
-  "geoLocAPIKey": ""
+  "geoLocAPIKey": "",
+  "updateEvery_Hours": 4
 }
