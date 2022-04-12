@@ -266,5 +266,8 @@
     "useTabs": true,
     "jsxSingleQuote": true,
     "printWidth": 210
+  },
+  "electronmon": {
+    "patterns": ["!config/**"]
   }
 }
