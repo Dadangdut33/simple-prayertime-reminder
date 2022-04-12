@@ -5,9 +5,14 @@ const container = document.getElementById('root')!;
 const root = createRoot(container);
 root.render(<App />);
 
-// calling IPC exposed from preload script
+// example of calling IPC exposed from preload script
+// check in app / browser console for result
+/**
 window.electron.ipcRenderer.once('ipc-example', (arg) => {
 	// eslint-disable-next-line no-console
 	console.log(arg);
 });
-window.electron.ipcRenderer.myPing();
+
+const testPing = window.electron.ipcRenderer.sendSync('test-sync', 'bruh');
+		console.log('outside ipc', testPing);
+ */

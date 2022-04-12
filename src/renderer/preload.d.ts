@@ -1,16 +1,14 @@
 declare global {
-  interface Window {
-    electron: {
-      ipcRenderer: {
-        myPing(): void;
-        on(
-          channel: string,
-          func: (...args: unknown[]) => void
-        ): (() => void) | undefined;
-        once(channel: string, func: (...args: unknown[]) => void): void;
-      };
-    };
-  }
+	interface Window {
+		electron: {
+			ipcRenderer: {
+				on(channel: string, func: (...args: unknown[]) => void): (() => void) | undefined;
+				once(channel: string, func: (...args: unknown[]) => void): void;
+				send(channel: string, ...args: unknown[]): void;
+				sendSync(channel: string, ...args: unknown[]): unknown;
+			};
+		};
+	}
 }
 
 export {};
