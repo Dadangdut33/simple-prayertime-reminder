@@ -196,3 +196,11 @@ ipcMain.on('test-sync', (event, arg) => {
 	console.log(arg);
 	event.returnValue = 'pong';
 });
+
+ipcMain.on('get-config', (event, _arg) => {
+	event.returnValue = appConfig;
+});
+
+ipcMain.on('get-cached', (event, _arg) => {
+	event.returnValue = cacheData;
+});
