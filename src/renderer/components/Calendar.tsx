@@ -4,6 +4,8 @@ import TextField from '@mui/material/TextField';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { Link as RouterLink } from 'react-router-dom';
+import Link from '@mui/material/Link';
 
 export const Calendar = () => {
 	const [value, setValue] = useState<Date | null>(new Date());
@@ -11,6 +13,9 @@ export const Calendar = () => {
 	return (
 		<>
 			<CssBaseline />
+			<Link component={RouterLink} to='/'>
+				Home
+			</Link>
 			<LocalizationProvider dateAdapter={AdapterMoment}>
 				<StaticDatePicker
 					displayStaticWrapperAs='desktop'

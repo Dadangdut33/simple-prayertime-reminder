@@ -1,11 +1,13 @@
 import icon from '../../../assets/icon.svg';
+import { ColorModeContextInterface } from '../interfaces';
 import { useContext } from 'react';
 import { useTheme } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import IconButton from '@mui/material/IconButton';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
-import { ColorModeContextInterface } from '../interfaces';
+import { Link as RouterLink } from 'react-router-dom';
+import Link from '@mui/material/Link';
 
 export const MainMenu = ({ ColorModeContext }: any) => {
 	const theme = useTheme();
@@ -28,6 +30,9 @@ export const MainMenu = ({ ColorModeContext }: any) => {
 				<IconButton sx={{ ml: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
 					{theme.palette.mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
 				</IconButton>
+				<Link component={RouterLink} to='/calendar'>
+					Calendar
+				</Link>
 				<div className='Hello'>
 					<a href='/#' onClick={() => testIpc()}>
 						<button type='button'>

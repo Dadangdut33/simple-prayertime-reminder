@@ -33,6 +33,7 @@ export default function App() {
 				<Router>
 					<Routes>
 						<Route path='/' element={<MainMenu ColorModeContext={ColorModeContext} />} />
+						<Route path='/calendar' element={<Calendar />} />
 					</Routes>
 				</Router>
 			</ThemeProvider>
