@@ -1,12 +1,11 @@
 import './App.css';
 import './Font.css';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import { MainMenu } from './components';
+import { MainMenu, Calendar } from './components';
 import { useState, useEffect, useMemo, createContext } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material';
 
 const ColorModeContext = createContext({ toggleColorMode: () => {} });
-
 export default function App() {
 	const [mode, setMode] = useState<'light' | 'dark'>('light');
 	const colorMode = useMemo(

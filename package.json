@@ -227,10 +227,14 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
+    "@date-io/date-fns": "^2.13.1",
+    "@date-io/hijri": "^2.13.1",
+    "@date-io/moment": "^2.13.1",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
     "@mui/icons-material": "^5.6.0",
     "@mui/material": "^5.6.0",
+    "@mui/x-date-pickers": "^5.0.0-alpha.0",
     "adhan": "^4.3.2",
     "all-the-cities": "^3.1.0",
     "electron-debug": "^3.2.0",
@@ -268,6 +272,8 @@
     "printWidth": 210
   },
   "electronmon": {
-    "patterns": ["!config/**"]
+    "patterns": [
+      "!config/**"
+    ]
   }
 }
