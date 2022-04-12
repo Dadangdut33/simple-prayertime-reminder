@@ -48,5 +48,6 @@
     }
   },
   "geoLocAPIKey": "",
-  "updateEvery_Hours": 4
+  "updateEvery_Hours": 4,
+  "runAtStartup": true
 }

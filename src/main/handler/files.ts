@@ -58,6 +58,7 @@ export interface configInterface {
 	};
 	geoLocAPIKey: string;
 	updateEvery_Hours: number;
+	runAtStartup: boolean;
 }
 
 export const initialConfig: configInterface = {
@@ -111,6 +112,7 @@ export const initialConfig: configInterface = {
 	},
 	geoLocAPIKey: '', // get from https://freegeoip.app/
 	updateEvery_Hours: 4,
+	runAtStartup: true,
 };
 
 export const cacheData: cacheDataInterface = {
