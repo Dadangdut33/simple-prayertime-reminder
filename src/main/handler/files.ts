@@ -1,8 +1,8 @@
 import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
 import { Moment } from 'moment-timezone';
 import path from 'path';
-const appConfigPath = path.join(__dirname, '../../../json/config.json');
-const cacheDataPath = path.join(__dirname, '../../../json/cachedata.json');
+const appConfigPath = path.join(__dirname, '../../../config/config.json');
+const cacheDataPath = path.join(__dirname, '../../../config/cachedata.json');
 const pathDict = {
 	app: appConfigPath,
 	cache: cacheDataPath,
@@ -40,6 +40,7 @@ export interface calcOptionInterface {
 
 export interface configInterface {
 	locationOption: {
+		city: string;
 		latitude: string;
 		longitude: string;
 	};
@@ -63,6 +64,7 @@ export interface configInterface {
 
 export const initialConfig: configInterface = {
 	locationOption: {
+		city: '',
 		latitude: '0',
 		longitude: '0',
 	},

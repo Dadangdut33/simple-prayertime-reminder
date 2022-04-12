@@ -119,11 +119,13 @@ const checkConfigOnStart = async () => {
 			const dataPosTry_2 = getLatLong_FromCitiesName(Intl.DateTimeFormat().resolvedOptions().timeZone === 'utc' ? 'utc' : Intl.DateTimeFormat().resolvedOptions().timeZone.split('/')[1]);
 
 			if (dataPosTry_2.success) {
+				appConfig.locationOption.city = dataPosTry_2.result[0].name;
 				appConfig.locationOption.latitude = dataPosTry_2.result[0].loc.coordinates[1];
 				appConfig.locationOption.longitude = dataPosTry_2.result[0].loc.coordinates[0];
 			}
 		} else {
 			// successfully get lat long from the api
+			appConfig.locationOption.city = dataPos.data.city;
 			appConfig.locationOption.latitude = dataPos.data.latitude;
 			appConfig.locationOption.longitude = dataPos.data.longitude;
 		}
