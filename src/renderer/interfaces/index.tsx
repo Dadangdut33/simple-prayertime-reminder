@@ -1,0 +1,1 @@
+export { ColorModeContextInterface } from './ColorModeInterface';

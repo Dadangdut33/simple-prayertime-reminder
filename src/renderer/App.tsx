@@ -1,56 +1,42 @@
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import icon from '../../assets/icon.svg';
 import './App.css';
 import './Font.css';
+import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
+import { MainMenu } from './components';
+import { useState, useEffect, useMemo, createContext } from 'react';
+import { createTheme, ThemeProvider } from '@mui/material';
 
-const Hello = () => {
-	const testIpc = () => {
-		const testPing = window.electron.ipcRenderer.sendSync('test-sync', 'bruh');
-		console.log('outside ipc', testPing);
-	};
-
-	return (
-		<div>
-			<div className='Hello'>
-				<img width='200px' alt='icon' src={icon} />
-			</div>
-			<h1>electron-react-boilerplate</h1>
-			<div className='Hello'>
-				<a href='/#' onClick={() => testIpc()}>
-					<button type='button'>
-						<span role='img' aria-label='books'>
-							📚
-						</span>
-						Test
-					</button>
-				</a>
-				<a href='https://electron-react-boilerplate.js.org/' target='_blank' rel='noreferrer'>
-					<button type='button'>
-						<span role='img' aria-label='books'>
-							📚
-						</span>
-						Read our docs
-					</button>
-				</a>
-				<a href='https://github.com/sponsors/electron-react-boilerplate' target='_blank' rel='noreferrer'>
-					<button type='button'>
-						<span role='img' aria-label='books'>
-							🙏
-						</span>
-						Donate
-					</button>
-				</a>
-			</div>
-		</div>
-	);
-};
+const ColorModeContext = createContext({ toggleColorMode: () => {} });
 
 export default function App() {
+	const [mode, setMode] = useState<'light' | 'dark'>('light');
+	const colorMode = useMemo(
+		() => ({
+			toggleColorMode: () => {
+				setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+			},
+		}),
+		[]
+	);
+
+	const theme = useMemo(
+		() =>
+			createTheme({
+				palette: {
+					mode,
+				},
+			}),
+		[mode]
+	);
+
 	return (
-		<Router>
-			<Routes>
-				<Route path='/' element={<Hello />} />
-			</Routes>
-		</Router>
+		<ColorModeContext.Provider value={colorMode}>
+			<ThemeProvider theme={theme}>
+				<Router>
+					<Routes>
+						<Route path='/' element={<MainMenu ColorModeContext={ColorModeContext} />} />
+					</Routes>
+				</Router>
+			</ThemeProvider>
+		</ColorModeContext.Provider>
 	);
 }
