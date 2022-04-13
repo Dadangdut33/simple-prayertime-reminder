@@ -1,7 +1,7 @@
 import './App.css';
 import './Font.css';
 import { configInterface } from 'main/handler/files';
-import { AppNav, MainMenu, Calendar } from './components';
+import { AppNav, MainMenu, Calendar, About } from './components';
 import { useState, useEffect, useMemo, createContext } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import Card from '@mui/material/Card';
@@ -51,13 +51,13 @@ export default function App() {
 		<ColorModeContext.Provider value={colorMode}>
 			<ThemeProvider theme={theme}>
 				<Router>
-					<Card sx={{ m: 1, backgroundColor: theme.palette.background.paper }} id={mode}>
+					<Card sx={{ m: 1.5, backgroundColor: theme.palette.background.paper }} id={mode}>
 						<AppNav theme={mode} />
 						<Routes>
 							<Route path='/' element={<MainMenu ColorModeContext={ColorModeContext} />} />
 							<Route path='/calendar' element={<Calendar />} />
 							<Route path='/settings' element={<Calendar />} />
-							<Route path='/about' element={<Calendar />} />
+							<Route path='/about' element={<About />} />
 						</Routes>
 					</Card>
 				</Router>
