@@ -1,6 +1,7 @@
 {
   "name": "simple-prayertime-reminder",
   "description": "A simple muslim prayertime reminder for desktop. Made using Electron with electron-react-boilerplate.",
+  "version": "1.0.0",
   "scripts": {
     "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
     "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.prod.ts",
@@ -31,7 +32,7 @@
     ]
   },
   "build": {
-    "productName": "SimplePrayerTimeReminder",
+    "productName": "Simple PrayerTime Reminder",
     "appId": "org.erb.SimplePrayerTimeReminder",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
