@@ -1,14 +1,13 @@
 # Simple Prayertime Reminder
 
-A simple muslim prayertime reminder app for desktop. Made using Electron with electron-react-boilerplate.
+A simple muslim prayertime reminder app for desktop. Made using [Electron](https://electron.atom.io/) with [electron-react-boilerplate](https://github.com/electron-react-boilerplate/electron-react-boilerplate). UI are made using [Material UI](https://mui.com/) 
 
-Still WIP.
+**Still WIP.**
 
 
 <br>
 
 ---
-
 
 <img src=".erb/img/erb-banner.svg" width="100%" />
 <p>
@@ -18,6 +17,11 @@ Still WIP.
 <br>
 
 ## Starting Development
+
+Install all the packages:
+```
+npm install
+```
 
 Start the app in the `dev` environment:
 
@@ -33,10 +37,13 @@ To package apps for the local platform:
 npm run package
 ```
 
-## Docs
+This will compile the app into the `release` folder. 
 
-See our [docs and guides here](https://electron-react-boilerplate.js.org/docs/installation)
+## Electron React Boilerplate Docs
+
+See Electron React Boilerplate [docs and guides here](https://electron-react-boilerplate.js.org/docs/installation)
 
 ## License
 
+MIT © [Dadangdut33](https://github.com/Dadangdut33/simple-prayertime-reminder/blob/main/LICENSE) and 
 MIT © [Electron React Boilerplate](https://github.com/electron-react-boilerplate)
