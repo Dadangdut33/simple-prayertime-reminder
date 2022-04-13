@@ -204,3 +204,11 @@ ipcMain.on('get-config', (event, _arg) => {
 ipcMain.on('get-cached', (event, _arg) => {
 	event.returnValue = cacheData;
 });
+
+ipcMain.on('get-version', (event, _arg) => {
+	event.returnValue = process.env.npm_package_version;
+});
+
+ipcMain.on('open-external-url', (_event, arg) => {
+	shell.openExternal(arg);
+});
