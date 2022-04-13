@@ -1,10 +1,11 @@
 import './App.css';
 import './Font.css';
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
+import { configInterface } from 'main/handler/files';
 import { AppNav, MainMenu, Calendar } from './components';
 import { useState, useEffect, useMemo, createContext } from 'react';
+import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@mui/material';
-import { configInterface } from 'main/handler/files';
+import { Box } from '@mui/material';
 
 // --------------------------
 const ColorModeContext = createContext({ toggleColorMode: () => {} });
@@ -31,6 +32,7 @@ export default function App() {
 		[mode]
 	);
 
+	// get theme from settings
 	useEffect(() => {
 		const currentConfig = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
 		setMode(currentConfig.theme);
@@ -40,11 +42,13 @@ export default function App() {
 		<ColorModeContext.Provider value={colorMode}>
 			<ThemeProvider theme={theme}>
 				<Router>
-					<AppNav />
-					<Routes>
-						<Route path='/' element={<MainMenu ColorModeContext={ColorModeContext} />} />
-						<Route path='/calendar' element={<Calendar />} />
-					</Routes>
+					<Box sx={{ m: 1 }}>
+						<AppNav theme={mode} />
+						<Routes>
+							<Route path='/' element={<MainMenu ColorModeContext={ColorModeContext} />} />
+							<Route path='/calendar' element={<Calendar />} />
+						</Routes>
+					</Box>
 				</Router>
 			</ThemeProvider>
 		</ColorModeContext.Provider>

@@ -1,28 +1,75 @@
 import { useState, SyntheticEvent } from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
+import { Box } from '@mui/material';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import PhoneIcon from '@mui/icons-material/Phone';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import PersonPinIcon from '@mui/icons-material/PersonPin';
+import Home from '@mui/icons-material/Home';
+import DateRangeIcon from '@mui/icons-material/DateRange';
+import SettingsIcon from '@mui/icons-material/Settings';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import Divider from '@mui/material/Divider';
-import { Box } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
-export const AppNav = () => {
+export const AppNav = ({ theme }: any) => {
 	const [value, setValue] = useState(0);
+	const navigate = useNavigate();
+	const navigateMap: any = {
+		0: '/',
+		1: '/calendar',
+		2: '/settings',
+		3: '/about',
+	};
 
 	const handleChange = (_event: SyntheticEvent, newValue: number) => {
 		setValue(newValue);
+		navigate(navigateMap[newValue]);
 	};
 
 	return (
 		<>
 			<CssBaseline />
 			<Box sx={{ width: '100%' }}>
-				<Tabs value={value} onChange={handleChange} aria-label='icon label tabs example' centered>
-					<Tab icon={<PhoneIcon />} label='RECENTS' />
-					<Tab icon={<FavoriteIcon />} label='FAVORITES' />
-					<Tab icon={<PersonPinIcon />} label='NEARBY' />
+				<Tabs value={value} onChange={handleChange} aria-label='app nav bar' centered>
+					<Tab
+						icon={<Home />}
+						iconPosition='start'
+						sx={{
+							'&:hover': {
+								color: theme === 'dark' ? '#808080' : '#ff99aa',
+							},
+						}}
+						label='Main Menu'
+					/>
+					<Tab
+						icon={<DateRangeIcon />}
+						iconPosition='start'
+						sx={{
+							'&:hover': {
+								color: theme === 'dark' ? '#808080' : '#ff99aa',
+							},
+						}}
+						label='Calendar'
+					/>
+					<Tab
+						icon={<SettingsIcon />}
+						iconPosition='start'
+						sx={{
+							'&:hover': {
+								color: theme === 'dark' ? '#808080' : '#ff99aa',
+							},
+						}}
+						label='Settings'
+					/>
+					<Tab
+						icon={<InfoOutlinedIcon />}
+						iconPosition='start'
+						sx={{
+							'&:hover': {
+								color: theme === 'dark' ? '#808080' : '#ff99aa',
+							},
+						}}
+						label='About'
+					/>
 				</Tabs>
 				<Divider variant='middle' />
 			</Box>
