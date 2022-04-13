@@ -1,7 +1,8 @@
 import icon from '../../../assets/icon.svg';
 import { ColorModeContextInterface } from '../interfaces';
 import { useContext } from 'react';
-import { useTheme } from '@mui/material';
+import useTheme from '@mui/material/styles/useTheme';
+import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import IconButton from '@mui/material/IconButton';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
@@ -19,7 +20,18 @@ export const MainMenu = ({ ColorModeContext }: any) => {
 	return (
 		<>
 			<CssBaseline />
-			<div>
+			<Box
+				sx={{
+					display: 'flex',
+					flexDirection: 'column',
+					width: '100%',
+					alignItems: 'center',
+					justifyContent: 'center',
+					color: 'text.primary',
+					borderRadius: 1,
+					p: 3,
+				}}
+			>
 				<div className='Hello'>
 					<img width='200px' alt='icon' src={icon} />
 				</div>
@@ -54,23 +66,7 @@ export const MainMenu = ({ ColorModeContext }: any) => {
 						</button>
 					</a>
 				</div>
-			</div>
+			</Box>
 		</>
 	);
-	// return (
-	// 	<Box
-	// 		sx={{
-	// 			display: 'flex',
-	// 			width: '100%',
-	// 			alignItems: 'center',
-	// 			justifyContent: 'center',
-	// 			bgcolor: 'background.default',
-	// 			color: 'text.primary',
-	// 			borderRadius: 1,
-	// 			p: 3,
-	// 		}}
-	// 	>
-
-	// 	</Box>
-	// );
 };

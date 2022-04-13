@@ -1,20 +1,23 @@
 body {
 	position: relative;
-	/* color: white; */
 	height: 100vh;
+	overflow-y: hidden;
 	/* background: linear-gradient(200.96deg,
 			#fedc2a -29.09%,
 			#dd5789 51.77%,
 			#7a2c9e 129.35%); */
-	font-family: sans-serif;
-	overflow-y: hidden;
-	/* display: flex;
-	justify-content: center; */
-	/* align-items: center; */
 }
 
 /* --------------------------- */
 /* MUI Overrides */
-/* .MuiPickerStaticWrapper-root {
-	transform: scale(1.1);
-} */
+.MuiCard-root#light {
+	box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1) !important;
+}
+
+.MuiCard-root#dark {
+	box-shadow: 0 0.25rem 1rem rgb(255, 255, 255, .275) !important;
+}
+
+.MuiCalendarPicker-root {
+	transform: scale(1.2);
+}

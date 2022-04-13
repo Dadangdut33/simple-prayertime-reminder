@@ -4,8 +4,9 @@ import { configInterface } from 'main/handler/files';
 import { AppNav, MainMenu, Calendar } from './components';
 import { useState, useEffect, useMemo, createContext } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import { createTheme, ThemeProvider } from '@mui/material';
-import { Box } from '@mui/material';
+import Card from '@mui/material/Card';
+import createTheme from '@mui/material/styles/createTheme';
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 
 // --------------------------
 const ColorModeContext = createContext({ toggleColorMode: () => {} });
@@ -27,6 +28,14 @@ export default function App() {
 			createTheme({
 				palette: {
 					mode,
+					...(mode === 'light'
+						? {} // default colors
+						: {
+								background: {
+									default: '#2f2f2f',
+									paper: '#0b0b0b',
+								},
+						  }),
 				},
 			}),
 		[mode]
@@ -42,13 +51,15 @@ export default function App() {
 		<ColorModeContext.Provider value={colorMode}>
 			<ThemeProvider theme={theme}>
 				<Router>
-					<Box sx={{ m: 1 }}>
+					<Card sx={{ m: 1, backgroundColor: theme.palette.background.paper }} id={mode}>
 						<AppNav theme={mode} />
 						<Routes>
 							<Route path='/' element={<MainMenu ColorModeContext={ColorModeContext} />} />
 							<Route path='/calendar' element={<Calendar />} />
+							<Route path='/settings' element={<Calendar />} />
+							<Route path='/about' element={<Calendar />} />
 						</Routes>
-					</Box>
+					</Card>
 				</Router>
 			</ThemeProvider>
 		</ColorModeContext.Provider>

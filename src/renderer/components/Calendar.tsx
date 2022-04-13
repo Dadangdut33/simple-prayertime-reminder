@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { CalendarPicker } from '@mui/x-date-pickers/CalendarPicker';
 
 export const Calendar = () => {
 	const [value, setValue] = useState<Date | null>(new Date());
@@ -11,19 +12,20 @@ export const Calendar = () => {
 	return (
 		<>
 			<CssBaseline />
-			<LocalizationProvider dateAdapter={AdapterMoment}>
-				<StaticDatePicker
-					displayStaticWrapperAs='desktop'
-					openTo='day'
-					value={value}
-					onChange={(newValue) => {
-						console.log(newValue);
+			<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center', justifyContent: 'center', color: 'text.primary', borderRadius: 1, p: 3, mt: 1 }}>
+				<LocalizationProvider dateAdapter={AdapterDateFns}>
+					<Grid item xs={12} md={6}>
+						<CalendarPicker
+							date={value}
+							onChange={(newValue) => {
+								console.log(newValue);
 
-						setValue(newValue);
-					}}
-					renderInput={(params) => <TextField {...params} />}
-				/>
-			</LocalizationProvider>
+								setValue(newValue);
+							}}
+						/>
+					</Grid>
+				</LocalizationProvider>
+			</Box>
 		</>
 	);
 };
