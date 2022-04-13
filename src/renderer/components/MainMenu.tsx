@@ -1,5 +1,5 @@
 import icon from '../../../assets/icon.svg';
-import { ColorModeContextInterface } from '../interfaces';
+import { ColorModeContextInterface } from 'renderer/interfaces';
 import { useContext } from 'react';
 import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
