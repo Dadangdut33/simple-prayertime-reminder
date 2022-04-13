@@ -4,6 +4,8 @@
 
 <h1 align="center"> Simple Prayertime Reminder - A simple muslim prayertime reminder app for desktop </h1>
 <p align="center">
+    <a href="https://lgtm.com/projects/g/Dadangdut33/simple-prayertime-reminder/alerts/"><img alt="Total alerts" src="https://img.shields.io/lgtm/alerts/g/Dadangdut33/simple-prayertime-reminder.svg?logo=lgtm&logoWidth=18"/></a>
+    <a href="https://lgtm.com/projects/g/Dadangdut33/simple-prayertime-reminder/context:javascript"><img alt="Language grade: JavaScript" src="https://img.shields.io/lgtm/grade/javascript/g/Dadangdut33/simple-prayertime-reminder.svg?logo=lgtm&logoWidth=18"/></a>
     <a href="https://github.com/Dadangdut33/simple-prayertime-reminder/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/Dadangdut33/simple-prayertime-reminder"></a>
     <a href="https://github.com/Dadangdut33/simple-prayertime-reminder/pulls"><img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/Dadangdut33/simple-prayertime-reminder"></a>
     <a href="https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest"><img src="https://img.shields.io/github/downloads/Dadangdut33/simple-prayertime-reminder/total"></a> <br>
