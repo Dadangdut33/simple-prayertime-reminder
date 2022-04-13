@@ -1,4 +1,4 @@
-import icon from '../../../assets/icon.svg';
+import icon from '../../../assets/display_icon.png';
 import { ColorModeContextInterface } from 'renderer/interfaces';
 import { useContext } from 'react';
 import useTheme from '@mui/material/styles/useTheme';
