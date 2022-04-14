@@ -23,6 +23,9 @@ import TextField from '@mui/material/TextField';
 import Switch from '@mui/material/Switch';
 import InputAdornment from '@mui/material/InputAdornment';
 import Checkbox from '@mui/material/Checkbox';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import InputLabel from '@mui/material/InputLabel';
 
 // Icons
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
@@ -31,6 +34,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import SaveIcon from '@mui/icons-material/Save';
 import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
 import Button from '@mui/material/Button';
+import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 
 export const Settings = ({ ColorModeContext }: any) => {
 	// Variables
@@ -44,6 +48,9 @@ export const Settings = ({ ColorModeContext }: any) => {
 	const [snackbarMsg, setSnackbarMsg] = useState<string>('');
 	const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'info' | 'warning' | 'error'>('info');
 
+	// available tz
+	const tzList = window.electron.ipcRenderer.sendSync('get-tz-list') as string[];
+
 	// --------------------------------------------------------------------------
 	// location
 	const [locMode, setLocMode] = useState(currentConfig.locationOption.mode);
@@ -52,12 +59,17 @@ export const Settings = ({ ColorModeContext }: any) => {
 	const [locLang, setLocLang] = useState(currentConfig.locationOption.longitude);
 	const [locUpdateEveryStartup, setLocUpdateEveryStartup] = useState(currentConfig.locationOption.updateEveryStartup);
 
+	// timezone
+	const [tzMode, setTzMode] = useState(currentConfig.timezoneOption.mode);
+	const [timezone, setTimezone] = useState(currentConfig.timezoneOption.timezone);
+
 	// --------------------------------------------------------------------------
 	// misc
 	const theme = useTheme();
 	const colorMode = useContext(ColorModeContext) as ColorModeContextInterface;
 
-	// Func
+	// --------------------------------------------------------------------------
+	// Handler
 	// --------------------------------------------------------------------------
 	// location
 	const handleLocModeChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -102,6 +114,7 @@ export const Settings = ({ ColorModeContext }: any) => {
 		const { city, latitude, longitude, successGet } = window.electron.ipcRenderer.sendSync('get-location-auto', currentConfig) as getPosition_absolute_I;
 
 		if (successGet) {
+			checkChanges();
 			setLocCity(city);
 			setLocLat(latitude);
 			setLocLang(longitude);
@@ -126,6 +139,7 @@ export const Settings = ({ ColorModeContext }: any) => {
 			setSnackbarMsg("Couldn't found city's name. Please check your input. (There might be typo)");
 			return;
 		} else {
+			checkChanges();
 			setShowSnackbar(true);
 			setSnackbarSeverity('success');
 			setSnackbarMsg('Location fetched successfully! City inputted has been replaced with the data fetched.');
@@ -133,6 +147,27 @@ export const Settings = ({ ColorModeContext }: any) => {
 			setLocLat(result[0].loc.coordinates[1]);
 			setLocLang(result[0].loc.coordinates[0]);
 		}
+	};
+
+	// --------------------------------------------------------------------------
+	// tz
+	const handleTzModeChange = (e: ChangeEvent<HTMLInputElement>) => {
+		checkChanges();
+		setTzMode(e.target.value as 'auto' | 'manual');
+		if (e.target.value === 'auto') {
+			if (currentConfig.timezoneOption.mode === 'auto') {
+				setTimezone(currentConfig.timezoneOption.timezone);
+			} else {
+				const timezone = window.electron.ipcRenderer.sendSync('get-tz-auto', currentConfig) as string;
+				setTimezone(timezone);
+			}
+		}
+	};
+
+	const handleTimezoneChange = (e: any) => {
+		// not importing the interface for IDE performance sake
+		checkChanges();
+		setTimezone(e.target.value);
 	};
 
 	// --------------------------------------------------------------------------
@@ -149,6 +184,8 @@ export const Settings = ({ ColorModeContext }: any) => {
 		setLocLat(initialConfig.locationOption.latitude);
 		setLocLang(initialConfig.locationOption.longitude);
 		setLocUpdateEveryStartup(initialConfig.locationOption.updateEveryStartup);
+		setTzMode(initialConfig.timezoneOption.mode);
+		setTimezone(initialConfig.timezoneOption.timezone);
 	};
 
 	// check changes
@@ -168,6 +205,8 @@ export const Settings = ({ ColorModeContext }: any) => {
 			currentConfig.locationOption.latitude = locLat;
 			currentConfig.locationOption.longitude = locLang;
 			currentConfig.locationOption.updateEveryStartup = locUpdateEveryStartup;
+			currentConfig.timezoneOption.mode = tzMode;
+			currentConfig.timezoneOption.timezone = timezone;
 			// save config
 			const result = window.electron.ipcRenderer.sendSync('save-config', currentConfig);
 
@@ -209,12 +248,15 @@ export const Settings = ({ ColorModeContext }: any) => {
 					p: 3,
 				}}
 			>
+				{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
 				<Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={showSnackbar} autoHideDuration={3500} onClose={handleSnackbarClose}>
 					<Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
 						{snackbarMsg}
 					</Alert>
 				</Snackbar>
+				{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
 				<Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+					{/* ------------------------------------- */}
 					{/* location */}
 					<Grid item xs={4}>
 						<div
@@ -270,8 +312,8 @@ export const Settings = ({ ColorModeContext }: any) => {
 										),
 									}}
 								/>
-								<TextField id='latitude' label='latitude' variant='outlined' size='small' value={locLat} onChange={handleLatChange} disabled={locMode === 'auto' ? true : false} />
-								<TextField id='longitude' label='longitude' variant='outlined' size='small' value={locLang} onChange={handleLangChange} disabled={locMode === 'auto' ? true : false} />
+								<TextField id='Latitude' label='latitude' variant='outlined' size='small' value={locLat} onChange={handleLatChange} disabled={locMode === 'auto' ? true : false} />
+								<TextField id='Longitude' label='longitude' variant='outlined' size='small' value={locLang} onChange={handleLangChange} disabled={locMode === 'auto' ? true : false} />
 								<Tooltip title='*Will only update if auto mode is enabled' arrow>
 									<FormControlLabel
 										control={<Checkbox sx={{ ml: 1 }} checked={locUpdateEveryStartup} onChange={handleLocUpdateEveryStartupChange} disabled={locMode === 'auto' ? false : true} />}
@@ -281,7 +323,9 @@ export const Settings = ({ ColorModeContext }: any) => {
 							</FormControl>
 						</Box>
 					</Grid>
-					<Grid item>
+					{/* ------------------------------------- */}
+					{/* Timezone */}
+					<Grid item xs={4}>
 						<div
 							style={{
 								display: 'flex',
@@ -289,7 +333,7 @@ export const Settings = ({ ColorModeContext }: any) => {
 								flexWrap: 'wrap',
 							}}
 						>
-							<LocationOnOutlinedIcon /> <h3 style={{ paddingLeft: '.5rem' }}>Location options</h3>
+							<AccessTimeOutlinedIcon /> <h3 style={{ paddingLeft: '.5rem' }}>Timezone options</h3>
 						</div>
 						<Box
 							component={'form'}
@@ -298,14 +342,38 @@ export const Settings = ({ ColorModeContext }: any) => {
 							sx={{
 								display: 'flex',
 								flexDirection: 'column',
-								'& .MuiTextField-root': { m: 1, width: '25ch' },
 							}}
 						>
-							<TextField id='city' label='City' variant='outlined' size='small' />
-							<TextField id='latitude' label='latitude' variant='outlined' size='small' />
-							<TextField id='longitude' label='longitude' variant='outlined' size='small' />
+							<FormControl>
+								<FormLabel id='location-mode-formlabel' sx={{ ml: 1 }}>
+									Mode
+								</FormLabel>
+								<RadioGroup sx={{ ml: 1 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={tzMode} onChange={handleTzModeChange}>
+									<FormControlLabel value='auto' control={<Radio />} label='Auto' />
+									<FormControlLabel value='manual' control={<Radio />} label='Manual' />
+								</RadioGroup>
+								<FormControl fullWidth sx={{ m: 1 }}>
+									<InputLabel id='select-timezone'>Timezone</InputLabel>
+									<Select
+										labelId='select-timezone'
+										id='select-timezone-select'
+										size='small'
+										value={timezone}
+										label='Timezone'
+										onChange={handleTimezoneChange}
+										disabled={tzMode === 'auto' ? true : false}
+									>
+										{tzList.map((tz, index) => (
+											<MenuItem key={index} value={tz}>
+												{tz}
+											</MenuItem>
+										))}
+									</Select>
+								</FormControl>
+							</FormControl>
 						</Box>
 					</Grid>
+					{/* ------------------------------------- */}
 					<Grid item>
 						<div
 							style={{
@@ -323,16 +391,14 @@ export const Settings = ({ ColorModeContext }: any) => {
 							sx={{
 								display: 'flex',
 								flexDirection: 'column',
-								'& .MuiTextField-root': { m: 1, width: '25ch' },
+								'& .MuiTextField-root': { m: 1 },
 							}}
 						>
-							<TextField id='city' label='City' variant='outlined' size='small' />
-							<TextField id='latitude' label='latitude' variant='outlined' size='small' />
-							<TextField id='longitude' label='longitude' variant='outlined' size='small' />
+							a
 						</Box>
 					</Grid>
 				</Grid>
-
+				{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
 				<Box sx={{ '& button': { m: 1 }, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
 					{/* Cancel changes */}
 					<Button variant='contained' onClick={handleCancel} size='small'>

@@ -17,6 +17,7 @@ import { initialConfig, writeConfig, readConfig } from './handler/files';
 import { getPrayerTimes } from './handler/praytime';
 import { onUnresponsiveWindow, errorBox, NoYesBox } from './handler/messageBox';
 import { getLatLong_FromCitiesName, getPosition_absolute } from './handler/getPos';
+import Moment from 'moment-timezone';
 
 // Global vars
 let mainWindow: BrowserWindow | null = null,
@@ -110,7 +111,7 @@ const checkConfigOnStart = async () => {
 	if (!success) {
 		// create new one
 		appConfig = initialConfig;
-		appConfig.timezoneOption.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone; // get timezone
+		appConfig.timezoneOption.timezone = Moment.tz.guess(); // get timezone
 
 		// get location
 		// default location is '0',' 0'. So if both of these methods fail, it will still works.
@@ -209,6 +210,8 @@ ipcMain.on('get-version', (event, _arg) => {
 	event.returnValue = process.env.npm_package_version;
 });
 
+// -----------
+// location
 ipcMain.on('get-location-auto', async (event, _arg) => {
 	const { city, latitude, longitude } = await getPosition_absolute(appConfig);
 	let successGet = true;
@@ -220,6 +223,16 @@ ipcMain.on('get-location-auto', async (event, _arg) => {
 ipcMain.on('get-location-manual', (event, arg) => {
 	const data = getLatLong_FromCitiesName(arg);
 	event.returnValue = data;
+});
+
+// -----------
+// tz
+ipcMain.on('get-tz-auto', (event, _arg) => {
+	event.returnValue = Moment.tz.guess();
+});
+
+ipcMain.on('get-tz-list', (event, _arg) => {
+	event.returnValue = Moment.tz.names();
 });
 
 // ----------------------------------------------------
