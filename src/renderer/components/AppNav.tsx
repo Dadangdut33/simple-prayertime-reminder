@@ -1,14 +1,18 @@
 import { useState, SyntheticEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+// MUI elements
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Home from '@mui/icons-material/Home';
+import Divider from '@mui/material/Divider';
+
+// Icons
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import SettingsIcon from '@mui/icons-material/Settings';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import Divider from '@mui/material/Divider';
-import { useNavigate } from 'react-router-dom';
 
 export const AppNav = ({ theme }: any) => {
 	const [value, setValue] = useState(0);

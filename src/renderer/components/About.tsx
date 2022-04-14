@@ -1,9 +1,15 @@
 import icon from '../../../assets/display_icon.png';
 import { useState, useEffect } from 'react';
-import Box from '@mui/material/Box';
+
+// MUI elements
 import CssBaseline from '@mui/material/CssBaseline';
+import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Link from '@mui/material/Link';
+import Tooltip from '@mui/material/Tooltip';
+import IconButton from '@mui/material/IconButton';
+
+// Icons
 import CodeOffOutlinedIcon from '@mui/icons-material/CodeOffOutlined';
 import BugReportIcon from '@mui/icons-material/BugReport';
 import CommitIcon from '@mui/icons-material/Commit';
@@ -11,8 +17,6 @@ import RecommendIcon from '@mui/icons-material/Recommend';
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import ForkLeftIcon from '@mui/icons-material/ForkLeft';
 import FreeBreakfastOutlinedIcon from '@mui/icons-material/FreeBreakfastOutlined';
-import Tooltip from '@mui/material/Tooltip';
-import IconButton from '@mui/material/IconButton';
 
 export const About = () => {
 	const [version, setVersion] = useState('');

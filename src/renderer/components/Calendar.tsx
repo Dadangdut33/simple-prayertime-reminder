@@ -1,7 +1,11 @@
 import { useState } from 'react';
+
+// MUI elements
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+
+// Datepicker
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { CalendarPicker } from '@mui/x-date-pickers/CalendarPicker';
