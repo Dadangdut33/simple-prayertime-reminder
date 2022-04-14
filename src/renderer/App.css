@@ -1,11 +1,7 @@
 body {
 	position: relative;
-	height: 100vh;
 	font-family: 'Roboto', sans-serif;
-	/* background: linear-gradient(200.96deg,
-			#fedc2a -29.09%,
-			#dd5789 51.77%,
-			#7a2c9e 129.35%); */
+	overflow-y: auto;
 }
 
 .checkver-span {
@@ -26,4 +22,25 @@ body {
 
 .MuiCalendarPicker-root {
 	transform: scale(1.2);
+}
+
+/* --------------------------- */
+/* custom scrollbar */
+::-webkit-scrollbar {
+	width: 20px;
+}
+
+::-webkit-scrollbar-track {
+	background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	background-color: #d6dee1;
+	border-radius: 20px;
+	border: 6px solid transparent;
+	background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background-color: #a8bbbf;
 }
