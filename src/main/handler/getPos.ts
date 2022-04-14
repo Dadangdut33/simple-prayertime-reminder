@@ -3,7 +3,7 @@ import { configInterface } from './files';
 const cities = require('all-the-cities');
 
 export const getLatLong = async (config: configInterface) => {
-	const url = `https://api.freegeoip.app/json/?apikey=${config.geoLocAPIKey !== '' ? config.geoLocAPIKey : `074b03c0-b9a6-11ec-a359-d768e44d2b27`}`;
+	const url = `https://api.freegeoip.app/json/?apikey=${config.geoLocAPIKey.mode === 'manual' ? config.geoLocAPIKey.key : `074b03c0-b9a6-11ec-a359-d768e44d2b27`}`;
 	let success = true,
 		data;
 	try {

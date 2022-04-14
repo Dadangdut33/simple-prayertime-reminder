@@ -19,13 +19,14 @@ export interface cacheDataInterface {
 }
 
 interface reminderInterface {
-	enabled: boolean;
-	time: number;
+	remindWhenOnTime: boolean;
+	earlyReminder: boolean;
+	earlyTime: number;
 }
 
 export interface calcOptionInterface {
-	method: 'MuslimWorldLeague' | 'Egyptian' | 'Karachi' | 'UmmAlQura' | 'Dubai' | 'MoonsightingCommittee' | 'NorthAmerica' | 'Kuwait' | 'Qatar' | 'Singapore' | 'Tehran' | 'Turkey';
 	mode: 'auto' | 'manual';
+	method: 'MuslimWorldLeague' | 'Egyptian' | 'Karachi' | 'UmmAlQura' | 'Dubai' | 'MoonsightingCommittee' | 'NorthAmerica' | 'Kuwait' | 'Qatar' | 'Singapore' | 'Tehran' | 'Turkey';
 	madhab: 'Shafi' | 'Hanafi';
 	highLatitudeRule: 'MiddleOfTheNight' | 'SeventhOfTheNight' | 'TwilightAngle';
 	adjustments: {
@@ -40,6 +41,7 @@ export interface calcOptionInterface {
 
 export interface configInterface {
 	locationOption: {
+		mode: 'auto' | 'manual';
 		city: string;
 		latitude: string;
 		longitude: string;
@@ -57,8 +59,11 @@ export interface configInterface {
 		maghrib: reminderInterface;
 		isha: reminderInterface;
 	};
-	geoLocAPIKey: string;
-	updateEvery_Hours: number;
+	geoLocAPIKey: {
+		mode: 'auto' | 'manual';
+		key: string;
+	};
+	updateEvery_X_Hours: number;
 	runAtStartup: boolean;
 	checkUpdateAtStartup: boolean;
 	theme: 'dark' | 'light';
@@ -66,6 +71,7 @@ export interface configInterface {
 
 export const initialConfig: configInterface = {
 	locationOption: {
+		mode: 'auto',
 		city: '',
 		latitude: '0',
 		longitude: '0',
@@ -75,8 +81,8 @@ export const initialConfig: configInterface = {
 		timezone: '',
 	},
 	calcOption: {
-		method: 'MuslimWorldLeague',
 		mode: 'auto',
+		method: 'MuslimWorldLeague',
 		madhab: 'Shafi',
 		highLatitudeRule: 'TwilightAngle',
 		adjustments: {
@@ -90,32 +96,41 @@ export const initialConfig: configInterface = {
 	},
 	reminderOption: {
 		fajr: {
-			enabled: false,
-			time: 0,
+			remindWhenOnTime: true,
+			earlyReminder: true,
+			earlyTime: 15,
 		},
 		sunrise: {
-			enabled: false,
-			time: 0,
+			remindWhenOnTime: true,
+			earlyReminder: true,
+			earlyTime: 15,
 		},
 		dhuhr: {
-			enabled: false,
-			time: 0,
+			remindWhenOnTime: true,
+			earlyReminder: true,
+			earlyTime: 15,
 		},
 		asr: {
-			enabled: false,
-			time: 0,
+			remindWhenOnTime: true,
+			earlyReminder: true,
+			earlyTime: 15,
 		},
 		maghrib: {
-			enabled: false,
-			time: 0,
+			remindWhenOnTime: true,
+			earlyReminder: true,
+			earlyTime: 15,
 		},
 		isha: {
-			enabled: false,
-			time: 0,
+			remindWhenOnTime: true,
+			earlyReminder: true,
+			earlyTime: 15,
 		},
 	},
-	geoLocAPIKey: '', // get from https://freegeoip.app/
-	updateEvery_Hours: 4,
+	geoLocAPIKey: {
+		mode: 'auto',
+		key: '', // get from https://freegeoip.app/
+	},
+	updateEvery_X_Hours: 4,
 	runAtStartup: true,
 	checkUpdateAtStartup: true,
 	theme: 'light',
