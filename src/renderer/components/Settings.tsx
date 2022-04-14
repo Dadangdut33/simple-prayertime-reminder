@@ -1,5 +1,5 @@
 import { ColorModeContextInterface } from 'renderer/interfaces';
-import { configInterface } from 'main/handler/files';
+import { configInterface } from 'main/interfaces';
 import { useContext, useEffect, useState } from 'react';
 import useTheme from '@mui/material/styles/useTheme';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -23,12 +23,15 @@ import SyncIcon from '@mui/icons-material/Sync';
 
 export const Settings = ({ ColorModeContext }: any) => {
 	// Variables
+	// config on tab open
+	const [currentConfig, setCurrentConfig] = useState<configInterface>(window.electron.ipcRenderer.sendSync('get-config') as configInterface);
+
 	// --------------------------------------------------------------------------
 	// location
-	const [locAuto, setLocAuto] = useState('auto');
-	const [locCity, setLocCity] = useState('');
-	const [locLat, setLocLat] = useState('');
-	const [locLang, setLocLang] = useState('');
+	const [locAuto, setLocAuto] = useState(currentConfig.locationOption.mode);
+	const [locCity, setLocCity] = useState(currentConfig.locationOption.city);
+	const [locLat, setLocLat] = useState(currentConfig.locationOption.latitude);
+	const [locLang, setLocLang] = useState(currentConfig.locationOption.longitude);
 
 	// --------------------------------------------------------------------------
 	// misc
@@ -44,23 +47,23 @@ export const Settings = ({ ColorModeContext }: any) => {
 	// --------------------------------------------------------------------------
 	// location
 	const handleLocAutoManual = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setLocAuto(e.target.value);
+		setLocAuto(e.target.value as 'auto' | 'manual');
+		// if auto, fetch location
 		if (e.target.value === 'auto') {
-			const currentConfig = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
-			setLocCity(currentConfig.locationOption.city);
-			setLocLat(currentConfig.locationOption.latitude);
-			setLocLang(currentConfig.locationOption.longitude);
+			if (currentConfig.locationOption.mode === 'auto') {
+				setLocCity(currentConfig.locationOption.city);
+				setLocLat(currentConfig.locationOption.latitude);
+				setLocLang(currentConfig.locationOption.longitude);
+			} else {
+				const { city, latitude, longitude }: any = window.electron.ipcRenderer.sendSync('get-location');
+				setLocCity(city);
+				setLocLat(latitude);
+				setLocLang(longitude);
+			}
 		}
 	};
 
 	// --------------------------------------------------------------------------
-	useEffect(() => {
-		const currentConfig = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
-		setLocAuto(currentConfig.locationOption.mode);
-		setLocCity(currentConfig.locationOption.city);
-		setLocLat(currentConfig.locationOption.latitude);
-		setLocLang(currentConfig.locationOption.longitude);
-	}, []);
 
 	return (
 		<>

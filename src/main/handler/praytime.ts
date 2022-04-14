@@ -1,6 +1,6 @@
 import adhan, { Coordinates, CalculationMethod } from 'adhan';
 import Moment from 'moment-timezone';
-import { configInterface } from './files';
+import { configInterface } from 'main/interfaces';
 
 const methodMap = {
 	MuslimWorldLeague: CalculationMethod.MuslimWorldLeague,

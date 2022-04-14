@@ -1,6 +1,6 @@
 import './App.css';
 import './Font.css';
-import { configInterface } from 'main/handler/files';
+import { configInterface } from 'main/interfaces';
 import { AppNav, MainMenu, Settings, Calendar, About } from './components';
 import { useState, useEffect, useMemo, createContext } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
