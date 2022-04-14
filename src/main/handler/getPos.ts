@@ -1,5 +1,5 @@
 import fetch from 'electron-fetch';
-import { configInterface } from 'main/interfaces';
+import { configInterface, getPosition_absolute_I } from 'main/interfaces';
 const cities = require('all-the-cities');
 
 export const getLatLong = async (config: configInterface) => {
@@ -33,22 +33,27 @@ export const getLatLong_FromCitiesName = (citySearch: string) => {
 	return { success, result };
 };
 
-export const getPosition_Safe = async (appConfig: configInterface) => {
+export const getPosition_absolute = async (appConfig: configInterface): Promise<getPosition_absolute_I> => {
 	const dataPos = await getLatLong(appConfig);
+	let city = '',
+		latitude = '0',
+		longitude = '0';
 
 	if (!dataPos.success) {
 		// if fail, get from city name
 		const dataPosTry_2 = getLatLong_FromCitiesName(Intl.DateTimeFormat().resolvedOptions().timeZone === 'utc' ? 'utc' : Intl.DateTimeFormat().resolvedOptions().timeZone.split('/')[1]);
 
 		if (dataPosTry_2.success) {
-			appConfig.locationOption.city = dataPosTry_2.result[0].name;
-			appConfig.locationOption.latitude = dataPosTry_2.result[0].loc.coordinates[1];
-			appConfig.locationOption.longitude = dataPosTry_2.result[0].loc.coordinates[0];
+			city = dataPosTry_2.result[0].name;
+			latitude = dataPosTry_2.result[0].loc.coordinates[1];
+			longitude = dataPosTry_2.result[0].loc.coordinates[0];
 		}
 	} else {
 		// successfully get lat long from the api
-		appConfig.locationOption.city = dataPos.data.city;
-		appConfig.locationOption.latitude = dataPos.data.latitude;
-		appConfig.locationOption.longitude = dataPos.data.longitude;
+		city = dataPos.data.city;
+		latitude = dataPos.data.latitude;
+		longitude = dataPos.data.longitude;
 	}
+
+	return { city, latitude, longitude };
 };

@@ -15,8 +15,8 @@ import { resolveHtmlPath } from './util';
 import { configInterface, cacheDataInterface } from './interfaces';
 import { initialConfig, writeConfig, readConfig } from './handler/files';
 import { getPrayerTimes } from './handler/praytime';
-import { onUnresponsiveWindow, errorBox } from './handler/messageBox';
-import { getLatLong, getLatLong_FromCitiesName } from './handler/getPos';
+import { onUnresponsiveWindow, errorBox, NoYesBox } from './handler/messageBox';
+import { getLatLong_FromCitiesName, getPosition_absolute } from './handler/getPos';
 
 // Global vars
 let mainWindow: BrowserWindow | null = null,
@@ -113,23 +113,11 @@ const checkConfigOnStart = async () => {
 		appConfig.timezoneOption.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone; // get timezone
 
 		// get location
-		// default location is 0, 0. So if both of these methods fail, it will still works.
-		const dataPos = await getLatLong(appConfig);
-		if (!dataPos.success) {
-			// if fail, get from city name
-			const dataPosTry_2 = getLatLong_FromCitiesName(Intl.DateTimeFormat().resolvedOptions().timeZone === 'utc' ? 'utc' : Intl.DateTimeFormat().resolvedOptions().timeZone.split('/')[1]);
-
-			if (dataPosTry_2.success) {
-				appConfig.locationOption.city = dataPosTry_2.result[0].name;
-				appConfig.locationOption.latitude = dataPosTry_2.result[0].loc.coordinates[1];
-				appConfig.locationOption.longitude = dataPosTry_2.result[0].loc.coordinates[0];
-			}
-		} else {
-			// successfully get lat long from the api
-			appConfig.locationOption.city = dataPos.data.city;
-			appConfig.locationOption.latitude = dataPos.data.latitude;
-			appConfig.locationOption.longitude = dataPos.data.longitude;
-		}
+		// default location is '0',' 0'. So if both of these methods fail, it will still works.
+		const { city, latitude, longitude } = await getPosition_absolute(appConfig);
+		appConfig.locationOption.city = city;
+		appConfig.locationOption.latitude = latitude;
+		appConfig.locationOption.longitude = longitude;
 
 		// write config file
 		if (data.toString().includes('ENOENT')) {
@@ -198,8 +186,19 @@ ipcMain.on('test-sync', (event, arg) => {
 	event.returnValue = 'pong';
 });
 
+// ----------------------------------------------------
+// config/files
 ipcMain.on('get-config', (event, _arg) => {
 	event.returnValue = appConfig;
+});
+
+ipcMain.on('save-config', (event, arg) => {
+	const success = writeConfig('app', arg);
+	if (success) {
+		appConfig = arg;
+	}
+
+	event.returnValue = success;
 });
 
 ipcMain.on('get-cached', (event, _arg) => {
@@ -210,6 +209,26 @@ ipcMain.on('get-version', (event, _arg) => {
 	event.returnValue = process.env.npm_package_version;
 });
 
+ipcMain.on('get-location-auto', async (event, _arg) => {
+	const { city, latitude, longitude } = await getPosition_absolute(appConfig);
+	let successGet = true;
+	if (city === '' && latitude === '0' && longitude === '0') successGet = false;
+
+	event.returnValue = { city, latitude, longitude, successGet };
+});
+
+ipcMain.on('get-location-manual', (event, arg) => {
+	const data = getLatLong_FromCitiesName(arg);
+	event.returnValue = data;
+});
+
+// ----------------------------------------------------
+// misc
 ipcMain.on('open-external-url', (_event, arg) => {
 	shell.openExternal(arg);
+});
+
+ipcMain.on('yesno-dialog', (event, arg: any) => {
+	const result = NoYesBox(arg.title, arg.question, mainWindow as BrowserWindow);
+	event.returnValue = result;
 });

@@ -41,12 +41,12 @@ export function warningBox(title: string, warningMsg: string, window: BrowserWin
 	});
 }
 
-export function NoYesBox(title: string, warningMsg: string, window: BrowserWindow) {
+export function NoYesBox(title: string, question: string, window: BrowserWindow) {
 	return dialog.showMessageBoxSync(window, {
-		title: `Warning: ${title}`,
+		title: `${title}`,
 		buttons: ['No', 'Yes'],
-		type: 'warning',
-		message: warningMsg,
+		type: 'info',
+		message: question,
 	});
 }
 

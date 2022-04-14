@@ -1,11 +1,16 @@
 import { ColorModeContextInterface } from 'renderer/interfaces';
-import { configInterface } from 'main/interfaces';
-import { useContext, useEffect, useState } from 'react';
+import { configInterface, getPosition_absolute_I } from 'main/interfaces';
+import { useContext, forwardRef, useState, ChangeEvent } from 'react';
 import useTheme from '@mui/material/styles/useTheme';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert, { AlertProps } from '@mui/material/Alert';
+const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) {
+	return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
+});
 
 // Form
 import IconButton from '@mui/material/IconButton';
@@ -16,38 +21,48 @@ import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import TextField from '@mui/material/TextField';
 import Switch from '@mui/material/Switch';
+import InputAdornment from '@mui/material/InputAdornment';
+import Checkbox from '@mui/material/Checkbox';
 
 // Icons
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import SyncIcon from '@mui/icons-material/Sync';
+import SearchIcon from '@mui/icons-material/Search';
+import SaveIcon from '@mui/icons-material/Save';
+import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
+import Button from '@mui/material/Button';
 
 export const Settings = ({ ColorModeContext }: any) => {
 	// Variables
 	// config on tab open
-	const [currentConfig, setCurrentConfig] = useState<configInterface>(window.electron.ipcRenderer.sendSync('get-config') as configInterface);
+	const initialConfig = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
+	const [currentConfig, setCurrentConfig] = useState<configInterface>(initialConfig); // current config
+	const [changed, setChanged] = useState<boolean>(false); // changed config
+
+	// snackbar
+	const [showSnackbar, setShowSnackbar] = useState<boolean>(false);
+	const [snackbarMsg, setSnackbarMsg] = useState<string>('');
+	const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'info' | 'warning' | 'error'>('info');
 
 	// --------------------------------------------------------------------------
 	// location
-	const [locAuto, setLocAuto] = useState(currentConfig.locationOption.mode);
+	const [locMode, setLocMode] = useState(currentConfig.locationOption.mode);
 	const [locCity, setLocCity] = useState(currentConfig.locationOption.city);
 	const [locLat, setLocLat] = useState(currentConfig.locationOption.latitude);
 	const [locLang, setLocLang] = useState(currentConfig.locationOption.longitude);
+	const [locUpdateEveryStartup, setLocUpdateEveryStartup] = useState(currentConfig.locationOption.updateEveryStartup);
 
 	// --------------------------------------------------------------------------
 	// misc
 	const theme = useTheme();
 	const colorMode = useContext(ColorModeContext) as ColorModeContextInterface;
 
-	const testIpc = () => {
-		const testPing = window.electron.ipcRenderer.sendSync('test-sync', 'bruh');
-		console.log('outside ipc', testPing);
-	};
-
 	// Func
 	// --------------------------------------------------------------------------
 	// location
-	const handleLocAutoManual = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setLocAuto(e.target.value as 'auto' | 'manual');
+	const handleLocModeChange = (e: ChangeEvent<HTMLInputElement>) => {
+		checkChanges();
+		setLocMode(e.target.value as 'auto' | 'manual');
 		// if auto, fetch location
 		if (e.target.value === 'auto') {
 			if (currentConfig.locationOption.mode === 'auto') {
@@ -55,7 +70,7 @@ export const Settings = ({ ColorModeContext }: any) => {
 				setLocLat(currentConfig.locationOption.latitude);
 				setLocLang(currentConfig.locationOption.longitude);
 			} else {
-				const { city, latitude, longitude }: any = window.electron.ipcRenderer.sendSync('get-location');
+				const { city, latitude, longitude } = window.electron.ipcRenderer.sendSync('get-location-auto', currentConfig) as getPosition_absolute_I;
 				setLocCity(city);
 				setLocLat(latitude);
 				setLocLang(longitude);
@@ -63,7 +78,123 @@ export const Settings = ({ ColorModeContext }: any) => {
 		}
 	};
 
+	const handleCityChange = (e: ChangeEvent<HTMLInputElement>) => {
+		checkChanges();
+		setLocCity(e.target.value);
+	};
+
+	const handleLatChange = (e: ChangeEvent<HTMLInputElement>) => {
+		checkChanges();
+		setLocLat(e.target.value);
+	};
+
+	const handleLangChange = (e: ChangeEvent<HTMLInputElement>) => {
+		checkChanges();
+		setLocLang(e.target.value);
+	};
+
+	const handleLocUpdateEveryStartupChange = (e: ChangeEvent<HTMLInputElement>) => {
+		checkChanges();
+		setLocUpdateEveryStartup(e.target.checked);
+	};
+
+	const getCityLatLang_Auto = () => {
+		const { city, latitude, longitude, successGet } = window.electron.ipcRenderer.sendSync('get-location-auto', currentConfig) as getPosition_absolute_I;
+
+		if (successGet) {
+			setLocCity(city);
+			setLocLat(latitude);
+			setLocLang(longitude);
+
+			// snackbar
+			setShowSnackbar(true);
+			setSnackbarMsg('Location fetched successfully!');
+			setSnackbarSeverity('success');
+		} else {
+			// snackbar
+			setShowSnackbar(true);
+			setSnackbarMsg('Failed to fetch location!');
+			setSnackbarSeverity('error');
+		}
+	};
+
+	const getCityLatLang_Manual = () => {
+		const { success, result }: any = window.electron.ipcRenderer.sendSync('get-location-manual', locCity);
+		if (!success) {
+			setShowSnackbar(true);
+			setSnackbarSeverity('error');
+			setSnackbarMsg("Couldn't found city's name. Please check your input. (There might be typo)");
+			return;
+		} else {
+			setShowSnackbar(true);
+			setSnackbarSeverity('success');
+			setSnackbarMsg('Location fetched successfully! City inputted has been replaced with the data fetched.');
+			setLocCity(result[0].name);
+			setLocLat(result[0].loc.coordinates[1]);
+			setLocLang(result[0].loc.coordinates[0]);
+		}
+	};
+
 	// --------------------------------------------------------------------------
+	// handle snackbar close
+	const handleSnackbarClose = () => {
+		setShowSnackbar(false);
+	};
+
+	// reset config
+	const resetConfig = () => {
+		setCurrentConfig(initialConfig);
+		setLocMode(initialConfig.locationOption.mode);
+		setLocCity(initialConfig.locationOption.city);
+		setLocLat(initialConfig.locationOption.latitude);
+		setLocLang(initialConfig.locationOption.longitude);
+		setLocUpdateEveryStartup(initialConfig.locationOption.updateEveryStartup);
+	};
+
+	// check changes
+	const checkChanges = () => {
+		// compare initial config and current config
+		// if changed set changed to true
+		// else set changed to false
+	};
+
+	const handleSave = () => {
+		// save config
+		const confirmation = window.electron.ipcRenderer.sendSync('yesno-dialog', { title: 'Confirmation', question: 'Are you sure you want to save changes made?' }) as boolean;
+		if (confirmation) {
+			// update config
+			currentConfig.locationOption.mode = locMode;
+			currentConfig.locationOption.city = locCity;
+			currentConfig.locationOption.latitude = locLat;
+			currentConfig.locationOption.longitude = locLang;
+			currentConfig.locationOption.updateEveryStartup = locUpdateEveryStartup;
+			// save config
+			const result = window.electron.ipcRenderer.sendSync('save-config', currentConfig);
+
+			if (result) {
+				// if success
+				// reset changed
+				setChanged(false);
+				// show snackbar
+				setShowSnackbar(true);
+				setSnackbarSeverity('success');
+				setSnackbarMsg('Changes saved successfully.');
+			} else {
+				// show snackbar
+				setShowSnackbar(true);
+				setSnackbarSeverity('error');
+				setSnackbarMsg('Error saving changes.');
+			}
+		}
+	};
+
+	const handleCancel = () => {
+		// reset config
+		const confirmation = window.electron.ipcRenderer.sendSync('yesno-dialog', { title: 'Confirmation', question: 'Are you sure you want to cancel changes made?' }) as boolean;
+		if (confirmation) {
+			resetConfig();
+		}
+	};
 
 	return (
 		<>
@@ -78,7 +209,13 @@ export const Settings = ({ ColorModeContext }: any) => {
 					p: 3,
 				}}
 			>
+				<Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={showSnackbar} autoHideDuration={3500} onClose={handleSnackbarClose}>
+					<Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+						{snackbarMsg}
+					</Alert>
+				</Snackbar>
 				<Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+					{/* location */}
 					<Grid item xs={4}>
 						<div
 							style={{
@@ -103,35 +240,44 @@ export const Settings = ({ ColorModeContext }: any) => {
 								<FormLabel id='location-mode-formlabel' sx={{ ml: 1 }}>
 									Mode
 								</FormLabel>
-								<RadioGroup sx={{ ml: 1 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={locAuto} onChange={handleLocAutoManual}>
+								<RadioGroup sx={{ ml: 1 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={locMode} onChange={handleLocModeChange}>
 									<FormControlLabel value='auto' control={<Radio />} label='Auto' />
 									<FormControlLabel value='manual' control={<Radio />} label='Manual' />
-									<Tooltip title='Click to sync location automatically' onClick={(e) => console.log(e)}>
-										<IconButton aria-label='delete' disabled={locAuto === 'manual' ? true : false}>
+									<Tooltip title='Click to sync location automatically' arrow>
+										<IconButton aria-label='delete' disabled={locMode === 'manual' ? true : false} onClick={getCityLatLang_Auto}>
 											<SyncIcon />
 										</IconButton>
 									</Tooltip>
 								</RadioGroup>
 
-								<TextField id='city' label='City' variant='outlined' size='small' value={locCity} onChange={(e) => setLocCity(e.target.value)} disabled={locAuto === 'auto' ? true : false} />
 								<TextField
-									id='latitude'
-									label='latitude'
+									id='city'
+									label='City'
 									variant='outlined'
 									size='small'
-									value={locLat}
-									onChange={(e) => setLocLat(e.target.value)}
-									disabled={locAuto === 'auto' ? true : false}
+									value={locCity}
+									onChange={handleCityChange}
+									disabled={locMode === 'auto' ? true : false}
+									InputProps={{
+										endAdornment: (
+											<Tooltip title="Click to search for inputted city's latitude/langitude" placement='top' arrow>
+												<InputAdornment position='end'>
+													<IconButton aria-label="Get inputted city's lattitude/langitude" onClick={getCityLatLang_Manual} edge='end' disabled={locMode === 'auto' ? true : false}>
+														<SearchIcon />
+													</IconButton>
+												</InputAdornment>
+											</Tooltip>
+										),
+									}}
 								/>
-								<TextField
-									id='longitude'
-									label='longitude'
-									variant='outlined'
-									size='small'
-									value={locLang}
-									onChange={(e) => setLocLang(e.target.value)}
-									disabled={locAuto === 'auto' ? true : false}
-								/>
+								<TextField id='latitude' label='latitude' variant='outlined' size='small' value={locLat} onChange={handleLatChange} disabled={locMode === 'auto' ? true : false} />
+								<TextField id='longitude' label='longitude' variant='outlined' size='small' value={locLang} onChange={handleLangChange} disabled={locMode === 'auto' ? true : false} />
+								<Tooltip title='*Will only update if auto mode is enabled' arrow>
+									<FormControlLabel
+										control={<Checkbox sx={{ ml: 1 }} checked={locUpdateEveryStartup} onChange={handleLocUpdateEveryStartupChange} disabled={locMode === 'auto' ? false : true} />}
+										label='Update location on app start'
+									/>
+								</Tooltip>
 							</FormControl>
 						</Box>
 					</Grid>
@@ -186,6 +332,16 @@ export const Settings = ({ ColorModeContext }: any) => {
 						</Box>
 					</Grid>
 				</Grid>
+
+				<Box sx={{ '& button': { m: 1 }, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+					{/* Cancel changes */}
+					<Button variant='contained' onClick={handleCancel} size='small'>
+						<SettingsBackupRestoreIcon fontSize='small' /> Cancel
+					</Button>
+					<Button variant='contained' onClick={handleSave} size='small'>
+						<SaveIcon fontSize='small' /> Save
+					</Button>
+				</Box>
 			</Box>
 		</>
 	);

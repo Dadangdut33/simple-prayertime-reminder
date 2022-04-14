@@ -141,21 +141,21 @@ export const About = () => {
 								flexDirection: 'row',
 							}}
 						>
-							<Tooltip title='Star the repository'>
+							<Tooltip title='Star the repository' arrow>
 								<IconButton>
 									<Link href='https://github.com/Dadangdut33/simple-prayertime-reminder/stargazers' target='_blank' rel='noreferrer' underline='hover'>
 										<StarBorderOutlinedIcon />
 									</Link>
 								</IconButton>
 							</Tooltip>
-							<Tooltip title='Fork the repository'>
+							<Tooltip title='Fork the repository' arrow>
 								<IconButton>
 									<Link href='https://github.com/Dadangdut33/simple-prayertime-reminder/fork' target='_blank' rel='noreferrer' underline='hover'>
 										<ForkLeftIcon />
 									</Link>
 								</IconButton>
 							</Tooltip>
-							<Tooltip title='Buy me A Ko-Fi'>
+							<Tooltip title='Buy me A Ko-Fi' arrow>
 								<IconButton>
 									<Link href='https://ko-fi.com/dadangdut33' target='_blank' rel='noreferrer' underline='hover'>
 										<FreeBreakfastOutlinedIcon />
