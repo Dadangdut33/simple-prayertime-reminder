@@ -1,7 +1,7 @@
 import './App.css';
 import './Font.css';
 import { configInterface } from 'main/handler/files';
-import { AppNav, MainMenu, Calendar, About } from './components';
+import { AppNav, MainMenu, Settings, Calendar, About } from './components';
 import { useState, useEffect, useMemo, createContext } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import Card from '@mui/material/Card';
@@ -41,7 +41,7 @@ export default function App() {
 		[mode]
 	);
 
-	// get theme from settings
+	// get theme from settings, on app start
 	useEffect(() => {
 		const currentConfig = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
 		setMode(currentConfig.theme);
@@ -54,9 +54,9 @@ export default function App() {
 					<Card sx={{ m: 1.5, backgroundColor: theme.palette.background.paper }} id={mode}>
 						<AppNav theme={mode} />
 						<Routes>
-							<Route path='/' element={<MainMenu ColorModeContext={ColorModeContext} />} />
+							<Route path='/' element={<MainMenu />} />
 							<Route path='/calendar' element={<Calendar />} />
-							<Route path='/settings' element={<Calendar />} />
+							<Route path='/settings' element={<Settings ColorModeContext={ColorModeContext} />} />
 							<Route path='/about' element={<About />} />
 						</Routes>
 					</Card>

@@ -45,6 +45,7 @@ export interface configInterface {
 		city: string;
 		latitude: string;
 		longitude: string;
+		updateEveryStartup: boolean;
 	};
 	timezoneOption: {
 		mode: 'auto' | 'manual';
@@ -75,6 +76,7 @@ export const initialConfig: configInterface = {
 		city: '',
 		latitude: '0',
 		longitude: '0',
+		updateEveryStartup: false,
 	},
 	timezoneOption: {
 		mode: 'auto',
