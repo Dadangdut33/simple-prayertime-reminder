@@ -9,14 +9,14 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, nativeTheme } from 'electron';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { configInterface, cacheDataInterface } from './interfaces';
 import { initialConfig, writeConfig, readConfig } from './handler/files';
 import { getPrayerTimes } from './handler/praytime';
 import { onUnresponsiveWindow, errorBox, NoYesBox } from './handler/messageBox';
-import { getLatLong_FromCitiesName, getPosition_absolute } from './handler/getPos';
+import { getLatLong_FromCitiesName, getPosition_absolute, verifyKey } from './handler/getPos';
 import Moment from 'moment-timezone';
 
 // Global vars
@@ -112,6 +112,7 @@ const checkConfigOnStart = async () => {
 		// create new one
 		appConfig = initialConfig;
 		appConfig.timezoneOption.timezone = Moment.tz.guess(); // get timezone
+		appConfig.theme = nativeTheme.shouldUseDarkColors ? 'dark' : 'light'; // set initial theme
 
 		// get location
 		// default location is '0',' 0'. So if both of these methods fail, it will still works.
@@ -226,6 +227,13 @@ ipcMain.on('get-tz-auto', (event, _arg) => {
 
 ipcMain.on('get-tz-list', (event, _arg) => {
 	event.returnValue = Moment.tz.names();
+});
+
+// -----------
+// api key
+ipcMain.on('verify-geoloc-key', async (event, arg) => {
+	const { success, data } = await verifyKey(arg);
+	event.returnValue = { success, data };
 });
 
 // ----------------------------------------------------

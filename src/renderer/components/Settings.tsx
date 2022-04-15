@@ -42,6 +42,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
 import Button from '@mui/material/Button';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
+import KeyIcon from '@mui/icons-material/Key';
 
 export const Settings = ({ ColorModeContext, changesMade, setChangesMade }: any) => {
 	// config on tab open
@@ -157,6 +158,34 @@ export const Settings = ({ ColorModeContext, changesMade, setChangesMade }: any)
 		// not importing the interface for IDE performance sake
 		checkChanges();
 		setTimezone(e.target.value);
+	};
+
+	// --------------------------------------------------------------------------
+	// geoloc
+	const [geolocMode, setGeolocMode] = useState(currentConfig.geoLocAPIKey.mode);
+	const [geolocKey, setGeolocKey] = useState(currentConfig.geoLocAPIKey.key);
+
+	const handleGeolocModeChange = (e: ChangeEvent<HTMLInputElement>) => {
+		checkChanges();
+		setGeolocMode(e.target.value as 'auto' | 'manual');
+	};
+
+	const handleGeolocKeyChange = (e: ChangeEvent<HTMLInputElement>) => {
+		checkChanges();
+		setGeolocKey(e.target.value);
+	};
+
+	const verifyKey = () => {
+		const { success, data }: any = window.electron.ipcRenderer.sendSync('verify-geoloc-key', geolocKey);
+		if (success) {
+			setShowSnackbar(true);
+			setSnackbarSeverity('success');
+			setSnackbarMsg('API key verified successfully!');
+		} else {
+			setShowSnackbar(true);
+			setSnackbarSeverity('error');
+			setSnackbarMsg(data.message ? data.message : data); // error message
+		}
 	};
 
 	// --------------------------------------------------------------------------
@@ -313,14 +342,14 @@ export const Settings = ({ ColorModeContext, changesMade, setChangesMade }: any)
 							sx={{
 								display: 'flex',
 								flexDirection: 'column',
-								'& .MuiTextField-root': { m: 1 },
+								'& .MuiTextField-root': { m: 1, ml: 0.5 },
 							}}
 						>
 							<FormControl>
-								<FormLabel id='location-mode-formlabel' sx={{ ml: 1 }}>
+								<FormLabel id='location-mode-formlabel' sx={{ ml: 0.5 }}>
 									Mode
 								</FormLabel>
-								<RadioGroup sx={{ ml: 1 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={locMode} onChange={handleLocModeChange}>
+								<RadioGroup sx={{ ml: 0.5 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={locMode} onChange={handleLocModeChange}>
 									<FormControlLabel value='auto' control={<Radio />} label='Auto' />
 									<FormControlLabel value='manual' control={<Radio />} label='Manual' />
 									<Tooltip title='Click to sync location automatically' arrow>
@@ -383,14 +412,14 @@ export const Settings = ({ ColorModeContext, changesMade, setChangesMade }: any)
 							}}
 						>
 							<FormControl>
-								<FormLabel id='location-mode-formlabel' sx={{ ml: 1 }}>
+								<FormLabel id='location-mode-formlabel' sx={{ ml: 0.5 }}>
 									Mode
 								</FormLabel>
-								<RadioGroup sx={{ ml: 1 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={tzMode} onChange={handleTzModeChange}>
+								<RadioGroup sx={{ ml: 0.5 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={tzMode} onChange={handleTzModeChange}>
 									<FormControlLabel value='auto' control={<Radio />} label='Auto' />
 									<FormControlLabel value='manual' control={<Radio />} label='Manual' />
 								</RadioGroup>
-								<FormControl fullWidth sx={{ m: 1 }}>
+								<FormControl fullWidth sx={{ m: 1, ml: 0.5 }}>
 									<InputLabel id='select-timezone'>Timezone</InputLabel>
 									<Select
 										labelId='select-timezone'
@@ -412,7 +441,8 @@ export const Settings = ({ ColorModeContext, changesMade, setChangesMade }: any)
 						</Box>
 					</Grid>
 					{/* ------------------------------------- */}
-					<Grid item>
+					{/* api keys */}
+					<Grid item xs={4}>
 						<div
 							style={{
 								display: 'flex',
@@ -420,7 +450,7 @@ export const Settings = ({ ColorModeContext, changesMade, setChangesMade }: any)
 								flexWrap: 'wrap',
 							}}
 						>
-							<LocationOnOutlinedIcon /> <h3 style={{ paddingLeft: '.5rem' }}>Location options</h3>
+							<KeyIcon /> <h3 style={{ paddingLeft: '.5rem' }}>API Key</h3>
 						</div>
 						<Box
 							component={'form'}
@@ -429,13 +459,43 @@ export const Settings = ({ ColorModeContext, changesMade, setChangesMade }: any)
 							sx={{
 								display: 'flex',
 								flexDirection: 'column',
-								'& .MuiTextField-root': { m: 1 },
+								'& .MuiTextField-root': { m: 1, ml: 0.5 },
 							}}
 						>
-							a
+							<FormControl>
+								<FormLabel id='location-mode-formlabel' sx={{ ml: 0.5 }}>
+									Mode
+								</FormLabel>
+								<RadioGroup sx={{ ml: 0.5 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={geolocMode} onChange={handleGeolocModeChange}>
+									<FormControlLabel value='auto' control={<Radio />} label='Auto' />
+									<FormControlLabel value='manual' control={<Radio />} label='Manual' />
+								</RadioGroup>
+
+								<TextField
+									id='freegeoip'
+									label='Freegeoip.app API Key'
+									variant='outlined'
+									size='small'
+									value={geolocKey}
+									onChange={handleGeolocKeyChange}
+									disabled={geolocMode === 'auto' ? true : false}
+									InputProps={{
+										endAdornment: (
+											<Tooltip title='Click to verify API key inputted' placement='top' arrow>
+												<InputAdornment position='end'>
+													<IconButton aria-label="Get inputted city's lattitude/langitude" onClick={verifyKey} edge='end' disabled={geolocMode === 'auto' ? true : false}>
+														<SearchIcon />
+													</IconButton>
+												</InputAdornment>
+											</Tooltip>
+										),
+									}}
+								/>
+							</FormControl>
 						</Box>
 					</Grid>
 				</Grid>
+
 				{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
 				<Box sx={{ '& button': { m: 1 }, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
 					{/* Cancel changes */}

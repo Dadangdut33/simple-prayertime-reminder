@@ -2,19 +2,48 @@ import fetch from 'electron-fetch';
 import { configInterface, getPosition_absolute_I } from 'main/interfaces';
 const cities = require('all-the-cities');
 
+export const verifyKey = async (key: string) => {
+	const url = `https://api.freegeoip.app/json/?apikey=${key}`;
+	let success = true,
+		data;
+	try {
+		const res = await fetch(url);
+		/**
+		 * Possible case:
+		 * - Invalid authentication credentials
+		 * - No API key found in request (Should not actually happen)
+		 */
+		if (res.status !== 200) success = false;
+
+		data = await res.json();
+	} catch (err) {
+		/**
+		 * - No internet connection
+		 */
+		success = false;
+		data = err;
+	} finally {
+		return { success, data };
+	}
+};
+
 export const getLatLong = async (config: configInterface) => {
 	const url = `https://api.freegeoip.app/json/?apikey=${config.geoLocAPIKey.mode === 'manual' ? config.geoLocAPIKey.key : `074b03c0-b9a6-11ec-a359-d768e44d2b27`}`;
 	let success = true,
 		data;
 	try {
 		const res = await fetch(url);
-		data = await res.json();
-	} catch (err) {
 		/**
 		 * Possible case:
 		 * - Invalid authentication credentials
 		 * - No API key found in request (Should not actually happen)
-		 * - Other possible errors (such as no internet and stuff...)
+		 */
+		if (res.status !== 200) success = false;
+
+		data = await res.json();
+	} catch (err) {
+		/**
+		 * - No internet connection
 		 */
 		success = false;
 		data = err;
