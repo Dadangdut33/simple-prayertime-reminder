@@ -24,10 +24,8 @@ import FormLabel from '@mui/material/FormLabel';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import Checkbox from '@mui/material/Checkbox';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import InputLabel from '@mui/material/InputLabel';
 import MuiInput from '@mui/material/Input';
+import Autocomplete from '@mui/material/Autocomplete';
 
 // Dialogbox
 import Dialog from '@mui/material/Dialog';
@@ -145,6 +143,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	// timezone
 	const [tzMode, setTzMode] = useState(currentConfig.timezoneOption.mode);
 	const [timezone, setTimezone] = useState(currentConfig.timezoneOption.timezone);
+	const [tzInput, setTzInput] = useState('');
 
 	const handleTzModeChange = (e: ChangeEvent<HTMLInputElement>) => {
 		checkChanges();
@@ -159,10 +158,16 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		}
 	};
 
-	const handleTimezoneChange = (e: any) => {
+	const handleTimezoneChange = (_event: any, newValue: string | null) => {
 		// not importing the interface for IDE performance sake
 		checkChanges();
-		setTimezone(e.target.value);
+		setTimezone(newValue as string);
+		// make sure something is always selected
+		if (newValue === null) setTimezone(tzList[0]);
+	};
+
+	const handleTzInputChange = (_event: any, newValue: string) => {
+		setTzInput(newValue as string);
 	};
 
 	// --------------------------------------------------------------------------
@@ -192,6 +197,8 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 			setSnackbarMsg(data.message ? data.message : data); // error message
 		}
 	};
+
+	// --------------------------------------------------------------------------
 
 	// --------------------------------------------------------------------------
 	// App Setting
@@ -472,22 +479,19 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 									<FormControlLabel value='manual' control={<Radio />} label='Manual' />
 								</RadioGroup>
 								<FormControl fullWidth sx={{ m: 1, ml: 0.5 }}>
-									<InputLabel id='select-timezone'>Timezone</InputLabel>
-									<Select
-										labelId='select-timezone'
-										id='select-timezone-select'
+									<Autocomplete
 										size='small'
+										id='select-timezone-select'
+										options={tzList}
 										value={timezone}
-										label='Timezone'
 										onChange={handleTimezoneChange}
+										inputValue={tzInput}
+										onInputChange={handleTzInputChange}
+										renderInput={(params) => <TextField {...params} label='Timezone' />}
 										disabled={tzMode === 'auto' ? true : false}
-									>
-										{tzList.map((tz, index) => (
-											<MenuItem key={index} value={tz}>
-												{tz}
-											</MenuItem>
-										))}
-									</Select>
+										autoHighlight
+										autoSelect
+									/>
 								</FormControl>
 							</FormControl>
 						</Box>
