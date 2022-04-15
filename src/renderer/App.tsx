@@ -59,7 +59,7 @@ export default function App() {
 						<Routes>
 							<Route path='/' element={<MainMenu />} />
 							<Route path='/calendar' element={<Calendar />} />
-							<Route path='/settings' element={<Settings ColorModeContext={ColorModeContext} changesMade={changesMade} setChangesMade={setChangesMade} />} />
+							<Route path='/settings' element={<Settings appTheme={mode} ColorModeContext={ColorModeContext} changesMade={changesMade} setChangesMade={setChangesMade} />} />
 							<Route path='/about' element={<About />} />
 						</Routes>
 					</Card>

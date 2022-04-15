@@ -25,7 +25,7 @@ export const AppNav = ({ theme, changesMade }: any) => {
 	};
 
 	const handleChange = (_event: SyntheticEvent, newValue: number) => {
-		if (changesMade) window.electron.ipcRenderer.send('invoke-open-changes-made');
+		if (changesMade) window.electron.ipcRenderer.send('invoke-open-changes-made', navigateMap[newValue]);
 		else {
 			setValue(newValue);
 			navigate(navigateMap[newValue]);

@@ -177,8 +177,8 @@ app.whenReady()
  * IPC
  */
 // invoke from main process
-ipcMain.on('invoke-open-changes-made', (_event, _arg) => {
-	if (mainWindow) mainWindow.webContents.send('open-changes-made');
+ipcMain.on('invoke-open-changes-made', (_event, arg) => {
+	if (mainWindow) mainWindow.webContents.send('open-changes-made', arg);
 });
 
 // ----------------------------------------------------

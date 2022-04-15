@@ -13,7 +13,7 @@ import IconButton from '@mui/material/IconButton';
 import CodeOffOutlinedIcon from '@mui/icons-material/CodeOffOutlined';
 import BugReportIcon from '@mui/icons-material/BugReport';
 import CommitIcon from '@mui/icons-material/Commit';
-import RecommendIcon from '@mui/icons-material/Recommend';
+import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import ForkLeftIcon from '@mui/icons-material/ForkLeft';
 import FreeBreakfastOutlinedIcon from '@mui/icons-material/FreeBreakfastOutlined';
@@ -133,7 +133,7 @@ export const About = () => {
 								flexWrap: 'wrap',
 							}}
 						>
-							<RecommendIcon style={{ fontSize: '28px' }} /> <h2 style={{ paddingLeft: '.5rem' }}>Support the project</h2>
+							<FavoriteBorderOutlinedIcon style={{ fontSize: '28px' }} /> <h2 style={{ paddingLeft: '.5rem' }}>Support the project</h2>
 						</div>
 						<Box
 							sx={{

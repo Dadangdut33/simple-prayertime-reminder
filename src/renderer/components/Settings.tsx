@@ -1,7 +1,9 @@
 import { ColorModeContextInterface } from 'renderer/interfaces';
 import { configInterface, getPosition_absolute_I } from 'main/interfaces';
 import { useContext, forwardRef, useState, ChangeEvent } from 'react';
-import useTheme from '@mui/material/styles/useTheme';
+import { useNavigate } from 'react-router-dom';
+
+// MUI
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -20,12 +22,12 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import TextField from '@mui/material/TextField';
-import Switch from '@mui/material/Switch';
 import InputAdornment from '@mui/material/InputAdornment';
 import Checkbox from '@mui/material/Checkbox';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
+import MuiInput from '@mui/material/Input';
 
 // Dialogbox
 import Dialog from '@mui/material/Dialog';
@@ -43,11 +45,14 @@ import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore
 import Button from '@mui/material/Button';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import KeyIcon from '@mui/icons-material/Key';
+import MiscellaneousServicesOutlinedIcon from '@mui/icons-material/MiscellaneousServicesOutlined';
 
-export const Settings = ({ ColorModeContext, changesMade, setChangesMade }: any) => {
+export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) => {
 	// config on tab open
 	const initialConfig = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
 	const [currentConfig, setCurrentConfig] = useState<configInterface>(initialConfig); // current config
+	const [destination, setDestination] = useState<string>(''); // destination path
+	const navigate = useNavigate();
 
 	// --------------------------------------------------------------------------
 	// location
@@ -190,8 +195,39 @@ export const Settings = ({ ColorModeContext, changesMade, setChangesMade }: any)
 
 	// --------------------------------------------------------------------------
 	// App Setting
-	const theme = useTheme();
 	const colorMode = useContext(ColorModeContext) as ColorModeContextInterface;
+
+	const handleColorModeChange = (_e: ChangeEvent<HTMLInputElement>) => {
+		checkChanges();
+		colorMode.toggleColorMode();
+	};
+
+	const [runAtStartup, setRunAtStartup] = useState(currentConfig.runAtStartup);
+	const [checkUpdateStartup, setcheckUpdateStartup] = useState(currentConfig.checkUpdateAtStartup);
+	const [updateEveryX, setUpdateEveryX] = useState(currentConfig.updateEvery_X_Hours);
+
+	const handleUpdateEveryX = (e: ChangeEvent<HTMLInputElement>) => {
+		checkChanges();
+		setUpdateEveryX(Number(e.target.value) || 0);
+	};
+
+	const handleBlurUpdateEveryX = () => {
+		if (updateEveryX < 0) {
+			setUpdateEveryX(0);
+		} else if (updateEveryX > 24) {
+			setUpdateEveryX(24);
+		}
+	};
+
+	const handleRunAtStartupChange = (e: ChangeEvent<HTMLInputElement>) => {
+		checkChanges();
+		setRunAtStartup(e.target.checked);
+	};
+
+	const handleCheckUpdateStartupChange = (e: ChangeEvent<HTMLInputElement>) => {
+		checkChanges();
+		setcheckUpdateStartup(e.target.checked);
+	};
 
 	// --------------------------------------------------------------------------
 	// snackbar
@@ -212,6 +248,7 @@ export const Settings = ({ ColorModeContext, changesMade, setChangesMade }: any)
 		setChangesMade(false);
 		setDialogOpen(false);
 		if (yes) saveTheConfig();
+		else navigate(destination);
 	};
 
 	const handleDialogSave = (yes = false) => {
@@ -233,6 +270,7 @@ export const Settings = ({ ColorModeContext, changesMade, setChangesMade }: any)
 	// --------------------------------------------------------------------------
 	// reset config
 	const resetConfig = () => {
+		if (currentConfig.theme !== appTheme) colorMode.toggleColorMode();
 		setCurrentConfig(initialConfig);
 		setLocMode(initialConfig.locationOption.mode);
 		setLocCity(initialConfig.locationOption.city);
@@ -241,6 +279,12 @@ export const Settings = ({ ColorModeContext, changesMade, setChangesMade }: any)
 		setLocUpdateEveryStartup(initialConfig.locationOption.updateEveryStartup);
 		setTzMode(initialConfig.timezoneOption.mode);
 		setTimezone(initialConfig.timezoneOption.timezone);
+		setGeolocMode(initialConfig.geoLocAPIKey.mode);
+		setGeolocKey(initialConfig.geoLocAPIKey.key);
+		setRunAtStartup(initialConfig.runAtStartup);
+		setcheckUpdateStartup(initialConfig.checkUpdateAtStartup);
+		setUpdateEveryX(initialConfig.updateEvery_X_Hours);
+		setChangesMade(false);
 	};
 
 	// save config
@@ -253,6 +297,12 @@ export const Settings = ({ ColorModeContext, changesMade, setChangesMade }: any)
 		currentConfig.locationOption.updateEveryStartup = locUpdateEveryStartup;
 		currentConfig.timezoneOption.mode = tzMode;
 		currentConfig.timezoneOption.timezone = timezone;
+		currentConfig.geoLocAPIKey.mode = geolocMode;
+		currentConfig.geoLocAPIKey.key = geolocKey;
+		currentConfig.theme = appTheme;
+		currentConfig.runAtStartup = runAtStartup;
+		currentConfig.checkUpdateAtStartup = checkUpdateStartup;
+		currentConfig.updateEvery_X_Hours = updateEveryX;
 		// save config
 		const result = window.electron.ipcRenderer.sendSync('save-config', currentConfig);
 
@@ -282,8 +332,10 @@ export const Settings = ({ ColorModeContext, changesMade, setChangesMade }: any)
 
 	// --------------------------------------------------------------------------
 	// listener for page switching
-	window.electron.ipcRenderer.on('open-changes-made', (_event, _arg) => {
+	window.electron.ipcRenderer.on('open-changes-made', (_event, arg) => {
 		setCurrentDialog('changes');
+		console.log(arg);
+		setDestination(arg as string);
 		setDialogOpen(true);
 	});
 
@@ -495,12 +547,79 @@ export const Settings = ({ ColorModeContext, changesMade, setChangesMade }: any)
 						</Box>
 					</Grid>
 				</Grid>
+				{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
+				{/* other settings */}
+				<Grid container spacing={2}>
+					<Grid item xs={12}>
+						<div
+							style={{
+								display: 'flex',
+								alignItems: 'center',
+								flexWrap: 'wrap',
+							}}
+						>
+							<MiscellaneousServicesOutlinedIcon /> <h3 style={{ paddingLeft: '.5rem' }}>Other Settings</h3>
+						</div>
+						<Box
+							component={'form'}
+							noValidate
+							autoComplete='off'
+							sx={{
+								display: 'flex',
+								flexDirection: 'row',
+							}}
+						>
+							<FormControl sx={{ mr: 2 }}>
+								<FormLabel id='app-theme-formlabel' sx={{ ml: 0.5 }}>
+									Theme
+								</FormLabel>
+								<RadioGroup sx={{ ml: 0.5 }} row aria-labelledby='app-theme' name='row-radio-buttons-app-theme' value={appTheme} onChange={handleColorModeChange}>
+									<FormControlLabel value='light' control={<Radio />} label='Light' />
+									<FormControlLabel value='dark' control={<Radio />} label='Dark' />
+								</RadioGroup>
+							</FormControl>
+
+							<FormControl sx={{ mr: 4 }}>
+								<FormLabel id='app-theme-formlabel' sx={{ ml: 0.5 }}>
+									Praytime Update Interval
+								</FormLabel>
+								<MuiInput
+									style={{ marginTop: '4px' }}
+									sx={{ ml: 0.5 }}
+									value={updateEveryX}
+									onChange={handleUpdateEveryX}
+									onBlur={handleBlurUpdateEveryX}
+									inputProps={{
+										step: 1,
+										min: 0,
+										max: 24,
+										type: 'number',
+										'aria-labelledby': 'input-slider',
+									}}
+								/>
+							</FormControl>
+
+							<FormControl>
+								<FormLabel id='app-theme-formlabel'>Startup Options</FormLabel>
+								<Box
+									sx={{
+										display: 'flex',
+										flexDirection: 'row',
+									}}
+								>
+									<FormControlLabel control={<Checkbox checked={runAtStartup} onChange={handleRunAtStartupChange} />} label='Run app on PC startup' />
+									<FormControlLabel control={<Checkbox checked={checkUpdateStartup} onChange={handleCheckUpdateStartupChange} />} label='Check for update on app start' />
+								</Box>
+							</FormControl>
+						</Box>
+					</Grid>
+				</Grid>
 
 				{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-				<Box sx={{ '& button': { m: 1 }, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+				<Box sx={{ '& button': { m: 1 }, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', mt: 3 }}>
 					{/* Cancel changes */}
 					<Button
-						variant='contained'
+						variant='outlined'
 						onClick={() => {
 							setCurrentDialog('cancel');
 							setDialogOpen(true);
