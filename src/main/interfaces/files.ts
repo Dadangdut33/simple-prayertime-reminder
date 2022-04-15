@@ -17,9 +17,9 @@ export interface reminderInterface {
 
 export interface calcOptionInterface {
 	mode: 'default' | 'manual';
-	method: 'MuslimWorldLeague' | 'Egyptian' | 'Karachi' | 'UmmAlQura' | 'Dubai' | 'MoonsightingCommittee' | 'NorthAmerica' | 'Kuwait' | 'Qatar' | 'Singapore' | 'Tehran' | 'Turkey';
-	madhab: 'Shafi' | 'Hanafi';
-	highLatitudeRule: 'MiddleOfTheNight' | 'SeventhOfTheNight' | 'TwilightAngle';
+	method: string | 'MuslimWorldLeague' | 'Egyptian' | 'Karachi' | 'UmmAlQura' | 'Dubai' | 'MoonsightingCommittee' | 'NorthAmerica' | 'Kuwait' | 'Qatar' | 'Singapore' | 'Tehran' | 'Turkey';
+	madhab: string | 'Shafi' | 'Hanafi';
+	highLatitudeRule: string | 'MiddleOfTheNight' | 'SeventhOfTheNight' | 'TwilightAngle';
 	adjustments: {
 		fajr: number;
 		sunrise: number;
