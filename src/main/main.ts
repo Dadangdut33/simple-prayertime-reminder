@@ -175,16 +175,9 @@ app.whenReady()
 /**
  * IPC
  */
-ipcMain.on('ipc-example', async (event, arg) => {
-	console.log(arg);
-	const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-	// console.log(msgTemplate(arg));
-	event.reply('ipc-example', msgTemplate('pong'));
-});
-
-ipcMain.on('test-sync', (event, arg) => {
-	console.log(arg);
-	event.returnValue = 'pong';
+// invoke from main process
+ipcMain.on('invoke-open-changes-made', (_event, _arg) => {
+	if (mainWindow) mainWindow.webContents.send('open-changes-made');
 });
 
 // ----------------------------------------------------

@@ -47,16 +47,19 @@ export default function App() {
 		setMode(currentConfig.theme);
 	}, []);
 
+	// track setting changes made
+	const [changesMade, setChangesMade] = useState<boolean>(false);
+
 	return (
 		<ColorModeContext.Provider value={colorMode}>
 			<ThemeProvider theme={theme}>
 				<Router>
 					<Card sx={{ m: 1.5, backgroundColor: theme.palette.background.paper }} id={mode}>
-						<AppNav theme={mode} />
+						<AppNav theme={mode} changesMade={changesMade} />
 						<Routes>
 							<Route path='/' element={<MainMenu />} />
 							<Route path='/calendar' element={<Calendar />} />
-							<Route path='/settings' element={<Settings ColorModeContext={ColorModeContext} />} />
+							<Route path='/settings' element={<Settings ColorModeContext={ColorModeContext} changesMade={changesMade} setChangesMade={setChangesMade} />} />
 							<Route path='/about' element={<About />} />
 						</Routes>
 					</Card>

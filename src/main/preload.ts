@@ -3,7 +3,7 @@ import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 contextBridge.exposeInMainWorld('electron', {
 	ipcRenderer: {
 		on(channel: string, func: (...args: unknown[]) => void) {
-			const validChannels = ['ipc-example'];
+			const validChannels = ['open-changes-made'];
 			if (validChannels.includes(channel)) {
 				const subscription = (_event: IpcRendererEvent, ...args: unknown[]) => func(...args);
 				// Deliberately strip event as it includes `sender`
@@ -15,7 +15,7 @@ contextBridge.exposeInMainWorld('electron', {
 			return undefined;
 		},
 		once(channel: string, func: (...args: unknown[]) => void) {
-			const validChannels = ['ipc-example'];
+			const validChannels = [''];
 			if (validChannels.includes(channel)) {
 				// Deliberately strip event as it includes `sender`
 				ipcRenderer.once(channel, (_event, ...args) => func(...args));

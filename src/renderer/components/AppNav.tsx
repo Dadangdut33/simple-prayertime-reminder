@@ -14,7 +14,7 @@ import DateRangeIcon from '@mui/icons-material/DateRange';
 import SettingsIcon from '@mui/icons-material/Settings';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
-export const AppNav = ({ theme }: any) => {
+export const AppNav = ({ theme, changesMade }: any) => {
 	const [value, setValue] = useState(0);
 	const navigate = useNavigate();
 	const navigateMap: any = {
@@ -25,8 +25,11 @@ export const AppNav = ({ theme }: any) => {
 	};
 
 	const handleChange = (_event: SyntheticEvent, newValue: number) => {
-		setValue(newValue);
-		navigate(navigateMap[newValue]);
+		if (changesMade) window.electron.ipcRenderer.send('invoke-open-changes-made');
+		else {
+			setValue(newValue);
+			navigate(navigateMap[newValue]);
+		}
 	};
 
 	return (

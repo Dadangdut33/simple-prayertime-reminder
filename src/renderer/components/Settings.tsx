@@ -27,6 +27,13 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 
+// Dialogbox
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+
 // Icons
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import SyncIcon from '@mui/icons-material/Sync';
@@ -36,20 +43,10 @@ import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore
 import Button from '@mui/material/Button';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 
-export const Settings = ({ ColorModeContext }: any) => {
-	// Variables
+export const Settings = ({ ColorModeContext, changesMade, setChangesMade }: any) => {
 	// config on tab open
 	const initialConfig = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
 	const [currentConfig, setCurrentConfig] = useState<configInterface>(initialConfig); // current config
-	const [changed, setChanged] = useState<boolean>(false); // changed config
-
-	// snackbar
-	const [showSnackbar, setShowSnackbar] = useState<boolean>(false);
-	const [snackbarMsg, setSnackbarMsg] = useState<string>('');
-	const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'info' | 'warning' | 'error'>('info');
-
-	// available tz
-	const tzList = window.electron.ipcRenderer.sendSync('get-tz-list') as string[];
 
 	// --------------------------------------------------------------------------
 	// location
@@ -58,20 +55,6 @@ export const Settings = ({ ColorModeContext }: any) => {
 	const [locLat, setLocLat] = useState(currentConfig.locationOption.latitude);
 	const [locLang, setLocLang] = useState(currentConfig.locationOption.longitude);
 	const [locUpdateEveryStartup, setLocUpdateEveryStartup] = useState(currentConfig.locationOption.updateEveryStartup);
-
-	// timezone
-	const [tzMode, setTzMode] = useState(currentConfig.timezoneOption.mode);
-	const [timezone, setTimezone] = useState(currentConfig.timezoneOption.timezone);
-
-	// --------------------------------------------------------------------------
-	// misc
-	const theme = useTheme();
-	const colorMode = useContext(ColorModeContext) as ColorModeContextInterface;
-
-	// --------------------------------------------------------------------------
-	// Handler
-	// --------------------------------------------------------------------------
-	// location
 	const handleLocModeChange = (e: ChangeEvent<HTMLInputElement>) => {
 		checkChanges();
 		setLocMode(e.target.value as 'auto' | 'manual');
@@ -150,7 +133,13 @@ export const Settings = ({ ColorModeContext }: any) => {
 	};
 
 	// --------------------------------------------------------------------------
-	// tz
+	// available tz
+	const tzList = window.electron.ipcRenderer.sendSync('get-tz-list') as string[];
+
+	// timezone
+	const [tzMode, setTzMode] = useState(currentConfig.timezoneOption.mode);
+	const [timezone, setTimezone] = useState(currentConfig.timezoneOption.timezone);
+
 	const handleTzModeChange = (e: ChangeEvent<HTMLInputElement>) => {
 		checkChanges();
 		setTzMode(e.target.value as 'auto' | 'manual');
@@ -171,11 +160,48 @@ export const Settings = ({ ColorModeContext }: any) => {
 	};
 
 	// --------------------------------------------------------------------------
+	// App Setting
+	const theme = useTheme();
+	const colorMode = useContext(ColorModeContext) as ColorModeContextInterface;
+
+	// --------------------------------------------------------------------------
+	// snackbar
+	const [showSnackbar, setShowSnackbar] = useState<boolean>(false);
+	const [snackbarMsg, setSnackbarMsg] = useState<string>('');
+	const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'info' | 'warning' | 'error'>('info');
+
 	// handle snackbar close
 	const handleSnackbarClose = () => {
 		setShowSnackbar(false);
 	};
 
+	// --------------------------------------------------------------------------
+	// dialogbox
+	const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+	const [currentDialog, setCurrentDialog] = useState<'save' | 'cancel' | 'changes'>('save');
+	const handleDialogChangesMade = (yes = false) => {
+		setChangesMade(false);
+		setDialogOpen(false);
+		if (yes) saveTheConfig();
+	};
+
+	const handleDialogSave = (yes = false) => {
+		setDialogOpen(false);
+		if (yes) saveTheConfig();
+	};
+
+	const handleDialogCancel = (yes = false) => {
+		setDialogOpen(false);
+		if (yes) resetConfig();
+	};
+
+	const dialogMap: any = {
+		changesMade: [handleDialogChangesMade, 'You have unsaved changes. Do you want to save them?'],
+		save: [handleDialogSave, 'Are you sure you want to save the settings changes?'],
+		cancel: [handleDialogCancel, 'Are you sure you want to cancel changes made?'],
+	};
+
+	// --------------------------------------------------------------------------
 	// reset config
 	const resetConfig = () => {
 		setCurrentConfig(initialConfig);
@@ -188,6 +214,36 @@ export const Settings = ({ ColorModeContext }: any) => {
 		setTimezone(initialConfig.timezoneOption.timezone);
 	};
 
+	// save config
+	const saveTheConfig = () => {
+		// update config
+		currentConfig.locationOption.mode = locMode;
+		currentConfig.locationOption.city = locCity;
+		currentConfig.locationOption.latitude = locLat;
+		currentConfig.locationOption.longitude = locLang;
+		currentConfig.locationOption.updateEveryStartup = locUpdateEveryStartup;
+		currentConfig.timezoneOption.mode = tzMode;
+		currentConfig.timezoneOption.timezone = timezone;
+		// save config
+		const result = window.electron.ipcRenderer.sendSync('save-config', currentConfig);
+
+		if (result) {
+			// if success
+			// reset changed
+			setChangesMade(false);
+			// show snackbar
+			setShowSnackbar(true);
+			setSnackbarSeverity('success');
+			setSnackbarMsg('Changes saved successfully.');
+		} else {
+			// show snackbar
+			setShowSnackbar(true);
+			setSnackbarSeverity('error');
+			setSnackbarMsg('Error saving changes.');
+		}
+	};
+
+	// --------------------------------------------------------------------------
 	// check changes
 	const checkChanges = () => {
 		// compare initial config and current config
@@ -195,49 +251,37 @@ export const Settings = ({ ColorModeContext }: any) => {
 		// else set changed to false
 	};
 
-	const handleSave = () => {
-		// save config
-		const confirmation = window.electron.ipcRenderer.sendSync('yesno-dialog', { title: 'Confirmation', question: 'Are you sure you want to save changes made?' }) as boolean;
-		if (confirmation) {
-			// update config
-			currentConfig.locationOption.mode = locMode;
-			currentConfig.locationOption.city = locCity;
-			currentConfig.locationOption.latitude = locLat;
-			currentConfig.locationOption.longitude = locLang;
-			currentConfig.locationOption.updateEveryStartup = locUpdateEveryStartup;
-			currentConfig.timezoneOption.mode = tzMode;
-			currentConfig.timezoneOption.timezone = timezone;
-			// save config
-			const result = window.electron.ipcRenderer.sendSync('save-config', currentConfig);
-
-			if (result) {
-				// if success
-				// reset changed
-				setChanged(false);
-				// show snackbar
-				setShowSnackbar(true);
-				setSnackbarSeverity('success');
-				setSnackbarMsg('Changes saved successfully.');
-			} else {
-				// show snackbar
-				setShowSnackbar(true);
-				setSnackbarSeverity('error');
-				setSnackbarMsg('Error saving changes.');
-			}
-		}
-	};
-
-	const handleCancel = () => {
-		// reset config
-		const confirmation = window.electron.ipcRenderer.sendSync('yesno-dialog', { title: 'Confirmation', question: 'Are you sure you want to cancel changes made?' }) as boolean;
-		if (confirmation) {
-			resetConfig();
-		}
-	};
+	// --------------------------------------------------------------------------
+	// listener for page switching
+	window.electron.ipcRenderer.on('open-changes-made', (_event, _arg) => {
+		setCurrentDialog('changes');
+		setDialogOpen(true);
+	});
 
 	return (
 		<>
 			<CssBaseline />
+
+			{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
+			<Dialog open={dialogOpen} onClose={() => dialogMap[currentDialog][0]()} aria-labelledby='alert-dialog-title' aria-describedby='alert-dialog-description'>
+				<DialogTitle id='alert-dialog-title'>{'Confirmation'}</DialogTitle>
+				<DialogContent>
+					<DialogContentText id='alert-dialog-description'>{dialogMap[currentDialog][1]}</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={() => dialogMap[currentDialog][0](true)}>Yes</Button>
+					<Button onClick={() => dialogMap[currentDialog][0]()} autoFocus>
+						No
+					</Button>
+				</DialogActions>
+			</Dialog>
+			{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
+			<Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={showSnackbar} autoHideDuration={3500} onClose={handleSnackbarClose}>
+				<Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+					{snackbarMsg}
+				</Alert>
+			</Snackbar>
+			{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
 			<Box
 				sx={{
 					display: 'flex',
@@ -248,12 +292,6 @@ export const Settings = ({ ColorModeContext }: any) => {
 					p: 3,
 				}}
 			>
-				{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-				<Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={showSnackbar} autoHideDuration={3500} onClose={handleSnackbarClose}>
-					<Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-						{snackbarMsg}
-					</Alert>
-				</Snackbar>
 				{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
 				<Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
 					{/* ------------------------------------- */}
@@ -401,10 +439,24 @@ export const Settings = ({ ColorModeContext }: any) => {
 				{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
 				<Box sx={{ '& button': { m: 1 }, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
 					{/* Cancel changes */}
-					<Button variant='contained' onClick={handleCancel} size='small'>
+					<Button
+						variant='contained'
+						onClick={() => {
+							setCurrentDialog('cancel');
+							setDialogOpen(true);
+						}}
+						size='small'
+					>
 						<SettingsBackupRestoreIcon fontSize='small' /> Cancel
 					</Button>
-					<Button variant='contained' onClick={handleSave} size='small'>
+					<Button
+						variant='contained'
+						onClick={() => {
+							setCurrentDialog('save');
+							setDialogOpen(true);
+						}}
+						size='small'
+					>
 						<SaveIcon fontSize='small' /> Save
 					</Button>
 				</Box>
