@@ -16,7 +16,7 @@ export interface reminderInterface {
 }
 
 export interface calcOptionInterface {
-	mode: 'auto' | 'manual';
+	mode: 'default' | 'manual';
 	method: 'MuslimWorldLeague' | 'Egyptian' | 'Karachi' | 'UmmAlQura' | 'Dubai' | 'MoonsightingCommittee' | 'NorthAmerica' | 'Kuwait' | 'Qatar' | 'Singapore' | 'Tehran' | 'Turkey';
 	madhab: 'Shafi' | 'Hanafi';
 	highLatitudeRule: 'MiddleOfTheNight' | 'SeventhOfTheNight' | 'TwilightAngle';

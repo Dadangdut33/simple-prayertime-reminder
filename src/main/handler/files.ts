@@ -22,7 +22,7 @@ export const initialConfig: configInterface = {
 		timezone: '',
 	},
 	calcOption: {
-		mode: 'auto',
+		mode: 'default',
 		method: 'MuslimWorldLeague',
 		madhab: 'Shafi',
 		highLatitudeRule: 'TwilightAngle',

@@ -4,6 +4,7 @@ import { useContext, forwardRef, useState, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // MUI
+import Divider from '@mui/material/Divider';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -44,6 +45,7 @@ import Button from '@mui/material/Button';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import KeyIcon from '@mui/icons-material/Key';
 import MiscellaneousServicesOutlinedIcon from '@mui/icons-material/MiscellaneousServicesOutlined';
+import CalculateOutlinedIcon from '@mui/icons-material/CalculateOutlined';
 
 export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) => {
 	// config on tab open
@@ -53,8 +55,132 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	const navigate = useNavigate();
 
 	// --------------------------------------------------------------------------
+	// calcOption
+	const [calcOptMode, setCalcOptMode] = useState<'default' | 'manual'>(currentConfig.calcOption.mode);
+	const [calcOptMethod, setCalcOptMethod] = useState<string>(currentConfig.calcOption.method);
+	const [calcOptMadhab, setCalcOptMadhab] = useState<string>(currentConfig.calcOption.madhab);
+	const [calcOptHighLatRule, setCalcOptHighLatRule] = useState<string>(currentConfig.calcOption.highLatitudeRule);
+	const [calcOptAdjustment_Fajr, setCalcOptAdjustment_Fajr] = useState<number>(currentConfig.calcOption.adjustments.fajr);
+	const [calcOptAdjustment_Sunrise, setCalcOptAdjustment_Sunrise] = useState<number>(currentConfig.calcOption.adjustments.sunrise);
+	const [calcOptAdjustment_Dhuhr, setCalcOptAdjustment_Dhuhr] = useState<number>(currentConfig.calcOption.adjustments.dhuhr);
+	const [calcOptAdjustment_Asr, setCalcOptAdjustment_Asr] = useState<number>(currentConfig.calcOption.adjustments.asr);
+	const [calcOptAdjustment_Maghrib, setCalcOptAdjustment_Maghrib] = useState<number>(currentConfig.calcOption.adjustments.maghrib);
+	const [calcOptAdjustment_Isha, setCalcOptAdjustment_Isha] = useState<number>(currentConfig.calcOption.adjustments.isha);
+
+	const methodList = ['MuslimWorldLeague', 'Egyptian', 'Karachi', 'UmmAlQura', 'Dubai', 'MoonsightingCommittee', 'NorthAmerica', 'Kuwait', 'Qatar', 'Singapore', 'Tehran', 'Turkey'];
+	const madhabList = ['Shafi', 'Hanafi'];
+	const highLatRuleList = ['MiddleOfTheNight', 'SeventhOfTheNight', 'TwilightAngle'];
+	const [calcOptMethodInput, setCalcOptMethodInput] = useState<string>('');
+	const [calcOptMadhabInput, setCalcOptMadhabInput] = useState<string>('');
+	const [calcOptHighLatRuleInput, setCalcOptHighLatRuleInput] = useState<string>('');
+
+	const handleCalcOptModeChange = (event: ChangeEvent<HTMLInputElement>) => {
+		checkChanges();
+		setCalcOptMode(event.target.value as 'default' | 'manual');
+
+		if (event.target.value === 'default') {
+			setCalcOptMethod('MuslimWorldLeague');
+			setCalcOptMadhab('Shafi');
+			setCalcOptHighLatRule('TwilightAngle');
+		}
+	};
+
+	const handleCalcOptMethodChange = (_event: any, newValue: string | null) => {
+		checkChanges();
+		setCalcOptMethod(newValue as string);
+
+		if (newValue === null) setCalcOptMethod(methodList[0]);
+	};
+
+	const handleCalcOptMethodInputChange = (_event: any, newValue: string) => {
+		setCalcOptMethodInput(newValue as string);
+	};
+
+	const handleCalcOptMadhabChange = (_event: any, newValue: string | null) => {
+		checkChanges();
+		setCalcOptMadhab(newValue as string);
+
+		if (newValue === null) setCalcOptMadhab(madhabList[0]);
+	};
+
+	const handleCalcOptMadhabInputChange = (_event: any, newValue: string) => {
+		setCalcOptMadhabInput(newValue as string);
+	};
+
+	const handleCalcOptHighLatRuleChange = (_event: any, newValue: string | null) => {
+		checkChanges();
+		setCalcOptHighLatRule(newValue as string);
+
+		if (newValue === null) setCalcOptHighLatRule(highLatRuleList[0]);
+	};
+
+	const handleCalcOptHighLatRuleInputChange = (_event: any, newValue: string) => {
+		setCalcOptHighLatRuleInput(newValue as string);
+	};
+
+	const handleCalOptAdjustment_FajrChange = (event: ChangeEvent<HTMLInputElement>) => {
+		checkChanges();
+		setCalcOptAdjustment_Fajr(Number(event.target.value) || 0);
+	};
+
+	const handleBlur_Fajr = () => {
+		if (calcOptAdjustment_Fajr < -600) setCalcOptAdjustment_Fajr(-600);
+		else if (calcOptAdjustment_Fajr > 600) setCalcOptAdjustment_Fajr(600);
+	};
+
+	const handleCalOptAdjustment_SunriseChange = (event: ChangeEvent<HTMLInputElement>) => {
+		checkChanges();
+		setCalcOptAdjustment_Sunrise(Number(event.target.value) || 0);
+	};
+
+	const handleBlur_Sunrise = () => {
+		if (calcOptAdjustment_Sunrise < -600) setCalcOptAdjustment_Sunrise(-600);
+		else if (calcOptAdjustment_Sunrise > 600) setCalcOptAdjustment_Sunrise(600);
+	};
+
+	const handleCalOptAdjustment_DhuhrChange = (event: ChangeEvent<HTMLInputElement>) => {
+		checkChanges();
+		setCalcOptAdjustment_Dhuhr(Number(event.target.value) || 0);
+	};
+
+	const handleBlur_Dhuhr = () => {
+		if (calcOptAdjustment_Dhuhr < -600) setCalcOptAdjustment_Dhuhr(-600);
+		else if (calcOptAdjustment_Dhuhr > 600) setCalcOptAdjustment_Dhuhr(600);
+	};
+
+	const handleCalOptAdjustment_AsrChange = (event: ChangeEvent<HTMLInputElement>) => {
+		checkChanges();
+		setCalcOptAdjustment_Asr(Number(event.target.value) || 0);
+	};
+
+	const handleBlur_Asr = () => {
+		if (calcOptAdjustment_Asr < -600) setCalcOptAdjustment_Asr(-600);
+		else if (calcOptAdjustment_Asr > 600) setCalcOptAdjustment_Asr(600);
+	};
+
+	const handleCalOptAdjustment_MaghribChange = (event: ChangeEvent<HTMLInputElement>) => {
+		checkChanges();
+		setCalcOptAdjustment_Maghrib(Number(event.target.value) || 0);
+	};
+
+	const handleBlur_Maghrib = () => {
+		if (calcOptAdjustment_Maghrib < -600) setCalcOptAdjustment_Maghrib(-600);
+		else if (calcOptAdjustment_Maghrib > 600) setCalcOptAdjustment_Maghrib(600);
+	};
+
+	const handleCalOptAdjustment_IshaChange = (event: ChangeEvent<HTMLInputElement>) => {
+		checkChanges();
+		setCalcOptAdjustment_Isha(Number(event.target.value) || 0);
+	};
+
+	const handleBlur_Isha = () => {
+		if (calcOptAdjustment_Isha < -600) setCalcOptAdjustment_Isha(-600);
+		else if (calcOptAdjustment_Isha > 600) setCalcOptAdjustment_Isha(600);
+	};
+
+	// --------------------------------------------------------------------------
 	// location
-	const [locMode, setLocMode] = useState(currentConfig.locationOption.mode);
+	const [locMode, setLocMode] = useState<'auto' | 'manual'>(currentConfig.locationOption.mode);
 	const [locCity, setLocCity] = useState(currentConfig.locationOption.city);
 	const [locLat, setLocLat] = useState(currentConfig.locationOption.latitude);
 	const [locLang, setLocLang] = useState(currentConfig.locationOption.longitude);
@@ -141,9 +267,9 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	const tzList = window.electron.ipcRenderer.sendSync('get-tz-list') as string[];
 
 	// timezone
-	const [tzMode, setTzMode] = useState(currentConfig.timezoneOption.mode);
-	const [timezone, setTimezone] = useState(currentConfig.timezoneOption.timezone);
-	const [tzInput, setTzInput] = useState('');
+	const [tzMode, setTzMode] = useState<'auto' | 'manual'>(currentConfig.timezoneOption.mode);
+	const [timezone, setTimezone] = useState<string>(currentConfig.timezoneOption.timezone);
+	const [tzInput, setTzInput] = useState<string>('');
 
 	const handleTzModeChange = (e: ChangeEvent<HTMLInputElement>) => {
 		checkChanges();
@@ -172,8 +298,8 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	// --------------------------------------------------------------------------
 	// geoloc
-	const [geolocMode, setGeolocMode] = useState(currentConfig.geoLocAPIKey.mode);
-	const [geolocKey, setGeolocKey] = useState(currentConfig.geoLocAPIKey.key);
+	const [geolocMode, setGeolocMode] = useState<'auto' | 'manual'>(currentConfig.geoLocAPIKey.mode);
+	const [geolocKey, setGeolocKey] = useState<string>(currentConfig.geoLocAPIKey.key);
 
 	const handleGeolocModeChange = (e: ChangeEvent<HTMLInputElement>) => {
 		checkChanges();
@@ -278,7 +404,18 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	// reset config
 	const resetConfig = () => {
 		if (currentConfig.theme !== appTheme) colorMode.toggleColorMode();
+		setChangesMade(false);
 		setCurrentConfig(initialConfig);
+		setCalcOptMode(initialConfig.calcOption.mode);
+		setCalcOptMethod(initialConfig.calcOption.method);
+		setCalcOptMadhab(initialConfig.calcOption.madhab);
+		setCalcOptHighLatRule(initialConfig.calcOption.highLatitudeRule);
+		setCalcOptAdjustment_Fajr(initialConfig.calcOption.adjustments.fajr);
+		setCalcOptAdjustment_Sunrise(initialConfig.calcOption.adjustments.sunrise);
+		setCalcOptAdjustment_Dhuhr(initialConfig.calcOption.adjustments.dhuhr);
+		setCalcOptAdjustment_Asr(initialConfig.calcOption.adjustments.asr);
+		setCalcOptAdjustment_Maghrib(initialConfig.calcOption.adjustments.maghrib);
+		setCalcOptAdjustment_Isha(initialConfig.calcOption.adjustments.isha);
 		setLocMode(initialConfig.locationOption.mode);
 		setLocCity(initialConfig.locationOption.city);
 		setLocLat(initialConfig.locationOption.latitude);
@@ -291,12 +428,21 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		setRunAtStartup(initialConfig.runAtStartup);
 		setcheckUpdateStartup(initialConfig.checkUpdateAtStartup);
 		setUpdateEveryX(initialConfig.updateEvery_X_Hours);
-		setChangesMade(false);
 	};
 
 	// save config
 	const saveTheConfig = () => {
 		// update config
+		currentConfig.calcOption.mode = calcOptMode;
+		currentConfig.calcOption.method = calcOptMethod;
+		currentConfig.calcOption.madhab = calcOptMadhab;
+		currentConfig.calcOption.highLatitudeRule = calcOptHighLatRule;
+		currentConfig.calcOption.adjustments.fajr = calcOptAdjustment_Fajr;
+		currentConfig.calcOption.adjustments.sunrise = calcOptAdjustment_Sunrise;
+		currentConfig.calcOption.adjustments.dhuhr = calcOptAdjustment_Dhuhr;
+		currentConfig.calcOption.adjustments.asr = calcOptAdjustment_Asr;
+		currentConfig.calcOption.adjustments.maghrib = calcOptAdjustment_Maghrib;
+		currentConfig.calcOption.adjustments.isha = calcOptAdjustment_Isha;
 		currentConfig.locationOption.mode = locMode;
 		currentConfig.locationOption.city = locCity;
 		currentConfig.locationOption.latitude = locLat;
@@ -349,7 +495,6 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	return (
 		<>
 			<CssBaseline />
-
 			{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
 			<Dialog open={dialogOpen} onClose={() => dialogMap[currentDialog][0]()} aria-labelledby='alert-dialog-title' aria-describedby='alert-dialog-description'>
 				<DialogTitle id='alert-dialog-title'>{'Confirmation'}</DialogTitle>
@@ -381,6 +526,222 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 				}}
 			>
 				{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
+				{/* calc option, reminder */}
+				<Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+					<Grid item xs={6}>
+						<div
+							style={{
+								display: 'flex',
+								alignItems: 'center',
+								flexWrap: 'wrap',
+							}}
+						>
+							<CalculateOutlinedIcon /> <h3 style={{ paddingLeft: '.5rem' }}>Prayer Times Calculation</h3>
+						</div>
+						<Box
+							component={'form'}
+							noValidate
+							autoComplete='off'
+							sx={{
+								display: 'flex',
+								flexDirection: 'column',
+								'& .MuiTextField-root': { m: 1, ml: 0.5 },
+							}}
+						>
+							<FormControl>
+								<FormLabel id='location-mode-formlabel' sx={{ ml: 0.5 }}>
+									Mode
+								</FormLabel>
+								<RadioGroup sx={{ ml: 0.5 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={calcOptMode} onChange={handleCalcOptModeChange}>
+									<FormControlLabel value='default' control={<Radio />} label='Default' />
+									<FormControlLabel value='manual' control={<Radio />} label='Manual' />
+								</RadioGroup>
+
+								<FormControl fullWidth>
+									<Autocomplete
+										size='small'
+										id='select-calc-method'
+										options={methodList}
+										value={calcOptMethod}
+										onChange={handleCalcOptMethodChange}
+										inputValue={calcOptMethodInput}
+										onInputChange={handleCalcOptMethodInputChange}
+										renderInput={(params) => <TextField {...params} label='Calculation Method' />}
+										disabled={calcOptMode === 'default' ? true : false}
+										autoHighlight
+									/>
+								</FormControl>
+
+								<FormControl fullWidth>
+									<Autocomplete
+										size='small'
+										id='select-calc-madhab'
+										options={madhabList}
+										value={calcOptMadhab}
+										onChange={handleCalcOptMadhabChange}
+										inputValue={calcOptMadhabInput}
+										onInputChange={handleCalcOptMadhabInputChange}
+										renderInput={(params) => <TextField {...params} label='Madhab' />}
+										disabled={calcOptMode === 'default' ? true : false}
+										autoHighlight
+									/>
+								</FormControl>
+
+								<FormControl fullWidth>
+									<Autocomplete
+										size='small'
+										id='select-high-latitude'
+										options={highLatRuleList}
+										value={calcOptHighLatRule}
+										onChange={handleCalcOptHighLatRuleChange}
+										inputValue={calcOptHighLatRuleInput}
+										onInputChange={handleCalcOptHighLatRuleInputChange}
+										renderInput={(params) => <TextField {...params} label='High Latitude Adjustment' />}
+										disabled={calcOptMode === 'default' ? true : false}
+										autoHighlight
+									/>
+								</FormControl>
+
+								<FormLabel id='prayer-adjustment' sx={{ ml: 0.5 }}>
+									Prayer Time Adjustment
+								</FormLabel>
+								<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'start', '& .MuiFormControl-root': { mr: 2.5 } }}>
+									<FormControl>
+										<FormLabel id='fajr-adjustment' sx={{ ml: 0.5 }}>
+											Fajr
+										</FormLabel>
+										<MuiInput
+											style={{ marginTop: '4px' }}
+											sx={{ ml: 0.5 }}
+											value={calcOptAdjustment_Fajr}
+											onChange={handleCalOptAdjustment_FajrChange}
+											onBlur={handleBlur_Fajr}
+											inputProps={{
+												step: 1,
+												min: -600,
+												max: 600,
+												type: 'number',
+												'aria-labelledby': 'input-slider',
+											}}
+										/>
+									</FormControl>
+
+									<FormControl>
+										<FormLabel id='sunrise-adjustment'>Sunrise</FormLabel>
+										<MuiInput
+											style={{ marginTop: '4px' }}
+											value={calcOptAdjustment_Sunrise}
+											onChange={handleCalOptAdjustment_SunriseChange}
+											onBlur={handleBlur_Sunrise}
+											inputProps={{
+												step: 1,
+												min: -600,
+												max: 600,
+												type: 'number',
+												'aria-labelledby': 'input-slider',
+											}}
+										/>
+									</FormControl>
+
+									<FormControl>
+										<FormLabel id='dhuhr-adjustment'>Dhuhr</FormLabel>
+										<MuiInput
+											style={{ marginTop: '4px' }}
+											value={calcOptAdjustment_Dhuhr}
+											onChange={handleCalOptAdjustment_DhuhrChange}
+											onBlur={handleBlur_Dhuhr}
+											inputProps={{
+												step: 1,
+												min: -600,
+												max: 600,
+												type: 'number',
+												'aria-labelledby': 'input-slider',
+											}}
+										/>
+									</FormControl>
+
+									<FormControl>
+										<FormLabel id='asr-adjustment'>Asr</FormLabel>
+										<MuiInput
+											style={{ marginTop: '4px' }}
+											value={calcOptAdjustment_Asr}
+											onChange={handleCalOptAdjustment_AsrChange}
+											onBlur={handleBlur_Asr}
+											inputProps={{
+												step: 1,
+												min: -600,
+												max: 600,
+												type: 'number',
+												'aria-labelledby': 'input-slider',
+											}}
+										/>
+									</FormControl>
+
+									<FormControl>
+										<FormLabel id='maghrib-adjustment'>Magrib</FormLabel>
+										<MuiInput
+											style={{ marginTop: '4px' }}
+											value={calcOptAdjustment_Maghrib}
+											onChange={handleCalOptAdjustment_MaghribChange}
+											onBlur={handleBlur_Maghrib}
+											inputProps={{
+												step: 1,
+												min: -600,
+												max: 600,
+												type: 'number',
+												'aria-labelledby': 'input-slider',
+											}}
+										/>
+									</FormControl>
+
+									<FormControl>
+										<FormLabel id='isha-adjustment'>Isha</FormLabel>
+										<MuiInput
+											style={{ marginTop: '4px' }}
+											value={calcOptAdjustment_Isha}
+											onChange={handleCalOptAdjustment_IshaChange}
+											onBlur={handleBlur_Isha}
+											inputProps={{
+												step: 1,
+												min: -600,
+												max: 600,
+												type: 'number',
+												'aria-labelledby': 'input-slider',
+											}}
+										/>
+									</FormControl>
+								</Box>
+							</FormControl>
+						</Box>
+					</Grid>
+
+					<Grid item xs={6}>
+						<div
+							style={{
+								display: 'flex',
+								alignItems: 'center',
+								flexWrap: 'wrap',
+							}}
+						>
+							<KeyIcon /> <h3 style={{ paddingLeft: '.5rem' }}>API Key</h3>
+						</div>
+						<Box
+							component={'form'}
+							noValidate
+							autoComplete='off'
+							sx={{
+								display: 'flex',
+								flexDirection: 'column',
+								'& .MuiTextField-root': { m: 1, ml: 0.5 },
+							}}
+						>
+							a
+						</Box>
+					</Grid>
+				</Grid>
+				{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
+				{/* location, timezone, api keys */}
+				<Divider sx={{ mt: 2, mb: 2 }} />
 				<Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
 					{/* ------------------------------------- */}
 					{/* location */}
@@ -490,7 +851,6 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 										renderInput={(params) => <TextField {...params} label='Timezone' />}
 										disabled={tzMode === 'auto' ? true : false}
 										autoHighlight
-										autoSelect
 									/>
 								</FormControl>
 							</FormControl>
@@ -553,6 +913,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 				</Grid>
 				{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
 				{/* other settings */}
+				<Divider sx={{ mt: 2, mb: 2 }} />
 				<Grid container spacing={2}>
 					<Grid item xs={12}>
 						<div
@@ -620,7 +981,8 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 				</Grid>
 
 				{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-				<Box sx={{ '& button': { m: 1 }, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', mt: 3 }}>
+				<Divider sx={{ mt: 3, width: '200px', ml: 'auto', mr: 'auto' }} />
+				<Box sx={{ '& button': { m: 1 }, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', mt: 0.25 }}>
 					{/* Cancel changes */}
 					<Button
 						variant='outlined'
