@@ -10,6 +10,14 @@ body {
 	color: blueviolet
 }
 
+.subtle-text {
+	color: #999;
+}
+
+.prayername {
+	margin-left: 2rem;
+}
+
 /* --------------------------- */
 /* MUI Overrides */
 .MuiCard-root#light {

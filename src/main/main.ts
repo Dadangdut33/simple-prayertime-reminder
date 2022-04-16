@@ -204,6 +204,10 @@ ipcMain.on('get-cached', (event, _arg) => {
 	event.returnValue = cacheData;
 });
 
+ipcMain.on('get-timezone', (event, _arg) => {
+	event.returnValue = appConfig.timezoneOption.timezone;
+});
+
 ipcMain.on('get-version', (event, _arg) => {
 	event.returnValue = process.env.npm_package_version;
 });
@@ -249,4 +253,11 @@ ipcMain.on('open-external-url', (_event, arg) => {
 ipcMain.on('yesno-dialog', (event, arg: any) => {
 	const result = NoYesBox(arg.title, arg.question, mainWindow as BrowserWindow);
 	event.returnValue = result;
+});
+
+// ----------------------------------------------------
+// praytime
+ipcMain.on('get-this-pt', (event, arg) => {
+	const pt = getPrayerTimes(appConfig, arg);
+	event.returnValue = pt;
 });

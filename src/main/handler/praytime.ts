@@ -2,7 +2,7 @@ import adhan, { Coordinates, CalculationMethod } from 'adhan';
 import Moment from 'moment-timezone';
 import { configInterface } from 'main/interfaces';
 
-const methodMap = {
+const methodMap: any = {
 	MuslimWorldLeague: CalculationMethod.MuslimWorldLeague,
 	Egyptian: CalculationMethod.Egyptian,
 	Karachi: CalculationMethod.Karachi,
@@ -17,14 +17,14 @@ const methodMap = {
 	Turkey: CalculationMethod.Turkey,
 };
 
-const highLatitudeRuleMap = {
+const highLatitudeRuleMap: any = {
 	MiddleOfTheNight: adhan.HighLatitudeRule.MiddleOfTheNight,
 	SeventhOfTheNight: adhan.HighLatitudeRule.SeventhOfTheNight,
 	TwilightAngle: adhan.HighLatitudeRule.TwilightAngle,
 };
 
-export const getPrayerTimes = (settings: configInterface) => {
-	const date = new Date(), // Current date
+export const getPrayerTimes = (settings: configInterface, customDate: string = '') => {
+	const date = customDate !== '' ? new Date(customDate) : new Date(),
 		params = methodMap[settings.calcOption.method](),
 		coordinates = new Coordinates(parseFloat(settings.locationOption.latitude), parseFloat(settings.locationOption.longitude));
 
@@ -47,12 +47,12 @@ export const getPrayerTimes = (settings: configInterface) => {
 	// ----------------------------------------------------------------
 	// HH:mm -> 24h | h:mm A -> AM/PM
 	const prayerGet = new adhan.PrayerTimes(coordinates, date, params);
-	let fajrTime = Moment(prayerGet.fajr).tz(settings.timezoneOption.timezone),
-		sunriseTime = Moment(prayerGet.sunrise).tz(settings.timezoneOption.timezone),
-		dhuhrTime = Moment(prayerGet.dhuhr).tz(settings.timezoneOption.timezone),
-		asrTime = Moment(prayerGet.asr).tz(settings.timezoneOption.timezone),
-		maghribTime = Moment(prayerGet.maghrib).tz(settings.timezoneOption.timezone),
-		ishaTime = Moment(prayerGet.isha).tz(settings.timezoneOption.timezone),
+	let fajrTime = Moment(prayerGet.fajr).tz(settings.timezoneOption.timezone).toString(),
+		sunriseTime = Moment(prayerGet.sunrise).tz(settings.timezoneOption.timezone).toString(),
+		dhuhrTime = Moment(prayerGet.dhuhr).tz(settings.timezoneOption.timezone).toString(),
+		asrTime = Moment(prayerGet.asr).tz(settings.timezoneOption.timezone).toString(),
+		maghribTime = Moment(prayerGet.maghrib).tz(settings.timezoneOption.timezone).toString(),
+		ishaTime = Moment(prayerGet.isha).tz(settings.timezoneOption.timezone).toString(),
 		current = prayerGet.currentPrayer().toString(),
 		next = prayerGet.nextPrayer().toString();
 
