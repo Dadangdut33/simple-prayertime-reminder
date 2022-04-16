@@ -537,7 +537,10 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		setChangesMade(false);
 		setDialogOpen(false);
 		if (yes) saveTheConfig();
-		else window.electron.ipcRenderer.send('invoke-page-change', destination);
+		else {
+			if (currentConfig.theme !== appTheme) colorMode.toggleColorMode();
+			window.electron.ipcRenderer.send('invoke-page-change', destination);
+		}
 	};
 
 	const handleDialogSave = (yes = false) => {
