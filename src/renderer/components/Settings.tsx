@@ -26,6 +26,9 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Checkbox from '@mui/material/Checkbox';
 import MuiInput from '@mui/material/Input';
 import Autocomplete from '@mui/material/Autocomplete';
+import Select from '@mui/material/Select';
+import FormGroup from '@mui/material/FormGroup';
+import MenuItem from '@mui/material/MenuItem';
 
 // Dialogbox
 import Dialog from '@mui/material/Dialog';
@@ -46,7 +49,6 @@ import KeyIcon from '@mui/icons-material/Key';
 import MiscellaneousServicesOutlinedIcon from '@mui/icons-material/MiscellaneousServicesOutlined';
 import CalculateOutlinedIcon from '@mui/icons-material/CalculateOutlined';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
-import FormGroup from '@mui/material/FormGroup';
 
 export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) => {
 	// config on tab open
@@ -510,6 +512,12 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		checkChanges();
 	};
 
+	const [clockStyle, setClockStyle] = useState(currentConfig.clockStyle);
+	const handleClockStyleChange = (e: any) => {
+		setClockStyle(e.target.value as string);
+		checkChanges();
+	};
+
 	// --------------------------------------------------------------------------
 	// snackbar
 	const [showSnackbar, setShowSnackbar] = useState<boolean>(false);
@@ -596,6 +604,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		setRunAtStartup(initialConfig.runAtStartup);
 		setcheckUpdateStartup(initialConfig.checkUpdateAtStartup);
 		setUpdateEveryX(initialConfig.updateEvery_X_Hours);
+		setClockStyle(initialConfig.clockStyle);
 
 		// snackbar
 		setSnackbarMsg('Settings reset successfully.');
@@ -642,10 +651,11 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		currentConfig.timezoneOption.timezone = timezone;
 		currentConfig.geoLocAPIKey.mode = geolocMode;
 		currentConfig.geoLocAPIKey.key = geolocKey;
-		currentConfig.theme = appTheme;
 		currentConfig.runAtStartup = runAtStartup;
 		currentConfig.checkUpdateAtStartup = checkUpdateStartup;
 		currentConfig.updateEvery_X_Hours = updateEveryX;
+		currentConfig.clockStyle = clockStyle;
+		currentConfig.theme = appTheme;
 	};
 
 	// save config
@@ -1322,6 +1332,13 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 									<FormControlLabel control={<Checkbox checked={runAtStartup} onChange={handleRunAtStartupChange} />} label='Run app on PC startup' />
 									<FormControlLabel control={<Checkbox checked={checkUpdateStartup} onChange={handleCheckUpdateStartupChange} />} label='Check for update on app start' />
 								</Box>
+							</FormControl>
+							<FormControl sx={{ minWidth: '120px' }}>
+								<FormLabel id='app-theme-formlabel'>Clock Style</FormLabel>
+								<Select size='small' labelId='demo-simple-select-label' id='demo-simple-select' value={clockStyle} onChange={handleClockStyleChange}>
+									<MenuItem value='AM/PM'>AM/PM</MenuItem>
+									<MenuItem value='24h'>24h</MenuItem>
+								</Select>
 							</FormControl>
 						</Box>
 					</Grid>

@@ -58,5 +58,6 @@ export interface configInterface {
 	updateEvery_X_Hours: number;
 	runAtStartup: boolean;
 	checkUpdateAtStartup: boolean;
+	clockStyle: string | 'AM/PM' | '24h';
 	theme: 'dark' | 'light';
 }

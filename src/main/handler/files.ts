@@ -73,6 +73,7 @@ export const initialConfig: configInterface = {
 	},
 	updateEvery_X_Hours: 4,
 	runAtStartup: true,
+	clockStyle: 'AM/PM',
 	checkUpdateAtStartup: true,
 	theme: 'light',
 };
