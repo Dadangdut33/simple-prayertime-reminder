@@ -1,4 +1,4 @@
-import { useState, SyntheticEvent } from 'react';
+import { useState, SyntheticEvent, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // MUI elements
@@ -24,6 +24,13 @@ export const AppNav = ({ theme, changesMade }: any) => {
 		3: '/about',
 	};
 
+	const valueMap: any = {
+		'/': 0,
+		'/calendar': 1,
+		'/settings': 2,
+		'/about': 3,
+	};
+
 	const handleChange = (_event: SyntheticEvent, newValue: number) => {
 		if (changesMade) window.electron.ipcRenderer.send('invoke-open-changes-made', navigateMap[newValue]);
 		else {
@@ -31,6 +38,14 @@ export const AppNav = ({ theme, changesMade }: any) => {
 			navigate(navigateMap[newValue]);
 		}
 	};
+
+	// listener for page switching
+	useEffect(() => {
+		window.electron.ipcRenderer.on('page-change', (arg: any) => {
+			setValue(valueMap[arg]);
+			navigate(arg);
+		});
+	}, []);
 
 	return (
 		<>

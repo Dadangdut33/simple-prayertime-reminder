@@ -181,6 +181,10 @@ ipcMain.on('invoke-open-changes-made', (_event, arg) => {
 	if (mainWindow) mainWindow.webContents.send('open-changes-made', arg);
 });
 
+ipcMain.on('invoke-page-change', (_event, arg) => {
+	if (mainWindow) mainWindow.webContents.send('page-change', arg);
+});
+
 // ----------------------------------------------------
 // config/files
 ipcMain.on('get-config', (event, _arg) => {

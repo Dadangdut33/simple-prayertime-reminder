@@ -1,7 +1,6 @@
 import { ColorModeContextInterface } from 'renderer/interfaces';
 import { configInterface, getPosition_absolute_I } from 'main/interfaces';
-import { useContext, forwardRef, useState, ChangeEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useContext, forwardRef, useState, ChangeEvent, useEffect } from 'react';
 
 // MUI
 import Divider from '@mui/material/Divider';
@@ -46,13 +45,14 @@ import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import KeyIcon from '@mui/icons-material/Key';
 import MiscellaneousServicesOutlinedIcon from '@mui/icons-material/MiscellaneousServicesOutlined';
 import CalculateOutlinedIcon from '@mui/icons-material/CalculateOutlined';
+import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
+import FormGroup from '@mui/material/FormGroup';
 
 export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) => {
 	// config on tab open
 	const initialConfig = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
-	const [currentConfig, setCurrentConfig] = useState<configInterface>(initialConfig); // current config
+	const [currentConfig, setCurrentConfig] = useState<configInterface>(window.electron.ipcRenderer.sendSync('get-config') as configInterface); // current config
 	const [destination, setDestination] = useState<string>(''); // destination path
-	const navigate = useNavigate();
 
 	// --------------------------------------------------------------------------
 	// calcOption
@@ -75,7 +75,6 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	const [calcOptHighLatRuleInput, setCalcOptHighLatRuleInput] = useState<string>('');
 
 	const handleCalcOptModeChange = (event: ChangeEvent<HTMLInputElement>) => {
-		checkChanges();
 		setCalcOptMode(event.target.value as 'default' | 'manual');
 
 		if (event.target.value === 'default') {
@@ -83,13 +82,14 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 			setCalcOptMadhab('Shafi');
 			setCalcOptHighLatRule('TwilightAngle');
 		}
+		checkChanges();
 	};
 
 	const handleCalcOptMethodChange = (_event: any, newValue: string | null) => {
-		checkChanges();
 		setCalcOptMethod(newValue as string);
 
 		if (newValue === null) setCalcOptMethod(methodList[0]);
+		checkChanges();
 	};
 
 	const handleCalcOptMethodInputChange = (_event: any, newValue: string) => {
@@ -97,10 +97,10 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	};
 
 	const handleCalcOptMadhabChange = (_event: any, newValue: string | null) => {
-		checkChanges();
 		setCalcOptMadhab(newValue as string);
 
 		if (newValue === null) setCalcOptMadhab(madhabList[0]);
+		checkChanges();
 	};
 
 	const handleCalcOptMadhabInputChange = (_event: any, newValue: string) => {
@@ -108,10 +108,10 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	};
 
 	const handleCalcOptHighLatRuleChange = (_event: any, newValue: string | null) => {
-		checkChanges();
 		setCalcOptHighLatRule(newValue as string);
 
 		if (newValue === null) setCalcOptHighLatRule(highLatRuleList[0]);
+		checkChanges();
 	};
 
 	const handleCalcOptHighLatRuleInputChange = (_event: any, newValue: string) => {
@@ -119,8 +119,8 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	};
 
 	const handleCalOptAdjustment_FajrChange = (event: ChangeEvent<HTMLInputElement>) => {
-		checkChanges();
 		setCalcOptAdjustment_Fajr(Number(event.target.value) || 0);
+		checkChanges();
 	};
 
 	const handleBlur_Fajr = () => {
@@ -129,8 +129,8 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	};
 
 	const handleCalOptAdjustment_SunriseChange = (event: ChangeEvent<HTMLInputElement>) => {
-		checkChanges();
 		setCalcOptAdjustment_Sunrise(Number(event.target.value) || 0);
+		checkChanges();
 	};
 
 	const handleBlur_Sunrise = () => {
@@ -139,8 +139,8 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	};
 
 	const handleCalOptAdjustment_DhuhrChange = (event: ChangeEvent<HTMLInputElement>) => {
-		checkChanges();
 		setCalcOptAdjustment_Dhuhr(Number(event.target.value) || 0);
+		checkChanges();
 	};
 
 	const handleBlur_Dhuhr = () => {
@@ -149,8 +149,8 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	};
 
 	const handleCalOptAdjustment_AsrChange = (event: ChangeEvent<HTMLInputElement>) => {
-		checkChanges();
 		setCalcOptAdjustment_Asr(Number(event.target.value) || 0);
+		checkChanges();
 	};
 
 	const handleBlur_Asr = () => {
@@ -159,8 +159,8 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	};
 
 	const handleCalOptAdjustment_MaghribChange = (event: ChangeEvent<HTMLInputElement>) => {
-		checkChanges();
 		setCalcOptAdjustment_Maghrib(Number(event.target.value) || 0);
+		checkChanges();
 	};
 
 	const handleBlur_Maghrib = () => {
@@ -169,13 +169,159 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	};
 
 	const handleCalOptAdjustment_IshaChange = (event: ChangeEvent<HTMLInputElement>) => {
-		checkChanges();
 		setCalcOptAdjustment_Isha(Number(event.target.value) || 0);
+		checkChanges();
 	};
 
 	const handleBlur_Isha = () => {
 		if (calcOptAdjustment_Isha < -600) setCalcOptAdjustment_Isha(-600);
 		else if (calcOptAdjustment_Isha > 600) setCalcOptAdjustment_Isha(600);
+	};
+
+	// --------------------------------------------------------------------------
+	// reminder option
+	const [remind_fajr_remindWhenOnTime, setRemind_fajr_remindWhenOnTime] = useState<boolean>(currentConfig.reminderOption.fajr.remindWhenOnTime);
+	const [remind_fajr_earlyReminder, setRemind_fajr_earlyReminder] = useState<boolean>(currentConfig.reminderOption.fajr.earlyReminder);
+	const [remind_fajr_earlyTime, setRemind_fajr_earlyTime] = useState<number>(currentConfig.reminderOption.fajr.earlyTime);
+
+	const [remind_sunrise_remindWhenOnTime, setRemind_sunrise_remindWhenOnTime] = useState<boolean>(currentConfig.reminderOption.sunrise.remindWhenOnTime);
+	const [remind_sunrise_earlyReminder, setRemind_sunrise_earlyReminder] = useState<boolean>(currentConfig.reminderOption.sunrise.earlyReminder);
+	const [remind_sunrise_earlyTime, setRemind_sunrise_earlyTime] = useState<number>(currentConfig.reminderOption.sunrise.earlyTime);
+
+	const [remind_dhuhr_remindWhenOnTime, setRemind_dhuhr_remindWhenOnTime] = useState<boolean>(currentConfig.reminderOption.dhuhr.remindWhenOnTime);
+	const [remind_dhuhr_earlyReminder, setRemind_dhuhr_earlyReminder] = useState<boolean>(currentConfig.reminderOption.dhuhr.earlyReminder);
+	const [remind_dhuhr_earlyTime, setRemind_dhuhr_earlyTime] = useState<number>(currentConfig.reminderOption.dhuhr.earlyTime);
+
+	const [remind_asr_remindWhenOnTime, setRemind_asr_remindWhenOnTime] = useState<boolean>(currentConfig.reminderOption.asr.remindWhenOnTime);
+	const [remind_asr_earlyReminder, setRemind_asr_earlyReminder] = useState<boolean>(currentConfig.reminderOption.asr.earlyReminder);
+	const [remind_asr_earlyTime, setRemind_asr_earlyTime] = useState<number>(currentConfig.reminderOption.asr.earlyTime);
+
+	const [remind_maghrib_remindWhenOnTime, setRemind_maghrib_remindWhenOnTime] = useState<boolean>(currentConfig.reminderOption.maghrib.remindWhenOnTime);
+	const [remind_maghrib_earlyReminder, setRemind_maghrib_earlyReminder] = useState<boolean>(currentConfig.reminderOption.maghrib.earlyReminder);
+	const [remind_maghrib_earlyTime, setRemind_maghrib_earlyTime] = useState<number>(currentConfig.reminderOption.maghrib.earlyTime);
+
+	const [remind_isha_remindWhenOnTime, setRemind_isha_remindWhenOnTime] = useState<boolean>(currentConfig.reminderOption.isha.remindWhenOnTime);
+	const [remind_isha_earlyReminder, setRemind_isha_earlyReminder] = useState<boolean>(currentConfig.reminderOption.isha.earlyReminder);
+	const [remind_isha_earlyTime, setRemind_isha_earlyTime] = useState<number>(currentConfig.reminderOption.isha.earlyTime);
+
+	const handleRemind_fajr_remindWhenOnTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setRemind_fajr_remindWhenOnTime(event.target.checked);
+		checkChanges();
+	};
+
+	const handleRemind_fajr_earlyReminderChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setRemind_fajr_earlyReminder(event.target.checked);
+		checkChanges();
+	};
+
+	const handleRemind_fajr_earlyTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setRemind_fajr_earlyTime(Number(event.target.value) || 0);
+		checkChanges();
+	};
+
+	const blurRemind_fajr_earlyTime = () => {
+		if (remind_fajr_earlyTime < 0) setRemind_fajr_earlyTime(0);
+		else if (remind_fajr_earlyTime > 300) setRemind_fajr_earlyTime(300);
+	};
+
+	const handleRemind_sunrise_remindWhenOnTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setRemind_sunrise_remindWhenOnTime(event.target.checked);
+		checkChanges();
+	};
+
+	const handleRemind_sunrise_earlyReminderChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setRemind_sunrise_earlyReminder(event.target.checked);
+		checkChanges();
+	};
+
+	const handleRemind_sunrise_earlyTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setRemind_sunrise_earlyTime(Number(event.target.value) || 0);
+		checkChanges();
+	};
+
+	const blurRemind_sunrise_earlyTime = () => {
+		if (remind_sunrise_earlyTime < 0) setRemind_sunrise_earlyTime(0);
+		else if (remind_sunrise_earlyTime > 300) setRemind_sunrise_earlyTime(300);
+	};
+
+	const handleRemind_dhuhr_remindWhenOnTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setRemind_dhuhr_remindWhenOnTime(event.target.checked);
+		checkChanges();
+	};
+
+	const handleRemind_dhuhr_earlyReminderChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setRemind_dhuhr_earlyReminder(event.target.checked);
+		checkChanges();
+	};
+
+	const handleRemind_dhuhr_earlyTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setRemind_dhuhr_earlyTime(Number(event.target.value) || 0);
+		checkChanges();
+	};
+
+	const blurRemind_dhuhr_earlyTime = () => {
+		if (remind_dhuhr_earlyTime < 0) setRemind_dhuhr_earlyTime(0);
+		else if (remind_dhuhr_earlyTime > 300) setRemind_dhuhr_earlyTime(300);
+	};
+
+	const handleRemind_asr_remindWhenOnTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setRemind_asr_remindWhenOnTime(event.target.checked);
+		checkChanges();
+	};
+
+	const handleRemind_asr_earlyReminderChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setRemind_asr_earlyReminder(event.target.checked);
+		checkChanges();
+	};
+
+	const handleRemind_asr_earlyTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setRemind_asr_earlyTime(Number(event.target.value) || 0);
+		checkChanges();
+	};
+
+	const blurRemind_asr_earlyTime = () => {
+		if (remind_asr_earlyTime < 0) setRemind_asr_earlyTime(0);
+		else if (remind_asr_earlyTime > 300) setRemind_asr_earlyTime(300);
+	};
+
+	const handleRemind_maghrib_remindWhenOnTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setRemind_maghrib_remindWhenOnTime(event.target.checked);
+		checkChanges();
+	};
+
+	const handleRemind_maghrib_earlyReminderChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setRemind_maghrib_earlyReminder(event.target.checked);
+		checkChanges();
+	};
+
+	const handleRemind_maghrib_earlyTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setRemind_maghrib_earlyTime(Number(event.target.value) || 0);
+		checkChanges();
+	};
+
+	const blurRemind_maghrib_earlyTime = () => {
+		if (remind_maghrib_earlyTime < 0) setRemind_maghrib_earlyTime(0);
+		else if (remind_maghrib_earlyTime > 300) setRemind_maghrib_earlyTime(300);
+	};
+
+	const handleRemind_isha_remindWhenOnTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setRemind_isha_remindWhenOnTime(event.target.checked);
+		checkChanges();
+	};
+
+	const handleRemind_isha_earlyReminderChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setRemind_isha_earlyReminder(event.target.checked);
+		checkChanges();
+	};
+
+	const handleRemind_isha_earlyTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setRemind_isha_earlyTime(Number(event.target.value) || 0);
+		checkChanges();
+	};
+
+	const blurRemind_isha_earlyTime = () => {
+		if (remind_isha_earlyTime < 0) setRemind_isha_earlyTime(0);
+		else if (remind_isha_earlyTime > 300) setRemind_isha_earlyTime(300);
 	};
 
 	// --------------------------------------------------------------------------
@@ -186,7 +332,6 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	const [locLang, setLocLang] = useState(currentConfig.locationOption.longitude);
 	const [locUpdateEveryStartup, setLocUpdateEveryStartup] = useState(currentConfig.locationOption.updateEveryStartup);
 	const handleLocModeChange = (e: ChangeEvent<HTMLInputElement>) => {
-		checkChanges();
 		setLocMode(e.target.value as 'auto' | 'manual');
 		// if auto, fetch location
 		if (e.target.value === 'auto') {
@@ -201,33 +346,33 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 				setLocLang(longitude);
 			}
 		}
+		checkChanges();
 	};
 
 	const handleCityChange = (e: ChangeEvent<HTMLInputElement>) => {
-		checkChanges();
 		setLocCity(e.target.value);
+		checkChanges();
 	};
 
 	const handleLatChange = (e: ChangeEvent<HTMLInputElement>) => {
-		checkChanges();
 		setLocLat(e.target.value);
+		checkChanges();
 	};
 
 	const handleLangChange = (e: ChangeEvent<HTMLInputElement>) => {
-		checkChanges();
 		setLocLang(e.target.value);
+		checkChanges();
 	};
 
 	const handleLocUpdateEveryStartupChange = (e: ChangeEvent<HTMLInputElement>) => {
-		checkChanges();
 		setLocUpdateEveryStartup(e.target.checked);
+		checkChanges();
 	};
 
 	const getCityLatLang_Auto = () => {
 		const { city, latitude, longitude, successGet } = window.electron.ipcRenderer.sendSync('get-location-auto', currentConfig) as getPosition_absolute_I;
 
 		if (successGet) {
-			checkChanges();
 			setLocCity(city);
 			setLocLat(latitude);
 			setLocLang(longitude);
@@ -236,6 +381,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 			setShowSnackbar(true);
 			setSnackbarMsg('Location fetched successfully!');
 			setSnackbarSeverity('success');
+			checkChanges();
 		} else {
 			// snackbar
 			setShowSnackbar(true);
@@ -252,13 +398,13 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 			setSnackbarMsg("Couldn't found city's name. Please check your input. (There might be typo)");
 			return;
 		} else {
-			checkChanges();
 			setShowSnackbar(true);
 			setSnackbarSeverity('success');
 			setSnackbarMsg('Location fetched successfully! City inputted has been replaced with the data fetched.');
 			setLocCity(result[0].name);
 			setLocLat(result[0].loc.coordinates[1]);
 			setLocLang(result[0].loc.coordinates[0]);
+			checkChanges();
 		}
 	};
 
@@ -272,7 +418,6 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	const [tzInput, setTzInput] = useState<string>('');
 
 	const handleTzModeChange = (e: ChangeEvent<HTMLInputElement>) => {
-		checkChanges();
 		setTzMode(e.target.value as 'auto' | 'manual');
 		if (e.target.value === 'auto') {
 			if (currentConfig.timezoneOption.mode === 'auto') {
@@ -282,14 +427,15 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 				setTimezone(timezone);
 			}
 		}
+		checkChanges();
 	};
 
 	const handleTimezoneChange = (_event: any, newValue: string | null) => {
 		// not importing the interface for IDE performance sake
-		checkChanges();
 		setTimezone(newValue as string);
 		// make sure something is always selected
 		if (newValue === null) setTimezone(tzList[0]);
+		checkChanges();
 	};
 
 	const handleTzInputChange = (_event: any, newValue: string) => {
@@ -302,13 +448,15 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	const [geolocKey, setGeolocKey] = useState<string>(currentConfig.geoLocAPIKey.key);
 
 	const handleGeolocModeChange = (e: ChangeEvent<HTMLInputElement>) => {
-		checkChanges();
 		setGeolocMode(e.target.value as 'auto' | 'manual');
+
+		if (e.target.value === 'auto') setGeolocKey('');
+		checkChanges();
 	};
 
 	const handleGeolocKeyChange = (e: ChangeEvent<HTMLInputElement>) => {
-		checkChanges();
 		setGeolocKey(e.target.value);
+		checkChanges();
 	};
 
 	const verifyKey = () => {
@@ -331,8 +479,8 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	const colorMode = useContext(ColorModeContext) as ColorModeContextInterface;
 
 	const handleColorModeChange = (_e: ChangeEvent<HTMLInputElement>) => {
-		checkChanges();
 		colorMode.toggleColorMode();
+		checkChanges();
 	};
 
 	const [runAtStartup, setRunAtStartup] = useState(currentConfig.runAtStartup);
@@ -340,8 +488,8 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	const [updateEveryX, setUpdateEveryX] = useState(currentConfig.updateEvery_X_Hours);
 
 	const handleUpdateEveryX = (e: ChangeEvent<HTMLInputElement>) => {
-		checkChanges();
 		setUpdateEveryX(Number(e.target.value) || 0);
+		checkChanges();
 	};
 
 	const handleBlurUpdateEveryX = () => {
@@ -353,13 +501,13 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	};
 
 	const handleRunAtStartupChange = (e: ChangeEvent<HTMLInputElement>) => {
-		checkChanges();
 		setRunAtStartup(e.target.checked);
+		checkChanges();
 	};
 
 	const handleCheckUpdateStartupChange = (e: ChangeEvent<HTMLInputElement>) => {
-		checkChanges();
 		setcheckUpdateStartup(e.target.checked);
+		checkChanges();
 	};
 
 	// --------------------------------------------------------------------------
@@ -381,7 +529,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		setChangesMade(false);
 		setDialogOpen(false);
 		if (yes) saveTheConfig();
-		else navigate(destination);
+		else window.electron.ipcRenderer.send('invoke-page-change', destination);
 	};
 
 	const handleDialogSave = (yes = false) => {
@@ -395,7 +543,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	};
 
 	const dialogMap: any = {
-		changesMade: [handleDialogChangesMade, 'You have unsaved changes. Do you want to save them?'],
+		changes: [handleDialogChangesMade, 'You have unsaved changes. Do you want to save them?'],
 		save: [handleDialogSave, 'Are you sure you want to save the settings changes?'],
 		cancel: [handleDialogCancel, 'Are you sure you want to cancel changes made?'],
 	};
@@ -406,6 +554,8 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		if (currentConfig.theme !== appTheme) colorMode.toggleColorMode();
 		setChangesMade(false);
 		setCurrentConfig(initialConfig);
+
+		// setting var
 		setCalcOptMode(initialConfig.calcOption.mode);
 		setCalcOptMethod(initialConfig.calcOption.method);
 		setCalcOptMadhab(initialConfig.calcOption.madhab);
@@ -416,6 +566,24 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		setCalcOptAdjustment_Asr(initialConfig.calcOption.adjustments.asr);
 		setCalcOptAdjustment_Maghrib(initialConfig.calcOption.adjustments.maghrib);
 		setCalcOptAdjustment_Isha(initialConfig.calcOption.adjustments.isha);
+		setRemind_fajr_remindWhenOnTime(initialConfig.reminderOption.fajr.remindWhenOnTime);
+		setRemind_fajr_earlyReminder(initialConfig.reminderOption.fajr.earlyReminder);
+		setRemind_fajr_earlyTime(initialConfig.reminderOption.fajr.earlyTime);
+		setRemind_sunrise_remindWhenOnTime(initialConfig.reminderOption.sunrise.remindWhenOnTime);
+		setRemind_sunrise_earlyReminder(initialConfig.reminderOption.sunrise.earlyReminder);
+		setRemind_sunrise_earlyTime(initialConfig.reminderOption.sunrise.earlyTime);
+		setRemind_dhuhr_remindWhenOnTime(initialConfig.reminderOption.dhuhr.remindWhenOnTime);
+		setRemind_dhuhr_earlyReminder(initialConfig.reminderOption.dhuhr.earlyReminder);
+		setRemind_dhuhr_earlyTime(initialConfig.reminderOption.dhuhr.earlyTime);
+		setRemind_asr_remindWhenOnTime(initialConfig.reminderOption.asr.remindWhenOnTime);
+		setRemind_asr_earlyReminder(initialConfig.reminderOption.asr.earlyReminder);
+		setRemind_asr_earlyTime(initialConfig.reminderOption.asr.earlyTime);
+		setRemind_maghrib_remindWhenOnTime(initialConfig.reminderOption.maghrib.remindWhenOnTime);
+		setRemind_maghrib_earlyReminder(initialConfig.reminderOption.maghrib.earlyReminder);
+		setRemind_maghrib_earlyTime(initialConfig.reminderOption.maghrib.earlyTime);
+		setRemind_isha_remindWhenOnTime(initialConfig.reminderOption.isha.remindWhenOnTime);
+		setRemind_isha_earlyReminder(initialConfig.reminderOption.isha.earlyReminder);
+		setRemind_isha_earlyTime(initialConfig.reminderOption.isha.earlyTime);
 		setLocMode(initialConfig.locationOption.mode);
 		setLocCity(initialConfig.locationOption.city);
 		setLocLat(initialConfig.locationOption.latitude);
@@ -428,10 +596,14 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		setRunAtStartup(initialConfig.runAtStartup);
 		setcheckUpdateStartup(initialConfig.checkUpdateAtStartup);
 		setUpdateEveryX(initialConfig.updateEvery_X_Hours);
+
+		// snackbar
+		setSnackbarMsg('Settings reset successfully.');
+		setSnackbarSeverity('info');
+		setShowSnackbar(true);
 	};
 
-	// save config
-	const saveTheConfig = () => {
+	const storeConfig = () => {
 		// update config
 		currentConfig.calcOption.mode = calcOptMode;
 		currentConfig.calcOption.method = calcOptMethod;
@@ -443,6 +615,24 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		currentConfig.calcOption.adjustments.asr = calcOptAdjustment_Asr;
 		currentConfig.calcOption.adjustments.maghrib = calcOptAdjustment_Maghrib;
 		currentConfig.calcOption.adjustments.isha = calcOptAdjustment_Isha;
+		currentConfig.reminderOption.fajr.remindWhenOnTime = remind_fajr_remindWhenOnTime;
+		currentConfig.reminderOption.fajr.earlyReminder = remind_fajr_earlyReminder;
+		currentConfig.reminderOption.fajr.earlyTime = remind_fajr_earlyTime;
+		currentConfig.reminderOption.sunrise.remindWhenOnTime = remind_sunrise_remindWhenOnTime;
+		currentConfig.reminderOption.sunrise.earlyReminder = remind_sunrise_earlyReminder;
+		currentConfig.reminderOption.sunrise.earlyTime = remind_sunrise_earlyTime;
+		currentConfig.reminderOption.dhuhr.remindWhenOnTime = remind_dhuhr_remindWhenOnTime;
+		currentConfig.reminderOption.dhuhr.earlyReminder = remind_dhuhr_earlyReminder;
+		currentConfig.reminderOption.dhuhr.earlyTime = remind_dhuhr_earlyTime;
+		currentConfig.reminderOption.asr.remindWhenOnTime = remind_asr_remindWhenOnTime;
+		currentConfig.reminderOption.asr.earlyReminder = remind_asr_earlyReminder;
+		currentConfig.reminderOption.asr.earlyTime = remind_asr_earlyTime;
+		currentConfig.reminderOption.maghrib.remindWhenOnTime = remind_maghrib_remindWhenOnTime;
+		currentConfig.reminderOption.maghrib.earlyReminder = remind_maghrib_earlyReminder;
+		currentConfig.reminderOption.maghrib.earlyTime = remind_maghrib_earlyTime;
+		currentConfig.reminderOption.isha.remindWhenOnTime = remind_isha_remindWhenOnTime;
+		currentConfig.reminderOption.isha.earlyReminder = remind_isha_earlyReminder;
+		currentConfig.reminderOption.isha.earlyTime = remind_isha_earlyTime;
 		currentConfig.locationOption.mode = locMode;
 		currentConfig.locationOption.city = locCity;
 		currentConfig.locationOption.latitude = locLat;
@@ -456,6 +646,12 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		currentConfig.runAtStartup = runAtStartup;
 		currentConfig.checkUpdateAtStartup = checkUpdateStartup;
 		currentConfig.updateEvery_X_Hours = updateEveryX;
+	};
+
+	// save config
+	const saveTheConfig = () => {
+		// update config
+		storeConfig();
 		// save config
 		const result = window.electron.ipcRenderer.sendSync('save-config', currentConfig);
 
@@ -478,19 +674,19 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	// --------------------------------------------------------------------------
 	// check changes
 	const checkChanges = () => {
-		// compare initial config and current config
-		// if changed set changed to true
-		// else set changed to false
+		// comparing both configs seems to make weird bugs so we just make the changes true
+		setChangesMade(true);
 	};
 
 	// --------------------------------------------------------------------------
 	// listener for page switching
-	window.electron.ipcRenderer.on('open-changes-made', (_event, arg) => {
-		setCurrentDialog('changes');
-		console.log(arg);
-		setDestination(arg as string);
-		setDialogOpen(true);
-	});
+	useEffect(() => {
+		window.electron.ipcRenderer.on('open-changes-made', (arg: any) => {
+			setCurrentDialog('changes');
+			setDestination(arg as string);
+			setDialogOpen(true);
+		});
+	}, []);
 
 	return (
 		<>
@@ -723,6 +919,231 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 								flexWrap: 'wrap',
 							}}
 						>
+							<TimerOutlinedIcon /> <h3 style={{ paddingLeft: '.5rem' }}>Reminder Options</h3>
+						</div>
+						<Box
+							component={'form'}
+							noValidate
+							autoComplete='off'
+							sx={{
+								display: 'flex',
+								flexDirection: 'row',
+								'& .MuiTextField-root': { m: 1, ml: 0.5 },
+							}}
+						>
+							<Box
+								sx={{
+									display: 'flex',
+									flexDirection: 'column',
+									'& .MuiFormControl-root': { mr: 2.5 },
+								}}
+							>
+								<FormLabel id='reminder-time-fajr'>Minutes Before</FormLabel>
+								<Box
+									sx={{
+										display: 'flex',
+										flexDirection: 'row',
+									}}
+								>
+									<FormControl>
+										<FormLabel id='reminder-time-fajr'>Fajr</FormLabel>
+										<MuiInput
+											style={{ marginTop: '4px' }}
+											value={remind_fajr_earlyTime}
+											onChange={handleRemind_fajr_earlyTimeChange}
+											onBlur={blurRemind_fajr_earlyTime}
+											inputProps={{
+												step: 1,
+												min: 0,
+												max: 300,
+												type: 'number',
+												'aria-labelledby': 'input-slider',
+											}}
+										/>
+									</FormControl>
+
+									<FormControl>
+										<FormLabel id='reminder-time-sunrise'>Sunrise</FormLabel>
+										<MuiInput
+											style={{ marginTop: '4px' }}
+											value={remind_sunrise_earlyTime}
+											onChange={handleRemind_sunrise_earlyTimeChange}
+											onBlur={blurRemind_sunrise_earlyTime}
+											inputProps={{
+												step: 1,
+												min: 0,
+												max: 300,
+												type: 'number',
+												'aria-labelledby': 'input-slider',
+											}}
+										/>
+									</FormControl>
+
+									<FormControl>
+										<FormLabel id='reminder-time-dhuhr'>Dhuhr</FormLabel>
+										<MuiInput
+											style={{ marginTop: '4px' }}
+											value={remind_dhuhr_earlyTime}
+											onChange={handleRemind_dhuhr_earlyTimeChange}
+											onBlur={blurRemind_dhuhr_earlyTime}
+											inputProps={{
+												step: 1,
+												min: 0,
+												max: 300,
+												type: 'number',
+												'aria-labelledby': 'input-slider',
+											}}
+										/>
+									</FormControl>
+
+									<FormControl>
+										<FormLabel id='reminder-time-asr'>Asr</FormLabel>
+										<MuiInput
+											style={{ marginTop: '4px' }}
+											value={remind_asr_earlyTime}
+											onChange={handleRemind_asr_earlyTimeChange}
+											onBlur={blurRemind_asr_earlyTime}
+											inputProps={{
+												step: 1,
+												min: 0,
+												max: 300,
+												type: 'number',
+												'aria-labelledby': 'input-slider',
+											}}
+										/>
+									</FormControl>
+
+									<FormControl>
+										<FormLabel id='reminder-time-maghrib'>Maghrib</FormLabel>
+										<MuiInput
+											style={{ marginTop: '4px' }}
+											value={remind_maghrib_earlyTime}
+											onChange={handleRemind_maghrib_earlyTimeChange}
+											onBlur={blurRemind_maghrib_earlyTime}
+											inputProps={{
+												step: 1,
+												min: 0,
+												max: 300,
+												type: 'number',
+												'aria-labelledby': 'input-slider',
+											}}
+										/>
+									</FormControl>
+
+									<FormControl>
+										<FormLabel id='reminder-time-isha'>Isha</FormLabel>
+										<MuiInput
+											style={{ marginTop: '4px' }}
+											value={remind_isha_earlyTime}
+											onChange={handleRemind_isha_earlyTimeChange}
+											onBlur={blurRemind_isha_earlyTime}
+											inputProps={{
+												step: 1,
+												min: 0,
+												max: 300,
+												type: 'number',
+												'aria-labelledby': 'input-slider',
+											}}
+										/>
+									</FormControl>
+								</Box>
+
+								<Box
+									sx={{
+										display: 'flex',
+									}}
+								>
+									<FormControl sx={{ mt: 2 }} component='fieldset' variant='standard'>
+										<FormLabel component='legend'>Remind When On Time</FormLabel>
+										<FormGroup>
+											<FormControlLabel control={<Checkbox checked={remind_fajr_remindWhenOnTime} onChange={handleRemind_fajr_remindWhenOnTimeChange} />} label='Fajr' />
+											<FormControlLabel control={<Checkbox checked={remind_sunrise_remindWhenOnTime} onChange={handleRemind_sunrise_remindWhenOnTimeChange} />} label='Sunrise' />
+											<FormControlLabel control={<Checkbox checked={remind_dhuhr_remindWhenOnTime} onChange={handleRemind_dhuhr_remindWhenOnTimeChange} />} label='Dhuhr' />
+											<FormControlLabel control={<Checkbox checked={remind_asr_remindWhenOnTime} onChange={handleRemind_asr_remindWhenOnTimeChange} />} label='Asr' />
+											<FormControlLabel control={<Checkbox checked={remind_maghrib_remindWhenOnTime} onChange={handleRemind_maghrib_remindWhenOnTimeChange} />} label='Maghrib' />
+											<FormControlLabel control={<Checkbox checked={remind_isha_remindWhenOnTime} onChange={handleRemind_isha_remindWhenOnTimeChange} />} label='Isha' />
+										</FormGroup>
+									</FormControl>
+
+									<FormControl sx={{ mt: 2, ml: 3 }} component='fieldset' variant='standard'>
+										<FormLabel component='legend'>Early Reminder</FormLabel>
+										<FormGroup>
+											<FormControlLabel control={<Checkbox checked={remind_fajr_earlyReminder} onChange={handleRemind_fajr_earlyReminderChange} />} label='Fajr' />
+											<FormControlLabel control={<Checkbox checked={remind_sunrise_earlyReminder} onChange={handleRemind_sunrise_earlyReminderChange} />} label='Sunrise' />
+											<FormControlLabel control={<Checkbox checked={remind_dhuhr_earlyReminder} onChange={handleRemind_dhuhr_earlyReminderChange} />} label='Dhuhr' />
+											<FormControlLabel control={<Checkbox checked={remind_asr_earlyReminder} onChange={handleRemind_asr_earlyReminderChange} />} label='Asr' />
+											<FormControlLabel control={<Checkbox checked={remind_maghrib_earlyReminder} onChange={handleRemind_maghrib_earlyReminderChange} />} label='Maghrib' />
+											<FormControlLabel control={<Checkbox checked={remind_isha_earlyReminder} onChange={handleRemind_isha_earlyReminderChange} />} label='Isha' />
+										</FormGroup>
+									</FormControl>
+								</Box>
+							</Box>
+						</Box>
+					</Grid>
+				</Grid>
+				{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
+				{/* location, timezone, api keys */}
+				<Divider sx={{ mt: 2, mb: 2 }} />
+				<Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+					{/* ------------------------------------- */}
+					{/* Timezone & API Keys */}
+					<Grid item xs={6}>
+						<div
+							style={{
+								display: 'flex',
+								alignItems: 'center',
+								flexWrap: 'wrap',
+							}}
+						>
+							<AccessTimeOutlinedIcon /> <h3 style={{ paddingLeft: '.5rem' }}>Timezone options</h3>
+						</div>
+						<Box
+							component={'form'}
+							noValidate
+							autoComplete='off'
+							sx={{
+								display: 'flex',
+								flexDirection: 'column',
+								'& .MuiTextField-root': { m: 1, ml: 0.5 },
+							}}
+						>
+							<FormControl>
+								<FormLabel id='location-mode-formlabel' sx={{ ml: 0.5 }}>
+									Mode
+								</FormLabel>
+								<RadioGroup sx={{ ml: 0.5 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={tzMode} onChange={handleTzModeChange}>
+									<FormControlLabel value='auto' control={<Radio />} label='Auto' />
+									<FormControlLabel value='manual' control={<Radio />} label='Manual' />
+								</RadioGroup>
+								<FormControl>
+									<Autocomplete
+										size='small'
+										id='select-timezone-select'
+										options={tzList}
+										value={timezone}
+										onChange={handleTimezoneChange}
+										inputValue={tzInput}
+										onInputChange={handleTzInputChange}
+										renderInput={(params) => <TextField {...params} label='Timezone' />}
+										disabled={tzMode === 'auto' ? true : false}
+										autoHighlight
+										sx={{
+											width: '98.5%',
+										}}
+									/>
+								</FormControl>
+							</FormControl>
+						</Box>
+
+						<Divider sx={{ pt: 2 }} />
+						{/* api keys */}
+						<div
+							style={{
+								display: 'flex',
+								alignItems: 'center',
+								flexWrap: 'wrap',
+							}}
+						>
 							<KeyIcon /> <h3 style={{ paddingLeft: '.5rem' }}>API Key</h3>
 						</div>
 						<Box
@@ -735,17 +1156,41 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 								'& .MuiTextField-root': { m: 1, ml: 0.5 },
 							}}
 						>
-							a
+							<FormControl>
+								<FormLabel id='location-mode-formlabel' sx={{ ml: 0.5 }}>
+									Mode
+								</FormLabel>
+								<RadioGroup sx={{ ml: 0.5 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={geolocMode} onChange={handleGeolocModeChange}>
+									<FormControlLabel value='auto' control={<Radio />} label='Auto' />
+									<FormControlLabel value='manual' control={<Radio />} label='Manual' />
+								</RadioGroup>
+
+								<TextField
+									id='freegeoip'
+									label='Freegeoip.app API Key'
+									variant='outlined'
+									size='small'
+									value={geolocKey}
+									onChange={handleGeolocKeyChange}
+									disabled={geolocMode === 'auto' ? true : false}
+									InputProps={{
+										endAdornment: (
+											<Tooltip title='Click to verify API key inputted' placement='top' arrow>
+												<InputAdornment position='end'>
+													<IconButton aria-label="Get inputted city's lattitude/langitude" onClick={verifyKey} edge='end' disabled={geolocMode === 'auto' ? true : false}>
+														<SearchIcon />
+													</IconButton>
+												</InputAdornment>
+											</Tooltip>
+										),
+									}}
+								/>
+							</FormControl>
 						</Box>
 					</Grid>
-				</Grid>
-				{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-				{/* location, timezone, api keys */}
-				<Divider sx={{ mt: 2, mb: 2 }} />
-				<Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
 					{/* ------------------------------------- */}
 					{/* location */}
-					<Grid item xs={4}>
+					<Grid item xs={6}>
 						<div
 							style={{
 								display: 'flex',
@@ -803,110 +1248,10 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 								<TextField id='Longitude' label='longitude' variant='outlined' size='small' value={locLang} onChange={handleLangChange} disabled={locMode === 'auto' ? true : false} />
 								<Tooltip title='*Will only update if auto mode is enabled' arrow>
 									<FormControlLabel
-										control={<Checkbox sx={{ ml: 1 }} checked={locUpdateEveryStartup} onChange={handleLocUpdateEveryStartupChange} disabled={locMode === 'auto' ? false : true} />}
+										control={<Checkbox sx={{ ml: 0.5 }} checked={locUpdateEveryStartup} onChange={handleLocUpdateEveryStartupChange} disabled={locMode === 'auto' ? false : true} />}
 										label='Update location on app start'
 									/>
 								</Tooltip>
-							</FormControl>
-						</Box>
-					</Grid>
-					{/* ------------------------------------- */}
-					{/* Timezone */}
-					<Grid item xs={4}>
-						<div
-							style={{
-								display: 'flex',
-								alignItems: 'center',
-								flexWrap: 'wrap',
-							}}
-						>
-							<AccessTimeOutlinedIcon /> <h3 style={{ paddingLeft: '.5rem' }}>Timezone options</h3>
-						</div>
-						<Box
-							component={'form'}
-							noValidate
-							autoComplete='off'
-							sx={{
-								display: 'flex',
-								flexDirection: 'column',
-							}}
-						>
-							<FormControl>
-								<FormLabel id='location-mode-formlabel' sx={{ ml: 0.5 }}>
-									Mode
-								</FormLabel>
-								<RadioGroup sx={{ ml: 0.5 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={tzMode} onChange={handleTzModeChange}>
-									<FormControlLabel value='auto' control={<Radio />} label='Auto' />
-									<FormControlLabel value='manual' control={<Radio />} label='Manual' />
-								</RadioGroup>
-								<FormControl fullWidth sx={{ m: 1, ml: 0.5 }}>
-									<Autocomplete
-										size='small'
-										id='select-timezone-select'
-										options={tzList}
-										value={timezone}
-										onChange={handleTimezoneChange}
-										inputValue={tzInput}
-										onInputChange={handleTzInputChange}
-										renderInput={(params) => <TextField {...params} label='Timezone' />}
-										disabled={tzMode === 'auto' ? true : false}
-										autoHighlight
-									/>
-								</FormControl>
-							</FormControl>
-						</Box>
-					</Grid>
-					{/* ------------------------------------- */}
-					{/* api keys */}
-					<Grid item xs={4}>
-						<div
-							style={{
-								display: 'flex',
-								alignItems: 'center',
-								flexWrap: 'wrap',
-							}}
-						>
-							<KeyIcon /> <h3 style={{ paddingLeft: '.5rem' }}>API Key</h3>
-						</div>
-						<Box
-							component={'form'}
-							noValidate
-							autoComplete='off'
-							sx={{
-								display: 'flex',
-								flexDirection: 'column',
-								'& .MuiTextField-root': { m: 1, ml: 0.5 },
-							}}
-						>
-							<FormControl>
-								<FormLabel id='location-mode-formlabel' sx={{ ml: 0.5 }}>
-									Mode
-								</FormLabel>
-								<RadioGroup sx={{ ml: 0.5 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={geolocMode} onChange={handleGeolocModeChange}>
-									<FormControlLabel value='auto' control={<Radio />} label='Auto' />
-									<FormControlLabel value='manual' control={<Radio />} label='Manual' />
-								</RadioGroup>
-
-								<TextField
-									id='freegeoip'
-									label='Freegeoip.app API Key'
-									variant='outlined'
-									size='small'
-									value={geolocKey}
-									onChange={handleGeolocKeyChange}
-									disabled={geolocMode === 'auto' ? true : false}
-									InputProps={{
-										endAdornment: (
-											<Tooltip title='Click to verify API key inputted' placement='top' arrow>
-												<InputAdornment position='end'>
-													<IconButton aria-label="Get inputted city's lattitude/langitude" onClick={verifyKey} edge='end' disabled={geolocMode === 'auto' ? true : false}>
-														<SearchIcon />
-													</IconButton>
-												</InputAdornment>
-											</Tooltip>
-										),
-									}}
-								/>
 							</FormControl>
 						</Box>
 					</Grid>
@@ -945,9 +1290,11 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 							</FormControl>
 
 							<FormControl sx={{ mr: 4 }}>
-								<FormLabel id='app-theme-formlabel' sx={{ ml: 0.5 }}>
-									Praytime Update Interval
-								</FormLabel>
+								<Tooltip title='*In hour' placement='top' arrow>
+									<FormLabel id='app-theme-formlabel' sx={{ ml: 0.5 }}>
+										Praytime Update Interval
+									</FormLabel>
+								</Tooltip>
 								<MuiInput
 									style={{ marginTop: '4px' }}
 									sx={{ ml: 0.5 }}
