@@ -29,6 +29,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import Select from '@mui/material/Select';
 import FormGroup from '@mui/material/FormGroup';
 import MenuItem from '@mui/material/MenuItem';
+import InputLabel from '@mui/material/InputLabel';
 
 // Dialogbox
 import Dialog from '@mui/material/Dialog';
@@ -72,9 +73,6 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	const methodList = ['MuslimWorldLeague', 'Egyptian', 'Karachi', 'UmmAlQura', 'Dubai', 'MoonsightingCommittee', 'NorthAmerica', 'Kuwait', 'Qatar', 'Singapore', 'Tehran', 'Turkey'];
 	const madhabList = ['Shafi', 'Hanafi'];
 	const highLatRuleList = ['MiddleOfTheNight', 'SeventhOfTheNight', 'TwilightAngle'];
-	const [calcOptMethodInput, setCalcOptMethodInput] = useState<string>('');
-	const [calcOptMadhabInput, setCalcOptMadhabInput] = useState<string>('');
-	const [calcOptHighLatRuleInput, setCalcOptHighLatRuleInput] = useState<string>('');
 
 	const handleCalcOptModeChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setCalcOptMode(event.target.value as 'default' | 'manual');
@@ -87,37 +85,22 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		checkChanges();
 	};
 
-	const handleCalcOptMethodChange = (_event: any, newValue: string | null) => {
-		setCalcOptMethod(newValue as string);
+	const handleCalcOptMethodChange = (event: any) => {
+		setCalcOptMethod(event.target.value as string);
 
-		if (newValue === null) setCalcOptMethod(methodList[0]);
 		checkChanges();
 	};
 
-	const handleCalcOptMethodInputChange = (_event: any, newValue: string) => {
-		setCalcOptMethodInput(newValue as string);
-	};
+	const handleCalcOptMadhabChange = (event: any) => {
+		setCalcOptMadhab(event.target.value as string);
 
-	const handleCalcOptMadhabChange = (_event: any, newValue: string | null) => {
-		setCalcOptMadhab(newValue as string);
-
-		if (newValue === null) setCalcOptMadhab(madhabList[0]);
 		checkChanges();
 	};
 
-	const handleCalcOptMadhabInputChange = (_event: any, newValue: string) => {
-		setCalcOptMadhabInput(newValue as string);
-	};
+	const handleCalcOptHighLatRuleChange = (event: any) => {
+		setCalcOptHighLatRule(event.target.value as string);
 
-	const handleCalcOptHighLatRuleChange = (_event: any, newValue: string | null) => {
-		setCalcOptHighLatRule(newValue as string);
-
-		if (newValue === null) setCalcOptHighLatRule(highLatRuleList[0]);
 		checkChanges();
-	};
-
-	const handleCalcOptHighLatRuleInputChange = (_event: any, newValue: string) => {
-		setCalcOptHighLatRuleInput(newValue as string);
 	};
 
 	const handleCalOptAdjustment_FajrChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -766,49 +749,37 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 									<FormControlLabel value='manual' control={<Radio />} label='Manual' />
 								</RadioGroup>
 
-								<FormControl fullWidth>
-									<Autocomplete
-										size='small'
-										id='select-calc-method'
-										options={methodList}
-										value={calcOptMethod}
-										onChange={handleCalcOptMethodChange}
-										inputValue={calcOptMethodInput}
-										onInputChange={handleCalcOptMethodInputChange}
-										renderInput={(params) => <TextField {...params} label='Calculation Method' />}
-										disabled={calcOptMode === 'default' ? true : false}
-										autoHighlight
-									/>
+								<FormControl fullWidth sx={{ mt: 1, mb: 1 }}>
+									<InputLabel id='calc-method'>Calculation Method</InputLabel>
+									<Select labelId='calc-method' value={calcOptMethod} label='Calculation Method' onChange={handleCalcOptMethodChange}>
+										{methodList.map((method) => (
+											<MenuItem key={method} value={method}>
+												{method}
+											</MenuItem>
+										))}
+									</Select>
 								</FormControl>
 
-								<FormControl fullWidth>
-									<Autocomplete
-										size='small'
-										id='select-calc-madhab'
-										options={madhabList}
-										value={calcOptMadhab}
-										onChange={handleCalcOptMadhabChange}
-										inputValue={calcOptMadhabInput}
-										onInputChange={handleCalcOptMadhabInputChange}
-										renderInput={(params) => <TextField {...params} label='Madhab' />}
-										disabled={calcOptMode === 'default' ? true : false}
-										autoHighlight
-									/>
+								<FormControl fullWidth sx={{ mt: 1, mb: 1 }}>
+									<InputLabel id='madhab-select'>Madhab</InputLabel>
+									<Select labelId='madhab-select' value={calcOptMadhab} label='Madhab' onChange={handleCalcOptMadhabChange}>
+										{madhabList.map((method) => (
+											<MenuItem key={method} value={method}>
+												{method}
+											</MenuItem>
+										))}
+									</Select>
 								</FormControl>
 
-								<FormControl fullWidth>
-									<Autocomplete
-										size='small'
-										id='select-high-latitude'
-										options={highLatRuleList}
-										value={calcOptHighLatRule}
-										onChange={handleCalcOptHighLatRuleChange}
-										inputValue={calcOptHighLatRuleInput}
-										onInputChange={handleCalcOptHighLatRuleInputChange}
-										renderInput={(params) => <TextField {...params} label='High Latitude Adjustment' />}
-										disabled={calcOptMode === 'default' ? true : false}
-										autoHighlight
-									/>
+								<FormControl fullWidth sx={{ mt: 1, mb: 1 }}>
+									<InputLabel id='highlat-select'>High Latitude Adjustment</InputLabel>
+									<Select labelId='highlat-select' value={calcOptHighLatRule} label='High Latitude Adjustment' onChange={handleCalcOptHighLatRuleChange}>
+										{highLatRuleList.map((method) => (
+											<MenuItem key={method} value={method}>
+												{method}
+											</MenuItem>
+										))}
+									</Select>
 								</FormControl>
 
 								<FormLabel id='prayer-adjustment' sx={{ ml: 0.5 }}>
@@ -1338,7 +1309,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 							</FormControl>
 							<FormControl sx={{ minWidth: '120px' }}>
 								<FormLabel id='app-theme-formlabel'>Clock Style</FormLabel>
-								<Select size='small' labelId='demo-simple-select-label' id='demo-simple-select' value={clockStyle} onChange={handleClockStyleChange}>
+								<Select size='small' value={clockStyle} onChange={handleClockStyleChange}>
 									<MenuItem value='AM/PM'>AM/PM</MenuItem>
 									<MenuItem value='24h'>24h</MenuItem>
 								</Select>
