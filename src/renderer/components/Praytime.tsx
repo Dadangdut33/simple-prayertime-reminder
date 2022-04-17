@@ -74,7 +74,7 @@ export const Praytime = ({ theme }: any) => {
 					>
 						<LocationOnIcon style={{ paddingBottom: '4px', fontSize: '28px' }} color='primary' />{' '}
 						<h2>
-							{appSettings.locationOption.city} ({appSettings.locationOption.latitude}, {appSettings.locationOption.latitude})
+							{appSettings.locationOption.city} ({appSettings.locationOption.latitude}, {appSettings.locationOption.longitude})
 						</h2>
 					</div>
 				</Box>
