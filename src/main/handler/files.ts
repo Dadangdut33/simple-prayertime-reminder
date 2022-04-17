@@ -1,11 +1,9 @@
 import path from 'path';
 import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
-import { configInterface, cacheDataInterface } from 'main/interfaces';
+import { configInterface } from 'main/interfaces';
 const appConfigPath = path.join(__dirname, '../../../config/config.json');
-const cacheDataPath = path.join(__dirname, '../../../config/cachedata.json');
 const pathDict = {
 	app: appConfigPath,
-	cache: cacheDataPath,
 };
 
 // -------------------------------------------------------------------------------------
@@ -78,15 +76,6 @@ export const initialConfig: configInterface = {
 	theme: 'light',
 };
 
-export const cacheData: cacheDataInterface = {
-	fajr: '',
-	sunrise: '',
-	dhuhr: '',
-	asr: '',
-	maghrib: '',
-	isha: '',
-};
-
 // -------------------------------------------------------
 // Error and success notif, will be handled in main
 export const makeFolderIfNotExist = (path: string) => {
@@ -99,7 +88,7 @@ export const makeFolderIfNotExist = (path: string) => {
 	}
 };
 
-export const writeConfig = (cfg_type: 'app' | 'cache', content: any) => {
+export const writeConfig = (cfg_type: 'app', content: any) => {
 	let success = true;
 	try {
 		makeFolderIfNotExist(path.dirname(pathDict[cfg_type]));
@@ -112,7 +101,7 @@ export const writeConfig = (cfg_type: 'app' | 'cache', content: any) => {
 	}
 };
 
-export const readConfig = (cfg_type: 'app' | 'cache') => {
+export const readConfig = (cfg_type: 'app') => {
 	let success = true,
 		data: any;
 	try {

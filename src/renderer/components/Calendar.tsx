@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { cacheDataInterface, configInterface } from 'main/interfaces';
+import { configInterface } from 'main/interfaces';
 
 // MUI elements
 import CssBaseline from '@mui/material/CssBaseline';
@@ -19,18 +19,20 @@ const moment = require('moment-hijri');
 moment.locale('en');
 
 export const Calendar = () => {
-	const { fajr, sunrise, dhuhr, asr, maghrib, isha } = window.electron.ipcRenderer.sendSync('get-cached') as cacheDataInterface;
+	const { fajrTime, sunriseTime, dhuhrTime, asrTime, maghribTime, ishaTime } = window.electron.ipcRenderer.sendSync('get-this-pt', '') as any;
 	const timezone = window.electron.ipcRenderer.sendSync('get-timezone') as string;
 	const appSettings = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
 
-	const [pt_fajr, setPt_fajr] = useState<string>(new Date(new Date(fajr.toString()).valueOf() + appSettings.calcOption.adjustments.fajr * 60000).toString());
-	const [pt_sunrise, setPt_sunrise] = useState<string>(new Date(new Date(sunrise.toString()).valueOf() + appSettings.calcOption.adjustments.sunrise * 60000).toString());
-	const [pt_dhuhr, setPt_dhuhr] = useState<string>(new Date(new Date(dhuhr.toString()).valueOf() + appSettings.calcOption.adjustments.dhuhr * 60000).toString());
-	const [pt_asr, setPt_asr] = useState<string>(new Date(new Date(asr.toString()).valueOf() + appSettings.calcOption.adjustments.asr * 60000).toString());
-	const [pt_maghrib, setPt_maghrib] = useState<string>(new Date(new Date(maghrib.toString()).valueOf() + appSettings.calcOption.adjustments.maghrib * 60000).toString());
-	const [pt_isha, setPt_isha] = useState<string>(new Date(new Date(isha.toString()).valueOf() + appSettings.calcOption.adjustments.isha * 60000).toString());
+	const [pt_fajr, setPt_fajr] = useState<string>(fajrTime);
+	const [pt_sunrise, setPt_sunrise] = useState<string>(sunriseTime);
+	const [pt_dhuhr, setPt_dhuhr] = useState<string>(dhuhrTime);
+	const [pt_asr, setPt_asr] = useState<string>(asrTime);
+	const [pt_maghrib, setPt_maghrib] = useState<string>(maghribTime);
+	const [pt_isha, setPt_isha] = useState<string>(ishaTime);
 
 	const [selected, setSelected] = useState<Date | null>(new Date());
+	const hijriDate = new Date(new Date().setDate(selected!.getDate() - 1));
+
 	return (
 		<>
 			<CssBaseline />
@@ -43,12 +45,12 @@ export const Calendar = () => {
 								setSelected(newValue);
 								const pt = window.electron.ipcRenderer.sendSync('get-this-pt', newValue?.toString()) as any;
 								// set new prayer times with the adjustment
-								setPt_fajr(new Date(new Date(pt.fajrTime).valueOf() + appSettings.calcOption.adjustments.fajr * 60000).toString());
-								setPt_sunrise(new Date(new Date(pt.sunriseTime).valueOf() + appSettings.calcOption.adjustments.sunrise * 60000).toString());
-								setPt_dhuhr(new Date(new Date(pt.dhuhrTime).valueOf() + appSettings.calcOption.adjustments.dhuhr * 60000).toString());
-								setPt_asr(new Date(new Date(pt.asrTime).valueOf() + appSettings.calcOption.adjustments.asr * 60000).toString());
-								setPt_maghrib(new Date(new Date(pt.maghribTime).valueOf() + appSettings.calcOption.adjustments.maghrib * 60000).toString());
-								setPt_isha(new Date(new Date(pt.ishaTime).valueOf() + appSettings.calcOption.adjustments.isha * 60000).toString());
+								setPt_fajr(pt.fajrTime);
+								setPt_sunrise(pt.sunriseTime);
+								setPt_dhuhr(pt.dhuhrTime);
+								setPt_asr(pt.asrTime);
+								setPt_maghrib(pt.maghribTime);
+								setPt_isha(pt.ishaTime);
 							}}
 							minDate={new Date('1937-03-14')}
 							// hijri calendar have to be limited to 2076...
@@ -61,7 +63,7 @@ export const Calendar = () => {
 					<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'start' }}>
 						{Moment(selected).tz(timezone).format('dddd, D MMMM YYYY')} -{' '}
 						<span className='subtle-text' style={{ marginLeft: '3px' }}>
-							{moment(selected).tz(timezone).format('iD iMMMM iYYYY')}
+							{moment(hijriDate).tz(timezone).format('iD iMMMM iYYYY')}
 						</span>
 					</Box>
 					<Stack direction='row' divider={<Divider orientation='vertical' flexItem />} spacing={2} sx={{ mt: 3, justifyContent: 'space-between' }}>

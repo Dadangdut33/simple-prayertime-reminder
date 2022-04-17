@@ -12,7 +12,7 @@ import path from 'path';
 import { app, BrowserWindow, shell, ipcMain, nativeTheme } from 'electron';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import { configInterface, cacheDataInterface } from './interfaces';
+import { configInterface } from './interfaces';
 import { initialConfig, writeConfig, readConfig } from './handler/files';
 import { getPrayerTimes } from './handler/praytime';
 import { onUnresponsiveWindow, errorBox, NoYesBox } from './handler/messageBox';
@@ -21,8 +21,7 @@ import Moment from 'moment-timezone';
 
 // Global vars
 let mainWindow: BrowserWindow | null = null,
-	appConfig: configInterface,
-	cacheData: cacheDataInterface;
+	appConfig: configInterface;
 
 // -------------------------------------------------------------------------------------
 /**
@@ -132,19 +131,6 @@ const checkConfigOnStart = async () => {
 	} else appConfig = data as configInterface;
 
 	// ------------------------
-	// update prayertimes cache
-	const pt_Get = getPrayerTimes(appConfig);
-
-	cacheData = {
-		fajr: pt_Get.fajrTime,
-		sunrise: pt_Get.sunriseTime,
-		dhuhr: pt_Get.dhuhrTime,
-		asr: pt_Get.asrTime,
-		maghrib: pt_Get.maghribTime,
-		isha: pt_Get.ishaTime,
-	};
-
-	writeConfig('cache', cacheData);
 };
 
 // -------------------------------------------------------------------------------------
@@ -198,10 +184,6 @@ ipcMain.on('save-config', (event, arg) => {
 	}
 
 	event.returnValue = success;
-});
-
-ipcMain.on('get-cached', (event, _arg) => {
-	event.returnValue = cacheData;
 });
 
 ipcMain.on('get-timezone', (event, _arg) => {

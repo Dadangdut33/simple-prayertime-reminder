@@ -1,14 +1,3 @@
-import { Moment } from 'moment-timezone';
-
-export interface cacheDataInterface {
-	fajr: string | Moment;
-	sunrise: string | Moment;
-	dhuhr: string | Moment;
-	asr: string | Moment;
-	maghrib: string | Moment;
-	isha: string | Moment;
-}
-
 export interface reminderInterface {
 	remindWhenOnTime: boolean;
 	earlyReminder: boolean;
