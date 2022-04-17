@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { configInterface, getPrayerTimes_I } from 'main/interfaces';
 
 // Clocks
 import { CountdownCircleTimer } from 'react-countdown-circle-timer';
@@ -12,12 +13,18 @@ import Box from '@mui/material/Box';
 
 export const Praytime = ({ theme }: any) => {
 	const [value, setValue] = useState(new Date());
+	const [currentPt, setCurrentPt] = useState<getPrayerTimes_I>(window.electron.ipcRenderer.sendSync('get-this-pt', '') as getPrayerTimes_I);
+	const appSettings = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
 
 	useEffect(() => {
 		const interval = setInterval(() => setValue(new Date()), 1000);
+		const updateDataInterval = setInterval(() => {
+			setCurrentPt(window.electron.ipcRenderer.sendSync('get-this-pt', '') as getPrayerTimes_I);
+		}, appSettings.updateEvery_X_Hours * 3600 * 1000);
 
 		return () => {
 			clearInterval(interval);
+			clearInterval(updateDataInterval);
 		};
 	}, []);
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { configInterface } from 'main/interfaces';
+import { configInterface, getPrayerTimes_I } from 'main/interfaces';
 
 // MUI elements
 import CssBaseline from '@mui/material/CssBaseline';
@@ -19,7 +19,7 @@ const moment = require('moment-hijri');
 moment.locale('en');
 
 export const Schedule = () => {
-	const { fajrTime, sunriseTime, dhuhrTime, asrTime, maghribTime, ishaTime } = window.electron.ipcRenderer.sendSync('get-this-pt', '') as any;
+	const { fajrTime, sunriseTime, dhuhrTime, asrTime, maghribTime, ishaTime } = window.electron.ipcRenderer.sendSync('get-this-pt', '') as getPrayerTimes_I;
 	const timezone = window.electron.ipcRenderer.sendSync('get-timezone') as string;
 	const appSettings = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
 
@@ -42,7 +42,7 @@ export const Schedule = () => {
 							date={selected}
 							onChange={(newValue) => {
 								setSelected(newValue);
-								const pt = window.electron.ipcRenderer.sendSync('get-this-pt', newValue?.toString()) as any;
+								const pt = window.electron.ipcRenderer.sendSync('get-this-pt', newValue?.toString()) as getPrayerTimes_I;
 								// set new prayer times with the adjustment
 								setPt_fajr(pt.fajrTime);
 								setPt_sunrise(pt.sunriseTime);
