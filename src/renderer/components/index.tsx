@@ -1,5 +1,5 @@
 export { AppNav } from './AppNav';
-export { MainMenu } from './MainMenu';
+export { Praytime } from './Praytime';
 export { Settings } from './Settings';
-export { Calendar } from './Calendar';
+export { Schedule } from './Schedule';
 export { About } from './About';

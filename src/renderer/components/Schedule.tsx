@@ -18,7 +18,7 @@ import Moment from 'moment-timezone';
 const moment = require('moment-hijri');
 moment.locale('en');
 
-export const Calendar = () => {
+export const Schedule = () => {
 	const { fajrTime, sunriseTime, dhuhrTime, asrTime, maghribTime, ishaTime } = window.electron.ipcRenderer.sendSync('get-this-pt', '') as any;
 	const timezone = window.electron.ipcRenderer.sendSync('get-timezone') as string;
 	const appSettings = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
