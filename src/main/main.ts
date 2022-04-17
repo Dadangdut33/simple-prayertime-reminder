@@ -131,6 +131,15 @@ const checkConfigOnStart = async () => {
 	} else appConfig = data as configInterface;
 
 	// ------------------------
+	// update location on app start if enabled
+	if (appConfig.locationOption.updateEveryStartup) {
+		const { city, latitude, longitude } = await getPosition_absolute(appConfig);
+		appConfig.locationOption.city = city;
+		appConfig.locationOption.latitude = latitude;
+		appConfig.locationOption.longitude = longitude;
+
+		writeConfig('app', appConfig);
+	}
 };
 
 // -------------------------------------------------------------------------------------
