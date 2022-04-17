@@ -73,6 +73,7 @@ export const initialConfig: configInterface = {
 	runAtStartup: true,
 	clockStyle: 'AM/PM',
 	checkUpdateAtStartup: true,
+	hijriCalendarOffset: -1,
 	theme: 'light',
 };
 

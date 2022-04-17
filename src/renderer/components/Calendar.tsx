@@ -31,7 +31,7 @@ export const Calendar = () => {
 	const [pt_isha, setPt_isha] = useState<string>(ishaTime);
 
 	const [selected, setSelected] = useState<Date | null>(new Date());
-	const hijriDate = new Date(new Date().setDate(selected!.getDate() - 1));
+	const hijriDate = new Date(new Date().setDate(selected!.getDate() + appSettings.hijriCalendarOffset));
 
 	return (
 		<>
