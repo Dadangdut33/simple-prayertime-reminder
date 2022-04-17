@@ -75,7 +75,7 @@ body {
 /* ------------ */
 /* HANDS */
 /* seconds hand animation */
-.analogue#dark .react-clock__hand.react-clock__second-hand {
+.analogue .react-clock__hand.react-clock__second-hand {
 	transition: transform cubic-bezier(0.68, 0, 0.27, 1.55) 0.2s;
 }
 
