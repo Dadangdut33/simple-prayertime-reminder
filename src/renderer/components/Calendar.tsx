@@ -31,7 +31,6 @@ export const Calendar = () => {
 	const [pt_isha, setPt_isha] = useState<string>(ishaTime);
 
 	const [selected, setSelected] = useState<Date | null>(new Date());
-	const hijriDate = new Date(new Date().setDate(selected!.getDate() + appSettings.hijriCalendarOffset));
 
 	return (
 		<>
@@ -63,7 +62,9 @@ export const Calendar = () => {
 					<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'start' }}>
 						{Moment(selected).tz(timezone).format('dddd, D MMMM YYYY')} -{' '}
 						<span className='subtle-text' style={{ marginLeft: '3px' }}>
-							{moment(hijriDate).tz(timezone).format('iD iMMMM iYYYY')}
+							{appSettings.hijriCalendarOffset < 0
+								? moment(selected).subtract(Math.abs(appSettings.hijriCalendarOffset), 'days').tz(timezone).format('iD iMMMM iYYYY')
+								: moment(selected).add(appSettings.hijriCalendarOffset, 'days').tz(timezone).format('iD iMMMM iYYYY')}
 						</span>
 					</Box>
 					<Stack direction='row' divider={<Divider orientation='vertical' flexItem />} spacing={2} sx={{ mt: 3, justifyContent: 'space-between' }}>

@@ -608,7 +608,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		setHijriCalendarOffset(initialConfig.hijriCalendarOffset);
 
 		// snackbar
-		setSnackbarMsg('Settings reset successfully.');
+		setSnackbarMsg('Canceled changes made.');
 		setSnackbarSeverity('info');
 		setShowSnackbar(true);
 	};
@@ -717,7 +717,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 				</DialogActions>
 			</Dialog>
 			{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-			<Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={showSnackbar} autoHideDuration={3500} onClose={handleSnackbarClose}>
+			<Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'left' }} open={showSnackbar} autoHideDuration={3500} onClose={handleSnackbarClose}>
 				<Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
 					{snackbarMsg}
 				</Alert>
@@ -1351,7 +1351,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 				</Grid>
 
 				{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-				<Divider sx={{ mt: 3, width: '200px', ml: 'auto', mr: 'auto' }} />
+				<Divider sx={{ mt: 6, width: '200px', ml: 'auto', mr: 'auto' }} />
 				<Box sx={{ '& button': { m: 1 }, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', mt: 0.25 }}>
 					{/* Cancel changes */}
 					<Button
