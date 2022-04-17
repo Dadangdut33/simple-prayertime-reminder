@@ -557,13 +557,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	};
 
 	// --------------------------------------------------------------------------
-	// reset config
-	const resetConfig = () => {
-		if (currentConfig.theme !== appTheme) colorMode.toggleColorMode();
-		setChangesMade(false);
-		setCurrentConfig(initialConfig);
-
-		// setting var
+	const setInitialValue = () => {
 		setCalcOptMode(initialConfig.calcOption.mode);
 		setCalcOptMethod(initialConfig.calcOption.method);
 		setCalcOptMadhab(initialConfig.calcOption.madhab);
@@ -606,6 +600,16 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		setUpdateEveryX(initialConfig.updateEvery_X_Hours);
 		setClockStyle(initialConfig.clockStyle);
 		setHijriCalendarOffset(initialConfig.hijriCalendarOffset);
+	};
+
+	// reset config
+	const resetConfig = () => {
+		if (currentConfig.theme !== appTheme) colorMode.toggleColorMode();
+		setChangesMade(false);
+		setCurrentConfig(initialConfig);
+
+		// setting var
+		setInitialValue();
 
 		// snackbar
 		setSnackbarMsg('Canceled changes made.');
@@ -691,8 +695,8 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	};
 
 	// --------------------------------------------------------------------------
-	// listener for page switching
 	useEffect(() => {
+		// listener for page switching
 		window.electron.ipcRenderer.on('open-changes-made', (arg: any) => {
 			setCurrentDialog('changes');
 			setDestination(arg as string);

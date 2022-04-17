@@ -252,3 +252,5 @@ ipcMain.on('get-this-pt', (event, arg) => {
 	const pt = getPrayerTimes(appConfig, arg);
 	event.returnValue = pt;
 });
+
+// -------------------------------------------------------------------------------------

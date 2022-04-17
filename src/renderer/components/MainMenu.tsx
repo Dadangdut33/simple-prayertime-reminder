@@ -1,14 +1,23 @@
-import icon from '../../../assets/display_icon.png';
+import { useState, useEffect } from 'react';
+// @ts-ignore
+import Clock from 'react-clock';
+import 'react-clock/dist/Clock.css';
+import { CountdownCircleTimer } from 'react-countdown-circle-timer';
 
 // MUI elements
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 
-export const MainMenu = () => {
-	const testIpc = () => {
-		const testPing = window.electron.ipcRenderer.sendSync('test-sync', 'bruh');
-		console.log('outside ipc', testPing);
-	};
+export const MainMenu = ({ theme }: any) => {
+	const [value, setValue] = useState(new Date());
+
+	useEffect(() => {
+		const interval = setInterval(() => setValue(new Date()), 1000);
+
+		return () => {
+			clearInterval(interval);
+		};
+	}, []);
 
 	return (
 		<>
@@ -20,41 +29,18 @@ export const MainMenu = () => {
 					width: '100%',
 					alignItems: 'center',
 					justifyContent: 'center',
-					color: 'text.primary',
 					borderRadius: 1,
 					p: 3,
 				}}
 			>
-				<div className='Hello'>
-					<img width='200px' alt='icon' src={icon} />
-				</div>
-				<h1>electron-react-boilerplate</h1>
-				<div className='Hello'>
-					<a href='/#' onClick={() => testIpc()}>
-						<button type='button'>
-							<span role='img' aria-label='books'>
-								📚
-							</span>
-							Test
-						</button>
-					</a>
-					<a href='https://electron-react-boilerplate.js.org/' target='_blank' rel='noreferrer'>
-						<button type='button'>
-							<span role='img' aria-label='books'>
-								📚
-							</span>
-							Read our docs
-						</button>
-					</a>
-					<a href='https://github.com/sponsors/electron-react-boilerplate' target='_blank' rel='noreferrer'>
-						<button type='button'>
-							<span role='img' aria-label='books'>
-								🙏
-							</span>
-							Donate
-						</button>
-					</a>
-				</div>
+				<Box id='the-clock' sx={{ mt: 3 }}>
+					<CountdownCircleTimer isPlaying duration={900} colors={['#004777', '#F7B801', '#A30000', '#A30000']} colorsTime={[800, 600, 400, 0]} strokeWidth={4} size={290} />
+					<div className='analogue' id={theme}>
+						<Clock value={value} renderNumbers={true} size={250} minuteHandWidth={3} hourHandWidth={5} secondHandWidth={2} />
+					</div>
+				</Box>
+
+				<Box sx={{ mt: 5 }}>tes</Box>
 			</Box>
 		</>
 	);

@@ -19,6 +19,60 @@ body {
 }
 
 /* --------------------------- */
+/* clock timer */
+#the-clock>div:first-of-type {
+	position: absolute !important;
+	margin-left: -20px;
+	margin-top: -20px;
+}
+
+/* ------------ */
+/* clock */
+/* the circle */
+.analogue#dark .react-clock__face {
+	border-color: white;
+	box-shadow: 0 0.25rem 1rem rgb(255, 255, 255, .275);
+}
+
+.analogue#light .react-clock__face {
+	box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+/* ------------ */
+/* MARKS */
+/* minute */
+.analogue#dark .react-clock__face .react-clock__mark .react-clock__minute-mark__body {
+	background: #eaeaea;
+}
+
+/* hour */
+.analogue#dark .react-clock__face .react-clock__mark .react-clock__hour-mark__body {
+	background: white;
+}
+
+/* ------------ */
+/* HANDS */
+/* seconds hand animation */
+.analogue#dark .react-clock__hand.react-clock__second-hand {
+	transition: transform cubic-bezier(0.68, 0, 0.27, 1.55) 0.2s;
+}
+
+/* the hour hand */
+.analogue#dark .react-clock__hand__body.react-clock__hour-hand__body {
+	background: #eaeaea;
+}
+
+/* the minute hand */
+.analogue#dark .react-clock__hand__body.react-clock__minute-hand__body {
+	background: white;
+}
+
+/* the second hand */
+.react-clock__hand__body.react-clock__second-hand__body {
+	background: #30b2e3;
+}
+
+/* --------------------------- */
 /* MUI Overrides */
 .MuiCard-root#light {
 	box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1) !important;

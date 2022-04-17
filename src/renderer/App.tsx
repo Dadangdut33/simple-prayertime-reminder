@@ -57,7 +57,7 @@ export default function App() {
 					<Card sx={{ m: 1.5, backgroundColor: theme.palette.background.paper }} id={mode}>
 						<AppNav theme={mode} changesMade={changesMade} />
 						<Routes>
-							<Route path='/' element={<MainMenu />} />
+							<Route path='/' element={<MainMenu theme={mode} />} />
 							<Route path='/calendar' element={<Calendar />} />
 							<Route path='/settings' element={<Settings appTheme={mode} ColorModeContext={ColorModeContext} changesMade={changesMade} setChangesMade={setChangesMade} />} />
 							<Route path='/about' element={<About />} />
