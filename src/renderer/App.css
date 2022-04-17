@@ -22,20 +22,42 @@ body {
 /* clock timer */
 #the-clock>div:first-of-type {
 	position: absolute !important;
-	margin-left: -20px;
-	margin-top: -20px;
+	margin-left: -23px;
+	margin-top: -23px;
+	border-radius: 143px;
+	width: 294px !important;
+	height: 294px !important;
+}
+
+.light-clock>div:first-of-type {
+	-webkit-box-shadow: 0 0 30px 15px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 0 30px 15px rgba(0, 0, 0, 0.1);
+}
+
+.dark-clock>div:first-of-type {
+	-webkit-box-shadow: 0 0.25rem 1rem rgb(255, 255, 255, .275);
+	box-shadow: 0 0.25rem 1rem rgb(255, 255, 255, .275);
+}
+
+#the-clock div svg {
+	position: absolute !important;
+	margin-left: 1.8px;
+	margin-top: 3.5px;
 }
 
 /* ------------ */
 /* clock */
 /* the circle */
 .analogue#dark .react-clock__face {
-	border-color: white;
-	box-shadow: 0 0.25rem 1rem rgb(255, 255, 255, .275);
+	border-color: #00d2ff;
+	box-shadow: 0 0.25rem 1rem rgb(0, 210, 255, .275);
+	-webkit-box-shadow: 0 0.25rem 1rem rgb(0, 210, 255, .275);
 }
 
 .analogue#light .react-clock__face {
-	box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1);
+	border-color: #999;
+	-webkit-box-shadow: 0 5px 5px 4px rgba(0, 0, 0, 0.15);
+	box-shadow: 0 5px 5px 4px rgba(0, 0, 0, 0.15);
 }
 
 /* ------------ */
@@ -75,10 +97,12 @@ body {
 /* --------------------------- */
 /* MUI Overrides */
 .MuiCard-root#light {
+	-webkit-box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1) !important;
 	box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1) !important;
 }
 
 .MuiCard-root#dark {
+	-webkit-box-shadow: 0 0.25rem 1rem rgb(255, 255, 255, .275) !important;
 	box-shadow: 0 0.25rem 1rem rgb(255, 255, 255, .275) !important;
 }
 
@@ -90,6 +114,7 @@ body {
 /* custom scrollbar */
 ::-webkit-scrollbar {
 	width: 20px;
+	display: none;
 }
 
 ::-webkit-scrollbar-track {

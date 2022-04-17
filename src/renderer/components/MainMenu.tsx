@@ -33,14 +33,14 @@ export const MainMenu = ({ theme }: any) => {
 					p: 3,
 				}}
 			>
-				<Box id='the-clock' sx={{ mt: 3 }}>
-					<CountdownCircleTimer isPlaying duration={900} colors={['#004777', '#F7B801', '#A30000', '#A30000']} colorsTime={[800, 600, 400, 0]} strokeWidth={4} size={290} />
+				<Box id='the-clock' className={theme + '-clock'} sx={{ mt: 3 }}>
+					<CountdownCircleTimer isPlaying duration={7} colors={['#004777', '#F7B801', '#A30000', '#A30000']} colorsTime={[6, 4, 3, 0]} strokeWidth={4} size={290} />
 					<div className='analogue' id={theme}>
 						<Clock value={value} renderNumbers={true} size={250} minuteHandWidth={3} hourHandWidth={5} secondHandWidth={2} />
 					</div>
 				</Box>
 
-				<Box sx={{ mt: 5 }}>tes</Box>
+				<Box sx={{ mt: 6 }}>tes</Box>
 			</Box>
 		</>
 	);
