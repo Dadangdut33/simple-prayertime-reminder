@@ -470,20 +470,19 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	const [runAtStartup, setRunAtStartup] = useState(currentConfig.runAtStartup);
 	const [checkUpdateStartup, setcheckUpdateStartup] = useState(currentConfig.checkUpdateAtStartup);
-	const [updateEveryX, setUpdateEveryX] = useState(currentConfig.updateEvery_X_Hours);
 	const [clockStyle, setClockStyle] = useState(currentConfig.clockStyle);
 	const [hijriCalendarOffset, setHijriCalendarOffset] = useState(currentConfig.hijriCalendarOffset);
 
-	const handleUpdateEveryX = (e: ChangeEvent<HTMLInputElement>) => {
-		setUpdateEveryX(Number(e.target.value) || 0);
+	const handleHijriCalendarOffsetChange = (e: ChangeEvent<HTMLInputElement>) => {
+		setHijriCalendarOffset(Number(e.target.value) || 0);
 		checkChanges();
 	};
 
-	const handleBlurUpdateEveryX = () => {
-		if (updateEveryX < 0) {
-			setUpdateEveryX(0);
-		} else if (updateEveryX > 24) {
-			setUpdateEveryX(24);
+	const handleBlurHijriCalendarOffset = () => {
+		if (hijriCalendarOffset < -5) {
+			setHijriCalendarOffset(-5);
+		} else if (hijriCalendarOffset > 5) {
+			setHijriCalendarOffset(5);
 		}
 	};
 
@@ -500,19 +499,6 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	const handleClockStyleChange = (e: any) => {
 		setClockStyle(e.target.value as string);
 		checkChanges();
-	};
-
-	const handleHijriCalendarOffsetChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setHijriCalendarOffset(Number(e.target.value) || 0);
-		checkChanges();
-	};
-
-	const handleBlurHijriCalendarOffset = () => {
-		if (hijriCalendarOffset < -5) {
-			setHijriCalendarOffset(-5);
-		} else if (hijriCalendarOffset > 5) {
-			setHijriCalendarOffset(5);
-		}
 	};
 
 	// --------------------------------------------------------------------------
@@ -597,7 +583,6 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		setGeolocKey(initialConfig.geoLocAPIKey.key);
 		setRunAtStartup(initialConfig.runAtStartup);
 		setcheckUpdateStartup(initialConfig.checkUpdateAtStartup);
-		setUpdateEveryX(initialConfig.updateEvery_X_Hours);
 		setClockStyle(initialConfig.clockStyle);
 		setHijriCalendarOffset(initialConfig.hijriCalendarOffset);
 	};
@@ -658,7 +643,6 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		currentConfig.geoLocAPIKey.key = geolocKey;
 		currentConfig.runAtStartup = runAtStartup;
 		currentConfig.checkUpdateAtStartup = checkUpdateStartup;
-		currentConfig.updateEvery_X_Hours = updateEveryX;
 		currentConfig.clockStyle = clockStyle;
 		currentConfig.theme = appTheme;
 		currentConfig.hijriCalendarOffset = hijriCalendarOffset;
@@ -1292,21 +1276,20 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 							</FormControl>
 
 							<FormControl sx={{ mr: 4 }}>
-								<Tooltip title='*In hour' placement='top' arrow>
-									<FormLabel sx={{ ml: 0.5 }}>Praytime Update Interval</FormLabel>
+								<Tooltip title='*In days' placement='top' arrow>
+									<FormLabel sx={{ ml: 0.5 }}>Hijri Calendar Offset</FormLabel>
 								</Tooltip>
 								<MuiInput
 									style={{ marginTop: '4px' }}
 									sx={{ ml: 0.5 }}
-									value={updateEveryX}
-									onChange={handleUpdateEveryX}
-									onBlur={handleBlurUpdateEveryX}
+									value={hijriCalendarOffset}
+									onChange={handleHijriCalendarOffsetChange}
+									onBlur={handleBlurHijriCalendarOffset}
 									inputProps={{
 										step: 1,
-										min: 0,
-										max: 24,
+										min: -5,
+										max: 5,
 										type: 'number',
-										'aria-labelledby': 'input-slider',
 									}}
 								/>
 							</FormControl>
@@ -1330,25 +1313,6 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 									<MenuItem value='AM/PM'>AM/PM</MenuItem>
 									<MenuItem value='24h'>24h</MenuItem>
 								</Select>
-							</FormControl>
-
-							<FormControl>
-								<Tooltip title='*In hour' placement='top' arrow>
-									<FormLabel sx={{ ml: 0.5 }}>Hijri Calendar Offset</FormLabel>
-								</Tooltip>
-								<MuiInput
-									style={{ marginTop: '4px' }}
-									sx={{ ml: 0.5 }}
-									value={hijriCalendarOffset}
-									onChange={handleHijriCalendarOffsetChange}
-									onBlur={handleBlurHijriCalendarOffset}
-									inputProps={{
-										step: 1,
-										min: -5,
-										max: 5,
-										type: 'number',
-									}}
-								/>
 							</FormControl>
 						</Box>
 					</Grid>

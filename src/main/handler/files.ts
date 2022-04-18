@@ -69,7 +69,6 @@ export const initialConfig: configInterface = {
 		mode: 'auto',
 		key: '', // get from https://freegeoip.app/
 	},
-	updateEvery_X_Hours: 4,
 	runAtStartup: true,
 	clockStyle: 'AM/PM',
 	checkUpdateAtStartup: true,

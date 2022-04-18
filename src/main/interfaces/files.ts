@@ -44,7 +44,6 @@ export interface configInterface {
 		mode: 'auto' | 'manual';
 		key: string;
 	};
-	updateEvery_X_Hours: number;
 	runAtStartup: boolean;
 	checkUpdateAtStartup: boolean;
 	clockStyle: string | 'AM/PM' | '24h';
