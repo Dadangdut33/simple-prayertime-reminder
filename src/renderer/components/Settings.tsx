@@ -206,7 +206,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	const blurRemind_fajr_earlyTime = () => {
 		if (remind_fajr_earlyTime < 0) setRemind_fajr_earlyTime(0);
-		else if (remind_fajr_earlyTime > 300) setRemind_fajr_earlyTime(300);
+		else if (remind_fajr_earlyTime > 60) setRemind_fajr_earlyTime(60);
 	};
 
 	const handleRemind_sunrise_remindWhenOnTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -226,7 +226,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	const blurRemind_sunrise_earlyTime = () => {
 		if (remind_sunrise_earlyTime < 0) setRemind_sunrise_earlyTime(0);
-		else if (remind_sunrise_earlyTime > 300) setRemind_sunrise_earlyTime(300);
+		else if (remind_sunrise_earlyTime > 60) setRemind_sunrise_earlyTime(60);
 	};
 
 	const handleRemind_dhuhr_remindWhenOnTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -246,7 +246,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	const blurRemind_dhuhr_earlyTime = () => {
 		if (remind_dhuhr_earlyTime < 0) setRemind_dhuhr_earlyTime(0);
-		else if (remind_dhuhr_earlyTime > 300) setRemind_dhuhr_earlyTime(300);
+		else if (remind_dhuhr_earlyTime > 60) setRemind_dhuhr_earlyTime(60);
 	};
 
 	const handleRemind_asr_remindWhenOnTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -266,7 +266,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	const blurRemind_asr_earlyTime = () => {
 		if (remind_asr_earlyTime < 0) setRemind_asr_earlyTime(0);
-		else if (remind_asr_earlyTime > 300) setRemind_asr_earlyTime(300);
+		else if (remind_asr_earlyTime > 60) setRemind_asr_earlyTime(60);
 	};
 
 	const handleRemind_maghrib_remindWhenOnTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -286,7 +286,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	const blurRemind_maghrib_earlyTime = () => {
 		if (remind_maghrib_earlyTime < 0) setRemind_maghrib_earlyTime(0);
-		else if (remind_maghrib_earlyTime > 300) setRemind_maghrib_earlyTime(300);
+		else if (remind_maghrib_earlyTime > 60) setRemind_maghrib_earlyTime(60);
 	};
 
 	const handleRemind_isha_remindWhenOnTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -306,7 +306,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	const blurRemind_isha_earlyTime = () => {
 		if (remind_isha_earlyTime < 0) setRemind_isha_earlyTime(0);
-		else if (remind_isha_earlyTime > 300) setRemind_isha_earlyTime(300);
+		else if (remind_isha_earlyTime > 60) setRemind_isha_earlyTime(60);
 	};
 
 	// --------------------------------------------------------------------------
@@ -949,7 +949,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 											inputProps={{
 												step: 1,
 												min: 0,
-												max: 300,
+												max: 60,
 												type: 'number',
 												'aria-labelledby': 'input-slider',
 											}}
@@ -966,7 +966,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 											inputProps={{
 												step: 1,
 												min: 0,
-												max: 300,
+												max: 60,
 												type: 'number',
 												'aria-labelledby': 'input-slider',
 											}}
@@ -983,7 +983,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 											inputProps={{
 												step: 1,
 												min: 0,
-												max: 300,
+												max: 60,
 												type: 'number',
 												'aria-labelledby': 'input-slider',
 											}}
@@ -1000,7 +1000,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 											inputProps={{
 												step: 1,
 												min: 0,
-												max: 300,
+												max: 60,
 												type: 'number',
 												'aria-labelledby': 'input-slider',
 											}}
@@ -1017,7 +1017,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 											inputProps={{
 												step: 1,
 												min: 0,
-												max: 300,
+												max: 60,
 												type: 'number',
 												'aria-labelledby': 'input-slider',
 											}}
@@ -1034,7 +1034,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 											inputProps={{
 												step: 1,
 												min: 0,
-												max: 300,
+												max: 60,
 												type: 'number',
 												'aria-labelledby': 'input-slider',
 											}}
