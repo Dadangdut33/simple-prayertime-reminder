@@ -13,6 +13,8 @@ import Box from '@mui/material/Box';
 
 // Icons
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 
 // Date parser
 import Moment from 'moment-timezone';
@@ -79,6 +81,18 @@ export const Praytime = ({ theme }: any) => {
 		const durationInitial = Moment.duration(startInitial.diff(end));
 
 		return Math.abs(durationInitial.asSeconds());
+	};
+
+	const formatTimerWithHours = (time: number) => {
+		let hours: string | number = Math.floor(time / 3600);
+		let minutes: string | number = Math.floor((time - hours * 3600) / 60);
+		let seconds: string | number = time - hours * 3600 - minutes * 60;
+
+		if (hours < 10) hours = `0${hours}`.slice(-2);
+		if (minutes < 10) minutes = `0${minutes}`.slice(-2);
+		if (seconds < 10) seconds = `0${seconds}`.slice(-2);
+
+		return `${hours}:${minutes}:${seconds}`;
 	};
 
 	// ---------------------------------------------------------
@@ -164,16 +178,38 @@ export const Praytime = ({ theme }: any) => {
 					</div>
 				</Box>
 
-				<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 6 }}>
-					<h3>{currentPt.current.charAt(0).toUpperCase() + currentPt.current.slice(1)}</h3>
+				<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', mt: 6 }}>
+					<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+						<h3>{currentPt.current.charAt(0).toUpperCase() + currentPt.current.slice(1)}</h3>
 
-					<p>
-						{Moment(pt_Map[currentPt.current])
-							.tz(timezone)
-							.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
-					</p>
+						<p>
+							{Moment(pt_Map[currentPt.current])
+								.tz(timezone)
+								.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
+						</p>
+					</Box>
 
-					<h2>{remainingTime}</h2>
+					<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', ml: 6, mr: 6 }}>
+						<div
+							style={{
+								display: 'flex',
+								alignItems: 'center',
+								flexWrap: 'wrap',
+							}}
+						>
+							<DoubleArrowIcon color='primary' style={{ fontSize: '26px' }} /> <h2>{formatTimerWithHours(remainingTime)}</h2>
+						</div>
+					</Box>
+
+					<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+						<h3>{currentPt.next.charAt(0).toUpperCase() + currentPt.next.slice(1)}</h3>
+
+						<p>
+							{Moment(pt_Map[currentPt.next])
+								.tz(timezone)
+								.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
+						</p>
+					</Box>
 				</Box>
 			</Box>
 		</>
