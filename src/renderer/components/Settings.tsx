@@ -732,7 +732,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 								flexWrap: 'wrap',
 							}}
 						>
-							<CalculateOutlinedIcon /> <h3 style={{ paddingLeft: '.5rem' }}>Prayer Times Calculation</h3>
+							<CalculateOutlinedIcon color='primary' /> <h3 style={{ paddingLeft: '.5rem' }}>Prayer Times Calculation</h3>
 						</div>
 						<Box
 							component={'form'}
@@ -907,7 +907,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 								flexWrap: 'wrap',
 							}}
 						>
-							<TimerOutlinedIcon /> <h3 style={{ paddingLeft: '.5rem' }}>Reminder Options</h3>
+							<TimerOutlinedIcon color='primary' /> <h3 style={{ paddingLeft: '.5rem' }}>Reminder Options</h3>
 						</div>
 						<Box
 							component={'form'}
@@ -1083,7 +1083,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 								flexWrap: 'wrap',
 							}}
 						>
-							<AccessTimeOutlinedIcon /> <h3 style={{ paddingLeft: '.5rem' }}>Timezone options</h3>
+							<AccessTimeOutlinedIcon color='primary' /> <h3 style={{ paddingLeft: '.5rem' }}>Timezone options</h3>
 						</div>
 						<Box
 							component={'form'}
@@ -1132,7 +1132,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 								flexWrap: 'wrap',
 							}}
 						>
-							<KeyIcon /> <h3 style={{ paddingLeft: '.5rem' }}>API Key</h3>
+							<KeyIcon color='primary' /> <h3 style={{ paddingLeft: '.5rem' }}>API Key</h3>
 						</div>
 						<Box
 							component={'form'}
@@ -1186,7 +1186,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 								flexWrap: 'wrap',
 							}}
 						>
-							<LocationOnOutlinedIcon /> <h3 style={{ paddingLeft: '.5rem' }}>Location options</h3>
+							<LocationOnOutlinedIcon color='primary' /> <h3 style={{ paddingLeft: '.5rem' }}>Location options</h3>
 						</div>
 						<Box
 							component={'form'}
@@ -1256,7 +1256,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 								flexWrap: 'wrap',
 							}}
 						>
-							<MiscellaneousServicesOutlinedIcon /> <h3 style={{ paddingLeft: '.5rem' }}>Other Settings</h3>
+							<MiscellaneousServicesOutlinedIcon color='primary' /> <h3 style={{ paddingLeft: '.5rem' }}>Other Settings</h3>
 						</div>
 						<Box
 							component={'form'}

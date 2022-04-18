@@ -99,7 +99,7 @@ export const About = () => {
 								flexWrap: 'wrap',
 							}}
 						>
-							<CodeOffOutlinedIcon style={{ paddingBottom: '4px', fontSize: '28px' }} /> <h2 style={{ paddingLeft: '.5rem' }}>License & Source Code</h2>
+							<CodeOffOutlinedIcon color='primary' style={{ paddingBottom: '4px', fontSize: '28px' }} /> <h2 style={{ paddingLeft: '.5rem' }}>License & Source Code</h2>
 						</div>
 						<p style={{ marginTop: 0 }}>
 							This application is open source and licensed under the MIT License. You can find the code{' '}
@@ -116,7 +116,7 @@ export const About = () => {
 								flexWrap: 'wrap',
 							}}
 						>
-							<BugReportIcon style={{ fontSize: '28px' }} /> <h2 style={{ paddingLeft: '.5rem' }}>Report Bugs</h2>
+							<BugReportIcon color='primary' style={{ fontSize: '28px' }} /> <h2 style={{ paddingLeft: '.5rem' }}>Report Bugs</h2>
 						</div>
 						<p style={{ marginTop: 0 }}>
 							You can report bugs or suggest features by submitting an issue on the{' '}
@@ -133,7 +133,7 @@ export const About = () => {
 								flexWrap: 'wrap',
 							}}
 						>
-							<FavoriteBorderOutlinedIcon style={{ fontSize: '28px' }} /> <h2 style={{ paddingLeft: '.5rem' }}>Support the project</h2>
+							<FavoriteBorderOutlinedIcon color='primary' style={{ fontSize: '28px' }} /> <h2 style={{ paddingLeft: '.5rem' }}>Support the project</h2>
 						</div>
 						<Box
 							sx={{
@@ -172,7 +172,7 @@ export const About = () => {
 								flexWrap: 'wrap',
 							}}
 						>
-							<CommitIcon style={{ fontSize: '28px' }} /> <h2 style={{ paddingLeft: '.5rem' }}>Version</h2>
+							<CommitIcon color='primary' style={{ fontSize: '28px' }} /> <h2 style={{ paddingLeft: '.5rem' }}>Version</h2>
 						</div>
 						<p style={{ marginTop: 0 }}>
 							Current version: <strong>{version}</strong> | Latest version available:{' '}
