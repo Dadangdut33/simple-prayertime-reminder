@@ -50,3 +50,15 @@ export interface configInterface {
 	hijriCalendarOffset: number;
 	theme: 'dark' | 'light';
 }
+
+export type ColorHex = `#${string}`;
+export interface colorCache {
+	current: string;
+	colors: ColorHex[];
+	intervals: number[];
+}
+
+export interface colorCacheGet {
+	success: boolean;
+	data: colorCache;
+}

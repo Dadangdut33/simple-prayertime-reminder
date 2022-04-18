@@ -2,9 +2,12 @@ import path from 'path';
 import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
 import { configInterface } from 'main/interfaces';
 const appConfigPath = path.join(__dirname, '../../../config/config.json');
+const colorCachePath = path.join(__dirname, '../../../config/colorCache.json');
 const pathDict = {
 	app: appConfigPath,
+	color: colorCachePath,
 };
+type validDict = 'app' | 'color';
 
 // -------------------------------------------------------------------------------------
 export const initialConfig: configInterface = {
@@ -88,7 +91,7 @@ export const makeFolderIfNotExist = (path: string) => {
 	}
 };
 
-export const writeConfig = (cfg_type: 'app', content: any) => {
+export const writeConfig = (cfg_type: validDict, content: any) => {
 	let success = true;
 	try {
 		makeFolderIfNotExist(path.dirname(pathDict[cfg_type]));
@@ -101,7 +104,7 @@ export const writeConfig = (cfg_type: 'app', content: any) => {
 	}
 };
 
-export const readConfig = (cfg_type: 'app') => {
+export const readConfig = (cfg_type: validDict) => {
 	let success = true,
 		data: any;
 	try {

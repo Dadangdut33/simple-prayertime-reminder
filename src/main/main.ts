@@ -203,6 +203,14 @@ ipcMain.on('get-version', (event, _arg) => {
 	event.returnValue = process.env.npm_package_version;
 });
 
+ipcMain.on('get-cache-color', (event, _arg) => {
+	event.returnValue = readConfig('color');
+});
+
+ipcMain.on('save-cache-color', (_event, arg) => {
+	writeConfig('color', arg);
+});
+
 // -----------
 // location
 ipcMain.on('get-location-auto', async (event, _arg) => {

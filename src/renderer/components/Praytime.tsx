@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { configInterface, getPrayerTimes_I } from 'main/interfaces';
+import { configInterface, getPrayerTimes_I, ColorHex, colorCache, colorCacheGet } from 'main/interfaces';
 
 // Clocks
 import { CountdownCircleTimer } from 'react-countdown-circle-timer';
@@ -16,9 +16,6 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 // Date parser
 import Moment from 'moment-timezone';
-
-// type
-type ColorHex = `#${string}`;
 
 export const Praytime = ({ theme }: any) => {
 	const [value, setValue] = useState(new Date());
@@ -58,6 +55,14 @@ export const Praytime = ({ theme }: any) => {
 		}
 		setRandomColorList(colorList);
 		setColorChangeSecondsList(secondsList.reverse());
+
+		const saved: colorCache = {
+			current: currentPt.current,
+			colors: colorList,
+			intervals: secondsList,
+		};
+
+		window.electron.ipcRenderer.send('save-cache-color', saved);
 	};
 
 	const getDif = () => {
@@ -78,7 +83,15 @@ export const Praytime = ({ theme }: any) => {
 
 	// ---------------------------------------------------------
 	useEffect(() => {
-		generateRandomHexColor(getDif() / amountDivider);
+		const getCacheColor = window.electron.ipcRenderer.sendSync('get-cache-color') as colorCacheGet;
+		if (getCacheColor.success && getCacheColor.data.current === currentPt.current) {
+			console.log('cache');
+			setRandomColorList(getCacheColor.data.colors);
+			setColorChangeSecondsList(getCacheColor.data.intervals);
+		} else {
+			console.log('generate');
+			generateRandomHexColor(getDif() / amountDivider);
+		}
 
 		const interval = setInterval(() => {
 			setValue(new Date());
