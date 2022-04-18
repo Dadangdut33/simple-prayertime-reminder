@@ -38,6 +38,22 @@ export const Praytime = ({ theme }: any) => {
 		isha: currentPt.ishaTime,
 	};
 
+	const getNext = () => {
+		if (currentPt.next === 'fajr') {
+			currentPt.next = 'sunrise';
+		} else if (currentPt.next === 'sunrise') {
+			currentPt.next = 'dhuhr';
+		} else if (currentPt.next === 'dhuhr') {
+			currentPt.next = 'asr';
+		} else if (currentPt.next === 'asr') {
+			currentPt.next = 'maghrib';
+		} else if (currentPt.next === 'maghrib') {
+			currentPt.next = 'isha';
+		} else if (currentPt.next === 'isha') {
+			currentPt.next = 'fajr';
+		}
+	};
+
 	const generateRandomHexColor = (amount: number) => {
 		let colorList: ColorHex[] = [],
 			secondsList: number[] = [];
@@ -160,10 +176,14 @@ export const Praytime = ({ theme }: any) => {
 							setRemainingTime(remainingTime);
 						}}
 						onComplete={() => {
-							setCurrentPt(window.electron.ipcRenderer.sendSync('get-this-pt', '') as getPrayerTimes_I);
+							// Update next and current
+							currentPt.current = currentPt.next;
+							getNext();
 							const newValue = getDif();
 							generateRandomHexColor(newValue / amountDivider);
 
+							// get new pt
+							setCurrentPt(window.electron.ipcRenderer.sendSync('get-this-pt', '') as getPrayerTimes_I);
 							return {
 								shouldRepeat: true,
 								newInitialRemainingTime: newValue,
