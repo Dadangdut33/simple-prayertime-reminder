@@ -9,10 +9,10 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain, nativeTheme } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, nativeTheme, Notification } from 'electron';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import { configInterface } from './interfaces';
+import { configInterface, getPrayerTimes_I } from './interfaces';
 import { initialConfig, writeConfig, readConfig } from './handler/files';
 import { getPrayerTimes } from './handler/praytime';
 import { onUnresponsiveWindow, errorBox, NoYesBox } from './handler/messageBox';
@@ -21,7 +21,10 @@ import Moment from 'moment-timezone';
 
 // Global vars
 let mainWindow: BrowserWindow | null = null,
-	appConfig: configInterface;
+	appConfig: configInterface,
+	theInterval = null,
+	ptGet: getPrayerTimes_I,
+	iconPath = '';
 
 // -------------------------------------------------------------------------------------
 /**
@@ -140,6 +143,9 @@ const checkConfigOnStart = async () => {
 
 		writeConfig('app', appConfig);
 	}
+
+	// get pt
+	updatePt();
 };
 
 // -------------------------------------------------------------------------------------
@@ -159,6 +165,17 @@ app.whenReady()
 	.then(async () => {
 		await checkConfigOnStart();
 		createWindow();
+
+		const RESOURCES_PATH = app.isPackaged ? path.join(process.resourcesPath, 'assets') : path.join(__dirname, '../../assets');
+		const getAssetPath = (...paths: string[]): string => {
+			return path.join(RESOURCES_PATH, ...paths);
+		};
+
+		iconPath = getAssetPath('icon.png');
+
+		// start notification interval
+		notifyInterval();
+
 		app.on('activate', () => {
 			// On macOS it's common to re-create a window in the app when the
 			// dock icon is clicked and there are no other windows open.
@@ -190,6 +207,7 @@ ipcMain.on('save-config', (event, arg) => {
 	const success = writeConfig('app', arg);
 	if (success) {
 		appConfig = arg;
+		updatePt();
 	}
 
 	event.returnValue = success;
@@ -262,3 +280,72 @@ ipcMain.on('get-this-pt', (event, arg) => {
 });
 
 // -------------------------------------------------------------------------------------
+
+const getMinuteFromSeconds = (seconds: number) => {
+	return Math.floor(seconds / 60);
+};
+
+const getMinuteToSeconds = (minute: number) => {
+	return minute * 60;
+};
+
+const updatePt = () => {
+	ptGet = getPrayerTimes(appConfig);
+};
+
+const getPt = (pt: string) => {
+	const pt_Map: any = {
+		fajr: ptGet.fajrTime,
+		sunrise: ptGet.sunriseTime,
+		dhuhr: ptGet.dhuhrTime,
+		asr: ptGet.asrTime,
+		maghrib: ptGet.maghribTime,
+		isha: ptGet.ishaTime,
+	};
+
+	return pt_Map[pt];
+};
+
+const checkNotify = (now: Date) => {
+	const nowMoment = Moment(now).tz(appConfig.timezoneOption.timezone).toString();
+	let notification = null,
+		title,
+		subtitle = 'Prayer time',
+		body,
+		icon = path.join(__dirname, 'assets/icons/icon.png');
+	if (nowMoment === ptGet.fajrTime) {
+		title = 'Fajr';
+		body = 'Fajr time is now';
+	} else if (nowMoment === ptGet.sunriseTime) {
+		title = 'Sunrise';
+		body = 'Sunrise time is now';
+	} else if (nowMoment === ptGet.dhuhrTime) {
+		title = 'Dhuhr';
+		body = 'Dhuhr time is now';
+	} else if (nowMoment === ptGet.asrTime) {
+		title = 'Asr';
+		body = 'Asr time is now';
+	} else if (nowMoment === ptGet.maghribTime) {
+		title = 'Maghrib';
+		body = 'Maghrib time is now';
+	} else if (nowMoment === ptGet.ishaTime) {
+		title = 'Isha';
+		body = 'Isha time is now';
+	}
+
+	if (title) {
+		notification = new Notification({ title, subtitle, body, icon });
+		notification.show();
+	}
+};
+
+const notifyInterval = () => {
+	theInterval = setInterval(() => {
+		const now = new Date();
+
+		checkNotify(now);
+
+		// check if it's time to notify
+		// if (Moment(now).tz(appConfig.timezoneOption.timezone) ===
+	}, 1000);
+};

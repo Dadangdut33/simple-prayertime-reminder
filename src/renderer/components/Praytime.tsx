@@ -98,11 +98,9 @@ export const Praytime = ({ theme }: any) => {
 	useEffect(() => {
 		const getCacheColor = window.electron.ipcRenderer.sendSync('get-cache-color') as colorCacheGet;
 		if (getCacheColor.success && getCacheColor.data.current === currentPt.current) {
-			console.log('cache');
 			setRandomColorList(getCacheColor.data.colors);
 			setColorChangeSecondsList(getCacheColor.data.intervals);
 		} else {
-			console.log('generate');
 			generateRandomHexColor(getDif() / amountDivider);
 		}
 
