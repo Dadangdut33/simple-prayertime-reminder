@@ -17,12 +17,19 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 // Date parser
 import Moment from 'moment-timezone';
 
+// type
+type ColorHex = `#${string}`;
+
 export const Praytime = ({ theme }: any) => {
 	const [value, setValue] = useState(new Date());
 	const [currentPt, setCurrentPt] = useState<getPrayerTimes_I>(window.electron.ipcRenderer.sendSync('get-this-pt', '') as getPrayerTimes_I);
 	const timezone = window.electron.ipcRenderer.sendSync('get-timezone') as string;
 	const appSettings = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
 	const [remainingTime, setRemainingTime] = useState(0);
+	const [randomColorList, setRandomColorList] = useState<ColorHex[]>([]);
+	const [colorChangeSecondsList, setColorChangeSecondsList] = useState<number[]>([]);
+	const amountDivider = 75;
+	const forbiddenColor = ['#dfdfdf', '#d9d9d9', '#e9e9e9', '#e2e2e2', '#dadada']; // Mostly gray
 
 	const pt_Map: any = {
 		fajr: currentPt.fajrTime,
@@ -31,6 +38,26 @@ export const Praytime = ({ theme }: any) => {
 		asr: currentPt.asrTime,
 		maghrib: currentPt.maghribTime,
 		isha: currentPt.ishaTime,
+	};
+
+	const generateRandomHexColor = (amount: number) => {
+		let colorList: ColorHex[] = [],
+			secondsList: number[] = [];
+		for (let i = 0; i < amount; i++) {
+			let colorGet = ('#' + Math.floor(Math.random() * 16777215).toString(16)) as ColorHex;
+
+			// make sure it's not a forbidden color
+			while (forbiddenColor.includes(colorGet)) {
+				colorGet = ('#' + Math.floor(Math.random() * 16777215).toString(16)) as ColorHex;
+			}
+
+			colorList.push(colorGet);
+
+			let seconds = i * amountDivider;
+			secondsList.push(seconds);
+		}
+		setRandomColorList(colorList);
+		setColorChangeSecondsList(secondsList.reverse());
 	};
 
 	const getDif = () => {
@@ -49,8 +76,10 @@ export const Praytime = ({ theme }: any) => {
 		return Math.abs(durationInitial.asSeconds());
 	};
 
+	// ---------------------------------------------------------
 	useEffect(() => {
-		getDif();
+		generateRandomHexColor(getDif() / amountDivider);
+
 		const interval = setInterval(() => {
 			setValue(new Date());
 		}, 1000);
@@ -60,6 +89,10 @@ export const Praytime = ({ theme }: any) => {
 		};
 	}, []);
 
+	const durationOpen = getDif();
+	const durationOpenInitial = getDifInitial();
+
+	// ==========================================================
 	return (
 		<>
 			<CssBaseline />
@@ -93,10 +126,10 @@ export const Praytime = ({ theme }: any) => {
 				<Box id='the-clock' className={theme + '-clock'} sx={{ mt: 3, mb: 3 }}>
 					<CountdownCircleTimer
 						isPlaying
-						duration={getDif()}
-						initialRemainingTime={getDifInitial()}
-						colors={['#004777', '#F7B801', '#A30000', '#A30000']}
-						colorsTime={[6, 4, 3, 0]}
+						duration={durationOpen}
+						initialRemainingTime={durationOpenInitial}
+						colors={randomColorList as any}
+						colorsTime={colorChangeSecondsList as any}
 						strokeWidth={4}
 						size={290}
 						onUpdate={(remainingTime: number) => {
@@ -104,10 +137,12 @@ export const Praytime = ({ theme }: any) => {
 						}}
 						onComplete={() => {
 							setCurrentPt(window.electron.ipcRenderer.sendSync('get-this-pt', '') as getPrayerTimes_I);
+							const newValue = getDif();
+							generateRandomHexColor(newValue / amountDivider);
 
 							return {
 								shouldRepeat: true,
-								newInitialRemainingTime: getDif(),
+								newInitialRemainingTime: newValue,
 							};
 						}}
 					/>
