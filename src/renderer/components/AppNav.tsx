@@ -39,12 +39,18 @@ export const AppNav = ({ theme, changesMade }: any) => {
 		}
 	};
 
+	const pageChangeFunc = (arg: any) => {
+		setValue(valueMap[arg]);
+		navigate(arg);
+	};
+
 	// listener for page switching
 	useEffect(() => {
-		window.electron.ipcRenderer.on('page-change', (arg: any) => {
-			setValue(valueMap[arg]);
-			navigate(arg);
-		});
+		window.electron.ipcRenderer.on('page-change', pageChangeFunc);
+
+		return () => {
+			window.electron.ipcRenderer.removeEventListener('page-change', pageChangeFunc);
+		};
 	}, []);
 
 	return (

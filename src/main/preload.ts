@@ -27,5 +27,8 @@ contextBridge.exposeInMainWorld('electron', {
 		sendSync(channel: string, ...args: unknown[]) {
 			return ipcRenderer.sendSync(channel, ...args);
 		},
+		removeEventListener(channel: string, func: (...args: unknown[]) => void) {
+			ipcRenderer.removeListener(channel, func);
+		},
 	},
 });

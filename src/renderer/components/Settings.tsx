@@ -678,14 +678,20 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		setChangesMade(true);
 	};
 
+	const openChangesMadeFunc = (arg: any) => {
+		setCurrentDialog('changes');
+		setDestination(arg as string);
+		setDialogOpen(true);
+	};
+
 	// --------------------------------------------------------------------------
 	useEffect(() => {
 		// listener for page switching
-		window.electron.ipcRenderer.on('open-changes-made', (arg: any) => {
-			setCurrentDialog('changes');
-			setDestination(arg as string);
-			setDialogOpen(true);
-		});
+		window.electron.ipcRenderer.on('open-changes-made', openChangesMadeFunc);
+
+		return () => {
+			window.electron.ipcRenderer.removeEventListener('open-changes-made', openChangesMadeFunc);
+		};
 	}, []);
 
 	return (

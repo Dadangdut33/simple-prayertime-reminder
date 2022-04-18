@@ -13,7 +13,6 @@ import Box from '@mui/material/Box';
 
 // Icons
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 
 // Date parser
