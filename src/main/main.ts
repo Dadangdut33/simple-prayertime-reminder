@@ -22,9 +22,14 @@ import Moment from 'moment-timezone';
 // Global vars
 let mainWindow: BrowserWindow | null = null,
 	appConfig: configInterface,
-	theInterval = null,
 	ptGet: getPrayerTimes_I,
 	iconPath = '';
+
+// Functions
+const RESOURCES_PATH = app.isPackaged ? path.join(process.resourcesPath, 'assets') : path.join(__dirname, '../../assets');
+const getAssetPath = (...paths: string[]): string => {
+	return path.join(RESOURCES_PATH, ...paths);
+};
 
 // -------------------------------------------------------------------------------------
 /**
@@ -58,12 +63,6 @@ const createWindow = async () => {
 	if (isDevelopment) {
 		await installExtensions();
 	}
-
-	const RESOURCES_PATH = app.isPackaged ? path.join(process.resourcesPath, 'assets') : path.join(__dirname, '../../assets');
-
-	const getAssetPath = (...paths: string[]): string => {
-		return path.join(RESOURCES_PATH, ...paths);
-	};
 
 	mainWindow = new BrowserWindow({
 		show: false,
@@ -166,11 +165,7 @@ app.whenReady()
 		await checkConfigOnStart();
 		createWindow();
 
-		const RESOURCES_PATH = app.isPackaged ? path.join(process.resourcesPath, 'assets') : path.join(__dirname, '../../assets');
-		const getAssetPath = (...paths: string[]): string => {
-			return path.join(RESOURCES_PATH, ...paths);
-		};
-
+		// get iconPath
 		iconPath = getAssetPath('icon.png');
 
 		// start notification interval
@@ -280,72 +275,117 @@ ipcMain.on('get-this-pt', (event, arg) => {
 });
 
 // -------------------------------------------------------------------------------------
-
-const getMinuteFromSeconds = (seconds: number) => {
-	return Math.floor(seconds / 60);
-};
-
-const getMinuteToSeconds = (minute: number) => {
-	return minute * 60;
-};
-
 const updatePt = () => {
 	ptGet = getPrayerTimes(appConfig);
 };
 
-const getPt = (pt: string) => {
-	const pt_Map: any = {
-		fajr: ptGet.fajrTime,
-		sunrise: ptGet.sunriseTime,
-		dhuhr: ptGet.dhuhrTime,
-		asr: ptGet.asrTime,
-		maghrib: ptGet.maghribTime,
-		isha: ptGet.ishaTime,
-	};
-
-	return pt_Map[pt];
-};
-
-const checkNotify = (now: Date) => {
-	const nowMoment = Moment(now).tz(appConfig.timezoneOption.timezone).toString();
+const checkNotifyOnTime = (now: Moment.Moment) => {
 	let notification = null,
 		title,
 		subtitle = 'Prayer time',
-		body,
-		icon = path.join(__dirname, 'assets/icons/icon.png');
-	if (nowMoment === ptGet.fajrTime) {
-		title = 'Fajr';
-		body = 'Fajr time is now';
-	} else if (nowMoment === ptGet.sunriseTime) {
-		title = 'Sunrise';
-		body = 'Sunrise time is now';
-	} else if (nowMoment === ptGet.dhuhrTime) {
-		title = 'Dhuhr';
-		body = 'Dhuhr time is now';
-	} else if (nowMoment === ptGet.asrTime) {
-		title = 'Asr';
-		body = 'Asr time is now';
-	} else if (nowMoment === ptGet.maghribTime) {
-		title = 'Maghrib';
-		body = 'Maghrib time is now';
-	} else if (nowMoment === ptGet.ishaTime) {
-		title = 'Isha';
-		body = 'Isha time is now';
+		body;
+
+	switch (now.format('HH:mm')) {
+		case Moment(new Date(ptGet.fajrTime)).tz(appConfig.timezoneOption.timezone).format('HH:mm'):
+			if (appConfig.reminderOption.fajr) title = 'Fajr';
+			break;
+		case Moment(new Date(ptGet.sunriseTime)).tz(appConfig.timezoneOption.timezone).format('HH:mm'):
+			if (appConfig.reminderOption.sunrise) title = 'Sunrise';
+			break;
+		case Moment(new Date(ptGet.dhuhrTime)).tz(appConfig.timezoneOption.timezone).format('HH:mm'):
+			if (appConfig.reminderOption.dhuhr) title = 'Dhuhr';
+			break;
+		case Moment(new Date(ptGet.asrTime)).tz(appConfig.timezoneOption.timezone).format('HH:mm'):
+			if (appConfig.reminderOption.asr) title = 'Asr';
+			break;
+		case Moment(new Date(ptGet.maghribTime)).tz(appConfig.timezoneOption.timezone).format('HH:mm'):
+			if (appConfig.reminderOption.maghrib) title = 'Maghrib';
+			break;
+		case Moment(new Date(ptGet.ishaTime)).tz(appConfig.timezoneOption.timezone).format('HH:mm'):
+			if (appConfig.reminderOption.isha) title = 'Isha';
+			break;
+		default:
+			break;
 	}
 
 	if (title) {
-		notification = new Notification({ title, subtitle, body, icon });
+		body = `It's time for ${title === 'Sunrise' ? 'Sunrise' : title + ' Prayer'}`;
+
+		notification = new Notification({ title, subtitle, body, icon: iconPath });
 		notification.show();
+		notification.addListener('click', () => {
+			if (mainWindow) {
+				mainWindow.show();
+				mainWindow.focus();
+			}
+		});
 	}
 };
 
+const checkNotifyBefore = (now: Moment.Moment) => {
+	let notification = null,
+		title,
+		subtitle = 'Prayer time',
+		body;
+
+	// minutes before prayer
+	switch (now.format('HH:mm')) {
+		case Moment(new Date(ptGet.fajrTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.fajr.earlyTime, 'minutes').format('HH:mm'):
+			if (appConfig.reminderOption.fajr.earlyReminder) title = 'Fajr';
+			body = `${appConfig.reminderOption.fajr.earlyTime} minutes before ${title} prayer`;
+			break;
+		case Moment(new Date(ptGet.sunriseTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.sunrise.earlyTime, 'minutes').format('HH:mm'):
+			if (appConfig.reminderOption.sunrise.earlyReminder) title = 'Sunrise';
+			body = `${appConfig.reminderOption.sunrise.earlyTime} minutes before ${title}`;
+			break;
+		case Moment(new Date(ptGet.dhuhrTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.dhuhr.earlyTime, 'minutes').format('HH:mm'):
+			if (appConfig.reminderOption.dhuhr.earlyReminder) title = 'Dhuhr';
+			body = `${appConfig.reminderOption.dhuhr.earlyTime} minutes before ${title} prayer`;
+			break;
+		case Moment(new Date(ptGet.asrTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.asr.earlyTime, 'minutes').format('HH:mm'):
+			if (appConfig.reminderOption.asr.earlyReminder) title = 'Asr';
+			body = `${appConfig.reminderOption.asr.earlyTime} minutes before ${title} prayer`;
+			break;
+		case Moment(new Date(ptGet.maghribTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.maghrib.earlyTime, 'minutes').format('HH:mm'):
+			if (appConfig.reminderOption.maghrib.earlyReminder) title = 'Maghrib';
+			body = `${appConfig.reminderOption.maghrib.earlyTime} minutes before ${title} prayer`;
+			break;
+		case Moment(new Date(ptGet.ishaTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.isha.earlyTime, 'minutes').format('HH:mm'):
+			if (appConfig.reminderOption.isha.earlyReminder) title = 'Isha';
+			body = `${appConfig.reminderOption.isha.earlyTime} minutes before ${title} prayer`;
+			break;
+		default:
+			break;
+	}
+
+	if (title) {
+		notification = new Notification({ title, subtitle, body, icon: iconPath });
+		notification.show();
+		notification.addListener('click', () => {
+			if (mainWindow) {
+				mainWindow.show();
+				mainWindow.focus();
+			}
+		});
+	}
+};
+
+const intervalFunc = () => {
+	const now = new Date();
+	const nowMoment = Moment(now).tz(appConfig.timezoneOption.timezone);
+
+	checkNotifyBefore(nowMoment);
+	checkNotifyOnTime(nowMoment);
+};
+
 const notifyInterval = () => {
-	theInterval = setInterval(() => {
-		const now = new Date();
+	let toExactMinute = 60000 - (new Date().getTime() % 60000);
+	// run on start
+	intervalFunc();
 
-		checkNotify(now);
-
-		// check if it's time to notify
-		// if (Moment(now).tz(appConfig.timezoneOption.timezone) ===
-	}, 1000);
+	// timeout first before running to make sure it runs on exact minute
+	setTimeout(() => {
+		setInterval(intervalFunc, 60000); // every 1 minute. Exact minute
+		intervalFunc();
+	}, toExactMinute);
 };
