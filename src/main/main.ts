@@ -23,7 +23,9 @@ import Moment from 'moment-timezone';
 let mainWindow: BrowserWindow | null = null,
 	appConfig: configInterface,
 	ptGet: getPrayerTimes_I,
-	iconPath = '';
+	iconPath = '',
+	timerTimeout: NodeJS.Timer,
+	timerInterval: NodeJS.Timer;
 
 // Functions
 const RESOURCES_PATH = app.isPackaged ? path.join(process.resourcesPath, 'assets') : path.join(__dirname, '../../assets');
@@ -170,6 +172,9 @@ app.whenReady()
 
 		// start notification interval
 		notifyInterval();
+
+		// check if locale time is changed by user
+		checkIfUserChangesLocalTime();
 
 		app.on('activate', () => {
 			// On macOS it's common to re-create a window in the app when the
@@ -384,8 +389,32 @@ const notifyInterval = () => {
 	intervalFunc();
 
 	// timeout first before running to make sure it runs on exact minute
-	setTimeout(() => {
-		setInterval(intervalFunc, 60000); // every 1 minute. Exact minute
+	timerTimeout = setTimeout(() => {
+		timerInterval = setInterval(intervalFunc, 60000); // every 1 minute. Exact minute
 		intervalFunc();
 	}, toExactMinute);
+};
+
+const clearNotifyInterval = () => {
+	clearInterval(timerInterval);
+	clearTimeout(timerTimeout);
+};
+
+const checkIfUserChangesLocalTime = () => {
+	let timeBefore = new Date();
+
+	setInterval(() => {
+		let checkDif = Math.floor((new Date().getTime() - timeBefore.getTime()) / 1000);
+		if (checkDif !== 30) {
+			// if user changes local time
+			// reset the notification interval
+			clearNotifyInterval();
+			notifyInterval();
+
+			timeBefore = new Date();
+		} else {
+			// no change
+			timeBefore = new Date();
+		}
+	}, 30000);
 };
