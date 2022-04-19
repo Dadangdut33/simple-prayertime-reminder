@@ -39,18 +39,27 @@ export const Praytime = ({ theme }: any) => {
 	};
 
 	const getNext = () => {
-		if (currentPt.next === 'fajr') {
-			currentPt.next = 'sunrise';
-		} else if (currentPt.next === 'sunrise') {
-			currentPt.next = 'dhuhr';
-		} else if (currentPt.next === 'dhuhr') {
-			currentPt.next = 'asr';
-		} else if (currentPt.next === 'asr') {
-			currentPt.next = 'maghrib';
-		} else if (currentPt.next === 'maghrib') {
-			currentPt.next = 'isha';
-		} else if (currentPt.next === 'isha') {
-			currentPt.next = 'fajr';
+		switch (currentPt.next) {
+			case 'fajr':
+				currentPt.next = 'sunrise';
+				break;
+			case 'sunrise':
+				currentPt.next = 'dhuhr';
+				break;
+			case 'dhuhr':
+				currentPt.next = 'asr';
+				break;
+			case 'asr':
+				currentPt.next = 'maghrib';
+				break;
+			case 'maghrib':
+				currentPt.next = 'isha';
+				break;
+			case 'isha':
+				currentPt.next = 'fajr';
+				break;
+			default:
+				break;
 		}
 	};
 
@@ -82,20 +91,35 @@ export const Praytime = ({ theme }: any) => {
 		window.electron.ipcRenderer.send('save-cache-color', saved);
 	};
 
+	const check_00_fajr = () => {
+		const checkNow = Moment().tz(timezone);
+		const before = Moment('00:00:00', 'HH:mm:ss').tz(timezone);
+		const after = Moment(currentPt.fajrTime, 'HH:mm:ss').tz(timezone);
+		if (checkNow.isBetween(before, after)) {
+			return true;
+		} else {
+			return false;
+		}
+	};
+
 	const getDif = () => {
 		const start = Moment(pt_Map[currentPt.current]).tz(timezone);
 		const end = Moment(pt_Map[currentPt.next]).tz(timezone);
+		if (currentPt.next === 'fajr' && !check_00_fajr()) end.add(1, 'day');
+
 		const duration = Moment.duration(start.diff(end));
 
 		return Math.abs(duration.asSeconds());
 	};
 
 	const getDifInitial = () => {
-		const end = Moment(pt_Map[currentPt.next]);
-		const startInitial = Moment(new Date());
+		const startInitial = Moment(new Date()).tz(timezone);
+		const end = Moment(pt_Map[currentPt.next]).tz(timezone);
+		if (currentPt.next === 'fajr' && !check_00_fajr()) end.add(1, 'day');
+
 		const durationInitial = Moment.duration(startInitial.diff(end));
 
-		return Math.abs(durationInitial.asSeconds());
+		return Math.ceil(Math.abs(durationInitial.asSeconds()));
 	};
 
 	const formatTimerWithHours = (time: number) => {
@@ -184,6 +208,7 @@ export const Praytime = ({ theme }: any) => {
 
 							// get new pt
 							setCurrentPt(window.electron.ipcRenderer.sendSync('get-this-pt', '') as getPrayerTimes_I);
+
 							return {
 								shouldRepeat: true,
 								newInitialRemainingTime: newValue,

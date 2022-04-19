@@ -23,6 +23,15 @@ const highLatitudeRuleMap: any = {
 	TwilightAngle: adhan.HighLatitudeRule.TwilightAngle,
 };
 
+const beforeMap: any = {
+	fajr: 'isha',
+	sunrise: 'fajr',
+	dhuhr: 'sunrise',
+	asr: 'dhuhr',
+	maghrib: 'asr',
+	isha: 'maghrib',
+};
+
 export const getPrayerTimes = (settings: configInterface, customDate: string = '') => {
 	const date = customDate !== '' ? new Date(customDate) : new Date(),
 		params = methodMap[settings.calcOption.method](),
@@ -57,6 +66,7 @@ export const getPrayerTimes = (settings: configInterface, customDate: string = '
 		next = prayerGet.nextPrayer().toString();
 
 	if (next === 'none') next = 'fajr';
+	if (current === 'none') current = beforeMap[next];
 
 	return {
 		prayerGet,
