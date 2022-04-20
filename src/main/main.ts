@@ -11,6 +11,7 @@
 import path from 'path';
 import { app, BrowserWindow, shell, ipcMain, nativeTheme, Notification } from 'electron';
 import MenuBuilder from './menu';
+import TrayManager from './tray';
 import { resolveHtmlPath } from './util';
 import { configInterface, getPrayerTimes_I } from './interfaces';
 import { initialConfig, writeConfig, readConfig } from './handler/files';
@@ -19,6 +20,7 @@ import { onUnresponsiveWindow, errorBox, NoYesBox } from './handler/messageBox';
 import { getLatLong_FromCitiesName, getPosition_absolute, verifyKey } from './handler/getPos';
 import Moment from 'moment-timezone';
 
+// -------------------------------------------------------------------------------------
 // Global vars
 let mainWindow: BrowserWindow | null = null,
 	appConfig: configInterface,
@@ -26,7 +28,10 @@ let mainWindow: BrowserWindow | null = null,
 	iconPath = '',
 	timerTimeout: NodeJS.Timeout,
 	timerInterval: NodeJS.Timer,
-	checkTimeChangesInterval: NodeJS.Timer;
+	checkTimeChangesInterval: NodeJS.Timer,
+	startDate = new Date();
+
+let menuBuilder: MenuBuilder, trayManager: TrayManager;
 
 // Functions
 const RESOURCES_PATH = app.isPackaged ? path.join(process.resourcesPath, 'assets') : path.join(__dirname, '../../assets');
@@ -99,8 +104,12 @@ const createWindow = async () => {
 		mainWindow = null;
 	});
 
-	const menuBuilder = new MenuBuilder(mainWindow);
+	menuBuilder = new MenuBuilder(mainWindow);
 	menuBuilder.buildMenu();
+
+	trayManager = new TrayManager(mainWindow!, getAssetPath('icon.png'));
+	trayManager.createTray();
+	trayManager.updatePrayTime(ptGet, appConfig); // update trayicon with the prayer times
 
 	// Open urls in the user's browser
 	mainWindow.webContents.setWindowOpenHandler((edata) => {
@@ -174,8 +183,8 @@ app.whenReady()
 		// start notification interval
 		notifyInterval();
 
-		// check if locale time is changed by user
-		if (appConfig.detectTimeChange) checkIfUserChangesLocalTime();
+		// start detecttimechange interval if enabled
+		if (appConfig.detectTimeChange) checkIfUserChangesLocalTime(); // check if locale time is changed by user
 
 		app.on('activate', () => {
 			// On macOS it's common to re-create a window in the app when the
@@ -198,6 +207,10 @@ ipcMain.on('invoke-page-change', (_event, arg) => {
 	if (mainWindow) mainWindow.webContents.send('page-change', arg);
 });
 
+ipcMain.on('update-tray', (_event, _arg) => {
+	if (trayManager) trayManager.updatePrayTime(ptGet, appConfig);
+});
+
 // ----------------------------------------------------
 // config/files
 ipcMain.on('get-config', (event, _arg) => {
@@ -214,6 +227,7 @@ ipcMain.on('save-config', (event, arg) => {
 
 		appConfig = arg;
 		updatePt();
+		trayManager.updatePrayTime(ptGet, appConfig);
 	}
 
 	event.returnValue = success;
@@ -387,6 +401,14 @@ const intervalFunc = () => {
 
 	checkNotifyBefore(nowMoment);
 	checkNotifyOnTime(nowMoment);
+
+	// check if 1 day has passed
+	if (!nowMoment.isSame(Moment(startDate).tz(appConfig.timezoneOption.timezone), 'day')) {
+		startDate = now;
+		updatePt();
+		// update the tray date
+		ipcMain.emit('update-tray');
+	}
 };
 
 const notifyInterval = () => {
@@ -408,7 +430,6 @@ const clearNotifyInterval = () => {
 
 const checkIfUserChangesLocalTime = () => {
 	let timeBefore = new Date();
-	console.log('check if user changes local time');
 
 	checkTimeChangesInterval = setInterval(() => {
 		let checkDif = Math.floor((new Date().getTime() - timeBefore.getTime()) / 1000);
@@ -427,6 +448,5 @@ const checkIfUserChangesLocalTime = () => {
 };
 
 const clearCheckTimeChangesInterval = () => {
-	console.log('clear check if user changes local time');
 	clearInterval(checkTimeChangesInterval);
 };
