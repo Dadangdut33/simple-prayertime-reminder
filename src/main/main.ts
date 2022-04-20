@@ -114,15 +114,11 @@ const createWindow = async () => {
 		if (!mainWindow) {
 			throw new Error('"mainWindow" is not defined');
 		}
-		if (process.env.START_MINIMIZED === 'true') {
-			mainWindow.minimize();
-		} else {
-			mainWindow.show();
-		}
 	});
 
-	mainWindow.on('closed', () => {
-		mainWindow = null;
+	mainWindow.on('closed', (event: any) => {
+		event.preventDefault();
+		mainWindow?.hide();
 	});
 
 	menuBuilder = new MenuBuilder(mainWindow);
@@ -205,37 +201,54 @@ app.on('window-all-closed', () => {
 	}
 });
 
-app.whenReady()
-	.then(async () => {
-		await checkConfigOnStart();
-		createWindow();
+// prevent multiple instances
+const gotTheLock = app.requestSingleInstanceLock();
 
-		// get iconPath
-		iconPath = getAssetPath('icon.png');
+if (!gotTheLock) {
+	app.quit();
+} else {
+	app.on('second-instance', (_event, _commandLine, _workingDirectory) => {
+		// Someone tried to run a second instance, we should focus our window.
+		if (mainWindow) {
+			if (mainWindow.isMinimized()) mainWindow.restore();
 
-		// start notification interval
-		notifyInterval();
+			if (!mainWindow.isVisible()) mainWindow.show();
 
-		// start detecttimechange interval if enabled
-		if (appConfig.detectTimeChange) checkIfUserChangesLocalTime(); // check if locale time is changed by user
-
-		// auto launch
-		if (appConfig.runAtStartup) {
-			const checkLoginOpen = wasOpenedAtLogin();
-
-			if (checkLoginOpen) {
-				mainWindow?.hide();
-			}
+			mainWindow.focus();
 		}
+	});
 
-		app.on('activate', () => {
-			// On macOS it's common to re-create a window in the app when the
-			// dock icon is clicked and there are no other windows open.
-			if (mainWindow === null) createWindow();
-		});
-	})
-	.catch(console.log);
+	app.whenReady()
+		.then(async () => {
+			await checkConfigOnStart();
+			createWindow();
 
+			// get iconPath
+			iconPath = getAssetPath('icon.png');
+
+			// start notification interval
+			notifyInterval();
+
+			// start detecttimechange interval if enabled
+			if (appConfig.detectTimeChange) checkIfUserChangesLocalTime(); // check if locale time is changed by user
+
+			// auto launch
+			if (appConfig.runAtStartup) {
+				const checkLoginOpen = wasOpenedAtLogin();
+
+				if (checkLoginOpen) {
+					mainWindow?.hide();
+				}
+			}
+
+			app.on('activate', () => {
+				// On macOS it's common to re-create a window in the app when the
+				// dock icon is clicked and there are no other windows open.
+				if (mainWindow === null) createWindow();
+			});
+		})
+		.catch(console.log);
+}
 // -------------------------------------------------------------------------------------
 /**
  * IPC
