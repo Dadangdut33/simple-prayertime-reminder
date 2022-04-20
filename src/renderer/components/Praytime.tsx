@@ -73,7 +73,7 @@ export const Praytime = ({ theme }: any) => {
 	const check_00_fajr = () => {
 		const checkNow = Moment().tz(timezone);
 		const before = Moment('00:00:00', 'HH:mm:ss').tz(timezone);
-		const after = Moment(currentPt.fajrTime, 'HH:mm:ss').tz(timezone);
+		const after = Moment(new Date(currentPt.fajrTime), 'HH:mm:ss').tz(timezone);
 		if (checkNow.isBetween(before, after)) {
 			return true;
 		} else {
@@ -82,8 +82,8 @@ export const Praytime = ({ theme }: any) => {
 	};
 
 	const getDif = () => {
-		const start = Moment(pt_Map[currentPt.current]).tz(timezone);
-		const end = Moment(pt_Map[currentPt.next]).tz(timezone);
+		const start = Moment(new Date(pt_Map[currentPt.current])).tz(timezone);
+		const end = Moment(new Date(pt_Map[currentPt.next])).tz(timezone);
 		if (currentPt.next === 'fajr' && !check_00_fajr()) end.add(1, 'day');
 
 		const duration = Moment.duration(start.diff(end));
@@ -93,7 +93,7 @@ export const Praytime = ({ theme }: any) => {
 
 	const getDifInitial = () => {
 		const startInitial = Moment(new Date()).tz(timezone);
-		const end = Moment(pt_Map[currentPt.next]).tz(timezone);
+		const end = Moment(new Date(pt_Map[currentPt.next])).tz(timezone);
 		if (currentPt.next === 'fajr' && !check_00_fajr()) end.add(1, 'day');
 
 		const durationInitial = Moment.duration(startInitial.diff(end));
@@ -114,8 +114,8 @@ export const Praytime = ({ theme }: any) => {
 	};
 
 	const setRemainTimeFunc = () => {
-		const startInitial = Moment(new Date()).tz(timezone);
-		const end = Moment(pt_Map[currentPt.next]).tz(timezone);
+		const startInitial = Moment().tz(timezone);
+		const end = Moment(new Date(pt_Map[currentPt.next])).tz(timezone);
 		if (currentPt.next === 'fajr' && !check_00_fajr()) end.add(1, 'day');
 
 		const durationInitial = Moment.duration(startInitial.diff(end));
@@ -215,7 +215,7 @@ export const Praytime = ({ theme }: any) => {
 						<h3>{currentPt.current.charAt(0).toUpperCase() + currentPt.current.slice(1)}</h3>
 
 						<p>
-							{Moment(pt_Map[currentPt.current])
+							{Moment(new Date(pt_Map[currentPt.current]))
 								.tz(timezone)
 								.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
 						</p>
@@ -237,7 +237,7 @@ export const Praytime = ({ theme }: any) => {
 						<h3>{currentPt.next.charAt(0).toUpperCase() + currentPt.next.slice(1)}</h3>
 
 						<p>
-							{Moment(pt_Map[currentPt.next])
+							{Moment(new Date(pt_Map[currentPt.next]))
 								.tz(timezone)
 								.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
 						</p>

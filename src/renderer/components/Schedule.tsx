@@ -71,7 +71,7 @@ export const Schedule = () => {
 						<Box sx={{ display: 'flex', flexDirection: 'column' }}>
 							<div>
 								<strong>
-									{Moment(pt_fajr)
+									{Moment(new Date(pt_fajr))
 										.tz(timezone)
 										.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
 								</strong>
@@ -79,7 +79,7 @@ export const Schedule = () => {
 							</div>
 							<div>
 								<strong>
-									{Moment(pt_sunrise)
+									{Moment(new Date(pt_sunrise))
 										.tz(timezone)
 										.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
 								</strong>
@@ -87,7 +87,7 @@ export const Schedule = () => {
 							</div>
 							<div>
 								<strong>
-									{Moment(pt_dhuhr)
+									{Moment(new Date(pt_dhuhr))
 										.tz(timezone)
 										.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
 								</strong>
@@ -97,7 +97,7 @@ export const Schedule = () => {
 						<Box sx={{ display: 'flex', flexDirection: 'column' }}>
 							<div>
 								<strong>
-									{Moment(pt_asr)
+									{Moment(new Date(pt_asr))
 										.tz(timezone)
 										.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
 								</strong>
@@ -105,7 +105,7 @@ export const Schedule = () => {
 							</div>
 							<div>
 								<strong>
-									{Moment(pt_maghrib)
+									{Moment(new Date(pt_maghrib))
 										.tz(timezone)
 										.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
 								</strong>
@@ -113,7 +113,7 @@ export const Schedule = () => {
 							</div>
 							<div>
 								<strong>
-									{Moment(pt_isha)
+									{Moment(new Date(pt_isha))
 										.tz(timezone)
 										.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
 								</strong>
