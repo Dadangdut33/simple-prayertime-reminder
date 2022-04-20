@@ -116,17 +116,17 @@ const createWindow = async () => {
 		}
 	});
 
-	mainWindow.on('closed', (event: any) => {
-		event.preventDefault();
-		mainWindow?.hide();
-	});
-
 	menuBuilder = new MenuBuilder(mainWindow);
 	menuBuilder.buildMenu();
 
 	trayManager = new TrayManager(mainWindow!, getAssetPath('icon.png'));
 	trayManager.createTray();
 	trayManager.updatePrayTime(ptGet, appConfig); // update trayicon with the prayer times
+
+	mainWindow.on('close', (event: any) => {
+		event.preventDefault();
+		mainWindow!.hide();
+	});
 
 	// Open urls in the user's browser
 	mainWindow.webContents.setWindowOpenHandler((edata) => {
