@@ -19,6 +19,7 @@ import { getPrayerTimes } from './handler/praytime';
 import { onUnresponsiveWindow, errorBox, NoYesBox } from './handler/messageBox';
 import { getLatLong_FromCitiesName, getPosition_absolute, verifyKey } from './handler/getPos';
 import Moment from 'moment-timezone';
+import os from 'os';
 
 // -------------------------------------------------------------------------------------
 // Global vars
@@ -29,7 +30,14 @@ let mainWindow: BrowserWindow | null = null,
 	timerTimeout: NodeJS.Timeout,
 	timerInterval: NodeJS.Timer,
 	checkTimeChangesInterval: NodeJS.Timer,
-	startDate = new Date();
+	startDate = new Date(),
+	autoLaunch = require('auto-launch'),
+	launcherOption = {
+		name: 'Simple PrayerTimes Reminder',
+		path: process.execPath,
+		isHidden: true,
+	},
+	autoLauncher = new autoLaunch(launcherOption);
 
 let menuBuilder: MenuBuilder, trayManager: TrayManager;
 
@@ -37,6 +45,19 @@ let menuBuilder: MenuBuilder, trayManager: TrayManager;
 const RESOURCES_PATH = app.isPackaged ? path.join(process.resourcesPath, 'assets') : path.join(__dirname, '../../assets');
 const getAssetPath = (...paths: string[]): string => {
 	return path.join(RESOURCES_PATH, ...paths);
+};
+
+const wasOpenedAtLogin = () => {
+	try {
+		// mac
+		if (os.platform() === 'darwin') {
+			let loginSettings = app.getLoginItemSettings();
+			return loginSettings.wasOpenedAtLogin;
+		} // else
+		return app.commandLine.hasSwitch('hidden');
+	} catch {
+		return false;
+	}
 };
 
 // -------------------------------------------------------------------------------------
@@ -134,6 +155,18 @@ const checkConfigOnStart = async () => {
 		appConfig.locationOption.latitude = latitude;
 		appConfig.locationOption.longitude = longitude;
 
+		// set autolaunch value
+		autoLauncher
+			.isEnabled()
+			.then((isEnabled: boolean) => {
+				if (isEnabled) return;
+
+				autoLauncher.enable();
+			})
+			.catch((err: any) => {
+				console.log(err);
+			});
+
 		// write config file
 		if (data.toString().includes('ENOENT')) {
 			// no config file found
@@ -186,6 +219,15 @@ app.whenReady()
 		// start detecttimechange interval if enabled
 		if (appConfig.detectTimeChange) checkIfUserChangesLocalTime(); // check if locale time is changed by user
 
+		// auto launch
+		if (appConfig.runAtStartup) {
+			const checkLoginOpen = wasOpenedAtLogin();
+
+			if (checkLoginOpen) {
+				mainWindow?.hide();
+			}
+		}
+
 		app.on('activate', () => {
 			// On macOS it's common to re-create a window in the app when the
 			// dock icon is clicked and there are no other windows open.
@@ -224,6 +266,15 @@ ipcMain.on('save-config', (event, arg) => {
 		if (appConfig.detectTimeChange !== arg.detectTimeChange)
 			if (arg.detectTimeChange) checkIfUserChangesLocalTime(); // check enabled or disabled
 			else clearCheckTimeChangesInterval();
+
+		// if runAtStartup is changed
+		if (appConfig.runAtStartup !== arg.runAtStartup) {
+			if (arg.runAtStartup) {
+				autoLauncher.enable();
+			} else {
+				autoLauncher.disable();
+			}
+		}
 
 		appConfig = arg;
 		updatePt();

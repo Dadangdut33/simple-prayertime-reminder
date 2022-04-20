@@ -29,7 +29,7 @@ export const Praytime = ({ theme }: any) => {
 	const [clockValue, setClockValue] = useState(new Date());
 	const [randomColorList, setRandomColorList] = useState<ColorHex[]>([]);
 	const [colorChangeSecondsList, setColorChangeSecondsList] = useState<number[]>([]);
-	const forbiddenColor = ['#dfdfdf', '#d9d9d9', '#e9e9e9', '#e2e2e2', '#dadada', '#e1e1d7', '#deb4ac', '#db918a']; // Mostly gray
+	const forbiddenColor = ['#dfdfdf', '#d9d9d9', '#e9e9e9', '#e2e2e2', '#dadada', '#e1e1d7', '#deb4ac', '#db918a', '#82c0c2']; // Mostly gray
 	const amountDivider = 75;
 
 	// ----------------------------------------------------------------------------------------------------------------------
