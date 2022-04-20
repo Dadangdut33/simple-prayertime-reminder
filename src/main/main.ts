@@ -24,8 +24,9 @@ let mainWindow: BrowserWindow | null = null,
 	appConfig: configInterface,
 	ptGet: getPrayerTimes_I,
 	iconPath = '',
-	timerTimeout: NodeJS.Timer,
-	timerInterval: NodeJS.Timer;
+	timerTimeout: NodeJS.Timeout,
+	timerInterval: NodeJS.Timer,
+	checkTimeChangesInterval: NodeJS.Timer;
 
 // Functions
 const RESOURCES_PATH = app.isPackaged ? path.join(process.resourcesPath, 'assets') : path.join(__dirname, '../../assets');
@@ -174,7 +175,7 @@ app.whenReady()
 		notifyInterval();
 
 		// check if locale time is changed by user
-		checkIfUserChangesLocalTime();
+		if (appConfig.detectTimeChange) checkIfUserChangesLocalTime();
 
 		app.on('activate', () => {
 			// On macOS it's common to re-create a window in the app when the
@@ -206,6 +207,11 @@ ipcMain.on('get-config', (event, _arg) => {
 ipcMain.on('save-config', (event, arg) => {
 	const success = writeConfig('app', arg);
 	if (success) {
+		// if detectclockChange is changed
+		if (appConfig.detectTimeChange !== arg.detectTimeChange)
+			if (arg.detectTimeChange) checkIfUserChangesLocalTime(); // check enabled or disabled
+			else clearCheckTimeChangesInterval();
+
 		appConfig = arg;
 		updatePt();
 	}
@@ -402,8 +408,9 @@ const clearNotifyInterval = () => {
 
 const checkIfUserChangesLocalTime = () => {
 	let timeBefore = new Date();
+	console.log('check if user changes local time');
 
-	setInterval(() => {
+	checkTimeChangesInterval = setInterval(() => {
 		let checkDif = Math.floor((new Date().getTime() - timeBefore.getTime()) / 1000);
 		if (checkDif !== 30) {
 			// if user changes local time
@@ -417,4 +424,9 @@ const checkIfUserChangesLocalTime = () => {
 			timeBefore = new Date();
 		}
 	}, 30000);
+};
+
+const clearCheckTimeChangesInterval = () => {
+	console.log('clear check if user changes local time');
+	clearInterval(checkTimeChangesInterval);
 };

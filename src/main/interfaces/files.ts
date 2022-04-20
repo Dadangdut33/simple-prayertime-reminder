@@ -47,6 +47,7 @@ export interface configInterface {
 	runAtStartup: boolean;
 	checkUpdateAtStartup: boolean;
 	clockStyle: string | 'AM/PM' | '24h';
+	detectTimeChange: boolean;
 	hijriCalendarOffset: number;
 	theme: 'dark' | 'light';
 }

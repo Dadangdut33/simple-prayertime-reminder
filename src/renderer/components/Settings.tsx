@@ -472,6 +472,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	const [checkUpdateStartup, setcheckUpdateStartup] = useState(currentConfig.checkUpdateAtStartup);
 	const [clockStyle, setClockStyle] = useState(currentConfig.clockStyle);
 	const [hijriCalendarOffset, setHijriCalendarOffset] = useState(currentConfig.hijriCalendarOffset);
+	const [detectTimeChange, setDetectTimeChange] = useState(currentConfig.detectTimeChange);
 
 	const handleHijriCalendarOffsetChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setHijriCalendarOffset(Number(e.target.value) || 0);
@@ -498,6 +499,11 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	const handleClockStyleChange = (e: any) => {
 		setClockStyle(e.target.value as string);
+		checkChanges();
+	};
+
+	const handleDetectTimeChange = (e: ChangeEvent<HTMLInputElement>) => {
+		setDetectTimeChange(e.target.checked);
 		checkChanges();
 	};
 
@@ -585,6 +591,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		setcheckUpdateStartup(initialConfig.checkUpdateAtStartup);
 		setClockStyle(initialConfig.clockStyle);
 		setHijriCalendarOffset(initialConfig.hijriCalendarOffset);
+		setDetectTimeChange(initialConfig.detectTimeChange);
 	};
 
 	// reset config
@@ -646,6 +653,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		currentConfig.clockStyle = clockStyle;
 		currentConfig.theme = appTheme;
 		currentConfig.hijriCalendarOffset = hijriCalendarOffset;
+		currentConfig.detectTimeChange = detectTimeChange;
 	};
 
 	// save config
@@ -1319,6 +1327,20 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 									<MenuItem value='AM/PM'>AM/PM</MenuItem>
 									<MenuItem value='24h'>24h</MenuItem>
 								</Select>
+							</FormControl>
+
+							<FormControl>
+								<FormLabel>Time sync</FormLabel>
+								<Box
+									sx={{
+										display: 'flex',
+										flexDirection: 'row',
+									}}
+								>
+									<Tooltip title='The app will check every 30 seconds for local time changes. Recommended to turn off if you are not messing arround with the local time/clock of your PC'>
+										<FormControlLabel control={<Checkbox checked={detectTimeChange} onChange={handleDetectTimeChange} />} label='Detect local time change' />
+									</Tooltip>
+								</Box>
 							</FormControl>
 						</Box>
 					</Grid>
