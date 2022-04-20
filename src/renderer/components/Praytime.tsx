@@ -19,8 +19,9 @@ import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 import Moment from 'moment-timezone';
 
 export const Praytime = ({ theme }: any) => {
+	// ----------------------------------------------------------------------------------------------------------------------
 	// Config
-	const [currentPt, setCurrentPt] = useState<getPrayerTimes_I>(window.electron.ipcRenderer.sendSync('get-this-pt', '') as getPrayerTimes_I);
+	const currentPt = window.electron.ipcRenderer.sendSync('get-this-pt') as getPrayerTimes_I;
 	const timezone = window.electron.ipcRenderer.sendSync('get-timezone') as string;
 	const appSettings = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
 
@@ -31,6 +32,7 @@ export const Praytime = ({ theme }: any) => {
 	const forbiddenColor = ['#dfdfdf', '#d9d9d9', '#e9e9e9', '#e2e2e2', '#dadada', '#e1e1d7', '#deb4ac', '#db918a']; // Mostly gray
 	const amountDivider = 75;
 
+	// ----------------------------------------------------------------------------------------------------------------------
 	const pt_Map: any = {
 		fajr: currentPt.fajrTime,
 		sunrise: currentPt.sunriseTime,
@@ -111,6 +113,16 @@ export const Praytime = ({ theme }: any) => {
 		return `${hours}:${minutes}:${seconds}`;
 	};
 
+	const setRemainTimeFunc = () => {
+		const startInitial = Moment(new Date()).tz(timezone);
+		const end = Moment(pt_Map[currentPt.next]).tz(timezone);
+		if (currentPt.next === 'fajr' && !check_00_fajr()) end.add(1, 'day');
+
+		const durationInitial = Moment.duration(startInitial.diff(end));
+
+		setRemainingTime(Math.round(Math.abs(durationInitial.asSeconds())));
+	};
+
 	// --------------------------------------------------------
 	// Timer
 	const durationOpen = getDif();
@@ -119,6 +131,21 @@ export const Praytime = ({ theme }: any) => {
 
 	// ---------------------------------------------------------
 	useEffect(() => {
+		// Timer shown
+		let timer_clock_Interval: NodeJS.Timer;
+		let toExactSecond = 1000 - (new Date().getTime() % 1000);
+		let timeoutTimer = setTimeout(() => {
+			timer_clock_Interval = setInterval(() => {
+				// update clock value
+				setClockValue(new Date());
+				// update timer value
+				setRemainTimeFunc();
+			}, 1000);
+
+			setClockValue(new Date());
+			setRemainTimeFunc();
+		}, toExactSecond); // match second
+
 		const getCacheColor = window.electron.ipcRenderer.sendSync('get-cache-color') as colorCacheGet;
 		if (getCacheColor.success && getCacheColor.data.current === currentPt.current) {
 			setRandomColorList(getCacheColor.data.colors);
@@ -127,12 +154,9 @@ export const Praytime = ({ theme }: any) => {
 			generateRandomHexColor(getDif() / amountDivider);
 		}
 
-		const interval = setInterval(() => {
-			setClockValue(new Date());
-		}, 1000);
-
 		return () => {
-			clearInterval(interval);
+			clearTimeout(timeoutTimer);
+			clearInterval(timer_clock_Interval);
 		};
 	}, []);
 
@@ -176,9 +200,6 @@ export const Praytime = ({ theme }: any) => {
 						colorsTime={colorChangeSecondsList as any}
 						strokeWidth={4}
 						size={290}
-						onUpdate={(remainingTime: number) => {
-							setRemainingTime(remainingTime);
-						}}
 						onComplete={() => {
 							// refresh page
 							window.location.reload();
