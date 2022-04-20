@@ -19,15 +19,17 @@ import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 import Moment from 'moment-timezone';
 
 export const Praytime = ({ theme }: any) => {
-	const [value, setValue] = useState(new Date());
+	// Config
 	const [currentPt, setCurrentPt] = useState<getPrayerTimes_I>(window.electron.ipcRenderer.sendSync('get-this-pt', '') as getPrayerTimes_I);
 	const timezone = window.electron.ipcRenderer.sendSync('get-timezone') as string;
 	const appSettings = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
-	const [remainingTime, setRemainingTime] = useState(0);
+
+	// clock
+	const [clockValue, setClockValue] = useState(new Date());
 	const [randomColorList, setRandomColorList] = useState<ColorHex[]>([]);
 	const [colorChangeSecondsList, setColorChangeSecondsList] = useState<number[]>([]);
+	const forbiddenColor = ['#dfdfdf', '#d9d9d9', '#e9e9e9', '#e2e2e2', '#dadada', '#e1e1d7', '#deb4ac', '#db918a']; // Mostly gray
 	const amountDivider = 75;
-	const forbiddenColor = ['#dfdfdf', '#d9d9d9', '#e9e9e9', '#e2e2e2', '#dadada']; // Mostly gray
 
 	const pt_Map: any = {
 		fajr: currentPt.fajrTime,
@@ -36,31 +38,6 @@ export const Praytime = ({ theme }: any) => {
 		asr: currentPt.asrTime,
 		maghrib: currentPt.maghribTime,
 		isha: currentPt.ishaTime,
-	};
-
-	const getNext = () => {
-		switch (currentPt.next) {
-			case 'fajr':
-				currentPt.next = 'sunrise';
-				break;
-			case 'sunrise':
-				currentPt.next = 'dhuhr';
-				break;
-			case 'dhuhr':
-				currentPt.next = 'asr';
-				break;
-			case 'asr':
-				currentPt.next = 'maghrib';
-				break;
-			case 'maghrib':
-				currentPt.next = 'isha';
-				break;
-			case 'isha':
-				currentPt.next = 'fajr';
-				break;
-			default:
-				break;
-		}
 	};
 
 	const generateRandomHexColor = (amount: number) => {
@@ -134,6 +111,12 @@ export const Praytime = ({ theme }: any) => {
 		return `${hours}:${minutes}:${seconds}`;
 	};
 
+	// --------------------------------------------------------
+	// Timer
+	const durationOpen = getDif();
+	const durationOpenInitial = getDifInitial();
+	const [remainingTime, setRemainingTime] = useState(getDifInitial());
+
 	// ---------------------------------------------------------
 	useEffect(() => {
 		const getCacheColor = window.electron.ipcRenderer.sendSync('get-cache-color') as colorCacheGet;
@@ -145,16 +128,13 @@ export const Praytime = ({ theme }: any) => {
 		}
 
 		const interval = setInterval(() => {
-			setValue(new Date());
+			setClockValue(new Date());
 		}, 1000);
 
 		return () => {
 			clearInterval(interval);
 		};
 	}, []);
-
-	const durationOpen = getDif();
-	const durationOpenInitial = getDifInitial();
 
 	// ==========================================================
 	return (
@@ -200,23 +180,12 @@ export const Praytime = ({ theme }: any) => {
 							setRemainingTime(remainingTime);
 						}}
 						onComplete={() => {
-							// Update next and current
-							currentPt.current = currentPt.next;
-							getNext();
-							const newValue = getDif();
-							generateRandomHexColor(newValue / amountDivider);
-
-							// get new pt
-							setCurrentPt(window.electron.ipcRenderer.sendSync('get-this-pt', '') as getPrayerTimes_I);
-
-							return {
-								shouldRepeat: true,
-								newInitialRemainingTime: newValue,
-							};
+							// refresh page
+							window.location.reload();
 						}}
 					/>
 					<div className='analogue' id={theme}>
-						<Clock value={value} renderNumbers={true} size={250} minuteHandWidth={3} hourHandWidth={5} secondHandWidth={2} />
+						<Clock value={clockValue} renderNumbers={true} size={250} minuteHandWidth={3} hourHandWidth={5} secondHandWidth={2} />
 					</div>
 				</Box>
 
