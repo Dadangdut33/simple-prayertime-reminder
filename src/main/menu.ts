@@ -41,50 +41,22 @@ export default class MenuBuilder {
 	}
 
 	buildDarwinTemplate(): MenuItemConstructorOptions[] {
-		const subMenuAbout: DarwinMenuItemConstructorOptions = {
-			label: 'Electron',
+		const subMenuFile: DarwinMenuItemConstructorOptions = {
+			label: 'File',
 			submenu: [
 				{
-					label: 'About ElectronReact',
-					selector: 'orderFrontStandardAboutPanel:',
-				},
-				{ type: 'separator' },
-				{ label: 'Services', submenu: [] },
-				{ type: 'separator' },
-				{
-					label: 'Hide ElectronReact',
+					label: 'Hide',
 					accelerator: 'Command+H',
-					selector: 'hide:',
+					click: () => {
+						this.mainWindow.hide();
+					},
 				},
-				{
-					label: 'Hide Others',
-					accelerator: 'Command+Shift+H',
-					selector: 'hideOtherApplications:',
-				},
-				{ label: 'Show All', selector: 'unhideAllApplications:' },
-				{ type: 'separator' },
 				{
 					label: 'Quit',
 					accelerator: 'Command+Q',
 					click: () => {
 						app.quit();
 					},
-				},
-			],
-		};
-		const subMenuEdit: DarwinMenuItemConstructorOptions = {
-			label: 'Edit',
-			submenu: [
-				{ label: 'Undo', accelerator: 'Command+Z', selector: 'undo:' },
-				{ label: 'Redo', accelerator: 'Shift+Command+Z', selector: 'redo:' },
-				{ type: 'separator' },
-				{ label: 'Cut', accelerator: 'Command+X', selector: 'cut:' },
-				{ label: 'Copy', accelerator: 'Command+C', selector: 'copy:' },
-				{ label: 'Paste', accelerator: 'Command+V', selector: 'paste:' },
-				{
-					label: 'Select All',
-					accelerator: 'Command+A',
-					selector: 'selectAll:',
 				},
 			],
 		};
@@ -126,44 +98,32 @@ export default class MenuBuilder {
 				},
 			],
 		};
-		const subMenuWindow: DarwinMenuItemConstructorOptions = {
-			label: 'Window',
-			submenu: [
-				{
-					label: 'Minimize',
-					accelerator: 'Command+M',
-					selector: 'performMiniaturize:',
-				},
-				{ label: 'Close', accelerator: 'Command+W', selector: 'performClose:' },
-				{ type: 'separator' },
-				{ label: 'Bring All to Front', selector: 'arrangeInFront:' },
-			],
-		};
 		const subMenuHelp: MenuItemConstructorOptions = {
 			label: 'Help',
 			submenu: [
 				{
-					label: 'Learn More',
+					label: 'Project Repository',
 					click() {
-						shell.openExternal('https://electronjs.org');
+						shell.openExternal('https://github.com/dadangdut33/simple-prayertime-reminder');
+					},
+				},
+				{ type: 'separator' },
+				{
+					label: 'Wiki/Documentation',
+					click() {
+						shell.openExternal('https://github.com/Dadangdut33/simple-prayertime-reminder/wiki');
 					},
 				},
 				{
-					label: 'Documentation',
+					label: 'Discussions',
 					click() {
-						shell.openExternal('https://github.com/electron/electron/tree/main/docs#readme');
+						shell.openExternal('https://github.com/Dadangdut33/simple-prayertime-reminder/discussions');
 					},
 				},
 				{
-					label: 'Community Discussions',
+					label: 'Issues',
 					click() {
-						shell.openExternal('https://www.electronjs.org/community');
-					},
-				},
-				{
-					label: 'Search Issues',
-					click() {
-						shell.openExternal('https://github.com/electron/electron/issues');
+						shell.openExternal('https://github.com/Dadangdut33/simple-prayertime-reminder/issues');
 					},
 				},
 			],
@@ -171,23 +131,26 @@ export default class MenuBuilder {
 
 		const subMenuView = process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true' ? subMenuViewDev : subMenuViewProd;
 
-		return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
+		return [subMenuFile, subMenuView, subMenuHelp];
 	}
 
 	buildDefaultTemplate() {
-		const templateDefault = [
+		const templateDefault: MenuItemConstructorOptions[] = [
 			{
 				label: '&File',
 				submenu: [
 					{
-						label: '&Open',
-						accelerator: 'Ctrl+O',
-					},
-					{
-						label: '&Close',
+						label: '&Hide to Tray',
 						accelerator: 'Ctrl+W',
 						click: () => {
-							this.mainWindow.close();
+							this.mainWindow.hide();
+						},
+					},
+					{
+						label: '&Quit',
+						accelerator: 'Ctrl+Q',
+						click: () => {
+							app.quit();
 						},
 					},
 				],
@@ -233,27 +196,28 @@ export default class MenuBuilder {
 				label: 'Help',
 				submenu: [
 					{
-						label: 'Learn More',
+						label: 'Project Repository',
 						click() {
-							shell.openExternal('https://electronjs.org');
+							shell.openExternal('https://github.com/dadangdut33/simple-prayertime-reminder');
+						},
+					},
+					{ type: 'separator' },
+					{
+						label: 'Wiki/Documentation',
+						click() {
+							shell.openExternal('https://github.com/Dadangdut33/simple-prayertime-reminder/wiki');
 						},
 					},
 					{
-						label: 'Documentation',
+						label: 'Discussions',
 						click() {
-							shell.openExternal('https://github.com/electron/electron/tree/main/docs#readme');
+							shell.openExternal('https://github.com/Dadangdut33/simple-prayertime-reminder/discussions');
 						},
 					},
 					{
-						label: 'Community Discussions',
+						label: 'Issues',
 						click() {
-							shell.openExternal('https://www.electronjs.org/community');
-						},
-					},
-					{
-						label: 'Search Issues',
-						click() {
-							shell.openExternal('https://github.com/electron/electron/issues');
+							shell.openExternal('https://github.com/Dadangdut33/simple-prayertime-reminder/issues');
 						},
 					},
 				],
