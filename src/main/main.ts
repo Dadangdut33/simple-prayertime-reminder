@@ -110,18 +110,26 @@ const createWindow = async () => {
 	// unresponsive
 	mainWindow.on('unresponsive', onUnresponsiveWindow);
 
-	mainWindow.on('ready-to-show', () => {
-		if (!mainWindow) {
-			throw new Error('"mainWindow" is not defined');
-		}
-	});
-
 	menuBuilder = new MenuBuilder(mainWindow);
 	menuBuilder.buildMenu();
 
 	trayManager = new TrayManager(mainWindow!, getAssetPath('icon.png'));
 	trayManager.createTray();
 	trayManager.updatePrayTime(ptGet, appConfig); // update trayicon with the prayer times
+
+	mainWindow.on('ready-to-show', () => {
+		if (!mainWindow) {
+			throw new Error('"mainWindow" is not defined');
+		}
+		// auto launch check
+		const checkLoginOpen = wasOpenedAtLogin();
+
+		if (checkLoginOpen) {
+			mainWindow.hide();
+		} else {
+			mainWindow.show();
+		}
+	});
 
 	mainWindow.on('close', (event: any) => {
 		event.preventDefault();
@@ -231,15 +239,6 @@ if (!gotTheLock) {
 
 			// start detecttimechange interval if enabled
 			if (appConfig.detectTimeChange) checkIfUserChangesLocalTime(); // check if locale time is changed by user
-
-			// auto launch
-			if (appConfig.runAtStartup) {
-				const checkLoginOpen = wasOpenedAtLogin();
-
-				if (checkLoginOpen) {
-					mainWindow?.hide();
-				}
-			}
 
 			app.on('activate', () => {
 				// On macOS it's common to re-create a window in the app when the
