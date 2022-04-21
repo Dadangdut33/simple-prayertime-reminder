@@ -769,7 +769,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 								<FormControl fullWidth sx={{ mt: 1, mb: 1 }}>
 									<InputLabel id='calc-method'>Calculation Method</InputLabel>
-									<Select labelId='calc-method' value={calcOptMethod} label='Calculation Method' onChange={handleCalcOptMethodChange}>
+									<Select labelId='calc-method' value={calcOptMethod} label='Calculation Method' onChange={handleCalcOptMethodChange} disabled={calcOptMode === 'default' ? true : false}>
 										{methodList.map((method) => (
 											<MenuItem key={method} value={method}>
 												{method}
@@ -780,7 +780,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 								<FormControl fullWidth sx={{ mt: 1, mb: 1 }}>
 									<InputLabel id='madhab-select'>Madhab</InputLabel>
-									<Select labelId='madhab-select' value={calcOptMadhab} label='Madhab' onChange={handleCalcOptMadhabChange}>
+									<Select labelId='madhab-select' value={calcOptMadhab} label='Madhab' onChange={handleCalcOptMadhabChange} disabled={calcOptMode === 'default' ? true : false}>
 										{madhabList.map((method) => (
 											<MenuItem key={method} value={method}>
 												{method}
@@ -791,7 +791,13 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 								<FormControl fullWidth sx={{ mt: 1, mb: 1 }}>
 									<InputLabel id='highlat-select'>High Latitude Adjustment</InputLabel>
-									<Select labelId='highlat-select' value={calcOptHighLatRule} label='High Latitude Adjustment' onChange={handleCalcOptHighLatRuleChange}>
+									<Select
+										labelId='highlat-select'
+										value={calcOptHighLatRule}
+										label='High Latitude Adjustment'
+										onChange={handleCalcOptHighLatRuleChange}
+										disabled={calcOptMode === 'default' ? true : false}
+									>
 										{highLatRuleList.map((method) => (
 											<MenuItem key={method} value={method}>
 												{method}
