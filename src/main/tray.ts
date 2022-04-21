@@ -23,7 +23,7 @@ export default class TrayManager {
 			{
 				label: 'Quit',
 				click: () => {
-					app.quit();
+					app.exit(0);
 				},
 			},
 		]);
@@ -87,7 +87,7 @@ export default class TrayManager {
 			{
 				label: 'Quit',
 				click: () => {
-					app.quit();
+					app.exit(0);
 				},
 			},
 		]);

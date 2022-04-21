@@ -55,7 +55,7 @@ export default class MenuBuilder {
 					label: 'Quit',
 					accelerator: 'Command+Q',
 					click: () => {
-						app.quit();
+						app.exit(0);
 					},
 				},
 			],
@@ -150,7 +150,7 @@ export default class MenuBuilder {
 						label: '&Quit',
 						accelerator: 'Ctrl+Q',
 						click: () => {
-							app.quit();
+							app.exit(0);
 						},
 					},
 				],
