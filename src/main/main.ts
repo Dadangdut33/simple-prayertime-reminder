@@ -301,7 +301,7 @@ ipcMain.on('get-timezone', (event, _arg) => {
 });
 
 ipcMain.on('get-version', (event, _arg) => {
-	event.returnValue = process.env.npm_package_version;
+	event.returnValue = app.getVersion();
 });
 
 ipcMain.on('get-cache-color', (event, _arg) => {
