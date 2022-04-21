@@ -28,7 +28,7 @@ export default class TrayManager {
 			},
 		]);
 
-		this.tray.setToolTip(`Simple PrayerTime Reminder - v${process.env.npm_package_version}`);
+		this.tray.setToolTip(`Simple PrayerTime Reminder - v${app.getVersion()}`);
 		this.tray.setContextMenu(contextMenu);
 
 		this.tray.on('click', () => {
