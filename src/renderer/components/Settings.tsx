@@ -85,82 +85,44 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		checkChanges();
 	};
 
-	const handleCalcOptMethodChange = (event: any) => {
-		setCalcOptMethod(event.target.value as string);
+	const calcOptSelectMap = {
+		method: setCalcOptMethod,
+		madhab: setCalcOptMadhab,
+		highLatitudeRule: setCalcOptHighLatRule,
+	};
+
+	const handleCalcOptSelectChange = (event: ChangeEvent<HTMLSelectElement>, map: 'method' | 'madhab' | 'highLatitudeRule') => {
+		calcOptSelectMap[map](event.target.value as string);
 
 		checkChanges();
 	};
 
-	const handleCalcOptMadhabChange = (event: any) => {
-		setCalcOptMadhab(event.target.value as string);
+	const adjustChangeMap: any = {
+		fajr: setCalcOptAdjustment_Fajr,
+		sunrise: setCalcOptAdjustment_Sunrise,
+		dhuhr: setCalcOptAdjustment_Dhuhr,
+		asr: setCalcOptAdjustment_Asr,
+		maghrib: setCalcOptAdjustment_Maghrib,
+		isha: setCalcOptAdjustment_Isha,
+	};
 
+	const varAdjustChangeMap: any = {
+		fajr: calcOptAdjustment_Fajr,
+		sunrise: calcOptAdjustment_Sunrise,
+		dhuhr: calcOptAdjustment_Dhuhr,
+		asr: calcOptAdjustment_Asr,
+		maghrib: calcOptAdjustment_Maghrib,
+		isha: calcOptAdjustment_Isha,
+	};
+
+	const handleCalcOptAdjustmentChange = (event: ChangeEvent<HTMLInputElement>, map: 'fajr' | 'sunrise' | 'dhuhr' | 'asr' | 'maghrib' | 'isha') => {
+		adjustChangeMap[map](Number(event.target.value) || 0);
 		checkChanges();
 	};
 
-	const handleCalcOptHighLatRuleChange = (event: any) => {
-		setCalcOptHighLatRule(event.target.value as string);
-
-		checkChanges();
-	};
-
-	const handleCalOptAdjustment_FajrChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setCalcOptAdjustment_Fajr(Number(event.target.value) || 0);
-		checkChanges();
-	};
-
-	const handleBlur_Fajr = () => {
-		if (calcOptAdjustment_Fajr < -600) setCalcOptAdjustment_Fajr(-600);
-		else if (calcOptAdjustment_Fajr > 600) setCalcOptAdjustment_Fajr(600);
-	};
-
-	const handleCalOptAdjustment_SunriseChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setCalcOptAdjustment_Sunrise(Number(event.target.value) || 0);
-		checkChanges();
-	};
-
-	const handleBlur_Sunrise = () => {
-		if (calcOptAdjustment_Sunrise < -600) setCalcOptAdjustment_Sunrise(-600);
-		else if (calcOptAdjustment_Sunrise > 600) setCalcOptAdjustment_Sunrise(600);
-	};
-
-	const handleCalOptAdjustment_DhuhrChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setCalcOptAdjustment_Dhuhr(Number(event.target.value) || 0);
-		checkChanges();
-	};
-
-	const handleBlur_Dhuhr = () => {
-		if (calcOptAdjustment_Dhuhr < -600) setCalcOptAdjustment_Dhuhr(-600);
-		else if (calcOptAdjustment_Dhuhr > 600) setCalcOptAdjustment_Dhuhr(600);
-	};
-
-	const handleCalOptAdjustment_AsrChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setCalcOptAdjustment_Asr(Number(event.target.value) || 0);
-		checkChanges();
-	};
-
-	const handleBlur_Asr = () => {
-		if (calcOptAdjustment_Asr < -600) setCalcOptAdjustment_Asr(-600);
-		else if (calcOptAdjustment_Asr > 600) setCalcOptAdjustment_Asr(600);
-	};
-
-	const handleCalOptAdjustment_MaghribChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setCalcOptAdjustment_Maghrib(Number(event.target.value) || 0);
-		checkChanges();
-	};
-
-	const handleBlur_Maghrib = () => {
-		if (calcOptAdjustment_Maghrib < -600) setCalcOptAdjustment_Maghrib(-600);
-		else if (calcOptAdjustment_Maghrib > 600) setCalcOptAdjustment_Maghrib(600);
-	};
-
-	const handleCalOptAdjustment_IshaChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setCalcOptAdjustment_Isha(Number(event.target.value) || 0);
-		checkChanges();
-	};
-
-	const handleBlur_Isha = () => {
-		if (calcOptAdjustment_Isha < -600) setCalcOptAdjustment_Isha(-600);
-		else if (calcOptAdjustment_Isha > 600) setCalcOptAdjustment_Isha(600);
+	const handleBlurCalcOptAdjustmentChange = (map: 'fajr' | 'sunrise' | 'dhuhr' | 'asr' | 'maghrib' | 'isha') => {
+		if (varAdjustChangeMap[map] < -300) adjustChangeMap[map](-300);
+		else if (varAdjustChangeMap[map] > 300) adjustChangeMap[map](300);
 	};
 
 	// --------------------------------------------------------------------------
@@ -769,7 +731,13 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 								<FormControl fullWidth sx={{ mt: 1, mb: 1 }}>
 									<InputLabel id='calc-method'>Calculation Method</InputLabel>
-									<Select labelId='calc-method' value={calcOptMethod} label='Calculation Method' onChange={handleCalcOptMethodChange} disabled={calcOptMode === 'default' ? true : false}>
+									<Select
+										labelId='calc-method'
+										value={calcOptMethod}
+										label='Calculation Method'
+										onChange={(e) => handleCalcOptSelectChange(e as any, 'method')}
+										disabled={calcOptMode === 'default' ? true : false}
+									>
 										{methodList.map((method) => (
 											<MenuItem key={method} value={method}>
 												{method}
@@ -780,7 +748,13 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 								<FormControl fullWidth sx={{ mt: 1, mb: 1 }}>
 									<InputLabel id='madhab-select'>Madhab</InputLabel>
-									<Select labelId='madhab-select' value={calcOptMadhab} label='Madhab' onChange={handleCalcOptMadhabChange} disabled={calcOptMode === 'default' ? true : false}>
+									<Select
+										labelId='madhab-select'
+										value={calcOptMadhab}
+										label='Madhab'
+										onChange={(e) => handleCalcOptSelectChange(e as any, 'madhab')}
+										disabled={calcOptMode === 'default' ? true : false}
+									>
 										{madhabList.map((method) => (
 											<MenuItem key={method} value={method}>
 												{method}
@@ -795,7 +769,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 										labelId='highlat-select'
 										value={calcOptHighLatRule}
 										label='High Latitude Adjustment'
-										onChange={handleCalcOptHighLatRuleChange}
+										onChange={(e) => handleCalcOptSelectChange(e as any, 'highLatitudeRule')}
 										disabled={calcOptMode === 'default' ? true : false}
 									>
 										{highLatRuleList.map((method) => (
@@ -818,12 +792,12 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 											style={{ marginTop: '4px' }}
 											sx={{ ml: 0.5 }}
 											value={calcOptAdjustment_Fajr}
-											onChange={handleCalOptAdjustment_FajrChange}
-											onBlur={handleBlur_Fajr}
+											onChange={(e) => handleCalcOptAdjustmentChange(e as any, 'fajr')}
+											onBlur={() => handleBlurCalcOptAdjustmentChange('fajr')}
 											inputProps={{
 												step: 1,
-												min: -600,
-												max: 600,
+												min: -300,
+												max: 300,
 												type: 'number',
 												'aria-labelledby': 'input-slider',
 											}}
@@ -835,12 +809,12 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 										<MuiInput
 											style={{ marginTop: '4px' }}
 											value={calcOptAdjustment_Sunrise}
-											onChange={handleCalOptAdjustment_SunriseChange}
-											onBlur={handleBlur_Sunrise}
+											onChange={(e) => handleCalcOptAdjustmentChange(e as any, 'sunrise')}
+											onBlur={() => handleBlurCalcOptAdjustmentChange('sunrise')}
 											inputProps={{
 												step: 1,
-												min: -600,
-												max: 600,
+												min: -300,
+												max: 300,
 												type: 'number',
 												'aria-labelledby': 'input-slider',
 											}}
@@ -852,12 +826,12 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 										<MuiInput
 											style={{ marginTop: '4px' }}
 											value={calcOptAdjustment_Dhuhr}
-											onChange={handleCalOptAdjustment_DhuhrChange}
-											onBlur={handleBlur_Dhuhr}
+											onChange={(e) => handleCalcOptAdjustmentChange(e as any, 'dhuhr')}
+											onBlur={() => handleBlurCalcOptAdjustmentChange('dhuhr')}
 											inputProps={{
 												step: 1,
-												min: -600,
-												max: 600,
+												min: -300,
+												max: 300,
 												type: 'number',
 												'aria-labelledby': 'input-slider',
 											}}
@@ -869,12 +843,12 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 										<MuiInput
 											style={{ marginTop: '4px' }}
 											value={calcOptAdjustment_Asr}
-											onChange={handleCalOptAdjustment_AsrChange}
-											onBlur={handleBlur_Asr}
+											onChange={(e) => handleCalcOptAdjustmentChange(e as any, 'asr')}
+											onBlur={() => handleBlurCalcOptAdjustmentChange('asr')}
 											inputProps={{
 												step: 1,
-												min: -600,
-												max: 600,
+												min: -300,
+												max: 300,
 												type: 'number',
 												'aria-labelledby': 'input-slider',
 											}}
@@ -886,12 +860,12 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 										<MuiInput
 											style={{ marginTop: '4px' }}
 											value={calcOptAdjustment_Maghrib}
-											onChange={handleCalOptAdjustment_MaghribChange}
-											onBlur={handleBlur_Maghrib}
+											onChange={(e) => handleCalcOptAdjustmentChange(e as any, 'maghrib')}
+											onBlur={() => handleBlurCalcOptAdjustmentChange('maghrib')}
 											inputProps={{
 												step: 1,
-												min: -600,
-												max: 600,
+												min: -300,
+												max: 300,
 												type: 'number',
 												'aria-labelledby': 'input-slider',
 											}}
@@ -903,12 +877,12 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 										<MuiInput
 											style={{ marginTop: '4px' }}
 											value={calcOptAdjustment_Isha}
-											onChange={handleCalOptAdjustment_IshaChange}
-											onBlur={handleBlur_Isha}
+											onChange={(e) => handleCalcOptAdjustmentChange(e as any, 'isha')}
+											onBlur={() => handleBlurCalcOptAdjustmentChange('isha')}
 											inputProps={{
 												step: 1,
-												min: -600,
-												max: 600,
+												min: -300,
+												max: 300,
 												type: 'number',
 												'aria-labelledby': 'input-slider',
 											}}
