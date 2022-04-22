@@ -51,6 +51,9 @@ import MiscellaneousServicesOutlinedIcon from '@mui/icons-material/Miscellaneous
 import CalculateOutlinedIcon from '@mui/icons-material/CalculateOutlined';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 
+// types
+type prayerTimes = 'fajr' | 'sunrise' | 'dhuhr' | 'asr' | 'maghrib' | 'isha';
+
 export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) => {
 	// config on tab open
 	const initialConfig = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
@@ -115,12 +118,12 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		isha: calcOptAdjustment_Isha,
 	};
 
-	const handleCalcOptAdjustmentChange = (event: ChangeEvent<HTMLInputElement>, map: 'fajr' | 'sunrise' | 'dhuhr' | 'asr' | 'maghrib' | 'isha') => {
+	const handleCalcOptAdjustmentChange = (event: ChangeEvent<HTMLInputElement>, map: prayerTimes) => {
 		adjustChangeMap[map](Number(event.target.value) || 0);
 		checkChanges();
 	};
 
-	const handleBlurCalcOptAdjustmentChange = (map: 'fajr' | 'sunrise' | 'dhuhr' | 'asr' | 'maghrib' | 'isha') => {
+	const handleBlurCalcOptAdjustmentChange = (map: prayerTimes) => {
 		if (varAdjustChangeMap[map] < -300) adjustChangeMap[map](-300);
 		else if (varAdjustChangeMap[map] > 300) adjustChangeMap[map](300);
 	};
@@ -151,124 +154,60 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	const [remind_isha_earlyReminder, setRemind_isha_earlyReminder] = useState<boolean>(currentConfig.reminderOption.isha.earlyReminder);
 	const [remind_isha_earlyTime, setRemind_isha_earlyTime] = useState<number>(currentConfig.reminderOption.isha.earlyTime);
 
-	const handleRemind_fajr_remindWhenOnTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setRemind_fajr_remindWhenOnTime(event.target.checked);
+	const remindWhenOnTimeChangeMap = {
+		fajr: setRemind_fajr_remindWhenOnTime,
+		sunrise: setRemind_sunrise_remindWhenOnTime,
+		dhuhr: setRemind_dhuhr_remindWhenOnTime,
+		asr: setRemind_asr_remindWhenOnTime,
+		maghrib: setRemind_maghrib_remindWhenOnTime,
+		isha: setRemind_isha_remindWhenOnTime,
+	};
+
+	const earlyReminderChangeMap = {
+		fajr: setRemind_fajr_earlyReminder,
+		sunrise: setRemind_sunrise_earlyReminder,
+		dhuhr: setRemind_dhuhr_earlyReminder,
+		asr: setRemind_asr_earlyReminder,
+		maghrib: setRemind_maghrib_earlyReminder,
+		isha: setRemind_isha_earlyReminder,
+	};
+
+	const earlyTimeChangeMap = {
+		fajr: setRemind_fajr_earlyTime,
+		sunrise: setRemind_sunrise_earlyTime,
+		dhuhr: setRemind_dhuhr_earlyTime,
+		asr: setRemind_asr_earlyTime,
+		maghrib: setRemind_maghrib_earlyTime,
+		isha: setRemind_isha_earlyTime,
+	};
+
+	const varEarlyTimeChangeMap = {
+		fajr: remind_fajr_earlyTime,
+		sunrise: remind_sunrise_earlyTime,
+		dhuhr: remind_dhuhr_earlyTime,
+		asr: remind_asr_earlyTime,
+		maghrib: remind_maghrib_earlyTime,
+		isha: remind_isha_earlyTime,
+	};
+
+	const handleRemindWhenOnTimeChange = (event: ChangeEvent<HTMLInputElement>, map: prayerTimes) => {
+		remindWhenOnTimeChangeMap[map](event.target.checked);
 		checkChanges();
 	};
 
-	const handleRemind_fajr_earlyReminderChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setRemind_fajr_earlyReminder(event.target.checked);
+	const handleEarlyReminderChange = (event: ChangeEvent<HTMLInputElement>, map: prayerTimes) => {
+		earlyReminderChangeMap[map](event.target.checked);
 		checkChanges();
 	};
 
-	const handleRemind_fajr_earlyTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setRemind_fajr_earlyTime(Number(event.target.value) || 0);
+	const handleEarlyTimeChange = (event: ChangeEvent<HTMLInputElement>, map: prayerTimes) => {
+		earlyTimeChangeMap[map](Number(event.target.value) || 1);
 		checkChanges();
 	};
 
-	const blurRemind_fajr_earlyTime = () => {
-		if (remind_fajr_earlyTime < 0) setRemind_fajr_earlyTime(0);
-		else if (remind_fajr_earlyTime > 60) setRemind_fajr_earlyTime(60);
-	};
-
-	const handleRemind_sunrise_remindWhenOnTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setRemind_sunrise_remindWhenOnTime(event.target.checked);
-		checkChanges();
-	};
-
-	const handleRemind_sunrise_earlyReminderChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setRemind_sunrise_earlyReminder(event.target.checked);
-		checkChanges();
-	};
-
-	const handleRemind_sunrise_earlyTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setRemind_sunrise_earlyTime(Number(event.target.value) || 0);
-		checkChanges();
-	};
-
-	const blurRemind_sunrise_earlyTime = () => {
-		if (remind_sunrise_earlyTime < 0) setRemind_sunrise_earlyTime(0);
-		else if (remind_sunrise_earlyTime > 60) setRemind_sunrise_earlyTime(60);
-	};
-
-	const handleRemind_dhuhr_remindWhenOnTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setRemind_dhuhr_remindWhenOnTime(event.target.checked);
-		checkChanges();
-	};
-
-	const handleRemind_dhuhr_earlyReminderChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setRemind_dhuhr_earlyReminder(event.target.checked);
-		checkChanges();
-	};
-
-	const handleRemind_dhuhr_earlyTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setRemind_dhuhr_earlyTime(Number(event.target.value) || 0);
-		checkChanges();
-	};
-
-	const blurRemind_dhuhr_earlyTime = () => {
-		if (remind_dhuhr_earlyTime < 0) setRemind_dhuhr_earlyTime(0);
-		else if (remind_dhuhr_earlyTime > 60) setRemind_dhuhr_earlyTime(60);
-	};
-
-	const handleRemind_asr_remindWhenOnTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setRemind_asr_remindWhenOnTime(event.target.checked);
-		checkChanges();
-	};
-
-	const handleRemind_asr_earlyReminderChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setRemind_asr_earlyReminder(event.target.checked);
-		checkChanges();
-	};
-
-	const handleRemind_asr_earlyTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setRemind_asr_earlyTime(Number(event.target.value) || 0);
-		checkChanges();
-	};
-
-	const blurRemind_asr_earlyTime = () => {
-		if (remind_asr_earlyTime < 0) setRemind_asr_earlyTime(0);
-		else if (remind_asr_earlyTime > 60) setRemind_asr_earlyTime(60);
-	};
-
-	const handleRemind_maghrib_remindWhenOnTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setRemind_maghrib_remindWhenOnTime(event.target.checked);
-		checkChanges();
-	};
-
-	const handleRemind_maghrib_earlyReminderChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setRemind_maghrib_earlyReminder(event.target.checked);
-		checkChanges();
-	};
-
-	const handleRemind_maghrib_earlyTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setRemind_maghrib_earlyTime(Number(event.target.value) || 0);
-		checkChanges();
-	};
-
-	const blurRemind_maghrib_earlyTime = () => {
-		if (remind_maghrib_earlyTime < 0) setRemind_maghrib_earlyTime(0);
-		else if (remind_maghrib_earlyTime > 60) setRemind_maghrib_earlyTime(60);
-	};
-
-	const handleRemind_isha_remindWhenOnTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setRemind_isha_remindWhenOnTime(event.target.checked);
-		checkChanges();
-	};
-
-	const handleRemind_isha_earlyReminderChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setRemind_isha_earlyReminder(event.target.checked);
-		checkChanges();
-	};
-
-	const handleRemind_isha_earlyTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setRemind_isha_earlyTime(Number(event.target.value) || 0);
-		checkChanges();
-	};
-
-	const blurRemind_isha_earlyTime = () => {
-		if (remind_isha_earlyTime < 0) setRemind_isha_earlyTime(0);
-		else if (remind_isha_earlyTime > 60) setRemind_isha_earlyTime(60);
+	const blurEarlyTime = (map: prayerTimes) => {
+		if (varEarlyTimeChangeMap[map] < 1) earlyTimeChangeMap[map](1);
+		else if (varEarlyTimeChangeMap[map] > 60) earlyTimeChangeMap[map](60);
 	};
 
 	// --------------------------------------------------------------------------
@@ -932,11 +871,11 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 										<MuiInput
 											style={{ marginTop: '4px' }}
 											value={remind_fajr_earlyTime}
-											onChange={handleRemind_fajr_earlyTimeChange}
-											onBlur={blurRemind_fajr_earlyTime}
+											onChange={(e) => handleEarlyTimeChange(e as any, 'fajr')}
+											onBlur={() => blurEarlyTime('fajr')}
 											inputProps={{
 												step: 1,
-												min: 0,
+												min: 1,
 												max: 60,
 												type: 'number',
 												'aria-labelledby': 'input-slider',
@@ -949,11 +888,11 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 										<MuiInput
 											style={{ marginTop: '4px' }}
 											value={remind_sunrise_earlyTime}
-											onChange={handleRemind_sunrise_earlyTimeChange}
-											onBlur={blurRemind_sunrise_earlyTime}
+											onChange={(e) => handleEarlyTimeChange(e as any, 'sunrise')}
+											onBlur={() => blurEarlyTime('sunrise')}
 											inputProps={{
 												step: 1,
-												min: 0,
+												min: 1,
 												max: 60,
 												type: 'number',
 												'aria-labelledby': 'input-slider',
@@ -966,11 +905,11 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 										<MuiInput
 											style={{ marginTop: '4px' }}
 											value={remind_dhuhr_earlyTime}
-											onChange={handleRemind_dhuhr_earlyTimeChange}
-											onBlur={blurRemind_dhuhr_earlyTime}
+											onChange={(e) => handleEarlyTimeChange(e as any, 'dhuhr')}
+											onBlur={() => blurEarlyTime('dhuhr')}
 											inputProps={{
 												step: 1,
-												min: 0,
+												min: 1,
 												max: 60,
 												type: 'number',
 												'aria-labelledby': 'input-slider',
@@ -983,11 +922,11 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 										<MuiInput
 											style={{ marginTop: '4px' }}
 											value={remind_asr_earlyTime}
-											onChange={handleRemind_asr_earlyTimeChange}
-											onBlur={blurRemind_asr_earlyTime}
+											onChange={(e) => handleEarlyTimeChange(e as any, 'asr')}
+											onBlur={() => blurEarlyTime('asr')}
 											inputProps={{
 												step: 1,
-												min: 0,
+												min: 1,
 												max: 60,
 												type: 'number',
 												'aria-labelledby': 'input-slider',
@@ -1000,11 +939,11 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 										<MuiInput
 											style={{ marginTop: '4px' }}
 											value={remind_maghrib_earlyTime}
-											onChange={handleRemind_maghrib_earlyTimeChange}
-											onBlur={blurRemind_maghrib_earlyTime}
+											onChange={(e) => handleEarlyTimeChange(e as any, 'maghrib')}
+											onBlur={() => blurEarlyTime('maghrib')}
 											inputProps={{
 												step: 1,
-												min: 0,
+												min: 1,
 												max: 60,
 												type: 'number',
 												'aria-labelledby': 'input-slider',
@@ -1017,11 +956,11 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 										<MuiInput
 											style={{ marginTop: '4px' }}
 											value={remind_isha_earlyTime}
-											onChange={handleRemind_isha_earlyTimeChange}
-											onBlur={blurRemind_isha_earlyTime}
+											onChange={(e) => handleEarlyTimeChange(e as any, 'isha')}
+											onBlur={() => blurEarlyTime('isha')}
 											inputProps={{
 												step: 1,
-												min: 0,
+												min: 1,
 												max: 60,
 												type: 'number',
 												'aria-labelledby': 'input-slider',
@@ -1038,24 +977,24 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 									<FormControl sx={{ mt: 2 }} component='fieldset' variant='standard'>
 										<FormLabel component='legend'>Remind When On Time</FormLabel>
 										<FormGroup>
-											<FormControlLabel control={<Checkbox checked={remind_fajr_remindWhenOnTime} onChange={handleRemind_fajr_remindWhenOnTimeChange} />} label='Fajr' />
-											<FormControlLabel control={<Checkbox checked={remind_sunrise_remindWhenOnTime} onChange={handleRemind_sunrise_remindWhenOnTimeChange} />} label='Sunrise' />
-											<FormControlLabel control={<Checkbox checked={remind_dhuhr_remindWhenOnTime} onChange={handleRemind_dhuhr_remindWhenOnTimeChange} />} label='Dhuhr' />
-											<FormControlLabel control={<Checkbox checked={remind_asr_remindWhenOnTime} onChange={handleRemind_asr_remindWhenOnTimeChange} />} label='Asr' />
-											<FormControlLabel control={<Checkbox checked={remind_maghrib_remindWhenOnTime} onChange={handleRemind_maghrib_remindWhenOnTimeChange} />} label='Maghrib' />
-											<FormControlLabel control={<Checkbox checked={remind_isha_remindWhenOnTime} onChange={handleRemind_isha_remindWhenOnTimeChange} />} label='Isha' />
+											<FormControlLabel control={<Checkbox checked={remind_fajr_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'fajr')} />} label='Fajr' />
+											<FormControlLabel control={<Checkbox checked={remind_sunrise_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'sunrise')} />} label='Sunrise' />
+											<FormControlLabel control={<Checkbox checked={remind_dhuhr_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'dhuhr')} />} label='Dhuhr' />
+											<FormControlLabel control={<Checkbox checked={remind_asr_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'asr')} />} label='Asr' />
+											<FormControlLabel control={<Checkbox checked={remind_maghrib_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'maghrib')} />} label='Maghrib' />
+											<FormControlLabel control={<Checkbox checked={remind_isha_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'isha')} />} label='Isha' />
 										</FormGroup>
 									</FormControl>
 
 									<FormControl sx={{ mt: 2, ml: 3 }} component='fieldset' variant='standard'>
 										<FormLabel component='legend'>Early Reminder</FormLabel>
 										<FormGroup>
-											<FormControlLabel control={<Checkbox checked={remind_fajr_earlyReminder} onChange={handleRemind_fajr_earlyReminderChange} />} label='Fajr' />
-											<FormControlLabel control={<Checkbox checked={remind_sunrise_earlyReminder} onChange={handleRemind_sunrise_earlyReminderChange} />} label='Sunrise' />
-											<FormControlLabel control={<Checkbox checked={remind_dhuhr_earlyReminder} onChange={handleRemind_dhuhr_earlyReminderChange} />} label='Dhuhr' />
-											<FormControlLabel control={<Checkbox checked={remind_asr_earlyReminder} onChange={handleRemind_asr_earlyReminderChange} />} label='Asr' />
-											<FormControlLabel control={<Checkbox checked={remind_maghrib_earlyReminder} onChange={handleRemind_maghrib_earlyReminderChange} />} label='Maghrib' />
-											<FormControlLabel control={<Checkbox checked={remind_isha_earlyReminder} onChange={handleRemind_isha_earlyReminderChange} />} label='Isha' />
+											<FormControlLabel control={<Checkbox checked={remind_fajr_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'fajr')} />} label='Fajr' />
+											<FormControlLabel control={<Checkbox checked={remind_sunrise_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'sunrise')} />} label='Sunrise' />
+											<FormControlLabel control={<Checkbox checked={remind_dhuhr_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'dhuhr')} />} label='Dhuhr' />
+											<FormControlLabel control={<Checkbox checked={remind_asr_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'asr')} />} label='Asr' />
+											<FormControlLabel control={<Checkbox checked={remind_maghrib_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'maghrib')} />} label='Maghrib' />
+											<FormControlLabel control={<Checkbox checked={remind_isha_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'isha')} />} label='Isha' />
 										</FormGroup>
 									</FormControl>
 								</Box>

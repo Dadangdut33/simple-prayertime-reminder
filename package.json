@@ -273,7 +273,7 @@
     "singleQuote": true,
     "useTabs": true,
     "jsxSingleQuote": true,
-    "printWidth": 210
+    "printWidth": 215
   },
   "electronmon": {
     "patterns": [
