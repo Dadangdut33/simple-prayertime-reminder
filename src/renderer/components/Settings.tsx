@@ -1,5 +1,5 @@
 import { ColorModeContextInterface } from 'renderer/interfaces';
-import { configInterface, getPosition_absolute_I } from 'main/interfaces';
+import { configInterface, getPosition_absolute_I, calcMethod, madhab, highLatitudeRule_T, prayerTimes } from 'main/interfaces';
 import { useContext, forwardRef, useState, ChangeEvent, useEffect } from 'react';
 
 // MUI
@@ -51,9 +51,6 @@ import MiscellaneousServicesOutlinedIcon from '@mui/icons-material/Miscellaneous
 import CalculateOutlinedIcon from '@mui/icons-material/CalculateOutlined';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 
-// types
-type prayerTimes = 'fajr' | 'sunrise' | 'dhuhr' | 'asr' | 'maghrib' | 'isha';
-
 export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) => {
 	// config on tab open
 	const initialConfig = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
@@ -63,9 +60,9 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	// --------------------------------------------------------------------------
 	// calcOption
 	const [calcOptMode, setCalcOptMode] = useState<'default' | 'manual'>(currentConfig.calcOption.mode);
-	const [calcOptMethod, setCalcOptMethod] = useState<string>(currentConfig.calcOption.method);
-	const [calcOptMadhab, setCalcOptMadhab] = useState<string>(currentConfig.calcOption.madhab);
-	const [calcOptHighLatRule, setCalcOptHighLatRule] = useState<string>(currentConfig.calcOption.highLatitudeRule);
+	const [calcOptMethod, setCalcOptMethod] = useState<calcMethod>(currentConfig.calcOption.method);
+	const [calcOptMadhab, setCalcOptMadhab] = useState<madhab>(currentConfig.calcOption.madhab);
+	const [calcOptHighLatRule, setCalcOptHighLatRule] = useState<highLatitudeRule_T>(currentConfig.calcOption.highLatitudeRule);
 	const [calcOptAdjustment_Fajr, setCalcOptAdjustment_Fajr] = useState<number>(currentConfig.calcOption.adjustments.fajr);
 	const [calcOptAdjustment_Sunrise, setCalcOptAdjustment_Sunrise] = useState<number>(currentConfig.calcOption.adjustments.sunrise);
 	const [calcOptAdjustment_Dhuhr, setCalcOptAdjustment_Dhuhr] = useState<number>(currentConfig.calcOption.adjustments.dhuhr);
@@ -95,7 +92,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	};
 
 	const handleCalcOptSelectChange = (event: ChangeEvent<HTMLSelectElement>, map: 'method' | 'madhab' | 'highLatitudeRule') => {
-		calcOptSelectMap[map](event.target.value as string);
+		calcOptSelectMap[map](event.target.value as any);
 
 		checkChanges();
 	};

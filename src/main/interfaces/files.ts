@@ -4,11 +4,15 @@ export interface reminderInterface {
 	earlyTime: number;
 }
 
+export type calcMethod = 'MuslimWorldLeague' | 'Egyptian' | 'Karachi' | 'UmmAlQura' | 'Dubai' | 'MoonsightingCommittee' | 'NorthAmerica' | 'Kuwait' | 'Qatar' | 'Singapore' | 'Tehran' | 'Turkey';
+export type madhab = 'Shafi' | 'Hanafi';
+export type highLatitudeRule_T = 'MiddleOfTheNight' | 'SeventhOfTheNight' | 'TwilightAngle';
+
 export interface calcOptionInterface {
 	mode: 'default' | 'manual';
-	method: string | 'MuslimWorldLeague' | 'Egyptian' | 'Karachi' | 'UmmAlQura' | 'Dubai' | 'MoonsightingCommittee' | 'NorthAmerica' | 'Kuwait' | 'Qatar' | 'Singapore' | 'Tehran' | 'Turkey';
-	madhab: string | 'Shafi' | 'Hanafi';
-	highLatitudeRule: string | 'MiddleOfTheNight' | 'SeventhOfTheNight' | 'TwilightAngle';
+	method: calcMethod;
+	madhab: madhab;
+	highLatitudeRule: highLatitudeRule_T;
 	adjustments: {
 		fajr: number;
 		sunrise: number;
