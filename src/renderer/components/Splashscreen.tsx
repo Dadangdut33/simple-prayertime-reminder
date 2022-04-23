@@ -28,7 +28,7 @@ export const Splashscreen = ({ show, theme }: any) => {
 							justifyContent: 'center',
 						}}
 					>
-						<img className='splash-img' id={theme} style={{ marginTop: '7rem' }} src={icon} alt='logo' />
+						<img className='splash-img' id={theme} src={icon} alt='logo' />
 						<Box sx={{ width: '400px', mt: 2 }}>
 							<Skeleton animation='wave' />
 						</Box>

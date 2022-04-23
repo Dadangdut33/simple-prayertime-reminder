@@ -143,6 +143,15 @@ const checkConfigOnStart = async () => {
 	updatePt();
 };
 
+const updateLocationOnStart = async () => {
+	const { city, latitude, longitude } = await getPosition_absolute(appConfig);
+	appConfig.locationOption.city = city;
+	appConfig.locationOption.latitude = latitude;
+	appConfig.locationOption.longitude = longitude;
+
+	writeConfig('app', appConfig);
+};
+
 const createWindow = async () => {
 	if (isDevelopment) {
 		await installExtensions();
@@ -210,6 +219,9 @@ const createWindow = async () => {
 					});
 			}
 		} catch {}
+
+		// update location if auto and enabled
+		if (appConfig.locationOption.mode === 'auto') if (appConfig.locationOption.updateEveryStartup) updateLocationOnStart();
 	});
 
 	mainWindow.on('close', (event: any) => {
