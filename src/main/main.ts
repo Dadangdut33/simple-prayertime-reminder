@@ -10,6 +10,11 @@
  */
 import path from 'path';
 import { app, BrowserWindow, shell, ipcMain, nativeTheme, Notification } from 'electron';
+import Moment from 'moment-timezone';
+import os from 'os';
+import fetch from 'electron-fetch';
+
+// -------------------------------------------------------------------------------------
 import MenuBuilder from './menu';
 import TrayManager from './tray';
 import { resolveHtmlPath } from './util';
@@ -18,8 +23,6 @@ import { initialConfig, writeConfig, readConfig } from './handler/files';
 import { getPrayerTimes } from './handler/praytime';
 import { onUnresponsiveWindow, errorBox, NoYesBox, prayerTime_IntrusiveNotification } from './handler/messageBox';
 import { getLatLong_FromCitiesName, getPosition_absolute, verifyKey } from './handler/getPos';
-import Moment from 'moment-timezone';
-import os from 'os';
 
 // -------------------------------------------------------------------------------------
 // Global vars
@@ -37,11 +40,14 @@ let mainWindow: BrowserWindow | null = null,
 		path: process.execPath,
 		isHidden: true,
 	},
-	autoLauncher = new autoLaunch(launcherOption);
+	autoLauncher = new autoLaunch(launcherOption),
+	menuBuilder: MenuBuilder,
+	trayManager: TrayManager;
 
-let menuBuilder: MenuBuilder, trayManager: TrayManager;
-
-// Functions
+// -------------------------------------------------------------------------------------
+/**
+ * Setup
+ */
 const RESOURCES_PATH = app.isPackaged ? path.join(process.resourcesPath, 'assets') : path.join(__dirname, '../../assets');
 const getAssetPath = (...paths: string[]): string => {
 	return path.join(RESOURCES_PATH, ...paths);
@@ -60,10 +66,6 @@ const wasOpenedAtLogin = () => {
 	}
 };
 
-// -------------------------------------------------------------------------------------
-/**
- * Setup
- */
 if (process.env.NODE_ENV === 'production') {
 	const sourceMapSupport = require('source-map-support');
 	sourceMapSupport.install();
@@ -86,61 +88,6 @@ const installExtensions = async () => {
 			forceDownload
 		)
 		.catch(console.log);
-};
-
-const createWindow = async () => {
-	if (isDevelopment) {
-		await installExtensions();
-	}
-
-	mainWindow = new BrowserWindow({
-		show: false,
-		width: 1200,
-		height: 728,
-		minWidth: 800,
-		minHeight: 600,
-		icon: getAssetPath('icon.png'),
-		webPreferences: {
-			preload: app.isPackaged ? path.join(__dirname, 'preload.js') : path.join(__dirname, '../../.erb/dll/preload.js'),
-		},
-	});
-
-	mainWindow.loadURL(resolveHtmlPath('index.html'));
-
-	// unresponsive
-	mainWindow.on('unresponsive', onUnresponsiveWindow);
-
-	menuBuilder = new MenuBuilder(mainWindow);
-	menuBuilder.buildMenu();
-
-	trayManager = new TrayManager(mainWindow!, getAssetPath('icon.png'));
-	trayManager.createTray();
-	trayManager.updatePrayTime(ptGet, appConfig); // update trayicon with the prayer times
-
-	mainWindow.on('ready-to-show', () => {
-		if (!mainWindow) {
-			throw new Error('"mainWindow" is not defined');
-		}
-		// auto launch check
-		const checkLoginOpen = wasOpenedAtLogin();
-
-		if (checkLoginOpen) {
-			mainWindow.hide();
-		} else {
-			mainWindow.show();
-		}
-	});
-
-	mainWindow.on('close', (event: any) => {
-		event.preventDefault();
-		mainWindow!.hide();
-	});
-
-	// Open urls in the user's browser
-	mainWindow.webContents.setWindowOpenHandler((edata) => {
-		shell.openExternal(edata.url);
-		return { action: 'deny' };
-	});
 };
 
 const checkConfigOnStart = async () => {
@@ -196,6 +143,87 @@ const checkConfigOnStart = async () => {
 	updatePt();
 };
 
+const createWindow = async () => {
+	if (isDevelopment) {
+		await installExtensions();
+	}
+
+	mainWindow = new BrowserWindow({
+		show: false,
+		width: 1200,
+		height: 728,
+		minWidth: 800,
+		minHeight: 600,
+		icon: getAssetPath('icon.png'),
+		webPreferences: {
+			preload: app.isPackaged ? path.join(__dirname, 'preload.js') : path.join(__dirname, '../../.erb/dll/preload.js'),
+		},
+	});
+
+	mainWindow.loadURL(resolveHtmlPath('index.html'));
+
+	// unresponsive
+	mainWindow.on('unresponsive', onUnresponsiveWindow);
+
+	menuBuilder = new MenuBuilder(mainWindow);
+	menuBuilder.buildMenu();
+
+	trayManager = new TrayManager(mainWindow!, getAssetPath('icon.png'));
+	trayManager.createTray();
+	trayManager.updatePrayTime(ptGet, appConfig); // update trayicon with the prayer times
+
+	mainWindow.on('ready-to-show', () => {
+		if (!mainWindow) {
+			throw new Error('"mainWindow" is not defined');
+		}
+		// auto launch check
+		const checkLoginOpen = wasOpenedAtLogin();
+
+		if (checkLoginOpen) {
+			mainWindow.hide();
+		} else {
+			mainWindow.show();
+		}
+
+		// check update
+		try {
+			if (appConfig.checkUpdateAtStartup) {
+				fetch('https://api.github.com/repos/Dadangdut33/simple-prayertime-reminder/releases/latest')
+					.then((response) => response.json())
+					.then((data) => {
+						let latestVer = data.tag_name;
+						if (latestVer > app.getVersion()) {
+							const msg = 'New version available! Click to download';
+							// notify with native notification
+							const notify = new Notification({
+								title: 'Simple PrayerTime Reminder',
+								body: msg,
+								icon: iconPath,
+							});
+
+							notify.show();
+
+							notify.on('click', () => {
+								shell.openExternal(data.html_url);
+							});
+						}
+					});
+			}
+		} catch {}
+	});
+
+	mainWindow.on('close', (event: any) => {
+		event.preventDefault();
+		mainWindow!.hide();
+	});
+
+	// Open urls in the user's browser
+	mainWindow.webContents.setWindowOpenHandler((edata) => {
+		shell.openExternal(edata.url);
+		return { action: 'deny' };
+	});
+};
+
 // -------------------------------------------------------------------------------------
 /**
  * Add event listeners...
@@ -209,6 +237,9 @@ app.on('window-all-closed', () => {
 	}
 });
 
+// -------------
+// START
+// -------------
 // prevent multiple instances
 const gotTheLock = app.requestSingleInstanceLock();
 
@@ -248,6 +279,7 @@ if (!gotTheLock) {
 		})
 		.catch(console.log);
 }
+
 // -------------------------------------------------------------------------------------
 /**
  * IPC
