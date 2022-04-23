@@ -130,26 +130,32 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	const [remind_fajr_remindWhenOnTime, setRemind_fajr_remindWhenOnTime] = useState<boolean>(currentConfig.reminderOption.fajr.remindWhenOnTime);
 	const [remind_fajr_earlyReminder, setRemind_fajr_earlyReminder] = useState<boolean>(currentConfig.reminderOption.fajr.earlyReminder);
 	const [remind_fajr_earlyTime, setRemind_fajr_earlyTime] = useState<number>(currentConfig.reminderOption.fajr.earlyTime);
+	const [remind_fajr_intrusive, setRemind_fajr_intrusive] = useState<boolean>(currentConfig.reminderOption.fajr.intrusiveNotification);
 
 	const [remind_sunrise_remindWhenOnTime, setRemind_sunrise_remindWhenOnTime] = useState<boolean>(currentConfig.reminderOption.sunrise.remindWhenOnTime);
 	const [remind_sunrise_earlyReminder, setRemind_sunrise_earlyReminder] = useState<boolean>(currentConfig.reminderOption.sunrise.earlyReminder);
 	const [remind_sunrise_earlyTime, setRemind_sunrise_earlyTime] = useState<number>(currentConfig.reminderOption.sunrise.earlyTime);
+	const [remind_sunrise_intrusive, setRemind_sunrise_intrusive] = useState<boolean>(currentConfig.reminderOption.sunrise.intrusiveNotification);
 
 	const [remind_dhuhr_remindWhenOnTime, setRemind_dhuhr_remindWhenOnTime] = useState<boolean>(currentConfig.reminderOption.dhuhr.remindWhenOnTime);
 	const [remind_dhuhr_earlyReminder, setRemind_dhuhr_earlyReminder] = useState<boolean>(currentConfig.reminderOption.dhuhr.earlyReminder);
 	const [remind_dhuhr_earlyTime, setRemind_dhuhr_earlyTime] = useState<number>(currentConfig.reminderOption.dhuhr.earlyTime);
+	const [remind_dhuhr_intrusive, setRemind_dhuhr_intrusive] = useState<boolean>(currentConfig.reminderOption.dhuhr.intrusiveNotification);
 
 	const [remind_asr_remindWhenOnTime, setRemind_asr_remindWhenOnTime] = useState<boolean>(currentConfig.reminderOption.asr.remindWhenOnTime);
 	const [remind_asr_earlyReminder, setRemind_asr_earlyReminder] = useState<boolean>(currentConfig.reminderOption.asr.earlyReminder);
 	const [remind_asr_earlyTime, setRemind_asr_earlyTime] = useState<number>(currentConfig.reminderOption.asr.earlyTime);
+	const [remind_asr_intrusive, setRemind_asr_intrusive] = useState<boolean>(currentConfig.reminderOption.asr.intrusiveNotification);
 
 	const [remind_maghrib_remindWhenOnTime, setRemind_maghrib_remindWhenOnTime] = useState<boolean>(currentConfig.reminderOption.maghrib.remindWhenOnTime);
 	const [remind_maghrib_earlyReminder, setRemind_maghrib_earlyReminder] = useState<boolean>(currentConfig.reminderOption.maghrib.earlyReminder);
 	const [remind_maghrib_earlyTime, setRemind_maghrib_earlyTime] = useState<number>(currentConfig.reminderOption.maghrib.earlyTime);
+	const [remind_maghrib_intrusive, setRemind_maghrib_intrusive] = useState<boolean>(currentConfig.reminderOption.maghrib.intrusiveNotification);
 
 	const [remind_isha_remindWhenOnTime, setRemind_isha_remindWhenOnTime] = useState<boolean>(currentConfig.reminderOption.isha.remindWhenOnTime);
 	const [remind_isha_earlyReminder, setRemind_isha_earlyReminder] = useState<boolean>(currentConfig.reminderOption.isha.earlyReminder);
 	const [remind_isha_earlyTime, setRemind_isha_earlyTime] = useState<number>(currentConfig.reminderOption.isha.earlyTime);
+	const [remind_isha_intrusive, setRemind_isha_intrusive] = useState<boolean>(currentConfig.reminderOption.isha.intrusiveNotification);
 
 	const remindWhenOnTimeChangeMap = {
 		fajr: setRemind_fajr_remindWhenOnTime,
@@ -187,6 +193,15 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		isha: remind_isha_earlyTime,
 	};
 
+	const intrusiveChangeMap = {
+		fajr: setRemind_fajr_intrusive,
+		sunrise: setRemind_sunrise_intrusive,
+		dhuhr: setRemind_dhuhr_intrusive,
+		asr: setRemind_asr_intrusive,
+		maghrib: setRemind_maghrib_intrusive,
+		isha: setRemind_isha_intrusive,
+	};
+
 	const handleRemindWhenOnTimeChange = (event: ChangeEvent<HTMLInputElement>, map: prayerTimes) => {
 		remindWhenOnTimeChangeMap[map](event.target.checked);
 		checkChanges();
@@ -205,6 +220,11 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	const blurEarlyTime = (map: prayerTimes) => {
 		if (varEarlyTimeChangeMap[map] < 1) earlyTimeChangeMap[map](1);
 		else if (varEarlyTimeChangeMap[map] > 60) earlyTimeChangeMap[map](60);
+	};
+
+	const handleIntrusiveChange = (event: ChangeEvent<HTMLInputElement>, map: prayerTimes) => {
+		intrusiveChangeMap[map](event.target.checked);
+		checkChanges();
 	};
 
 	// --------------------------------------------------------------------------
@@ -461,21 +481,27 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		setRemind_fajr_remindWhenOnTime(initialConfig.reminderOption.fajr.remindWhenOnTime);
 		setRemind_fajr_earlyReminder(initialConfig.reminderOption.fajr.earlyReminder);
 		setRemind_fajr_earlyTime(initialConfig.reminderOption.fajr.earlyTime);
+		setRemind_fajr_intrusive(initialConfig.reminderOption.fajr.intrusiveNotification);
 		setRemind_sunrise_remindWhenOnTime(initialConfig.reminderOption.sunrise.remindWhenOnTime);
 		setRemind_sunrise_earlyReminder(initialConfig.reminderOption.sunrise.earlyReminder);
 		setRemind_sunrise_earlyTime(initialConfig.reminderOption.sunrise.earlyTime);
+		setRemind_sunrise_intrusive(initialConfig.reminderOption.sunrise.intrusiveNotification);
 		setRemind_dhuhr_remindWhenOnTime(initialConfig.reminderOption.dhuhr.remindWhenOnTime);
 		setRemind_dhuhr_earlyReminder(initialConfig.reminderOption.dhuhr.earlyReminder);
 		setRemind_dhuhr_earlyTime(initialConfig.reminderOption.dhuhr.earlyTime);
+		setRemind_dhuhr_intrusive(initialConfig.reminderOption.dhuhr.intrusiveNotification);
 		setRemind_asr_remindWhenOnTime(initialConfig.reminderOption.asr.remindWhenOnTime);
 		setRemind_asr_earlyReminder(initialConfig.reminderOption.asr.earlyReminder);
 		setRemind_asr_earlyTime(initialConfig.reminderOption.asr.earlyTime);
+		setRemind_asr_intrusive(initialConfig.reminderOption.asr.intrusiveNotification);
 		setRemind_maghrib_remindWhenOnTime(initialConfig.reminderOption.maghrib.remindWhenOnTime);
 		setRemind_maghrib_earlyReminder(initialConfig.reminderOption.maghrib.earlyReminder);
 		setRemind_maghrib_earlyTime(initialConfig.reminderOption.maghrib.earlyTime);
+		setRemind_maghrib_intrusive(initialConfig.reminderOption.maghrib.intrusiveNotification);
 		setRemind_isha_remindWhenOnTime(initialConfig.reminderOption.isha.remindWhenOnTime);
 		setRemind_isha_earlyReminder(initialConfig.reminderOption.isha.earlyReminder);
 		setRemind_isha_earlyTime(initialConfig.reminderOption.isha.earlyTime);
+		setRemind_isha_intrusive(initialConfig.reminderOption.isha.intrusiveNotification);
 		setLocMode(initialConfig.locationOption.mode);
 		setLocCity(initialConfig.locationOption.city);
 		setLocLat(initialConfig.locationOption.latitude);
@@ -522,21 +548,27 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		currentConfig.reminderOption.fajr.remindWhenOnTime = remind_fajr_remindWhenOnTime;
 		currentConfig.reminderOption.fajr.earlyReminder = remind_fajr_earlyReminder;
 		currentConfig.reminderOption.fajr.earlyTime = remind_fajr_earlyTime;
+		currentConfig.reminderOption.fajr.intrusiveNotification = remind_fajr_intrusive;
 		currentConfig.reminderOption.sunrise.remindWhenOnTime = remind_sunrise_remindWhenOnTime;
 		currentConfig.reminderOption.sunrise.earlyReminder = remind_sunrise_earlyReminder;
 		currentConfig.reminderOption.sunrise.earlyTime = remind_sunrise_earlyTime;
+		currentConfig.reminderOption.sunrise.intrusiveNotification = remind_sunrise_intrusive;
 		currentConfig.reminderOption.dhuhr.remindWhenOnTime = remind_dhuhr_remindWhenOnTime;
 		currentConfig.reminderOption.dhuhr.earlyReminder = remind_dhuhr_earlyReminder;
 		currentConfig.reminderOption.dhuhr.earlyTime = remind_dhuhr_earlyTime;
+		currentConfig.reminderOption.dhuhr.intrusiveNotification = remind_dhuhr_intrusive;
 		currentConfig.reminderOption.asr.remindWhenOnTime = remind_asr_remindWhenOnTime;
 		currentConfig.reminderOption.asr.earlyReminder = remind_asr_earlyReminder;
 		currentConfig.reminderOption.asr.earlyTime = remind_asr_earlyTime;
+		currentConfig.reminderOption.asr.intrusiveNotification = remind_asr_intrusive;
 		currentConfig.reminderOption.maghrib.remindWhenOnTime = remind_maghrib_remindWhenOnTime;
 		currentConfig.reminderOption.maghrib.earlyReminder = remind_maghrib_earlyReminder;
 		currentConfig.reminderOption.maghrib.earlyTime = remind_maghrib_earlyTime;
+		currentConfig.reminderOption.maghrib.intrusiveNotification = remind_maghrib_intrusive;
 		currentConfig.reminderOption.isha.remindWhenOnTime = remind_isha_remindWhenOnTime;
 		currentConfig.reminderOption.isha.earlyReminder = remind_isha_earlyReminder;
 		currentConfig.reminderOption.isha.earlyTime = remind_isha_earlyTime;
+		currentConfig.reminderOption.isha.intrusiveNotification = remind_isha_intrusive;
 		currentConfig.locationOption.mode = locMode;
 		currentConfig.locationOption.city = locCity;
 		currentConfig.locationOption.latitude = locLat;
@@ -992,6 +1024,20 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 											<FormControlLabel control={<Checkbox checked={remind_asr_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'asr')} />} label='Asr' />
 											<FormControlLabel control={<Checkbox checked={remind_maghrib_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'maghrib')} />} label='Maghrib' />
 											<FormControlLabel control={<Checkbox checked={remind_isha_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'isha')} />} label='Isha' />
+										</FormGroup>
+									</FormControl>
+
+									<FormControl sx={{ mt: 2, ml: 3 }} component='fieldset' variant='standard'>
+										<Tooltip title='Will show up reminder as a interruptive message box' placement='top' arrow>
+											<FormLabel component='legend'>Intrusive notification</FormLabel>
+										</Tooltip>
+										<FormGroup>
+											<FormControlLabel control={<Checkbox checked={remind_fajr_intrusive} onChange={(e) => handleIntrusiveChange(e as any, 'fajr')} />} label='Fajr' />
+											<FormControlLabel control={<Checkbox checked={remind_sunrise_intrusive} onChange={(e) => handleIntrusiveChange(e as any, 'sunrise')} />} label='Sunrise' />
+											<FormControlLabel control={<Checkbox checked={remind_dhuhr_intrusive} onChange={(e) => handleIntrusiveChange(e as any, 'dhuhr')} />} label='Dhuhr' />
+											<FormControlLabel control={<Checkbox checked={remind_asr_intrusive} onChange={(e) => handleIntrusiveChange(e as any, 'asr')} />} label='Asr' />
+											<FormControlLabel control={<Checkbox checked={remind_maghrib_intrusive} onChange={(e) => handleIntrusiveChange(e as any, 'maghrib')} />} label='Maghrib' />
+											<FormControlLabel control={<Checkbox checked={remind_isha_intrusive} onChange={(e) => handleIntrusiveChange(e as any, 'isha')} />} label='Isha' />
 										</FormGroup>
 									</FormControl>
 								</Box>
