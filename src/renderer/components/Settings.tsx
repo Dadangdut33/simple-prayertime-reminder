@@ -3,6 +3,7 @@ import { configInterface, getPosition_absolute_I, calcMethod, madhab, highLatitu
 import { useContext, forwardRef, useState, ChangeEvent, useEffect } from 'react';
 
 // MUI
+import Fade from '@mui/material/Fade';
 import Divider from '@mui/material/Divider';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
@@ -655,685 +656,693 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 				</Alert>
 			</Snackbar>
 			{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-			<Box
-				sx={{
-					display: 'flex',
-					flexDirection: 'column',
-					width: '100%',
-					color: 'text.primary',
-					borderRadius: 1,
-					p: 3,
-				}}
-			>
-				{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-				{/* calc option, reminder */}
-				<Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-					<Grid item xs={6}>
-						<div
-							style={{
-								display: 'flex',
-								alignItems: 'center',
-								flexWrap: 'wrap',
-							}}
-						>
-							<CalculateOutlinedIcon color='primary' /> <h3 style={{ paddingLeft: '.5rem' }}>Prayer Times Calculation</h3>
-						</div>
-						<Box
-							component={'form'}
-							noValidate
-							autoComplete='off'
-							sx={{
-								display: 'flex',
-								flexDirection: 'column',
-								'& .MuiTextField-root': { m: 1, ml: 0.5 },
-							}}
-						>
-							<FormControl>
-								<FormLabel id='location-mode-formlabel' sx={{ ml: 0.5 }}>
-									Mode
-								</FormLabel>
-								<RadioGroup sx={{ ml: 0.5 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={calcOptMode} onChange={handleCalcOptModeChange}>
-									<FormControlLabel value='default' control={<Radio />} label='Default' />
-									<FormControlLabel value='manual' control={<Radio />} label='Manual' />
-								</RadioGroup>
-
-								<FormControl fullWidth sx={{ mt: 1, mb: 1 }}>
-									<InputLabel id='calc-method'>Calculation Method</InputLabel>
-									<Select
-										labelId='calc-method'
-										value={calcOptMethod}
-										label='Calculation Method'
-										onChange={(e) => handleCalcOptSelectChange(e as any, 'method')}
-										disabled={calcOptMode === 'default' ? true : false}
-									>
-										{methodList.map((method) => (
-											<MenuItem key={method} value={method}>
-												{method}
-											</MenuItem>
-										))}
-									</Select>
-								</FormControl>
-
-								<FormControl fullWidth sx={{ mt: 1, mb: 1 }}>
-									<InputLabel id='madhab-select'>Madhab</InputLabel>
-									<Select
-										labelId='madhab-select'
-										value={calcOptMadhab}
-										label='Madhab'
-										onChange={(e) => handleCalcOptSelectChange(e as any, 'madhab')}
-										disabled={calcOptMode === 'default' ? true : false}
-									>
-										{madhabList.map((method) => (
-											<MenuItem key={method} value={method}>
-												{method}
-											</MenuItem>
-										))}
-									</Select>
-								</FormControl>
-
-								<FormControl fullWidth sx={{ mt: 1, mb: 1 }}>
-									<InputLabel id='highlat-select'>High Latitude Adjustment</InputLabel>
-									<Select
-										labelId='highlat-select'
-										value={calcOptHighLatRule}
-										label='High Latitude Adjustment'
-										onChange={(e) => handleCalcOptSelectChange(e as any, 'highLatitudeRule')}
-										disabled={calcOptMode === 'default' ? true : false}
-									>
-										{highLatRuleList.map((method) => (
-											<MenuItem key={method} value={method}>
-												{method}
-											</MenuItem>
-										))}
-									</Select>
-								</FormControl>
-
-								<FormLabel id='prayer-adjustment' sx={{ ml: 0.5 }}>
-									Prayer Time Adjustment
-								</FormLabel>
-								<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'start', '& .MuiFormControl-root': { mr: 2.5 } }}>
-									<FormControl>
-										<FormLabel id='fajr-adjustment' sx={{ ml: 0.5 }}>
-											Fajr
-										</FormLabel>
-										<MuiInput
-											style={{ marginTop: '4px' }}
-											sx={{ ml: 0.5 }}
-											value={calcOptAdjustment_Fajr}
-											onChange={(e) => handleCalcOptAdjustmentChange(e as any, 'fajr')}
-											onBlur={() => handleBlurCalcOptAdjustmentChange('fajr')}
-											inputProps={{
-												step: 1,
-												min: -300,
-												max: 300,
-												type: 'number',
-												'aria-labelledby': 'input-slider',
-											}}
-										/>
-									</FormControl>
-
-									<FormControl>
-										<FormLabel id='sunrise-adjustment'>Sunrise</FormLabel>
-										<MuiInput
-											style={{ marginTop: '4px' }}
-											value={calcOptAdjustment_Sunrise}
-											onChange={(e) => handleCalcOptAdjustmentChange(e as any, 'sunrise')}
-											onBlur={() => handleBlurCalcOptAdjustmentChange('sunrise')}
-											inputProps={{
-												step: 1,
-												min: -300,
-												max: 300,
-												type: 'number',
-												'aria-labelledby': 'input-slider',
-											}}
-										/>
-									</FormControl>
-
-									<FormControl>
-										<FormLabel id='dhuhr-adjustment'>Dhuhr</FormLabel>
-										<MuiInput
-											style={{ marginTop: '4px' }}
-											value={calcOptAdjustment_Dhuhr}
-											onChange={(e) => handleCalcOptAdjustmentChange(e as any, 'dhuhr')}
-											onBlur={() => handleBlurCalcOptAdjustmentChange('dhuhr')}
-											inputProps={{
-												step: 1,
-												min: -300,
-												max: 300,
-												type: 'number',
-												'aria-labelledby': 'input-slider',
-											}}
-										/>
-									</FormControl>
-
-									<FormControl>
-										<FormLabel id='asr-adjustment'>Asr</FormLabel>
-										<MuiInput
-											style={{ marginTop: '4px' }}
-											value={calcOptAdjustment_Asr}
-											onChange={(e) => handleCalcOptAdjustmentChange(e as any, 'asr')}
-											onBlur={() => handleBlurCalcOptAdjustmentChange('asr')}
-											inputProps={{
-												step: 1,
-												min: -300,
-												max: 300,
-												type: 'number',
-												'aria-labelledby': 'input-slider',
-											}}
-										/>
-									</FormControl>
-
-									<FormControl>
-										<FormLabel id='maghrib-adjustment'>Magrib</FormLabel>
-										<MuiInput
-											style={{ marginTop: '4px' }}
-											value={calcOptAdjustment_Maghrib}
-											onChange={(e) => handleCalcOptAdjustmentChange(e as any, 'maghrib')}
-											onBlur={() => handleBlurCalcOptAdjustmentChange('maghrib')}
-											inputProps={{
-												step: 1,
-												min: -300,
-												max: 300,
-												type: 'number',
-												'aria-labelledby': 'input-slider',
-											}}
-										/>
-									</FormControl>
-
-									<FormControl>
-										<FormLabel id='isha-adjustment'>Isha</FormLabel>
-										<MuiInput
-											style={{ marginTop: '4px' }}
-											value={calcOptAdjustment_Isha}
-											onChange={(e) => handleCalcOptAdjustmentChange(e as any, 'isha')}
-											onBlur={() => handleBlurCalcOptAdjustmentChange('isha')}
-											inputProps={{
-												step: 1,
-												min: -300,
-												max: 300,
-												type: 'number',
-												'aria-labelledby': 'input-slider',
-											}}
-										/>
-									</FormControl>
-								</Box>
-							</FormControl>
-						</Box>
-					</Grid>
-
-					<Grid item xs={6}>
-						<div
-							style={{
-								display: 'flex',
-								alignItems: 'center',
-								flexWrap: 'wrap',
-							}}
-						>
-							<TimerOutlinedIcon color='primary' /> <h3 style={{ paddingLeft: '.5rem' }}>Reminder Options</h3>
-						</div>
-						<Box
-							component={'form'}
-							noValidate
-							autoComplete='off'
-							sx={{
-								display: 'flex',
-								flexDirection: 'row',
-								'& .MuiTextField-root': { m: 1, ml: 0.5 },
-							}}
-						>
+			<Fade in={true}>
+				<Box
+					sx={{
+						display: 'flex',
+						flexDirection: 'column',
+						width: '100%',
+						color: 'text.primary',
+						borderRadius: 1,
+						p: 3,
+					}}
+				>
+					{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
+					{/* calc option, reminder */}
+					<Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+						<Grid item xs={6}>
+							<div
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									flexWrap: 'wrap',
+								}}
+							>
+								<CalculateOutlinedIcon color='primary' /> <h3 style={{ paddingLeft: '.5rem' }}>Prayer Times Calculation</h3>
+							</div>
 							<Box
+								component={'form'}
+								noValidate
+								autoComplete='off'
 								sx={{
 									display: 'flex',
 									flexDirection: 'column',
-									'& .MuiFormControl-root': { mr: 2.5 },
+									'& .MuiTextField-root': { m: 1, ml: 0.5 },
 								}}
 							>
-								<FormLabel id='reminder-time-fajr'>Minutes Before</FormLabel>
+								<FormControl>
+									<FormLabel id='location-mode-formlabel' sx={{ ml: 0.5 }}>
+										Mode
+									</FormLabel>
+									<RadioGroup sx={{ ml: 0.5 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={calcOptMode} onChange={handleCalcOptModeChange}>
+										<FormControlLabel value='default' control={<Radio />} label='Default' />
+										<FormControlLabel value='manual' control={<Radio />} label='Manual' />
+									</RadioGroup>
+
+									<FormControl fullWidth sx={{ mt: 1, mb: 1 }}>
+										<InputLabel id='calc-method'>Calculation Method</InputLabel>
+										<Select
+											labelId='calc-method'
+											value={calcOptMethod}
+											label='Calculation Method'
+											onChange={(e) => handleCalcOptSelectChange(e as any, 'method')}
+											disabled={calcOptMode === 'default' ? true : false}
+										>
+											{methodList.map((method) => (
+												<MenuItem key={method} value={method}>
+													{method}
+												</MenuItem>
+											))}
+										</Select>
+									</FormControl>
+
+									<FormControl fullWidth sx={{ mt: 1, mb: 1 }}>
+										<InputLabel id='madhab-select'>Madhab</InputLabel>
+										<Select
+											labelId='madhab-select'
+											value={calcOptMadhab}
+											label='Madhab'
+											onChange={(e) => handleCalcOptSelectChange(e as any, 'madhab')}
+											disabled={calcOptMode === 'default' ? true : false}
+										>
+											{madhabList.map((method) => (
+												<MenuItem key={method} value={method}>
+													{method}
+												</MenuItem>
+											))}
+										</Select>
+									</FormControl>
+
+									<FormControl fullWidth sx={{ mt: 1, mb: 1 }}>
+										<InputLabel id='highlat-select'>High Latitude Adjustment</InputLabel>
+										<Select
+											labelId='highlat-select'
+											value={calcOptHighLatRule}
+											label='High Latitude Adjustment'
+											onChange={(e) => handleCalcOptSelectChange(e as any, 'highLatitudeRule')}
+											disabled={calcOptMode === 'default' ? true : false}
+										>
+											{highLatRuleList.map((method) => (
+												<MenuItem key={method} value={method}>
+													{method}
+												</MenuItem>
+											))}
+										</Select>
+									</FormControl>
+
+									<FormLabel id='prayer-adjustment' sx={{ ml: 0.5 }}>
+										Prayer Time Adjustment
+									</FormLabel>
+									<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'start', '& .MuiFormControl-root': { mr: 2.5 } }}>
+										<FormControl>
+											<FormLabel id='fajr-adjustment' sx={{ ml: 0.5 }}>
+												Fajr
+											</FormLabel>
+											<MuiInput
+												style={{ marginTop: '4px' }}
+												sx={{ ml: 0.5 }}
+												value={calcOptAdjustment_Fajr}
+												onChange={(e) => handleCalcOptAdjustmentChange(e as any, 'fajr')}
+												onBlur={() => handleBlurCalcOptAdjustmentChange('fajr')}
+												inputProps={{
+													step: 1,
+													min: -300,
+													max: 300,
+													type: 'number',
+													'aria-labelledby': 'input-slider',
+												}}
+											/>
+										</FormControl>
+
+										<FormControl>
+											<FormLabel id='sunrise-adjustment'>Sunrise</FormLabel>
+											<MuiInput
+												style={{ marginTop: '4px' }}
+												value={calcOptAdjustment_Sunrise}
+												onChange={(e) => handleCalcOptAdjustmentChange(e as any, 'sunrise')}
+												onBlur={() => handleBlurCalcOptAdjustmentChange('sunrise')}
+												inputProps={{
+													step: 1,
+													min: -300,
+													max: 300,
+													type: 'number',
+													'aria-labelledby': 'input-slider',
+												}}
+											/>
+										</FormControl>
+
+										<FormControl>
+											<FormLabel id='dhuhr-adjustment'>Dhuhr</FormLabel>
+											<MuiInput
+												style={{ marginTop: '4px' }}
+												value={calcOptAdjustment_Dhuhr}
+												onChange={(e) => handleCalcOptAdjustmentChange(e as any, 'dhuhr')}
+												onBlur={() => handleBlurCalcOptAdjustmentChange('dhuhr')}
+												inputProps={{
+													step: 1,
+													min: -300,
+													max: 300,
+													type: 'number',
+													'aria-labelledby': 'input-slider',
+												}}
+											/>
+										</FormControl>
+
+										<FormControl>
+											<FormLabel id='asr-adjustment'>Asr</FormLabel>
+											<MuiInput
+												style={{ marginTop: '4px' }}
+												value={calcOptAdjustment_Asr}
+												onChange={(e) => handleCalcOptAdjustmentChange(e as any, 'asr')}
+												onBlur={() => handleBlurCalcOptAdjustmentChange('asr')}
+												inputProps={{
+													step: 1,
+													min: -300,
+													max: 300,
+													type: 'number',
+													'aria-labelledby': 'input-slider',
+												}}
+											/>
+										</FormControl>
+
+										<FormControl>
+											<FormLabel id='maghrib-adjustment'>Magrib</FormLabel>
+											<MuiInput
+												style={{ marginTop: '4px' }}
+												value={calcOptAdjustment_Maghrib}
+												onChange={(e) => handleCalcOptAdjustmentChange(e as any, 'maghrib')}
+												onBlur={() => handleBlurCalcOptAdjustmentChange('maghrib')}
+												inputProps={{
+													step: 1,
+													min: -300,
+													max: 300,
+													type: 'number',
+													'aria-labelledby': 'input-slider',
+												}}
+											/>
+										</FormControl>
+
+										<FormControl>
+											<FormLabel id='isha-adjustment'>Isha</FormLabel>
+											<MuiInput
+												style={{ marginTop: '4px' }}
+												value={calcOptAdjustment_Isha}
+												onChange={(e) => handleCalcOptAdjustmentChange(e as any, 'isha')}
+												onBlur={() => handleBlurCalcOptAdjustmentChange('isha')}
+												inputProps={{
+													step: 1,
+													min: -300,
+													max: 300,
+													type: 'number',
+													'aria-labelledby': 'input-slider',
+												}}
+											/>
+										</FormControl>
+									</Box>
+								</FormControl>
+							</Box>
+						</Grid>
+
+						<Grid item xs={6}>
+							<div
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									flexWrap: 'wrap',
+								}}
+							>
+								<TimerOutlinedIcon color='primary' /> <h3 style={{ paddingLeft: '.5rem' }}>Reminder Options</h3>
+							</div>
+							<Box
+								component={'form'}
+								noValidate
+								autoComplete='off'
+								sx={{
+									display: 'flex',
+									flexDirection: 'row',
+									'& .MuiTextField-root': { m: 1, ml: 0.5 },
+								}}
+							>
 								<Box
 									sx={{
 										display: 'flex',
-										flexDirection: 'row',
+										flexDirection: 'column',
+										'& .MuiFormControl-root': { mr: 2.5 },
 									}}
 								>
-									<FormControl>
-										<FormLabel id='reminder-time-fajr'>Fajr</FormLabel>
-										<MuiInput
-											style={{ marginTop: '4px' }}
-											value={remind_fajr_earlyTime}
-											onChange={(e) => handleEarlyTimeChange(e as any, 'fajr')}
-											onBlur={() => blurEarlyTime('fajr')}
-											inputProps={{
-												step: 1,
-												min: 1,
-												max: 60,
-												type: 'number',
-												'aria-labelledby': 'input-slider',
-											}}
-										/>
-									</FormControl>
+									<FormLabel id='reminder-time-fajr'>Minutes Before</FormLabel>
+									<Box
+										sx={{
+											display: 'flex',
+											flexDirection: 'row',
+										}}
+									>
+										<FormControl>
+											<FormLabel id='reminder-time-fajr'>Fajr</FormLabel>
+											<MuiInput
+												style={{ marginTop: '4px' }}
+												value={remind_fajr_earlyTime}
+												onChange={(e) => handleEarlyTimeChange(e as any, 'fajr')}
+												onBlur={() => blurEarlyTime('fajr')}
+												inputProps={{
+													step: 1,
+													min: 1,
+													max: 60,
+													type: 'number',
+													'aria-labelledby': 'input-slider',
+												}}
+											/>
+										</FormControl>
 
-									<FormControl>
-										<FormLabel id='reminder-time-sunrise'>Sunrise</FormLabel>
-										<MuiInput
-											style={{ marginTop: '4px' }}
-											value={remind_sunrise_earlyTime}
-											onChange={(e) => handleEarlyTimeChange(e as any, 'sunrise')}
-											onBlur={() => blurEarlyTime('sunrise')}
-											inputProps={{
-												step: 1,
-												min: 1,
-												max: 60,
-												type: 'number',
-												'aria-labelledby': 'input-slider',
-											}}
-										/>
-									</FormControl>
+										<FormControl>
+											<FormLabel id='reminder-time-sunrise'>Sunrise</FormLabel>
+											<MuiInput
+												style={{ marginTop: '4px' }}
+												value={remind_sunrise_earlyTime}
+												onChange={(e) => handleEarlyTimeChange(e as any, 'sunrise')}
+												onBlur={() => blurEarlyTime('sunrise')}
+												inputProps={{
+													step: 1,
+													min: 1,
+													max: 60,
+													type: 'number',
+													'aria-labelledby': 'input-slider',
+												}}
+											/>
+										</FormControl>
 
-									<FormControl>
-										<FormLabel id='reminder-time-dhuhr'>Dhuhr</FormLabel>
-										<MuiInput
-											style={{ marginTop: '4px' }}
-											value={remind_dhuhr_earlyTime}
-											onChange={(e) => handleEarlyTimeChange(e as any, 'dhuhr')}
-											onBlur={() => blurEarlyTime('dhuhr')}
-											inputProps={{
-												step: 1,
-												min: 1,
-												max: 60,
-												type: 'number',
-												'aria-labelledby': 'input-slider',
-											}}
-										/>
-									</FormControl>
+										<FormControl>
+											<FormLabel id='reminder-time-dhuhr'>Dhuhr</FormLabel>
+											<MuiInput
+												style={{ marginTop: '4px' }}
+												value={remind_dhuhr_earlyTime}
+												onChange={(e) => handleEarlyTimeChange(e as any, 'dhuhr')}
+												onBlur={() => blurEarlyTime('dhuhr')}
+												inputProps={{
+													step: 1,
+													min: 1,
+													max: 60,
+													type: 'number',
+													'aria-labelledby': 'input-slider',
+												}}
+											/>
+										</FormControl>
 
-									<FormControl>
-										<FormLabel id='reminder-time-asr'>Asr</FormLabel>
-										<MuiInput
-											style={{ marginTop: '4px' }}
-											value={remind_asr_earlyTime}
-											onChange={(e) => handleEarlyTimeChange(e as any, 'asr')}
-											onBlur={() => blurEarlyTime('asr')}
-											inputProps={{
-												step: 1,
-												min: 1,
-												max: 60,
-												type: 'number',
-												'aria-labelledby': 'input-slider',
-											}}
-										/>
-									</FormControl>
+										<FormControl>
+											<FormLabel id='reminder-time-asr'>Asr</FormLabel>
+											<MuiInput
+												style={{ marginTop: '4px' }}
+												value={remind_asr_earlyTime}
+												onChange={(e) => handleEarlyTimeChange(e as any, 'asr')}
+												onBlur={() => blurEarlyTime('asr')}
+												inputProps={{
+													step: 1,
+													min: 1,
+													max: 60,
+													type: 'number',
+													'aria-labelledby': 'input-slider',
+												}}
+											/>
+										</FormControl>
 
-									<FormControl>
-										<FormLabel id='reminder-time-maghrib'>Maghrib</FormLabel>
-										<MuiInput
-											style={{ marginTop: '4px' }}
-											value={remind_maghrib_earlyTime}
-											onChange={(e) => handleEarlyTimeChange(e as any, 'maghrib')}
-											onBlur={() => blurEarlyTime('maghrib')}
-											inputProps={{
-												step: 1,
-												min: 1,
-												max: 60,
-												type: 'number',
-												'aria-labelledby': 'input-slider',
-											}}
-										/>
-									</FormControl>
+										<FormControl>
+											<FormLabel id='reminder-time-maghrib'>Maghrib</FormLabel>
+											<MuiInput
+												style={{ marginTop: '4px' }}
+												value={remind_maghrib_earlyTime}
+												onChange={(e) => handleEarlyTimeChange(e as any, 'maghrib')}
+												onBlur={() => blurEarlyTime('maghrib')}
+												inputProps={{
+													step: 1,
+													min: 1,
+													max: 60,
+													type: 'number',
+													'aria-labelledby': 'input-slider',
+												}}
+											/>
+										</FormControl>
 
-									<FormControl>
-										<FormLabel id='reminder-time-isha'>Isha</FormLabel>
-										<MuiInput
-											style={{ marginTop: '4px' }}
-											value={remind_isha_earlyTime}
-											onChange={(e) => handleEarlyTimeChange(e as any, 'isha')}
-											onBlur={() => blurEarlyTime('isha')}
-											inputProps={{
-												step: 1,
-												min: 1,
-												max: 60,
-												type: 'number',
-												'aria-labelledby': 'input-slider',
-											}}
-										/>
-									</FormControl>
-								</Box>
+										<FormControl>
+											<FormLabel id='reminder-time-isha'>Isha</FormLabel>
+											<MuiInput
+												style={{ marginTop: '4px' }}
+												value={remind_isha_earlyTime}
+												onChange={(e) => handleEarlyTimeChange(e as any, 'isha')}
+												onBlur={() => blurEarlyTime('isha')}
+												inputProps={{
+													step: 1,
+													min: 1,
+													max: 60,
+													type: 'number',
+													'aria-labelledby': 'input-slider',
+												}}
+											/>
+										</FormControl>
+									</Box>
 
-								<Box
-									sx={{
-										display: 'flex',
-									}}
-								>
-									<FormControl sx={{ mt: 2 }} component='fieldset' variant='standard'>
-										<FormLabel component='legend'>Remind When On Time</FormLabel>
-										<FormGroup>
-											<FormControlLabel control={<Checkbox checked={remind_fajr_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'fajr')} />} label='Fajr' />
-											<FormControlLabel control={<Checkbox checked={remind_sunrise_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'sunrise')} />} label='Sunrise' />
-											<FormControlLabel control={<Checkbox checked={remind_dhuhr_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'dhuhr')} />} label='Dhuhr' />
-											<FormControlLabel control={<Checkbox checked={remind_asr_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'asr')} />} label='Asr' />
-											<FormControlLabel control={<Checkbox checked={remind_maghrib_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'maghrib')} />} label='Maghrib' />
-											<FormControlLabel control={<Checkbox checked={remind_isha_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'isha')} />} label='Isha' />
-										</FormGroup>
-									</FormControl>
+									<Box
+										sx={{
+											display: 'flex',
+										}}
+									>
+										<FormControl sx={{ mt: 2 }} component='fieldset' variant='standard'>
+											<FormLabel component='legend'>Remind When On Time</FormLabel>
+											<FormGroup>
+												<FormControlLabel control={<Checkbox checked={remind_fajr_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'fajr')} />} label='Fajr' />
+												<FormControlLabel
+													control={<Checkbox checked={remind_sunrise_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'sunrise')} />}
+													label='Sunrise'
+												/>
+												<FormControlLabel control={<Checkbox checked={remind_dhuhr_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'dhuhr')} />} label='Dhuhr' />
+												<FormControlLabel control={<Checkbox checked={remind_asr_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'asr')} />} label='Asr' />
+												<FormControlLabel
+													control={<Checkbox checked={remind_maghrib_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'maghrib')} />}
+													label='Maghrib'
+												/>
+												<FormControlLabel control={<Checkbox checked={remind_isha_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'isha')} />} label='Isha' />
+											</FormGroup>
+										</FormControl>
 
-									<FormControl sx={{ mt: 2, ml: 3 }} component='fieldset' variant='standard'>
-										<FormLabel component='legend'>Early Reminder</FormLabel>
-										<FormGroup>
-											<FormControlLabel control={<Checkbox checked={remind_fajr_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'fajr')} />} label='Fajr' />
-											<FormControlLabel control={<Checkbox checked={remind_sunrise_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'sunrise')} />} label='Sunrise' />
-											<FormControlLabel control={<Checkbox checked={remind_dhuhr_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'dhuhr')} />} label='Dhuhr' />
-											<FormControlLabel control={<Checkbox checked={remind_asr_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'asr')} />} label='Asr' />
-											<FormControlLabel control={<Checkbox checked={remind_maghrib_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'maghrib')} />} label='Maghrib' />
-											<FormControlLabel control={<Checkbox checked={remind_isha_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'isha')} />} label='Isha' />
-										</FormGroup>
-									</FormControl>
+										<FormControl sx={{ mt: 2, ml: 3 }} component='fieldset' variant='standard'>
+											<FormLabel component='legend'>Early Reminder</FormLabel>
+											<FormGroup>
+												<FormControlLabel control={<Checkbox checked={remind_fajr_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'fajr')} />} label='Fajr' />
+												<FormControlLabel control={<Checkbox checked={remind_sunrise_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'sunrise')} />} label='Sunrise' />
+												<FormControlLabel control={<Checkbox checked={remind_dhuhr_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'dhuhr')} />} label='Dhuhr' />
+												<FormControlLabel control={<Checkbox checked={remind_asr_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'asr')} />} label='Asr' />
+												<FormControlLabel control={<Checkbox checked={remind_maghrib_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'maghrib')} />} label='Maghrib' />
+												<FormControlLabel control={<Checkbox checked={remind_isha_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'isha')} />} label='Isha' />
+											</FormGroup>
+										</FormControl>
 
-									<FormControl sx={{ mt: 2, ml: 3 }} component='fieldset' variant='standard'>
-										<Tooltip title='Will show up reminder as a interruptive message box' placement='top' arrow>
-											<FormLabel component='legend'>Intrusive notification</FormLabel>
-										</Tooltip>
-										<FormGroup>
-											<FormControlLabel control={<Checkbox checked={remind_fajr_intrusive} onChange={(e) => handleIntrusiveChange(e as any, 'fajr')} />} label='Fajr' />
-											<FormControlLabel control={<Checkbox checked={remind_sunrise_intrusive} onChange={(e) => handleIntrusiveChange(e as any, 'sunrise')} />} label='Sunrise' />
-											<FormControlLabel control={<Checkbox checked={remind_dhuhr_intrusive} onChange={(e) => handleIntrusiveChange(e as any, 'dhuhr')} />} label='Dhuhr' />
-											<FormControlLabel control={<Checkbox checked={remind_asr_intrusive} onChange={(e) => handleIntrusiveChange(e as any, 'asr')} />} label='Asr' />
-											<FormControlLabel control={<Checkbox checked={remind_maghrib_intrusive} onChange={(e) => handleIntrusiveChange(e as any, 'maghrib')} />} label='Maghrib' />
-											<FormControlLabel control={<Checkbox checked={remind_isha_intrusive} onChange={(e) => handleIntrusiveChange(e as any, 'isha')} />} label='Isha' />
-										</FormGroup>
-									</FormControl>
+										<FormControl sx={{ mt: 2, ml: 3 }} component='fieldset' variant='standard'>
+											<Tooltip title='Will show up reminder as a interruptive message box' placement='top' arrow>
+												<FormLabel component='legend'>Intrusive notification</FormLabel>
+											</Tooltip>
+											<FormGroup>
+												<FormControlLabel control={<Checkbox checked={remind_fajr_intrusive} onChange={(e) => handleIntrusiveChange(e as any, 'fajr')} />} label='Fajr' />
+												<FormControlLabel control={<Checkbox checked={remind_sunrise_intrusive} onChange={(e) => handleIntrusiveChange(e as any, 'sunrise')} />} label='Sunrise' />
+												<FormControlLabel control={<Checkbox checked={remind_dhuhr_intrusive} onChange={(e) => handleIntrusiveChange(e as any, 'dhuhr')} />} label='Dhuhr' />
+												<FormControlLabel control={<Checkbox checked={remind_asr_intrusive} onChange={(e) => handleIntrusiveChange(e as any, 'asr')} />} label='Asr' />
+												<FormControlLabel control={<Checkbox checked={remind_maghrib_intrusive} onChange={(e) => handleIntrusiveChange(e as any, 'maghrib')} />} label='Maghrib' />
+												<FormControlLabel control={<Checkbox checked={remind_isha_intrusive} onChange={(e) => handleIntrusiveChange(e as any, 'isha')} />} label='Isha' />
+											</FormGroup>
+										</FormControl>
+									</Box>
 								</Box>
 							</Box>
-						</Box>
+						</Grid>
 					</Grid>
-				</Grid>
-				{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-				{/* location, timezone, api keys */}
-				<Divider sx={{ mt: 2, mb: 2 }} />
-				<Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-					{/* ------------------------------------- */}
-					{/* Timezone & API Keys */}
-					<Grid item xs={6}>
-						<div
-							style={{
-								display: 'flex',
-								alignItems: 'center',
-								flexWrap: 'wrap',
-							}}
-						>
-							<AccessTimeOutlinedIcon color='primary' /> <h3 style={{ paddingLeft: '.5rem' }}>Timezone options</h3>
-						</div>
-						<Box
-							component={'form'}
-							noValidate
-							autoComplete='off'
-							sx={{
-								display: 'flex',
-								flexDirection: 'column',
-								'& .MuiTextField-root': { m: 1, ml: 0.5 },
-							}}
-						>
-							<FormControl>
-								<FormLabel id='location-mode-formlabel' sx={{ ml: 0.5 }}>
-									Mode
-								</FormLabel>
-								<RadioGroup sx={{ ml: 0.5 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={tzMode} onChange={handleTzModeChange}>
-									<FormControlLabel value='auto' control={<Radio />} label='Auto' />
-									<FormControlLabel value='manual' control={<Radio />} label='Manual' />
-								</RadioGroup>
+					{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
+					{/* location, timezone, api keys */}
+					<Divider sx={{ mt: 2, mb: 2 }} />
+					<Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+						{/* ------------------------------------- */}
+						{/* Timezone & API Keys */}
+						<Grid item xs={6}>
+							<div
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									flexWrap: 'wrap',
+								}}
+							>
+								<AccessTimeOutlinedIcon color='primary' /> <h3 style={{ paddingLeft: '.5rem' }}>Timezone options</h3>
+							</div>
+							<Box
+								component={'form'}
+								noValidate
+								autoComplete='off'
+								sx={{
+									display: 'flex',
+									flexDirection: 'column',
+									'& .MuiTextField-root': { m: 1, ml: 0.5 },
+								}}
+							>
 								<FormControl>
-									<Autocomplete
+									<FormLabel id='location-mode-formlabel' sx={{ ml: 0.5 }}>
+										Mode
+									</FormLabel>
+									<RadioGroup sx={{ ml: 0.5 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={tzMode} onChange={handleTzModeChange}>
+										<FormControlLabel value='auto' control={<Radio />} label='Auto' />
+										<FormControlLabel value='manual' control={<Radio />} label='Manual' />
+									</RadioGroup>
+									<FormControl>
+										<Autocomplete
+											size='small'
+											id='select-timezone-select'
+											options={tzList}
+											value={timezone}
+											onChange={handleTimezoneChange}
+											inputValue={tzInput}
+											onInputChange={handleTzInputChange}
+											renderInput={(params) => <TextField {...params} label='Timezone' />}
+											disabled={tzMode === 'auto' ? true : false}
+											autoHighlight
+											sx={{
+												width: '98.5%',
+											}}
+										/>
+									</FormControl>
+								</FormControl>
+							</Box>
+
+							<Divider sx={{ pt: 2 }} />
+							{/* api keys */}
+							<div
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									flexWrap: 'wrap',
+								}}
+							>
+								<KeyIcon color='primary' /> <h3 style={{ paddingLeft: '.5rem' }}>API Key</h3>
+							</div>
+							<Box
+								component={'form'}
+								noValidate
+								autoComplete='off'
+								sx={{
+									display: 'flex',
+									flexDirection: 'column',
+									'& .MuiTextField-root': { m: 1, ml: 0.5 },
+								}}
+							>
+								<FormControl>
+									<FormLabel id='location-mode-formlabel' sx={{ ml: 0.5 }}>
+										Mode
+									</FormLabel>
+									<RadioGroup sx={{ ml: 0.5 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={geolocMode} onChange={handleGeolocModeChange}>
+										<FormControlLabel value='auto' control={<Radio />} label='Auto' />
+										<FormControlLabel value='manual' control={<Radio />} label='Manual' />
+									</RadioGroup>
+
+									<TextField
+										id='freegeoip'
+										label='Freegeoip.app API Key'
+										variant='outlined'
 										size='small'
-										id='select-timezone-select'
-										options={tzList}
-										value={timezone}
-										onChange={handleTimezoneChange}
-										inputValue={tzInput}
-										onInputChange={handleTzInputChange}
-										renderInput={(params) => <TextField {...params} label='Timezone' />}
-										disabled={tzMode === 'auto' ? true : false}
-										autoHighlight
-										sx={{
-											width: '98.5%',
+										value={geolocKey}
+										onChange={handleGeolocKeyChange}
+										disabled={geolocMode === 'auto' ? true : false}
+										InputProps={{
+											endAdornment: (
+												<Tooltip title='Click to verify API key inputted' placement='top' arrow>
+													<InputAdornment position='end'>
+														<IconButton aria-label="Get inputted city's lattitude/langitude" onClick={verifyKey} edge='end' disabled={geolocMode === 'auto' ? true : false}>
+															<SearchIcon />
+														</IconButton>
+													</InputAdornment>
+												</Tooltip>
+											),
 										}}
 									/>
 								</FormControl>
-							</FormControl>
-						</Box>
+							</Box>
+						</Grid>
+						{/* ------------------------------------- */}
+						{/* location */}
+						<Grid item xs={6}>
+							<div
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									flexWrap: 'wrap',
+								}}
+							>
+								<LocationOnOutlinedIcon color='primary' /> <h3 style={{ paddingLeft: '.5rem' }}>Location options</h3>
+							</div>
+							<Box
+								component={'form'}
+								noValidate
+								autoComplete='off'
+								sx={{
+									display: 'flex',
+									flexDirection: 'column',
+									'& .MuiTextField-root': { m: 1, ml: 0.5 },
+								}}
+							>
+								<FormControl>
+									<FormLabel id='location-mode-formlabel' sx={{ ml: 0.5 }}>
+										Mode
+									</FormLabel>
+									<RadioGroup sx={{ ml: 0.5 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={locMode} onChange={handleLocModeChange}>
+										<FormControlLabel value='auto' control={<Radio />} label='Auto' />
+										<FormControlLabel value='manual' control={<Radio />} label='Manual' />
+										<Tooltip title='Click to sync location automatically' arrow>
+											<IconButton aria-label='delete' disabled={locMode === 'manual' ? true : false} onClick={getCityLatLang_Auto}>
+												<SyncIcon />
+											</IconButton>
+										</Tooltip>
+									</RadioGroup>
 
-						<Divider sx={{ pt: 2 }} />
-						{/* api keys */}
-						<div
-							style={{
-								display: 'flex',
-								alignItems: 'center',
-								flexWrap: 'wrap',
-							}}
-						>
-							<KeyIcon color='primary' /> <h3 style={{ paddingLeft: '.5rem' }}>API Key</h3>
-						</div>
-						<Box
-							component={'form'}
-							noValidate
-							autoComplete='off'
-							sx={{
-								display: 'flex',
-								flexDirection: 'column',
-								'& .MuiTextField-root': { m: 1, ml: 0.5 },
-							}}
-						>
-							<FormControl>
-								<FormLabel id='location-mode-formlabel' sx={{ ml: 0.5 }}>
-									Mode
-								</FormLabel>
-								<RadioGroup sx={{ ml: 0.5 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={geolocMode} onChange={handleGeolocModeChange}>
-									<FormControlLabel value='auto' control={<Radio />} label='Auto' />
-									<FormControlLabel value='manual' control={<Radio />} label='Manual' />
-								</RadioGroup>
-
-								<TextField
-									id='freegeoip'
-									label='Freegeoip.app API Key'
-									variant='outlined'
-									size='small'
-									value={geolocKey}
-									onChange={handleGeolocKeyChange}
-									disabled={geolocMode === 'auto' ? true : false}
-									InputProps={{
-										endAdornment: (
-											<Tooltip title='Click to verify API key inputted' placement='top' arrow>
-												<InputAdornment position='end'>
-													<IconButton aria-label="Get inputted city's lattitude/langitude" onClick={verifyKey} edge='end' disabled={geolocMode === 'auto' ? true : false}>
-														<SearchIcon />
-													</IconButton>
-												</InputAdornment>
-											</Tooltip>
-										),
-									}}
-								/>
-							</FormControl>
-						</Box>
-					</Grid>
-					{/* ------------------------------------- */}
-					{/* location */}
-					<Grid item xs={6}>
-						<div
-							style={{
-								display: 'flex',
-								alignItems: 'center',
-								flexWrap: 'wrap',
-							}}
-						>
-							<LocationOnOutlinedIcon color='primary' /> <h3 style={{ paddingLeft: '.5rem' }}>Location options</h3>
-						</div>
-						<Box
-							component={'form'}
-							noValidate
-							autoComplete='off'
-							sx={{
-								display: 'flex',
-								flexDirection: 'column',
-								'& .MuiTextField-root': { m: 1, ml: 0.5 },
-							}}
-						>
-							<FormControl>
-								<FormLabel id='location-mode-formlabel' sx={{ ml: 0.5 }}>
-									Mode
-								</FormLabel>
-								<RadioGroup sx={{ ml: 0.5 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={locMode} onChange={handleLocModeChange}>
-									<FormControlLabel value='auto' control={<Radio />} label='Auto' />
-									<FormControlLabel value='manual' control={<Radio />} label='Manual' />
-									<Tooltip title='Click to sync location automatically' arrow>
-										<IconButton aria-label='delete' disabled={locMode === 'manual' ? true : false} onClick={getCityLatLang_Auto}>
-											<SyncIcon />
-										</IconButton>
-									</Tooltip>
-								</RadioGroup>
-
-								<TextField
-									id='city'
-									label='City'
-									variant='outlined'
-									size='small'
-									value={locCity}
-									onChange={handleCityChange}
-									disabled={locMode === 'auto' ? true : false}
-									InputProps={{
-										endAdornment: (
-											<Tooltip title="Click to search for inputted city's latitude/langitude" placement='top' arrow>
-												<InputAdornment position='end'>
-													<IconButton aria-label="Get inputted city's lattitude/langitude" onClick={getCityLatLang_Manual} edge='end' disabled={locMode === 'auto' ? true : false}>
-														<SearchIcon />
-													</IconButton>
-												</InputAdornment>
-											</Tooltip>
-										),
-									}}
-								/>
-								<TextField id='Latitude' label='latitude' variant='outlined' size='small' value={locLat} onChange={handleLatChange} disabled={locMode === 'auto' ? true : false} />
-								<TextField id='Longitude' label='longitude' variant='outlined' size='small' value={locLang} onChange={handleLangChange} disabled={locMode === 'auto' ? true : false} />
-								<Tooltip title='*Will only update if auto mode is enabled' arrow>
-									<FormControlLabel
-										control={<Checkbox sx={{ ml: 0.5 }} checked={locUpdateEveryStartup} onChange={handleLocUpdateEveryStartupChange} disabled={locMode === 'auto' ? false : true} />}
-										label='Update location on app start'
+									<TextField
+										id='city'
+										label='City'
+										variant='outlined'
+										size='small'
+										value={locCity}
+										onChange={handleCityChange}
+										disabled={locMode === 'auto' ? true : false}
+										InputProps={{
+											endAdornment: (
+												<Tooltip title="Click to search for inputted city's latitude/langitude" placement='top' arrow>
+													<InputAdornment position='end'>
+														<IconButton aria-label="Get inputted city's lattitude/langitude" onClick={getCityLatLang_Manual} edge='end' disabled={locMode === 'auto' ? true : false}>
+															<SearchIcon />
+														</IconButton>
+													</InputAdornment>
+												</Tooltip>
+											),
+										}}
 									/>
-								</Tooltip>
-							</FormControl>
-						</Box>
-					</Grid>
-				</Grid>
-				{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-				{/* other settings */}
-				<Divider sx={{ mt: 2, mb: 2 }} />
-				<Grid container spacing={2}>
-					<Grid item xs={12}>
-						<div
-							style={{
-								display: 'flex',
-								alignItems: 'center',
-								flexWrap: 'wrap',
-							}}
-						>
-							<MiscellaneousServicesOutlinedIcon color='primary' /> <h3 style={{ paddingLeft: '.5rem' }}>Other Settings</h3>
-						</div>
-						<Box
-							component={'form'}
-							noValidate
-							autoComplete='off'
-							sx={{
-								display: 'flex',
-								flexDirection: 'row',
-							}}
-						>
-							<FormControl sx={{ mr: 2 }}>
-								<FormLabel sx={{ ml: 0.5 }}>Theme</FormLabel>
-								<RadioGroup sx={{ ml: 0.5 }} row aria-labelledby='app-theme' name='row-radio-buttons-app-theme' value={appTheme} onChange={handleColorModeChange}>
-									<FormControlLabel value='light' control={<Radio />} label='Light' />
-									<FormControlLabel value='dark' control={<Radio />} label='Dark' />
-								</RadioGroup>
-							</FormControl>
-
-							<FormControl sx={{ mr: 4 }}>
-								<Tooltip title='*In days' placement='top' arrow>
-									<FormLabel sx={{ ml: 0.5 }}>Hijri Calendar Offset</FormLabel>
-								</Tooltip>
-								<MuiInput
-									style={{ marginTop: '4px' }}
-									sx={{ ml: 0.5 }}
-									value={hijriCalendarOffset}
-									onChange={handleHijriCalendarOffsetChange}
-									onBlur={handleBlurHijriCalendarOffset}
-									inputProps={{
-										step: 1,
-										min: -5,
-										max: 5,
-										type: 'number',
-									}}
-								/>
-							</FormControl>
-
-							<FormControl>
-								<FormLabel>Startup Options</FormLabel>
-								<Box
-									sx={{
-										display: 'flex',
-										flexDirection: 'row',
-									}}
-								>
-									<FormControlLabel control={<Checkbox checked={runAtStartup} onChange={handleRunAtStartupChange} />} label='Run app on PC startup' />
-									<FormControlLabel control={<Checkbox checked={checkUpdateStartup} onChange={handleCheckUpdateStartupChange} />} label='Check for update on app start' />
-								</Box>
-							</FormControl>
-
-							<FormControl sx={{ minWidth: '120px', mr: 2 }}>
-								<FormLabel>Clock Style</FormLabel>
-								<Select size='small' value={clockStyle} onChange={handleClockStyleChange}>
-									<MenuItem value='AM/PM'>AM/PM</MenuItem>
-									<MenuItem value='24h'>24h</MenuItem>
-								</Select>
-							</FormControl>
-
-							<FormControl>
-								<FormLabel>Time sync</FormLabel>
-								<Box
-									sx={{
-										display: 'flex',
-										flexDirection: 'row',
-									}}
-								>
-									<Tooltip title='The app will check every 30 seconds for local time changes. Recommended to turn off if you are not messing arround with the local time/clock of your PC'>
-										<FormControlLabel control={<Checkbox checked={detectTimeChange} onChange={handleDetectTimeChange} />} label='Detect local time change' />
+									<TextField id='Latitude' label='latitude' variant='outlined' size='small' value={locLat} onChange={handleLatChange} disabled={locMode === 'auto' ? true : false} />
+									<TextField id='Longitude' label='longitude' variant='outlined' size='small' value={locLang} onChange={handleLangChange} disabled={locMode === 'auto' ? true : false} />
+									<Tooltip title='*Will only update if auto mode is enabled' arrow>
+										<FormControlLabel
+											control={<Checkbox sx={{ ml: 0.5 }} checked={locUpdateEveryStartup} onChange={handleLocUpdateEveryStartupChange} disabled={locMode === 'auto' ? false : true} />}
+											label='Update location on app start'
+										/>
 									</Tooltip>
-								</Box>
-							</FormControl>
-						</Box>
+								</FormControl>
+							</Box>
+						</Grid>
 					</Grid>
-				</Grid>
+					{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
+					{/* other settings */}
+					<Divider sx={{ mt: 2, mb: 2 }} />
+					<Grid container spacing={2}>
+						<Grid item xs={12}>
+							<div
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									flexWrap: 'wrap',
+								}}
+							>
+								<MiscellaneousServicesOutlinedIcon color='primary' /> <h3 style={{ paddingLeft: '.5rem' }}>Other Settings</h3>
+							</div>
+							<Box
+								component={'form'}
+								noValidate
+								autoComplete='off'
+								sx={{
+									display: 'flex',
+									flexDirection: 'row',
+								}}
+							>
+								<FormControl sx={{ mr: 2 }}>
+									<FormLabel sx={{ ml: 0.5 }}>Theme</FormLabel>
+									<RadioGroup sx={{ ml: 0.5 }} row aria-labelledby='app-theme' name='row-radio-buttons-app-theme' value={appTheme} onChange={handleColorModeChange}>
+										<FormControlLabel value='light' control={<Radio />} label='Light' />
+										<FormControlLabel value='dark' control={<Radio />} label='Dark' />
+									</RadioGroup>
+								</FormControl>
 
-				{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-				<Divider sx={{ mt: 6, width: '200px', ml: 'auto', mr: 'auto' }} />
-				<Box sx={{ '& button': { m: 1 }, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', mt: 0.25 }}>
-					{/* Cancel changes */}
-					<Button
-						variant='outlined'
-						onClick={() => {
-							setCurrentDialog('cancel');
-							setDialogOpen(true);
-						}}
-						size='small'
-					>
-						<SettingsBackupRestoreIcon fontSize='small' /> Cancel
-					</Button>
-					<Button
-						variant='contained'
-						onClick={() => {
-							setCurrentDialog('save');
-							setDialogOpen(true);
-						}}
-						size='small'
-					>
-						<SaveIcon fontSize='small' /> Save
-					</Button>
+								<FormControl sx={{ mr: 4 }}>
+									<Tooltip title='*In days' placement='top' arrow>
+										<FormLabel sx={{ ml: 0.5 }}>Hijri Calendar Offset</FormLabel>
+									</Tooltip>
+									<MuiInput
+										style={{ marginTop: '4px' }}
+										sx={{ ml: 0.5 }}
+										value={hijriCalendarOffset}
+										onChange={handleHijriCalendarOffsetChange}
+										onBlur={handleBlurHijriCalendarOffset}
+										inputProps={{
+											step: 1,
+											min: -5,
+											max: 5,
+											type: 'number',
+										}}
+									/>
+								</FormControl>
+
+								<FormControl>
+									<FormLabel>Startup Options</FormLabel>
+									<Box
+										sx={{
+											display: 'flex',
+											flexDirection: 'row',
+										}}
+									>
+										<FormControlLabel control={<Checkbox checked={runAtStartup} onChange={handleRunAtStartupChange} />} label='Run app on PC startup' />
+										<FormControlLabel control={<Checkbox checked={checkUpdateStartup} onChange={handleCheckUpdateStartupChange} />} label='Check for update on app start' />
+									</Box>
+								</FormControl>
+
+								<FormControl sx={{ minWidth: '120px', mr: 2 }}>
+									<FormLabel>Clock Style</FormLabel>
+									<Select size='small' value={clockStyle} onChange={handleClockStyleChange}>
+										<MenuItem value='AM/PM'>AM/PM</MenuItem>
+										<MenuItem value='24h'>24h</MenuItem>
+									</Select>
+								</FormControl>
+
+								<FormControl>
+									<FormLabel>Time sync</FormLabel>
+									<Box
+										sx={{
+											display: 'flex',
+											flexDirection: 'row',
+										}}
+									>
+										<Tooltip title='The app will check every 30 seconds for local time changes. Recommended to turn off if you are not messing arround with the local time/clock of your PC'>
+											<FormControlLabel control={<Checkbox checked={detectTimeChange} onChange={handleDetectTimeChange} />} label='Detect local time change' />
+										</Tooltip>
+									</Box>
+								</FormControl>
+							</Box>
+						</Grid>
+					</Grid>
+
+					{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
+					<Divider sx={{ mt: 6, width: '200px', ml: 'auto', mr: 'auto' }} />
+					<Box sx={{ '& button': { m: 1 }, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', mt: 0.25 }}>
+						{/* Cancel changes */}
+						<Button
+							variant='outlined'
+							onClick={() => {
+								setCurrentDialog('cancel');
+								setDialogOpen(true);
+							}}
+							size='small'
+						>
+							<SettingsBackupRestoreIcon fontSize='small' /> Cancel
+						</Button>
+						<Button
+							variant='contained'
+							onClick={() => {
+								setCurrentDialog('save');
+								setDialogOpen(true);
+							}}
+							size='small'
+						>
+							<SaveIcon fontSize='small' /> Save
+						</Button>
+					</Box>
 				</Box>
-			</Box>
+			</Fade>
 		</>
 	);
 };

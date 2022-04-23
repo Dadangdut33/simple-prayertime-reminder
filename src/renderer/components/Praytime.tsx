@@ -10,6 +10,7 @@ import 'react-clock/dist/Clock.css';
 // MUI elements
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
+import Fade from '@mui/material/Fade';
 
 // Icons
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -164,86 +165,88 @@ export const Praytime = ({ theme }: any) => {
 	return (
 		<>
 			<CssBaseline />
-			<Box
-				sx={{
-					display: 'flex',
-					flexDirection: 'column',
-					width: '100%',
-					alignItems: 'center',
-					justifyContent: 'center',
-					borderRadius: 1,
-					p: 3,
-				}}
-			>
-				<Box sx={{ mt: 2, mb: 2 }}>
-					<div
-						style={{
-							display: 'flex',
-							alignItems: 'center',
-							flexWrap: 'wrap',
-							paddingRight: '1rem',
-						}}
-					>
-						<LocationOnIcon style={{ paddingBottom: '4px', fontSize: '28px' }} color='primary' />{' '}
-						<h2>
-							{appSettings.locationOption.city} ({appSettings.locationOption.latitude}, {appSettings.locationOption.longitude})
-						</h2>
-					</div>
-				</Box>
-
-				<Box id='the-clock' className={theme + '-clock'} sx={{ mt: 3, mb: 3 }}>
-					<CountdownCircleTimer
-						isPlaying
-						duration={durationOpen}
-						initialRemainingTime={durationOpenInitial}
-						colors={randomColorList as any}
-						colorsTime={colorChangeSecondsList as any}
-						strokeWidth={4}
-						size={290}
-						onComplete={() => {
-							// refresh page
-							window.location.reload();
-						}}
-					/>
-					<div className='analogue' id={theme}>
-						<Clock value={clockValue} renderNumbers={true} size={250} minuteHandWidth={3} hourHandWidth={5} secondHandWidth={2} />
-					</div>
-				</Box>
-
-				<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', mt: 6 }}>
-					<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-						<h3>{currentPt.current.charAt(0).toUpperCase() + currentPt.current.slice(1)}</h3>
-
-						<p>
-							{Moment(new Date(pt_Map[currentPt.current]))
-								.tz(timezone)
-								.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
-						</p>
-					</Box>
-
-					<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', ml: 6, mr: 6 }}>
+			<Fade in={true}>
+				<Box
+					sx={{
+						display: 'flex',
+						flexDirection: 'column',
+						width: '100%',
+						alignItems: 'center',
+						justifyContent: 'center',
+						borderRadius: 1,
+						p: 3,
+					}}
+				>
+					<Box sx={{ mt: 2, mb: 2 }}>
 						<div
 							style={{
 								display: 'flex',
 								alignItems: 'center',
 								flexWrap: 'wrap',
+								paddingRight: '1rem',
 							}}
 						>
-							<DoubleArrowIcon color='primary' style={{ fontSize: '26px' }} /> <h2>{formatTimerWithHours(remainingTime)}</h2>
+							<LocationOnIcon style={{ paddingBottom: '4px', fontSize: '28px' }} color='primary' />{' '}
+							<h2>
+								{appSettings.locationOption.city} ({appSettings.locationOption.latitude}, {appSettings.locationOption.longitude})
+							</h2>
 						</div>
 					</Box>
 
-					<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-						<h3>{currentPt.next.charAt(0).toUpperCase() + currentPt.next.slice(1)}</h3>
+					<Box id='the-clock' className={theme + '-clock'} sx={{ mt: 3, mb: 3 }}>
+						<CountdownCircleTimer
+							isPlaying
+							duration={durationOpen}
+							initialRemainingTime={durationOpenInitial}
+							colors={randomColorList as any}
+							colorsTime={colorChangeSecondsList as any}
+							strokeWidth={4}
+							size={290}
+							onComplete={() => {
+								// refresh page
+								window.location.reload();
+							}}
+						/>
+						<div className='analogue' id={theme}>
+							<Clock value={clockValue} renderNumbers={true} size={250} minuteHandWidth={3} hourHandWidth={5} secondHandWidth={2} />
+						</div>
+					</Box>
 
-						<p>
-							{Moment(new Date(pt_Map[currentPt.next]))
-								.tz(timezone)
-								.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
-						</p>
+					<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', mt: 6 }}>
+						<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+							<h3>{currentPt.current.charAt(0).toUpperCase() + currentPt.current.slice(1)}</h3>
+
+							<p>
+								{Moment(new Date(pt_Map[currentPt.current]))
+									.tz(timezone)
+									.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
+							</p>
+						</Box>
+
+						<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', ml: 6, mr: 6 }}>
+							<div
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									flexWrap: 'wrap',
+								}}
+							>
+								<DoubleArrowIcon color='primary' style={{ fontSize: '26px' }} /> <h2>{formatTimerWithHours(remainingTime)}</h2>
+							</div>
+						</Box>
+
+						<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+							<h3>{currentPt.next.charAt(0).toUpperCase() + currentPt.next.slice(1)}</h3>
+
+							<p>
+								{Moment(new Date(pt_Map[currentPt.next]))
+									.tz(timezone)
+									.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
+							</p>
+						</Box>
 					</Box>
 				</Box>
-			</Box>
+			</Fade>
 		</>
 	);
 };

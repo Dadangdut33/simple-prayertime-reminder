@@ -19,6 +19,23 @@ body {
 }
 
 /* --------------------------- */
+/* splash */
+.splash-img {
+	max-width: 400px;
+}
+
+.splash-img#dark {
+	-webkit-box-shadow: 0 0.25rem 1rem rgb(255, 255, 255, .275) !important;
+	box-shadow: 0 0.25rem 1rem rgb(255, 255, 255, .275) !important;
+}
+
+.splash-img#light {
+	-webkit-box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1) !important;
+	box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1) !important;
+}
+
+
+/* --------------------------- */
 /* clock timer */
 #the-clock>div:first-of-type {
 	position: absolute !important;
