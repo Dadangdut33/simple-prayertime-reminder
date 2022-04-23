@@ -61,3 +61,22 @@ export function openFile(window: BrowserWindow) {
 		properties: ['openFile'],
 	});
 }
+
+export function prayerTime_IntrusiveNotification(title: string, msg: string, icon: string, mainWindow: BrowserWindow) {
+	if (mainWindow)
+		dialog.showMessageBox(mainWindow, {
+			title: title,
+			buttons: ['Ok'],
+			type: 'info',
+			message: msg,
+			icon: icon,
+		});
+	else
+		dialog.showMessageBoxSync({
+			title: title,
+			buttons: ['Ok'],
+			type: 'info',
+			message: msg,
+			icon: icon,
+		});
+}
