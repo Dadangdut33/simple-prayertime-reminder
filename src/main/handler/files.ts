@@ -41,31 +41,37 @@ export const initialConfig: configInterface = {
 			remindWhenOnTime: true,
 			earlyReminder: true,
 			earlyTime: 15,
+			intrusiveNotification: false,
 		},
 		sunrise: {
 			remindWhenOnTime: true,
 			earlyReminder: true,
 			earlyTime: 15,
+			intrusiveNotification: false,
 		},
 		dhuhr: {
 			remindWhenOnTime: true,
 			earlyReminder: true,
 			earlyTime: 15,
+			intrusiveNotification: false,
 		},
 		asr: {
 			remindWhenOnTime: true,
 			earlyReminder: true,
 			earlyTime: 15,
+			intrusiveNotification: false,
 		},
 		maghrib: {
 			remindWhenOnTime: true,
 			earlyReminder: true,
 			earlyTime: 15,
+			intrusiveNotification: false,
 		},
 		isha: {
 			remindWhenOnTime: true,
 			earlyReminder: true,
 			earlyTime: 15,
+			intrusiveNotification: false,
 		},
 	},
 	geoLocAPIKey: {

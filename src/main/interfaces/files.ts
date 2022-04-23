@@ -1,12 +1,13 @@
+export type calcMethod = 'MuslimWorldLeague' | 'Egyptian' | 'Karachi' | 'UmmAlQura' | 'Dubai' | 'MoonsightingCommittee' | 'NorthAmerica' | 'Kuwait' | 'Qatar' | 'Singapore' | 'Tehran' | 'Turkey';
+export type madhab = 'Shafi' | 'Hanafi';
+export type highLatitudeRule_T = 'MiddleOfTheNight' | 'SeventhOfTheNight' | 'TwilightAngle';
+
 export interface reminderInterface {
 	remindWhenOnTime: boolean;
 	earlyReminder: boolean;
 	earlyTime: number;
+	intrusiveNotification: boolean;
 }
-
-export type calcMethod = 'MuslimWorldLeague' | 'Egyptian' | 'Karachi' | 'UmmAlQura' | 'Dubai' | 'MoonsightingCommittee' | 'NorthAmerica' | 'Kuwait' | 'Qatar' | 'Singapore' | 'Tehran' | 'Turkey';
-export type madhab = 'Shafi' | 'Hanafi';
-export type highLatitudeRule_T = 'MiddleOfTheNight' | 'SeventhOfTheNight' | 'TwilightAngle';
 
 export interface calcOptionInterface {
 	mode: 'default' | 'manual';
