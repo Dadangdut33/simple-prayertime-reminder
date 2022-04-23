@@ -2,7 +2,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import icon from '../../../assets/display_icon.png';
 import Box from '@mui/material/Box';
 import Fade from '@mui/material/Fade';
-import Skeleton from '@mui/material/Skeleton';
+import LinearProgress from '@mui/material/LinearProgress';
 
 export const Splashscreen = ({ show, theme }: any) => {
 	return (
@@ -30,7 +30,7 @@ export const Splashscreen = ({ show, theme }: any) => {
 					>
 						<img className='splash-img' id={theme} src={icon} alt='logo' />
 						<Box sx={{ width: '400px', mt: 2 }}>
-							<Skeleton animation='wave' />
+							<LinearProgress />
 						</Box>
 					</Box>
 				</Box>
