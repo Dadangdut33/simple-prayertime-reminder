@@ -324,12 +324,8 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	const handleTzModeChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setTzMode(e.target.value as 'auto' | 'manual');
 		if (e.target.value === 'auto') {
-			if (currentConfig.timezoneOption.mode === 'auto') {
-				setTimezone(currentConfig.timezoneOption.timezone);
-			} else {
-				const timezone = window.electron.ipcRenderer.sendSync('get-tz-auto', currentConfig) as string;
-				setTimezone(timezone);
-			}
+			const timezone = window.electron.ipcRenderer.sendSync('get-tz-auto', currentConfig) as string;
+			setTimezone(timezone);
 		}
 		checkChanges();
 	};
