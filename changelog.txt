@@ -1,2 +1,9 @@
+[1.0.1]
+- fix splash screen accidentally shown on page reload 
+- refresh page when opening from tray
+- changed slide transition to fade
+- update timezone on start
+- timezone auto now get auto data from moment instead of checking previous value
+
 [1.0.0]
 - First release
