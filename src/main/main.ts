@@ -152,6 +152,11 @@ const updateLocationOnStart = async () => {
 	writeConfig('app', appConfig);
 };
 
+const updateTimezoneOnStart = () => {
+	appConfig.timezoneOption.timezone = Moment.tz.guess();
+	writeConfig('app', appConfig);
+};
+
 const createWindow = async () => {
 	if (isDevelopment) {
 		await installExtensions();
@@ -219,6 +224,8 @@ const createWindow = async () => {
 					});
 			}
 		} catch {}
+
+		updateTimezoneOnStart();
 
 		// update location if auto and enabled
 		if (appConfig.locationOption.mode === 'auto') if (appConfig.locationOption.updateEveryStartup) updateLocationOnStart();
