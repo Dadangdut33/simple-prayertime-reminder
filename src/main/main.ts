@@ -155,8 +155,10 @@ const updateLocationOnStart = async () => {
 };
 
 const updateTimezoneOnStart = () => {
-	appConfig.timezoneOption.timezone = Moment.tz.guess();
-	writeConfig('app', appConfig);
+	if (appConfig.timezoneOption.mode === 'auto') {
+		appConfig.timezoneOption.timezone = Moment.tz.guess();
+		writeConfig('app', appConfig);
+	}
 };
 
 const createWindow = async () => {
