@@ -3,7 +3,7 @@ import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 contextBridge.exposeInMainWorld('electron', {
 	ipcRenderer: {
 		on(channel: string, func: (...args: unknown[]) => void) {
-			const validChannels = ['open-changes-made', 'page-change'];
+			const validChannels = ['open-changes-made', 'page-change', 'refresh-from-main'];
 			if (validChannels.includes(channel)) {
 				const subscription = (_event: IpcRendererEvent, ...args: unknown[]) => func(...args);
 				// Deliberately strip event as it includes `sender`

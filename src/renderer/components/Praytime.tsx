@@ -130,6 +130,11 @@ export const Praytime = ({ theme }: any) => {
 	const durationOpenInitial = getDifInitial();
 	const [remainingTime, setRemainingTime] = useState(getDifInitial());
 
+	const refreshPage = () => {
+		// check window locatiom
+		if (window.electron.ipcRenderer.sendSync('get-current-page') === '/') window.location.reload();
+	};
+
 	// ---------------------------------------------------------
 	useEffect(() => {
 		// Timer shown
@@ -155,7 +160,10 @@ export const Praytime = ({ theme }: any) => {
 			generateRandomHexColor(getDif() / amountDivider);
 		}
 
+		// listener
+		window.electron.ipcRenderer.on('refresh-from-main', refreshPage);
 		return () => {
+			window.electron.ipcRenderer.removeEventListener('refresh-from-main', refreshPage);
 			clearTimeout(timeoutTimer);
 			clearInterval(timer_clock_Interval);
 		};

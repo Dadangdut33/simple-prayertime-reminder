@@ -32,7 +32,12 @@ export default class TrayManager {
 		this.tray.setContextMenu(contextMenu);
 
 		this.tray.on('click', () => {
+			const wasVisible = this.mainWindow.isVisible();
 			this.mainWindow.show();
+
+			if (!wasVisible) {
+				this.mainWindow.webContents.send('refresh-from-main');
+			}
 		});
 	}
 
@@ -81,7 +86,12 @@ export default class TrayManager {
 			{
 				label: 'Show',
 				click: () => {
+					const wasVisible = this.mainWindow.isVisible();
 					this.mainWindow.show();
+
+					if (!wasVisible) {
+						this.mainWindow.webContents.send('refresh-from-main');
+					}
 				},
 			},
 			{

@@ -34,12 +34,14 @@ export const AppNav = ({ theme, changesMade }: any) => {
 	const handleChange = (_event: SyntheticEvent, newValue: number) => {
 		if (changesMade) window.electron.ipcRenderer.send('invoke-open-changes-made', navigateMap[newValue]);
 		else {
+			window.electron.ipcRenderer.send('set-current-page', navigateMap[newValue]);
 			setValue(newValue);
 			navigate(navigateMap[newValue]);
 		}
 	};
 
 	const pageChangeFunc = (arg: any) => {
+		window.electron.ipcRenderer.send('set-current-page', navigateMap[arg]);
 		setValue(valueMap[arg]);
 		navigate(arg);
 	};

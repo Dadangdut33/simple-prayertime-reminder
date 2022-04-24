@@ -7,7 +7,7 @@ import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import createTheme from '@mui/material/styles/createTheme';
 import ThemeProvider from '@mui/material/styles/ThemeProvider';
-import Slide from '@mui/material/Slide';
+import Fade from '@mui/material/Fade';
 
 // --------------------------
 const ColorModeContext = createContext({ toggleColorMode: () => {} });
@@ -41,11 +41,13 @@ export default function App() {
 			}),
 		[mode]
 	);
+	const splashShownValue = window.electron.ipcRenderer.sendSync('get-splash-shown') as boolean;
 
-	const [showSplash, setShowSplash] = useState(true);
-	const [showMenu, setShowMenu] = useState(false);
+	const [showSplash, setShowSplash] = useState(!splashShownValue); // first time in session true
+	const [showMenu, setShowMenu] = useState(splashShownValue); // first time in session false
 	// get theme from settings, on app start
 	useEffect(() => {
+		window.electron.ipcRenderer.send('set-splash-shown');
 		const currentConfig = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
 		setMode(currentConfig.theme);
 
@@ -63,7 +65,7 @@ export default function App() {
 			<ThemeProvider theme={theme}>
 				<Router>
 					<Splashscreen show={showSplash} theme={mode} />
-					<Slide in={showMenu} direction='down'>
+					<Fade in={showMenu}>
 						<Card sx={{ m: 1.5, backgroundColor: theme.palette.background.paper }} id={mode}>
 							<AppNav theme={mode} changesMade={changesMade} />
 							<Routes>
@@ -73,7 +75,7 @@ export default function App() {
 								<Route path='/about' element={<About />} />
 							</Routes>
 						</Card>
-					</Slide>
+					</Fade>
 				</Router>
 			</ThemeProvider>
 		</ColorModeContext.Provider>

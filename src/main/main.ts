@@ -42,7 +42,9 @@ let mainWindow: BrowserWindow | null = null,
 	},
 	autoLauncher = new autoLaunch(launcherOption),
 	menuBuilder: MenuBuilder,
-	trayManager: TrayManager;
+	trayManager: TrayManager,
+	session_shown_splash = false,
+	currentPage = '/';
 
 // -------------------------------------------------------------------------------------
 /**
@@ -314,6 +316,23 @@ ipcMain.on('invoke-page-change', (_event, arg) => {
 
 ipcMain.on('update-tray', (_event, _arg) => {
 	if (trayManager) trayManager.updatePrayTime(ptGet, appConfig);
+});
+
+// splash
+ipcMain.on('get-splash-shown', (event, _arg) => {
+	event.returnValue = session_shown_splash;
+});
+
+ipcMain.on('set-splash-shown', (_event, _arg) => {
+	session_shown_splash = true;
+});
+
+ipcMain.on('get-current-page', (event, _arg) => {
+	event.returnValue = currentPage;
+});
+
+ipcMain.on('set-current-page', (_event, arg) => {
+	currentPage = arg;
 });
 
 // ----------------------------------------------------
