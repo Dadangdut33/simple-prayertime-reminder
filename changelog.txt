@@ -1,3 +1,6 @@
+[1.0.2]
+- update timezone on start only if auto mode enabled
+
 [1.0.1]
 - fix splash screen accidentally shown on page reload 
 - refresh page when opening from tray
