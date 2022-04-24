@@ -34,6 +34,7 @@ A simple muslim prayertime reminder app for desktop. Made using [Electron](https
   - [Electron React Boilerplate Docs](#electron-react-boilerplate-docs)
   - [License](#license)
 - [Attribution](#attribution)
+- [Further help](#further-help)
 
 ---
 
@@ -66,7 +67,7 @@ This app is quite modern looking because of Material UI, it also have dark and l
 
 # Download
 - [Latest release](https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest)
-
+- [Sourceforge](https://sourceforge.net/projects/simple-prayertime-reminder/)
 
 # Installation
 1. Download the latest release from [GitHub](https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest)
@@ -138,3 +139,9 @@ MIT © [Electron React Boilerplate](https://github.com/electron-react-boilerplat
 # Attribution
 
 <a href="https://www.flaticon.com/free-icons/mosque" title="mosque icons">Mosque icons created by Freepik - Flaticon</a>
+
+# Further help
+
+- Check the [Wiki](https://github.com/Dadangdut33/simple-prayertime-reminder/wiki/)
+- Submit an [Issue](https://github.com/Dadangdut33/simple-prayertime-reminder/issues)
+- Ask in [Discussion](https://github.com/Dadangdut33/simple-prayertime-reminder/discussions)
