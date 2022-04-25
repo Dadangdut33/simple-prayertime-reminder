@@ -194,14 +194,6 @@ const createWindow = async () => {
 		if (!mainWindow) {
 			throw new Error('"mainWindow" is not defined');
 		}
-		// auto launch check
-		const checkLoginOpen = wasOpenedAtLogin();
-
-		if (checkLoginOpen) {
-			mainWindow.hide();
-		} else {
-			mainWindow.show();
-		}
 
 		// check update
 		try {
@@ -299,6 +291,15 @@ if (!gotTheLock) {
 				// dock icon is clicked and there are no other windows open.
 				if (mainWindow === null) createWindow();
 			});
+
+			// auto launch check
+			const checkLoginOpen = wasOpenedAtLogin();
+
+			if (checkLoginOpen) {
+				mainWindow!.hide();
+			} else {
+				mainWindow!.show();
+			}
 		})
 		.catch(console.log);
 }

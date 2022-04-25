@@ -1,3 +1,6 @@
+[1.0.3]
+- fix window wont show up if run on app start
+
 [1.0.2]
 - update timezone on start only if auto mode enabled
 
