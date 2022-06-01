@@ -18,6 +18,7 @@
 A simple muslim prayertime reminder app for desktop. Made using [Electron](https://electron.atom.io/) with [electron-react-boilerplate](https://github.com/electron-react-boilerplate/electron-react-boilerplate). UI are made using [Material UI](https://mui.com/).
 
 ---
+
 # Table of Contents
 
 - [Table of Contents](#table-of-contents)
@@ -39,19 +40,22 @@ A simple muslim prayertime reminder app for desktop. Made using [Electron](https
 ---
 
 # FAQ
+
 1. **Q:** Compatible platform?\
    **A:** This app can be used on Windows and Linux. It should also work on MacOS but unfortunately, I haven't tested it.
 2. **Q:** What is this app for?\
    **A:** This app works just like any other prayer time/reminder app, it shows prayer time schedule for a specific location/date and the reminder for it.
 3. **Q:** How do i get help for the user settings?\
-   **A:** You can check out the [wiki](https://github.com/Dadangdut33/simple-prayertime-reminder/wiki) on [this section](https://github.com/Dadangdut33/simple-prayertime-reminder/wiki/Options). 
+   **A:** You can check out the [wiki](https://github.com/Dadangdut33/simple-prayertime-reminder/wiki) on [this section](https://github.com/Dadangdut33/simple-prayertime-reminder/wiki/Options).
 4. **Q:** My location is incorrect help\
    **A:** You can set the location manually in the settings. For more info check on the [options](https://github.com/Dadangdut33/simple-prayertime-reminder/wiki/Options) section of the wiki.
 5. **Q:** Does this work offline?\
    **A:** Yes, the app works offline, internet connection is only needed for location detecting (there is also an offline method if an internet connection is not present) and version checking.
 
 # Showcase
-This app is quite modern looking because of Material UI, it also have dark and light theme. 
+
+This app is quite modern looking because of Material UI, it also have dark and light theme.
+
 <details open>
   <summary>Preview</summary>
   <p align="center">
@@ -66,18 +70,22 @@ This app is quite modern looking because of Material UI, it also have dark and l
 </details>
 
 # Download
-- [Latest release](https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest)
-- [Sourceforge](https://sourceforge.net/projects/simple-prayertime-reminder/)
+
+-   [Latest release](https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest)
+-   [Sourceforge](https://sourceforge.net/projects/simple-prayertime-reminder/)
 
 # Installation
+
 1. Download the latest release from [GitHub](https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest)
 2. Extract/Install
 3. Run the program
 
 # Uninstallation
+
 Run the uninstaller if you are using the installer version. If using the portable version, you can just delete the folder. **On windows**, there might be a registry left behind that you can delete if want to by going to regedit and delete the `Simple PrayerTime Reminder` registry on `\HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run`.
 
 # Customization
+
 Check the [wiki](https://github.com/Dadangdut33/simple-prayertime-reminder/wiki) for more information.
 
 # Developing
@@ -92,6 +100,7 @@ Check the [wiki](https://github.com/Dadangdut33/simple-prayertime-reminder/wiki)
 ## Starting Development
 
 Install all the packages:
+
 ```
 npm install
 ```
@@ -110,7 +119,7 @@ To package apps for the local platform:
 npm run package
 ```
 
-This will compile the app into the `release` folder. 
+This will compile the app into the `release` folder.
 
 **To compile the app into a certain architecture/platform**, you can add extra options to the `package` command, ex:
 
@@ -119,12 +128,13 @@ npm run package --win --ia32
 
 # If npm does not work, try to use yarn
 yarn package --win --ia32
-``` 
+```
 
-For commands list you can check in the [official electron builder website](https://www.electron.build/cli) 
+For commands list you can check in the [official electron builder website](https://www.electron.build/cli)
 
 ## Further Instructions
-You can check this repo's [wiki](https://github.com/Dadangdut33/simple-prayertime-reminder/wiki) or You can ask in [discussions](https://github.com/Dadangdut33/simple-prayertime-reminder/discussions) 
+
+You can check this repo's [wiki](https://github.com/Dadangdut33/simple-prayertime-reminder/wiki) or You can ask in [discussions](https://github.com/Dadangdut33/simple-prayertime-reminder/discussions)
 
 ## Electron React Boilerplate Docs
 
@@ -132,16 +142,17 @@ See Electron React Boilerplate [docs and guides here](https://electron-react-boi
 
 ## License
 
-MIT © [Dadangdut33](https://github.com/Dadangdut33/simple-prayertime-reminder/blob/main/LICENSE) and 
+MIT © [Dadangdut33](https://github.com/Dadangdut33/simple-prayertime-reminder/blob/main/LICENSE) and
 MIT © [Electron React Boilerplate](https://github.com/electron-react-boilerplate)
 
-
 # Attribution
+
+<a href="https://youtu.be/iaWZ_3D6vOQ">Adhan uploaded by Ayat Via Youtube</a>
 
 <a href="https://www.flaticon.com/free-icons/mosque" title="mosque icons">Mosque icons created by Freepik - Flaticon</a>
 
 # Further help
 
-- Check the [Wiki](https://github.com/Dadangdut33/simple-prayertime-reminder/wiki/)
-- Submit an [Issue](https://github.com/Dadangdut33/simple-prayertime-reminder/issues)
-- Ask in [Discussion](https://github.com/Dadangdut33/simple-prayertime-reminder/discussions)
+-   Check the [Wiki](https://github.com/Dadangdut33/simple-prayertime-reminder/wiki/)
+-   Submit an [Issue](https://github.com/Dadangdut33/simple-prayertime-reminder/issues)
+-   Ask in [Discussion](https://github.com/Dadangdut33/simple-prayertime-reminder/discussions)
