@@ -275,7 +275,7 @@ if (!gotTheLock) {
 	app.whenReady()
 		.then(async () => {
 			await checkConfigOnStart();
-			createWindow();
+			await createWindow();
 
 			// get iconPath
 			iconPath = getAssetPath('icon.png');
