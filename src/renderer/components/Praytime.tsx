@@ -148,6 +148,10 @@ export const Praytime = ({ theme }: any) => {
 
 	// ---------------------------------------------------------
 	useEffect(() => {
+		// get chip state from localstorage
+		const chipState = localStorage.getItem('chip-state');
+		if (chipState === 'true') setChipExpanded(true);
+
 		// Timer shown
 		let timer_clock_Interval: NodeJS.Timer;
 		let toExactSecond = 1000 - (new Date().getTime() % 1000);
@@ -183,7 +187,8 @@ export const Praytime = ({ theme }: any) => {
 	// ---------------------------------------------------------
 	// extra / show all
 	const chipClick = () => {
-		console.info('You clicked the Chip.');
+		// save the state in local storage
+		localStorage.setItem('chip-state', JSON.stringify(!chipExpanded));
 		setChipExpanded(!chipExpanded);
 	};
 
