@@ -19,6 +19,12 @@ body {
 }
 
 /* --------------------------- */
+/* chip */
+#chip-expand span.MuiChip-label {
+	padding-left: 0px !important;
+}
+
+/* --------------------------- */
 /* splash */
 .splash-img {
 	max-width: 400px;

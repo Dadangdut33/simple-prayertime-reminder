@@ -11,13 +11,21 @@ import 'react-clock/dist/Clock.css';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Fade from '@mui/material/Fade';
+import Stack from '@mui/material/Stack';
+import Divider from '@mui/material/Divider';
+import Chip from '@mui/material/Chip';
+import Collapse from '@mui/material/Collapse';
 
 // Icons
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 
 // Date parser
 import Moment from 'moment-timezone';
+const moment = require('moment-hijri');
+moment.locale('en');
 
 export const Praytime = ({ theme }: any) => {
 	// ----------------------------------------------------------------------------------------------------------------------
@@ -27,11 +35,14 @@ export const Praytime = ({ theme }: any) => {
 	const appSettings = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
 
 	// clock
-	const [clockValue, setClockValue] = useState(new Date());
+	const [clockValueNow, setClockValueNow] = useState(new Date());
 	const [randomColorList, setRandomColorList] = useState<ColorHex[]>([]);
 	const [colorChangeSecondsList, setColorChangeSecondsList] = useState<number[]>([]);
 	const forbiddenColor = ['#dfdfdf', '#d9d9d9', '#e9e9e9', '#e2e2e2', '#dadada', '#e1e1d7', '#deb4ac', '#db918a', '#82c0c2']; // Mostly gray
 	const amountDivider = 75;
+
+	// chip shrink expand
+	const [chipExpanded, setChipExpanded] = useState(false);
 
 	// ----------------------------------------------------------------------------------------------------------------------
 	const pt_Map: any = {
@@ -143,12 +154,12 @@ export const Praytime = ({ theme }: any) => {
 		let timeoutTimer = setTimeout(() => {
 			timer_clock_Interval = setInterval(() => {
 				// update clock value
-				setClockValue(new Date());
+				setClockValueNow(new Date());
 				// update timer value
 				setRemainTimeFunc();
 			}, 1000);
 
-			setClockValue(new Date());
+			setClockValueNow(new Date());
 			setRemainTimeFunc();
 		}, toExactSecond); // match second
 
@@ -168,6 +179,13 @@ export const Praytime = ({ theme }: any) => {
 			clearInterval(timer_clock_Interval);
 		};
 	}, []);
+
+	// ---------------------------------------------------------
+	// extra / show all
+	const chipClick = () => {
+		console.info('You clicked the Chip.');
+		setChipExpanded(!chipExpanded);
+	};
 
 	// ==========================================================
 	return (
@@ -216,7 +234,7 @@ export const Praytime = ({ theme }: any) => {
 							}}
 						/>
 						<div className='analogue' id={theme}>
-							<Clock value={clockValue} renderNumbers={true} size={250} minuteHandWidth={3} hourHandWidth={5} secondHandWidth={2} />
+							<Clock value={clockValueNow} renderNumbers={true} size={250} minuteHandWidth={3} hourHandWidth={5} secondHandWidth={2} />
 						</div>
 					</Box>
 
@@ -253,6 +271,77 @@ export const Praytime = ({ theme }: any) => {
 							</p>
 						</Box>
 					</Box>
+
+					<Divider style={{ width: '50%' }}>
+						<Chip icon={chipExpanded ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />} onClick={chipClick} id='chip-expand' />
+					</Divider>
+
+					<Collapse in={chipExpanded}>
+						<Box sx={{ display: 'flex', flexDirection: 'column', mt: 3 }}>
+							<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'start' }}>
+								{Moment(clockValueNow).tz(timezone).format('dddd, D MMMM YYYY')} -{' '}
+								<span className='subtle-text' style={{ marginLeft: '3px' }}>
+									{appSettings.hijriCalendarOffset < 0
+										? moment(clockValueNow).subtract(Math.abs(appSettings.hijriCalendarOffset), 'days').tz(timezone).format('iD iMMMM iYYYY')
+										: moment(clockValueNow).add(appSettings.hijriCalendarOffset, 'days').tz(timezone).format('iD iMMMM iYYYY')}
+								</span>
+							</Box>
+							<Stack direction='row' divider={<Divider orientation='vertical' flexItem />} spacing={2} sx={{ mt: 3, justifyContent: 'space-between' }}>
+								<Box sx={{ display: 'flex', flexDirection: 'column' }}>
+									<div>
+										<strong>
+											{Moment(new Date(currentPt.fajrTime))
+												.tz(timezone)
+												.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
+										</strong>
+										<span className={currentPt.current === 'fajr' ? 'prayername' : 'prayername subtle-text'}>Fajr</span>
+									</div>
+									<div>
+										<strong>
+											{Moment(new Date(currentPt.sunriseTime))
+												.tz(timezone)
+												.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
+										</strong>
+										<span className={currentPt.current === 'sunrise' ? 'prayername' : 'prayername subtle-text'}>Sunrise</span>
+									</div>
+									<div>
+										<strong>
+											{Moment(new Date(currentPt.dhuhrTime))
+												.tz(timezone)
+												.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
+										</strong>
+										<span className={currentPt.current === 'dhuhr' ? 'prayername' : 'prayername subtle-text'}>Dhuhr</span>
+									</div>
+								</Box>
+								<Box sx={{ display: 'flex', flexDirection: 'column' }}>
+									<div>
+										<strong>
+											{Moment(new Date(currentPt.asrTime))
+												.tz(timezone)
+												.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
+										</strong>
+										<span className={currentPt.current === 'asr' ? 'prayername' : 'prayername subtle-text'}>Asr</span>
+									</div>
+									<div>
+										<strong>
+											{Moment(new Date(currentPt.maghribTime))
+												.tz(timezone)
+												.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
+										</strong>
+										<span className={currentPt.current === 'maghrib' ? 'prayername' : 'prayername subtle-text'}>Maghrib</span>
+									</div>
+									<div>
+										<strong>
+											{Moment(new Date(currentPt.ishaTime))
+												.tz(timezone)
+												.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
+										</strong>
+										<span className={currentPt.current === 'isha' ? 'prayername' : 'prayername subtle-text'}>Isha</span>
+									</div>
+								</Box>
+							</Stack>
+						</Box>
+					</Collapse>
 				</Box>
 			</Fade>
 		</>

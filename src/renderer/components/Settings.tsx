@@ -1033,7 +1033,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 										<FormControl sx={{ mt: 2, ml: 3 }} component='fieldset' variant='standard'>
 											<Tooltip title='Will show up reminder as a interruptive message box' placement='top' arrow>
-												<FormLabel component='legend'>Intrusive notification</FormLabel>
+												<FormLabel component='legend'>Popup notification</FormLabel>
 											</Tooltip>
 											<FormGroup>
 												<FormControlLabel control={<Checkbox checked={remind_fajr_intrusive} onChange={(e) => handleIntrusiveChange(e as any, 'fajr')} />} label='Fajr' />
