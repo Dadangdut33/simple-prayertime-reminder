@@ -2,6 +2,9 @@ import fetch from 'electron-fetch';
 import { configInterface, getPosition_absolute_I } from 'main/interfaces';
 const cities = require('all-the-cities');
 
+/**
+ * @deprecated The method should not be used
+ */
 export const verifyKey = async (key: string) => {
 	const url = `https://api.freegeoip.app/json/?apikey=${key}`;
 	let success = true,
@@ -27,17 +30,12 @@ export const verifyKey = async (key: string) => {
 	}
 };
 
-export const getLatLong = async (config: configInterface) => {
-	const url = `https://api.freegeoip.app/json/?apikey=${config.geoLocAPIKey.mode === 'manual' ? config.geoLocAPIKey.key : `074b03c0-b9a6-11ec-a359-d768e44d2b27`}`;
+export const getLatLong = async () => {
+	const url = `http://www.geoplugin.net/json.gp`;
 	let success = true,
 		data;
 	try {
 		const res = await fetch(url);
-		/**
-		 * Possible case:
-		 * - Invalid authentication credentials
-		 * - No API key found in request (Should not actually happen)
-		 */
 		if (res.status !== 200) success = false;
 
 		data = await res.json();
@@ -62,8 +60,8 @@ export const getLatLong_FromCitiesName = (citySearch: string) => {
 	return { success, result };
 };
 
-export const getPosition_absolute = async (appConfig: configInterface): Promise<getPosition_absolute_I> => {
-	const dataPos = await getLatLong(appConfig);
+export const getPosition_absolute = async (_appConfig: configInterface): Promise<getPosition_absolute_I> => {
+	const dataPos = await getLatLong();
 	let city = '',
 		latitude = '0',
 		longitude = '0';
@@ -79,9 +77,9 @@ export const getPosition_absolute = async (appConfig: configInterface): Promise<
 		}
 	} else {
 		// successfully get lat long from the api
-		city = dataPos.data.city;
-		latitude = dataPos.data.latitude;
-		longitude = dataPos.data.longitude;
+		city = dataPos.data.geoplugin_city;
+		latitude = dataPos.data.geoplugin_latitude;
+		longitude = dataPos.data.geoplugin_longitude;
 	}
 
 	return { city, latitude, longitude };

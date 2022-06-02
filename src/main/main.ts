@@ -42,6 +42,8 @@ let mainWindow: BrowserWindow | null = null,
 	},
 	autoLauncher = new autoLaunch(launcherOption),
 	player = require('play-sound')({}),
+	adhanPath = '',
+	adhanFajrPath = '',
 	menuBuilder: MenuBuilder,
 	trayManager: TrayManager,
 	session_shown_splash = false,
@@ -131,28 +133,22 @@ const checkConfigOnStart = async () => {
 		}
 	} else appConfig = data as configInterface;
 
-	// ------------------------
-	// update location on app start if enabled
-	if (appConfig.locationOption.updateEveryStartup) {
-		const { city, latitude, longitude } = await getPosition_absolute(appConfig);
-		appConfig.locationOption.city = city;
-		appConfig.locationOption.latitude = latitude;
-		appConfig.locationOption.longitude = longitude;
-
-		writeConfig('app', appConfig);
-	}
-
 	// get pt
 	updatePt();
 };
 
 const updateLocationOnStart = async () => {
-	const { city, latitude, longitude } = await getPosition_absolute(appConfig);
-	appConfig.locationOption.city = city;
-	appConfig.locationOption.latitude = latitude;
-	appConfig.locationOption.longitude = longitude;
+	// update location if auto and enabled
+	if (appConfig.locationOption.mode === 'auto') {
+		if (appConfig.locationOption.updateEveryStartup) {
+			const { city, latitude, longitude } = await getPosition_absolute(appConfig);
+			appConfig.locationOption.city = city;
+			appConfig.locationOption.latitude = latitude;
+			appConfig.locationOption.longitude = longitude;
 
-	writeConfig('app', appConfig);
+			writeConfig('app', appConfig);
+		}
+	}
 };
 
 const updateTimezoneOnStart = () => {
@@ -223,9 +219,7 @@ const createWindow = async () => {
 		} catch {}
 
 		updateTimezoneOnStart();
-
-		// update location if auto and enabled
-		if (appConfig.locationOption.mode === 'auto') if (appConfig.locationOption.updateEveryStartup) updateLocationOnStart();
+		updateLocationOnStart();
 	});
 
 	mainWindow.on('close', (event: any) => {
@@ -278,8 +272,10 @@ if (!gotTheLock) {
 			await checkConfigOnStart();
 			await createWindow();
 
-			// get iconPath
+			// get paths
 			iconPath = getAssetPath('icon.png');
+			adhanPath = getAssetPath('adhan.mp3');
+			adhanFajrPath = getAssetPath('adhan_fajr.mp3');
 
 			// start notification interval
 			notifyInterval();
@@ -413,6 +409,9 @@ ipcMain.on('get-tz-list', (event, _arg) => {
 
 // -----------
 // api key
+/**
+ * @deprecated The method should not be used
+ */
 ipcMain.on('verify-geoloc-key', async (event, arg) => {
 	const { success, data } = await verifyKey(arg);
 	event.returnValue = { success, data };

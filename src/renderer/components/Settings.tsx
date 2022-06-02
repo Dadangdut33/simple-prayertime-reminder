@@ -48,7 +48,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
 import Button from '@mui/material/Button';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
-import KeyIcon from '@mui/icons-material/Key';
+// import KeyIcon from '@mui/icons-material/Key';
 import MiscellaneousServicesOutlinedIcon from '@mui/icons-material/MiscellaneousServicesOutlined';
 import CalculateOutlinedIcon from '@mui/icons-material/CalculateOutlined';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
@@ -376,33 +376,33 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	// --------------------------------------------------------------------------
 	// geoloc
-	const [geolocMode, setGeolocMode] = useState<'auto' | 'manual'>(currentConfig.geoLocAPIKey.mode);
-	const [geolocKey, setGeolocKey] = useState<string>(currentConfig.geoLocAPIKey.key);
+	// const [geolocMode, setGeolocMode] = useState<'auto' | 'manual'>(currentConfig.geoLocAPIKey.mode);
+	// const [geolocKey, setGeolocKey] = useState<string>(currentConfig.geoLocAPIKey.key);
 
-	const handleGeolocModeChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setGeolocMode(e.target.value as 'auto' | 'manual');
+	// const handleGeolocModeChange = (e: ChangeEvent<HTMLInputElement>) => {
+	// 	setGeolocMode(e.target.value as 'auto' | 'manual');
 
-		if (e.target.value === 'auto') setGeolocKey('');
-		checkChanges();
-	};
+	// 	if (e.target.value === 'auto') setGeolocKey('');
+	// 	checkChanges();
+	// };
 
-	const handleGeolocKeyChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setGeolocKey(e.target.value);
-		checkChanges();
-	};
+	// const handleGeolocKeyChange = (e: ChangeEvent<HTMLInputElement>) => {
+	// 	setGeolocKey(e.target.value);
+	// 	checkChanges();
+	// };
 
-	const verifyKey = () => {
-		const { success, data }: any = window.electron.ipcRenderer.sendSync('verify-geoloc-key', geolocKey);
-		if (success) {
-			setShowSnackbar(true);
-			setSnackbarSeverity('success');
-			setSnackbarMsg('API key verified successfully!');
-		} else {
-			setShowSnackbar(true);
-			setSnackbarSeverity('error');
-			setSnackbarMsg(data.message ? data.message : data); // error message
-		}
-	};
+	// const verifyKey = () => {
+	// 	const { success, data }: any = window.electron.ipcRenderer.sendSync('verify-geoloc-key', geolocKey);
+	// 	if (success) {
+	// 		setShowSnackbar(true);
+	// 		setSnackbarSeverity('success');
+	// 		setSnackbarMsg('API key verified successfully!');
+	// 	} else {
+	// 		setShowSnackbar(true);
+	// 		setSnackbarSeverity('error');
+	// 		setSnackbarMsg(data.message ? data.message : data); // error message
+	// 	}
+	// };
 
 	// --------------------------------------------------------------------------
 
@@ -539,8 +539,8 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		setLocUpdateEveryStartup(initialConfig.locationOption.updateEveryStartup);
 		setTzMode(initialConfig.timezoneOption.mode);
 		setTimezone(initialConfig.timezoneOption.timezone);
-		setGeolocMode(initialConfig.geoLocAPIKey.mode);
-		setGeolocKey(initialConfig.geoLocAPIKey.key);
+		// setGeolocMode(initialConfig.geoLocAPIKey.mode);
+		// setGeolocKey(initialConfig.geoLocAPIKey.key);
 		setRunAtStartup(initialConfig.runAtStartup);
 		setcheckUpdateStartup(initialConfig.checkUpdateAtStartup);
 		setClockStyle(initialConfig.clockStyle);
@@ -606,8 +606,8 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		currentConfig.locationOption.updateEveryStartup = locUpdateEveryStartup;
 		currentConfig.timezoneOption.mode = tzMode;
 		currentConfig.timezoneOption.timezone = timezone;
-		currentConfig.geoLocAPIKey.mode = geolocMode;
-		currentConfig.geoLocAPIKey.key = geolocKey;
+		// currentConfig.geoLocAPIKey.mode = geolocMode;
+		// currentConfig.geoLocAPIKey.key = geolocKey;
 		currentConfig.runAtStartup = runAtStartup;
 		currentConfig.checkUpdateAtStartup = checkUpdateStartup;
 		currentConfig.clockStyle = clockStyle;
@@ -739,6 +739,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 									<FormControl fullWidth sx={{ mt: 1, mb: 1 }}>
 										<InputLabel id='calc-method'>Calculation Method</InputLabel>
 										<Select
+											size='small'
 											labelId='calc-method'
 											value={calcOptMethod}
 											label='Calculation Method'
@@ -756,6 +757,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 									<FormControl fullWidth sx={{ mt: 1, mb: 1 }}>
 										<InputLabel id='madhab-select'>Madhab</InputLabel>
 										<Select
+											size='small'
 											labelId='madhab-select'
 											value={calcOptMadhab}
 											label='Madhab'
@@ -773,6 +775,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 									<FormControl fullWidth sx={{ mt: 1, mb: 1 }}>
 										<InputLabel id='highlat-select'>High Latitude Adjustment</InputLabel>
 										<Select
+											size='small'
 											labelId='highlat-select'
 											value={calcOptHighLatRule}
 											label='High Latitude Adjustment'
@@ -1073,7 +1076,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 										</FormControl>
 
 										<FormControl sx={{ mt: 2, ml: 3 }} component='fieldset' variant='standard'>
-											<Tooltip title='Will show up reminder as a interruptive message box' placement='top' arrow>
+											<Tooltip title='Will show up reminder as an interruptive message box' placement='top' arrow>
 												<FormLabel component='legend'>Popup notification</FormLabel>
 											</Tooltip>
 											<FormGroup>
@@ -1095,7 +1098,74 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 					<Divider sx={{ mt: 2, mb: 2 }} />
 					<Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
 						{/* ------------------------------------- */}
-						{/* Timezone & API Keys */}
+						{/* location */}
+						<Grid item xs={6}>
+							<div
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									flexWrap: 'wrap',
+								}}
+							>
+								<LocationOnOutlinedIcon color='primary' /> <h3 style={{ paddingLeft: '.5rem' }}>Location options</h3>
+							</div>
+							<Box
+								component={'form'}
+								noValidate
+								autoComplete='off'
+								sx={{
+									display: 'flex',
+									flexDirection: 'column',
+									'& .MuiTextField-root': { m: 1, ml: 0.5 },
+								}}
+							>
+								<FormControl>
+									<FormLabel id='location-mode-formlabel' sx={{ ml: 0.5 }}>
+										Mode
+									</FormLabel>
+									<RadioGroup sx={{ ml: 0.5 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={locMode} onChange={handleLocModeChange}>
+										<FormControlLabel value='auto' control={<Radio />} label='Auto' />
+										<FormControlLabel value='manual' control={<Radio />} label='Manual' />
+										<Tooltip title='Click to sync location automatically. Data are fetched from geoplugin.net' arrow>
+											<IconButton aria-label='sync' disabled={locMode === 'manual' ? true : false} onClick={getCityLatLang_Auto}>
+												<SyncIcon />
+											</IconButton>
+										</Tooltip>
+									</RadioGroup>
+
+									<TextField
+										id='city'
+										label='City'
+										variant='outlined'
+										size='small'
+										value={locCity}
+										onChange={handleCityChange}
+										disabled={locMode === 'auto' ? true : false}
+										InputProps={{
+											endAdornment: (
+												<Tooltip title="Click to search for inputted city's latitude/langitude" placement='top' arrow>
+													<InputAdornment position='end'>
+														<IconButton aria-label="Get inputted city's lattitude/langitude" onClick={getCityLatLang_Manual} edge='end' disabled={locMode === 'auto' ? true : false}>
+															<SearchIcon />
+														</IconButton>
+													</InputAdornment>
+												</Tooltip>
+											),
+										}}
+									/>
+									<TextField id='Latitude' label='latitude' variant='outlined' size='small' value={locLat} onChange={handleLatChange} disabled={locMode === 'auto' ? true : false} />
+									<TextField id='Longitude' label='longitude' variant='outlined' size='small' value={locLang} onChange={handleLangChange} disabled={locMode === 'auto' ? true : false} />
+									<Tooltip title='*Will only update if auto mode is enabled' arrow>
+										<FormControlLabel
+											control={<Checkbox sx={{ ml: 0.5 }} checked={locUpdateEveryStartup} onChange={handleLocUpdateEveryStartupChange} disabled={locMode === 'auto' ? false : true} />}
+											label='Update location on app start'
+										/>
+									</Tooltip>
+								</FormControl>
+							</Box>
+						</Grid>
+						{/* ------------------------------------- */}
+						{/* Timezone */}
 						<Grid item xs={6}>
 							<div
 								style={{
@@ -1136,17 +1206,14 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 											renderInput={(params) => <TextField {...params} label='Timezone' />}
 											disabled={tzMode === 'auto' ? true : false}
 											autoHighlight
-											sx={{
-												width: '98.5%',
-											}}
 										/>
 									</FormControl>
 								</FormControl>
 							</Box>
 
-							<Divider sx={{ pt: 2 }} />
+							{/* <Divider sx={{ pt: 2 }} /> */}
 							{/* api keys */}
-							<div
+							{/* <div
 								style={{
 									display: 'flex',
 									alignItems: 'center',
@@ -1195,74 +1262,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 										}}
 									/>
 								</FormControl>
-							</Box>
-						</Grid>
-						{/* ------------------------------------- */}
-						{/* location */}
-						<Grid item xs={6}>
-							<div
-								style={{
-									display: 'flex',
-									alignItems: 'center',
-									flexWrap: 'wrap',
-								}}
-							>
-								<LocationOnOutlinedIcon color='primary' /> <h3 style={{ paddingLeft: '.5rem' }}>Location options</h3>
-							</div>
-							<Box
-								component={'form'}
-								noValidate
-								autoComplete='off'
-								sx={{
-									display: 'flex',
-									flexDirection: 'column',
-									'& .MuiTextField-root': { m: 1, ml: 0.5 },
-								}}
-							>
-								<FormControl>
-									<FormLabel id='location-mode-formlabel' sx={{ ml: 0.5 }}>
-										Mode
-									</FormLabel>
-									<RadioGroup sx={{ ml: 0.5 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={locMode} onChange={handleLocModeChange}>
-										<FormControlLabel value='auto' control={<Radio />} label='Auto' />
-										<FormControlLabel value='manual' control={<Radio />} label='Manual' />
-										<Tooltip title='Click to sync location automatically' arrow>
-											<IconButton aria-label='delete' disabled={locMode === 'manual' ? true : false} onClick={getCityLatLang_Auto}>
-												<SyncIcon />
-											</IconButton>
-										</Tooltip>
-									</RadioGroup>
-
-									<TextField
-										id='city'
-										label='City'
-										variant='outlined'
-										size='small'
-										value={locCity}
-										onChange={handleCityChange}
-										disabled={locMode === 'auto' ? true : false}
-										InputProps={{
-											endAdornment: (
-												<Tooltip title="Click to search for inputted city's latitude/langitude" placement='top' arrow>
-													<InputAdornment position='end'>
-														<IconButton aria-label="Get inputted city's lattitude/langitude" onClick={getCityLatLang_Manual} edge='end' disabled={locMode === 'auto' ? true : false}>
-															<SearchIcon />
-														</IconButton>
-													</InputAdornment>
-												</Tooltip>
-											),
-										}}
-									/>
-									<TextField id='Latitude' label='latitude' variant='outlined' size='small' value={locLat} onChange={handleLatChange} disabled={locMode === 'auto' ? true : false} />
-									<TextField id='Longitude' label='longitude' variant='outlined' size='small' value={locLang} onChange={handleLangChange} disabled={locMode === 'auto' ? true : false} />
-									<Tooltip title='*Will only update if auto mode is enabled' arrow>
-										<FormControlLabel
-											control={<Checkbox sx={{ ml: 0.5 }} checked={locUpdateEveryStartup} onChange={handleLocUpdateEveryStartupChange} disabled={locMode === 'auto' ? false : true} />}
-											label='Update location on app start'
-										/>
-									</Tooltip>
-								</FormControl>
-							</Box>
+							</Box> */}
 						</Grid>
 					</Grid>
 					{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}

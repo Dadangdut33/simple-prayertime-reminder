@@ -75,8 +75,9 @@ export const initialConfig: configInterface = {
 		},
 	},
 	geoLocAPIKey: {
+		// deprecated
 		mode: 'auto',
-		key: '', // get from https://freegeoip.app/
+		key: '',
 	},
 	runAtStartup: true,
 	clockStyle: 'AM/PM',
