@@ -14,6 +14,7 @@ import MuiAlert, { AlertProps } from '@mui/material/Alert';
 const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) {
 	return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
 });
+import CircularProgress from '@mui/material/CircularProgress';
 
 // Form
 import IconButton from '@mui/material/IconButton';
@@ -53,6 +54,11 @@ import CalculateOutlinedIcon from '@mui/icons-material/CalculateOutlined';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 
 export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) => {
+	// helper
+	const sleep = (time: number) => {
+		return new Promise((resolve) => setTimeout(resolve, time));
+	};
+
 	// config on tab open
 	const initialConfig = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
 	const [currentConfig, setCurrentConfig] = useState<configInterface>(window.electron.ipcRenderer.sendSync('get-config') as configInterface); // current config
@@ -235,7 +241,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	const [locLat, setLocLat] = useState(currentConfig.locationOption.latitude);
 	const [locLang, setLocLang] = useState(currentConfig.locationOption.longitude);
 	const [locUpdateEveryStartup, setLocUpdateEveryStartup] = useState(currentConfig.locationOption.updateEveryStartup);
-	const handleLocModeChange = (e: ChangeEvent<HTMLInputElement>) => {
+	const handleLocModeChange = async (e: ChangeEvent<HTMLInputElement>) => {
 		setLocMode(e.target.value as 'auto' | 'manual');
 		// if auto, fetch location
 		if (e.target.value === 'auto') {
@@ -244,10 +250,21 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 				setLocLat(currentConfig.locationOption.latitude);
 				setLocLang(currentConfig.locationOption.longitude);
 			} else {
+				setSnackbarLoading(true);
+				setShowSnackbar(true);
+				setSnackbarMsg('Fetching location. Please wait...');
+				setSnackbarSeverity('info');
+				await sleep(100);
+				// get data
 				const { city, latitude, longitude } = window.electron.ipcRenderer.sendSync('get-location-auto', currentConfig) as getPosition_absolute_I;
+
 				setLocCity(city);
 				setLocLat(latitude);
 				setLocLang(longitude);
+
+				// snackbar
+				setSnackbarLoading(false);
+				setShowSnackbar(false);
 			}
 		}
 		checkChanges();
@@ -273,9 +290,16 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		checkChanges();
 	};
 
-	const getCityLatLang_Auto = () => {
+	const getCityLatLang_Auto = async () => {
+		setSnackbarLoading(true);
+		setShowSnackbar(true);
+		setSnackbarMsg('Fetching location. Please wait...');
+		setSnackbarSeverity('info');
+
+		await sleep(100);
 		const { city, latitude, longitude, successGet } = window.electron.ipcRenderer.sendSync('get-location-auto', currentConfig) as getPosition_absolute_I;
 
+		setSnackbarLoading(false);
 		if (successGet) {
 			setLocCity(city);
 			setLocLat(latitude);
@@ -294,8 +318,16 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		}
 	};
 
-	const getCityLatLang_Manual = () => {
+	const getCityLatLang_Manual = async () => {
+		setSnackbarLoading(true);
+		setShowSnackbar(true);
+		setSnackbarMsg('Fetching location. Please wait...');
+		setSnackbarSeverity('info');
+
+		await sleep(100);
 		const { success, result }: any = window.electron.ipcRenderer.sendSync('get-location-manual', locCity);
+
+		setSnackbarLoading(false);
 		if (!success) {
 			setShowSnackbar(true);
 			setSnackbarSeverity('error');
@@ -424,6 +456,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	// --------------------------------------------------------------------------
 	// snackbar
+	const [snackbarLoading, setSnackbarLoading] = useState(false);
 	const [showSnackbar, setShowSnackbar] = useState<boolean>(false);
 	const [snackbarMsg, setSnackbarMsg] = useState<string>('');
 	const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'info' | 'warning' | 'error'>('info');
@@ -584,12 +617,19 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	};
 
 	// save config
-	const saveTheConfig = () => {
+	const saveTheConfig = async () => {
+		setSnackbarLoading(true);
+		setShowSnackbar(true);
+		setSnackbarMsg('Saving changes...');
+		setSnackbarSeverity('info');
+
+		await sleep(100);
 		// update config
 		storeConfig();
 		// save config
 		const result = window.electron.ipcRenderer.sendSync('save-config', currentConfig);
 
+		setSnackbarLoading(false);
 		if (result) {
 			// if success
 			// reset changed
@@ -646,8 +686,9 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 				</DialogActions>
 			</Dialog>
 			{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-			<Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'left' }} open={showSnackbar} autoHideDuration={3500} onClose={handleSnackbarClose}>
+			<Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'left' }} open={showSnackbar} autoHideDuration={snackbarLoading ? null : 3500} onClose={handleSnackbarClose}>
 				<Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+					{snackbarLoading ? <CircularProgress sx={{ mr: 0.75 }} color={'secondary'} size={10} /> : null}
 					{snackbarMsg}
 				</Alert>
 			</Snackbar>
