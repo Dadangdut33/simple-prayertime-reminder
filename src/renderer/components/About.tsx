@@ -18,14 +18,13 @@ import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlin
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import ForkLeftIcon from '@mui/icons-material/ForkLeft';
 import FreeBreakfastOutlinedIcon from '@mui/icons-material/FreeBreakfastOutlined';
+import DownloadIcon from '@mui/icons-material/Download';
 
 export const About = () => {
 	const [version, setVersion] = useState('');
 	const [newerAvailable, setNewerAvailable] = useState('Click to check');
 
 	const checkVersion = () => {
-		if (newerAvailable === 'You are using the latest version.') return;
-
 		if (newerAvailable === 'Click to check') {
 			// check latest version from github
 			fetch('https://api.github.com/repos/Dadangdut33/simple-prayertime-reminder/releases/latest')
@@ -33,13 +32,11 @@ export const About = () => {
 				.then((data) => {
 					let latestVer = data.tag_name;
 					if (latestVer > version) {
-						setNewerAvailable(`New version available (${latestVer})! Click to go to download page`);
+						setNewerAvailable(`New version available (${latestVer})!`);
 					} else {
 						setNewerAvailable('You are using the latest version.');
 					}
 				});
-		} else {
-			window.electron.ipcRenderer.send('open-external-url', 'https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest');
 		}
 	};
 
@@ -180,7 +177,14 @@ export const About = () => {
 								Current version: <strong>{version}</strong> | Latest version available:{' '}
 								<span className={newerAvailable === 'Click to check' ? 'checkver-span' : ``} onClick={() => checkVersion()}>
 									{newerAvailable}
-								</span>
+								</span>{' '}
+								{newerAvailable.includes('New version available') ? (
+									<Tooltip title='Click to go to download page' arrow>
+										<Link href='https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest' target='_blank' rel='noreferrer' underline='hover'>
+											<DownloadIcon color='primary' fontSize='small' />
+										</Link>
+									</Tooltip>
+								) : null}
 							</p>
 							<a target={'_blank'} rel='noreferrer' href='https://github.com/Dadangdut33/simple-prayertime-reminder/commits/main'>
 								<img alt={`GitHub commits since ${version}`} src={`https://img.shields.io/github/commits-since/Dadangdut33/simple-prayertime-reminder/${version}`} className='commit-since' />
