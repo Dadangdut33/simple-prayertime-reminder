@@ -72,7 +72,7 @@ export function prayerTime_IntrusiveNotification(title: string, msg: string, ico
 			icon: icon,
 		});
 	else
-		dialog.showMessageBoxSync({
+		dialog.showMessageBox({
 			title: title,
 			buttons: ['Ok'],
 			type: 'info',
