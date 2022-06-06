@@ -25,6 +25,13 @@ body {
 }
 
 /* --------------------------- */
+/* modal */
+.modal-icon {
+	width: 150px;
+	border-radius: 50%;
+}
+
+/* --------------------------- */
 /* splash */
 .splash-img {
 	max-width: 400px;

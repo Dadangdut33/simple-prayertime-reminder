@@ -1,7 +1,7 @@
 import './App.css';
 import './Font.css';
 import { configInterface } from 'main/interfaces';
-import { Splashscreen, AppNav, Praytime, Settings, Schedule, About } from './components';
+import { Splashscreen, ModalPraytime, AppNav, Praytime, Settings, Schedule, About } from './components';
 import { useState, useEffect, useMemo, createContext } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import Card from '@mui/material/Card';
@@ -65,6 +65,7 @@ export default function App() {
 			<ThemeProvider theme={theme}>
 				<Router>
 					<Splashscreen show={showSplash} theme={mode} />
+					<ModalPraytime />
 					<Fade in={showMenu}>
 						<Card sx={{ m: 1.5, backgroundColor: theme.palette.background.paper }} id={mode}>
 							<AppNav theme={mode} changesMade={changesMade} />
