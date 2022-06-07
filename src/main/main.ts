@@ -42,9 +42,7 @@ let mainWindow: BrowserWindow | null = null,
 		isHidden: true,
 	},
 	autoLauncher = new autoLaunch(launcherOption),
-	player = require('play-sound')({}),
 	modalTimeout: NodeJS.Timeout,
-	currentAudioPlaying: any = null,
 	adhanPath = '',
 	adhanFajrPath = '',
 	menuBuilder: MenuBuilder,
@@ -175,6 +173,8 @@ const createWindow = async () => {
 		icon: getAssetPath('icon.png'),
 		webPreferences: {
 			preload: app.isPackaged ? path.join(__dirname, 'preload.js') : path.join(__dirname, '../../.erb/dll/preload.js'),
+			webSecurity: false,
+			allowRunningInsecureContent: true,
 		},
 	});
 
@@ -280,6 +280,8 @@ if (!gotTheLock) {
 			adhanPath = getAssetPath('adhan.mp3');
 			adhanFajrPath = getAssetPath('adhan_fajr.mp3');
 
+			console.log(adhanPath);
+
 			// start notification interval
 			notifyInterval();
 
@@ -322,6 +324,16 @@ ipcMain.on('update-tray', (_event, _arg) => {
 });
 
 // ----------------------------------------------------
+// adhan
+ipcMain.on('get-adhan-path', (event, _arg) => {
+	event.returnValue = adhanPath.replace(/\\/g, '/');
+});
+
+ipcMain.on('get-adhan-path-fajr', (event, _arg) => {
+	event.returnValue = adhanFajrPath.replace(/\\/g, '/');
+});
+
+// ----------------------------------------------------
 // splash
 ipcMain.on('get-splash-shown', (event, _arg) => {
 	event.returnValue = session_shown_splash;
@@ -337,14 +349,6 @@ ipcMain.on('get-current-page', (event, _arg) => {
 
 ipcMain.on('set-current-page', (_event, arg) => {
 	currentPage = arg;
-});
-
-// ----------------------------------------------------
-// adhan
-ipcMain.on('kill-adhan', (_event, _arg) => {
-	if (currentAudioPlaying) {
-		currentAudioPlaying.kill();
-	}
 });
 
 // ----------------------------------------------------
@@ -455,10 +459,8 @@ const updatePt = () => {
 // modal
 const timeOutAutoCloseModal = () => {
 	clearTimeout(modalTimeout);
-	console.log('CLEADER TIMEOUT');
 	modalTimeout = setTimeout(() => {
 		mainWindow!.webContents.send('close-modal');
-		console.log('MODAL CLOSED');
 	}, 600000); // 10 minutes
 };
 
@@ -522,10 +524,10 @@ const checkNotifyOnTime = (now: Moment.Moment) => {
 			}
 		});
 
-		if (playAdhan && title !== 'Sunrise') {
-			const adhanMp3Path = title === 'Fajr' ? adhanFajrPath : adhanPath;
+		if (playAdhan) {
 			// check using fs wether adhanPath exist on disk or not
-			if (!existsSync(adhanMp3Path)) {
+			const checkPath = title === 'Fajr' ? adhanFajrPath : adhanPath;
+			if (!existsSync(checkPath)) {
 				// notify missing adhan file
 				const adhanNotFoundNotification = new Notification({
 					title: `${title === 'Fajr' ? 'adhan' : 'adhan_fajr'}.mp3 file missing`,
@@ -534,14 +536,14 @@ const checkNotifyOnTime = (now: Moment.Moment) => {
 					icon: iconPath,
 				});
 				adhanNotFoundNotification.show();
-				return;
 			}
-			if (mainWindow) {
+
+			if (mainWindow && title !== 'Sunrise') {
 				// refresh from main because originally it will refresh the page to reset the timer ring
 				mainWindow.webContents.send('refresh-from-main');
 
-				// timeout 7.5s before showing the modal
-				setTimeout(() => {
+				// timeout 3s before showing the modal
+				setTimeout(async () => {
 					timeOutAutoCloseModal();
 					mainWindow!.webContents.send('signal-modal-praytime', {
 						title: `Time For ${title === 'Sunrise' ? 'Sunrise' : title + ' Prayer'}`,
@@ -550,34 +552,8 @@ const checkNotifyOnTime = (now: Moment.Moment) => {
 						coordinates: `${appConfig.locationOption.latitude}, ${appConfig.locationOption.longitude}`,
 					});
 
-					console.log('WIDNWO SHOWN');
 					mainWindow!.show();
-
-					console.log('ADHAN PLAYED');
-
-					currentAudioPlaying = player.play(adhanMp3Path, (err: any) => {
-						if (err && !err.killed) {
-							console.log(err);
-							// throw error notification
-							const errorNotification = new Notification({
-								title: 'Error',
-								subtitle: 'Adhan',
-								body: err + '',
-								icon: iconPath,
-							});
-							errorNotification.show();
-						}
-					});
-				}, 7500);
-			} else {
-				console.log('mainWindow is null');
-				// notify
-				new Notification({
-					title: 'Error',
-					subtitle: 'Adhan',
-					body: 'mainWindow is not ready',
-					icon: iconPath,
-				}).show();
+				}, 3000);
 			}
 		}
 	}
@@ -642,8 +618,6 @@ const checkNotifyBefore = (now: Moment.Moment) => {
 		});
 
 		if (mainWindow) {
-			console.log('BEFORE PRAYER TIME');
-			console.log('SHOULD SHOW MODAL');
 			mainWindow.webContents.send('signal-modal-praytime', {
 				title: body,
 				time: appConfig.clockStyle === '24h' ? now.format('HH:mm') : now.format('hh:mm A'),

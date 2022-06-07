@@ -1,5 +1,8 @@
 import icon from '../../../assets/display_icon_notext.png';
 import { ModalContentInterface } from 'renderer/interfaces';
+import { useEffect, useState } from 'react';
+// @ts-ignore
+import ReactHowler from 'react-howler';
 
 // MUI
 import Box from '@mui/material/Box';
@@ -34,15 +37,37 @@ type ModalPraytimeProps = {
 };
 
 export const ModalPraytime = ({ modalContent, showModal, setShowModal }: ModalPraytimeProps) => {
+	// adhan player object
+	const [adhanPlayer, setAdhanPlayer] = useState<any>(null);
+	const [adhan_fajr, setAdhanFajr] = useState<any>(null);
+
+	// adhan path
+	const adhanPath = window.electron.ipcRenderer.sendSync('get-adhan-path') as string;
+	const adhanFajrPath = window.electron.ipcRenderer.sendSync('get-adhan-path-fajr') as string;
+
+	// Button
 	const okBtnPressed = () => {
 		setShowModal(false);
 		// send ipc to kill adhan
-		window.electron.ipcRenderer.send('kill-adhan');
+		adhanPlayer.stop();
+	};
+	const btn = () => {
+		setShowModal(true);
 	};
 
 	return (
 		<>
-			<Button onClick={() => setShowModal(true)}>Open modal</Button>
+			<ReactHowler
+				// ex: src='D://Coding/@Projects/Electron/simple-prayertime-reminder/assets/adhan.mp3'
+				src={adhanPath}
+				playing={showModal}
+				ref={(ref: any) => {
+					setAdhanPlayer(ref);
+				}}
+			/>
+			{/* <ReactHowler src='http://goldfirestudios.com/proj/howlerjs/sound.ogg' playing={true} /> */}
+
+			<Button onClick={() => btn()}>Open modal</Button>
 			<Modal open={showModal} aria-labelledby='praytime reminder modal' aria-describedby='shows praytime reminder info'>
 				<Box sx={centeredModal}>
 					<Box

@@ -70,18 +70,23 @@ export default function App() {
 		setShowModal(false);
 	};
 
+	// --------------------------
 	useEffect(() => {
+		// splash
 		window.electron.ipcRenderer.send('set-splash-shown');
-		window.electron.ipcRenderer.on('signal-modal-praytime', modalIPCHandler);
-		window.electron.ipcRenderer.on('close-modal', modalClosedFromMain);
-
-		const currentConfig = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
-		setMode(currentConfig.theme);
 
 		setTimeout(() => {
 			setShowSplash(false);
 			setShowMenu(true);
 		}, 1800);
+
+		// modal handler
+		window.electron.ipcRenderer.on('signal-modal-praytime', modalIPCHandler);
+		window.electron.ipcRenderer.on('close-modal', modalClosedFromMain);
+
+		// config
+		const currentConfig = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
+		setMode(currentConfig.theme);
 
 		return () => {
 			window.electron.ipcRenderer.removeEventListener('signal-modal-praytime', modalIPCHandler);
