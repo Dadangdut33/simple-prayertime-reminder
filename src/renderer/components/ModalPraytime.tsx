@@ -13,7 +13,7 @@ const centeredModal = {
 	top: '50%',
 	left: '50%',
 	transform: 'translate(-50%, -50%)',
-	width: 400,
+	width: 425,
 	bgcolor: 'background.paper',
 	borderRadius: '4px',
 	boxShadow: 24,
@@ -34,6 +34,12 @@ type ModalPraytimeProps = {
 };
 
 export const ModalPraytime = ({ modalContent, showModal, setShowModal }: ModalPraytimeProps) => {
+	const okBtnPressed = () => {
+		setShowModal(false);
+		// send ipc to kill adhan
+		window.electron.ipcRenderer.send('kill-adhan');
+	};
+
 	return (
 		<>
 			<Button onClick={() => setShowModal(true)}>Open modal</Button>
@@ -49,9 +55,18 @@ export const ModalPraytime = ({ modalContent, showModal, setShowModal }: ModalPr
 					>
 						<img src={icon} alt='spr-icon' className='modal-icon' />
 
-						<Typography sx={[textSpacing, bold]} variant='h5' component='h2'>
-							{modalContent.title}
-						</Typography>
+						<Box
+							sx={{
+								display: 'flex',
+								flexDirection: 'column',
+								alignItems: 'center',
+								textAlign: 'center',
+							}}
+						>
+							<Typography sx={[textSpacing, bold]} variant='h5' component='h2'>
+								{modalContent.title}
+							</Typography>
+						</Box>
 
 						<Typography sx={[textSpacing]} variant='h5' component='h2'>
 							{modalContent.time}
@@ -62,6 +77,7 @@ export const ModalPraytime = ({ modalContent, showModal, setShowModal }: ModalPr
 								display: 'flex',
 								flexDirection: 'column',
 								alignItems: 'center',
+								textAlign: 'center',
 							}}
 						>
 							<Typography sx={textSpacing} variant='subtitle1' component='h4'>
@@ -74,11 +90,11 @@ export const ModalPraytime = ({ modalContent, showModal, setShowModal }: ModalPr
 					</Box>
 					<Button
 						sx={{
-							width: 400,
+							width: 425,
 							borderRadius: 0,
 						}}
 						variant='contained'
-						onClick={() => setShowModal(false)}
+						onClick={okBtnPressed}
 					>
 						Ok
 					</Button>

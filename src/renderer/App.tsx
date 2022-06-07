@@ -62,13 +62,18 @@ export default function App() {
 	const [showModal, setShowModal] = useState(false);
 	const [modalContent, setModalContent] = useState<ModalContentInterface>(emptyModalContent);
 	const modalIPCHandler = (arg: any) => {
-		setShowModal(arg[0]);
-		setModalContent(arg[1]);
+		console.log(arg);
+		setShowModal(true);
+		setModalContent(arg);
+	};
+	const modalClosedFromMain = () => {
+		setShowModal(false);
 	};
 
 	useEffect(() => {
 		window.electron.ipcRenderer.send('set-splash-shown');
 		window.electron.ipcRenderer.on('signal-modal-praytime', modalIPCHandler);
+		window.electron.ipcRenderer.on('close-modal', modalClosedFromMain);
 
 		const currentConfig = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
 		setMode(currentConfig.theme);
@@ -80,6 +85,7 @@ export default function App() {
 
 		return () => {
 			window.electron.ipcRenderer.removeEventListener('signal-modal-praytime', modalIPCHandler);
+			window.electron.ipcRenderer.removeEventListener('close-modal', modalClosedFromMain);
 		};
 	}, []);
 

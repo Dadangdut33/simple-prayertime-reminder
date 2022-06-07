@@ -13,6 +13,7 @@ import { app, BrowserWindow, shell, ipcMain, nativeTheme, Notification } from 'e
 import Moment from 'moment-timezone';
 import os from 'os';
 import fetch from 'electron-fetch';
+import { existsSync } from 'fs';
 
 // -------------------------------------------------------------------------------------
 import MenuBuilder from './menu';
@@ -42,6 +43,8 @@ let mainWindow: BrowserWindow | null = null,
 	},
 	autoLauncher = new autoLaunch(launcherOption),
 	player = require('play-sound')({}),
+	modalTimeout: NodeJS.Timeout,
+	currentAudioPlaying: any = null,
 	adhanPath = '',
 	adhanFajrPath = '',
 	menuBuilder: MenuBuilder,
@@ -318,6 +321,7 @@ ipcMain.on('update-tray', (_event, _arg) => {
 	if (trayManager) trayManager.updatePrayTime(ptGet, appConfig);
 });
 
+// ----------------------------------------------------
 // splash
 ipcMain.on('get-splash-shown', (event, _arg) => {
 	event.returnValue = session_shown_splash;
@@ -333,6 +337,14 @@ ipcMain.on('get-current-page', (event, _arg) => {
 
 ipcMain.on('set-current-page', (_event, arg) => {
 	currentPage = arg;
+});
+
+// ----------------------------------------------------
+// adhan
+ipcMain.on('kill-adhan', (_event, _arg) => {
+	if (currentAudioPlaying) {
+		currentAudioPlaying.kill();
+	}
 });
 
 // ----------------------------------------------------
@@ -440,9 +452,19 @@ const updatePt = () => {
 	ptGet = getPrayerTimes(appConfig);
 };
 
+// modal
+const timeOutAutoCloseModal = () => {
+	clearTimeout(modalTimeout);
+	console.log('CLEADER TIMEOUT');
+	modalTimeout = setTimeout(() => {
+		mainWindow!.webContents.send('close-modal');
+		console.log('MODAL CLOSED');
+	}, 600000); // 10 minutes
+};
+
 const checkNotifyOnTime = (now: Moment.Moment) => {
 	let notification = null,
-		title,
+		title: string | null = null,
 		subtitle = 'Prayer time',
 		body,
 		playAdhan = false;
@@ -489,7 +511,7 @@ const checkNotifyOnTime = (now: Moment.Moment) => {
 	}
 
 	if (title) {
-		body = `It's time for ${title === 'Sunrise' ? 'Sunrise' : title + ' Prayer'}`;
+		body = `It's Time For ${title === 'Sunrise' ? 'Sunrise' : title + ' Prayer'}`;
 
 		notification = new Notification({ title, subtitle, body, icon: iconPath });
 		notification.show();
@@ -500,7 +522,64 @@ const checkNotifyOnTime = (now: Moment.Moment) => {
 			}
 		});
 
-		// if (playAdhan) prayerTime_IntrusiveNotification('Simple PrayerTime Reminder', body, iconPath, mainWindow!);
+		if (playAdhan && title !== 'Sunrise') {
+			const adhanMp3Path = title === 'Fajr' ? adhanFajrPath : adhanPath;
+			// check using fs wether adhanPath exist on disk or not
+			if (!existsSync(adhanMp3Path)) {
+				// notify missing adhan file
+				const adhanNotFoundNotification = new Notification({
+					title: `${title === 'Fajr' ? 'adhan' : 'adhan_fajr'}.mp3 file missing`,
+					subtitle: '',
+					body: `You can try to reinstall or copy your own ${title === 'Fajr' ? 'adhan' : 'adhan_fajr'}.mp3 to the assets folder of the app`,
+					icon: iconPath,
+				});
+				adhanNotFoundNotification.show();
+				return;
+			}
+			if (mainWindow) {
+				// refresh from main because originally it will refresh the page to reset the timer ring
+				mainWindow.webContents.send('refresh-from-main');
+
+				// timeout 7.5s before showing the modal
+				setTimeout(() => {
+					timeOutAutoCloseModal();
+					mainWindow!.webContents.send('signal-modal-praytime', {
+						title: `Time For ${title === 'Sunrise' ? 'Sunrise' : title + ' Prayer'}`,
+						time: appConfig.clockStyle === '24h' ? now.format('HH:mm') : now.format('hh:mm A'),
+						location: appConfig.locationOption.city,
+						coordinates: `${appConfig.locationOption.latitude}, ${appConfig.locationOption.longitude}`,
+					});
+
+					console.log('WIDNWO SHOWN');
+					mainWindow!.show();
+
+					console.log('ADHAN PLAYED');
+
+					currentAudioPlaying = player.play(adhanMp3Path, (err: any) => {
+						if (err && !err.killed) {
+							console.log(err);
+							// throw error notification
+							const errorNotification = new Notification({
+								title: 'Error',
+								subtitle: 'Adhan',
+								body: err + '',
+								icon: iconPath,
+							});
+							errorNotification.show();
+						}
+					});
+				}, 7500);
+			} else {
+				console.log('mainWindow is null');
+				// notify
+				new Notification({
+					title: 'Error',
+					subtitle: 'Adhan',
+					body: 'mainWindow is not ready',
+					icon: iconPath,
+				}).show();
+			}
+		}
 	}
 };
 
@@ -508,52 +587,45 @@ const checkNotifyBefore = (now: Moment.Moment) => {
 	let notification = null,
 		title,
 		subtitle = 'Prayer time',
-		body = '',
-		playAdhan = false;
+		body = '';
 
 	// minutes before prayer
 	switch (now.format('HH:mm')) {
 		case Moment(new Date(ptGet.fajrTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.fajr.earlyTime, 'minutes').format('HH:mm'):
 			if (appConfig.reminderOption.fajr.earlyReminder) {
 				title = 'Fajr';
-				if (appConfig.reminderOption.fajr.playAdhan) playAdhan = true;
 			}
-			body = `${appConfig.reminderOption.fajr.earlyTime} minutes before ${title} prayer`;
+			body = `${appConfig.reminderOption.fajr.earlyTime} Minutes Before ${title} Prayer`;
 			break;
 		case Moment(new Date(ptGet.sunriseTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.sunrise.earlyTime, 'minutes').format('HH:mm'):
 			if (appConfig.reminderOption.sunrise.earlyReminder) {
 				title = 'Sunrise';
-				if (appConfig.reminderOption.sunrise.playAdhan) playAdhan = true;
 			}
-			body = `${appConfig.reminderOption.sunrise.earlyTime} minutes before ${title}`;
+			body = `${appConfig.reminderOption.sunrise.earlyTime} Minutes Before ${title}`;
 			break;
 		case Moment(new Date(ptGet.dhuhrTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.dhuhr.earlyTime, 'minutes').format('HH:mm'):
 			if (appConfig.reminderOption.dhuhr.earlyReminder) {
 				title = 'Dhuhr';
-				if (appConfig.reminderOption.dhuhr.playAdhan) playAdhan = true;
 			}
-			body = `${appConfig.reminderOption.dhuhr.earlyTime} minutes before ${title} prayer`;
+			body = `${appConfig.reminderOption.dhuhr.earlyTime} Minutes Before ${title} Prayer`;
 			break;
 		case Moment(new Date(ptGet.asrTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.asr.earlyTime, 'minutes').format('HH:mm'):
 			if (appConfig.reminderOption.asr.earlyReminder) {
 				title = 'Asr';
-				if (appConfig.reminderOption.asr.playAdhan) playAdhan = true;
 			}
-			body = `${appConfig.reminderOption.asr.earlyTime} minutes before ${title} prayer`;
+			body = `${appConfig.reminderOption.asr.earlyTime} Minutes Before ${title} Prayer`;
 			break;
 		case Moment(new Date(ptGet.maghribTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.maghrib.earlyTime, 'minutes').format('HH:mm'):
 			if (appConfig.reminderOption.maghrib.earlyReminder) {
 				title = 'Maghrib';
-				if (appConfig.reminderOption.maghrib.playAdhan) playAdhan = true;
 			}
-			body = `${appConfig.reminderOption.maghrib.earlyTime} minutes before ${title} prayer`;
+			body = `${appConfig.reminderOption.maghrib.earlyTime} Minutes Before ${title} Prayer`;
 			break;
 		case Moment(new Date(ptGet.ishaTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.isha.earlyTime, 'minutes').format('HH:mm'):
 			if (appConfig.reminderOption.isha.earlyReminder) {
 				title = 'Isha';
-				if (appConfig.reminderOption.isha.playAdhan) playAdhan = true;
 			}
-			body = `${appConfig.reminderOption.isha.earlyTime} minutes before ${title} prayer`;
+			body = `${appConfig.reminderOption.isha.earlyTime} Minutes Before ${title} Prayer`;
 			break;
 		default:
 			break;
@@ -569,7 +641,17 @@ const checkNotifyBefore = (now: Moment.Moment) => {
 			}
 		});
 
-		// if (playAdhan) prayerTime_IntrusiveNotification('Simple PrayerTime Reminder', body, iconPath, mainWindow!);
+		if (mainWindow) {
+			console.log('BEFORE PRAYER TIME');
+			console.log('SHOULD SHOW MODAL');
+			mainWindow.webContents.send('signal-modal-praytime', {
+				title: body,
+				time: appConfig.clockStyle === '24h' ? now.format('HH:mm') : now.format('hh:mm A'),
+				location: appConfig.locationOption.city,
+				coordinates: `${appConfig.locationOption.latitude}, ${appConfig.locationOption.longitude}`,
+			});
+			timeOutAutoCloseModal();
+		}
 	}
 };
 
