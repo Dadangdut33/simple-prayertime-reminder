@@ -22,10 +22,10 @@ import DownloadIcon from '@mui/icons-material/Download';
 
 export const About = () => {
 	const [version, setVersion] = useState('');
-	const [newerAvailable, setNewerAvailable] = useState('Click to check');
+	const [newerAvailable, setNewerAvailable] = useState('Check for update');
 
 	const checkVersion = () => {
-		if (newerAvailable === 'Click to check') {
+		if (newerAvailable === 'Check for update') {
 			// check latest version from github
 			fetch('https://api.github.com/repos/Dadangdut33/simple-prayertime-reminder/releases/latest')
 				.then((response) => response.json())
@@ -132,7 +132,7 @@ export const About = () => {
 									flexWrap: 'wrap',
 								}}
 							>
-								<FavoriteBorderOutlinedIcon color='primary' style={{ fontSize: '28px' }} /> <h2 style={{ paddingLeft: '.5rem' }}>Support the project</h2>
+								<FavoriteBorderOutlinedIcon color='primary' style={{ fontSize: '28px' }} /> <h2 style={{ paddingLeft: '.5rem' }}>Support The Project</h2>
 							</div>
 							<Box
 								sx={{
@@ -174,8 +174,8 @@ export const About = () => {
 								<CommitIcon color='primary' style={{ fontSize: '28px' }} /> <h2 style={{ paddingLeft: '.5rem' }}>Version</h2>
 							</div>
 							<p style={{ marginTop: 0 }}>
-								Current version: <strong>{version}</strong> | Latest version available:{' '}
-								<span className={newerAvailable === 'Click to check' ? 'checkver-span' : ``} onClick={() => checkVersion()}>
+								Current version: <strong>{version}</strong> |{' '}
+								<span className={newerAvailable === 'Check for update' ? 'checkver-span' : ``} onClick={() => checkVersion()}>
 									{newerAvailable}
 								</span>{' '}
 								{newerAvailable.includes('New version available') ? (

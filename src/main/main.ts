@@ -21,7 +21,7 @@ import { resolveHtmlPath } from './util';
 import { configInterface, getPrayerTimes_I } from './interfaces';
 import { initialConfig, writeConfig, readConfig } from './handler/files';
 import { getPrayerTimes } from './handler/praytime';
-import { onUnresponsiveWindow, errorBox, NoYesBox, prayerTime_IntrusiveNotification } from './handler/messageBox';
+import { onUnresponsiveWindow, errorBox, NoYesBox } from './handler/messageBox';
 import { getLatLong_FromCitiesName, getPosition_absolute, verifyKey } from './handler/getPos';
 
 // -------------------------------------------------------------------------------------
@@ -167,7 +167,7 @@ const createWindow = async () => {
 		show: false,
 		width: 1200,
 		height: 728,
-		minWidth: 800,
+		minWidth: 900,
 		minHeight: 600,
 		icon: getAssetPath('icon.png'),
 		webPreferences: {
@@ -445,43 +445,43 @@ const checkNotifyOnTime = (now: Moment.Moment) => {
 		title,
 		subtitle = 'Prayer time',
 		body,
-		showIntrusive = false;
+		playAdhan = false;
 
 	switch (now.format('HH:mm')) {
 		case Moment(new Date(ptGet.fajrTime)).tz(appConfig.timezoneOption.timezone).format('HH:mm'):
 			if (appConfig.reminderOption.fajr) {
 				title = 'Fajr';
-				if (appConfig.reminderOption.fajr.intrusiveNotification) showIntrusive = true;
+				if (appConfig.reminderOption.fajr.playAdhan) playAdhan = true;
 			}
 			break;
 		case Moment(new Date(ptGet.sunriseTime)).tz(appConfig.timezoneOption.timezone).format('HH:mm'):
 			if (appConfig.reminderOption.sunrise) {
 				title = 'Sunrise';
-				if (appConfig.reminderOption.sunrise.intrusiveNotification) showIntrusive = true;
+				if (appConfig.reminderOption.sunrise.playAdhan) playAdhan = true;
 			}
 			break;
 		case Moment(new Date(ptGet.dhuhrTime)).tz(appConfig.timezoneOption.timezone).format('HH:mm'):
 			if (appConfig.reminderOption.dhuhr) {
 				title = 'Dhuhr';
-				if (appConfig.reminderOption.dhuhr.intrusiveNotification) showIntrusive = true;
+				if (appConfig.reminderOption.dhuhr.playAdhan) playAdhan = true;
 			}
 			break;
 		case Moment(new Date(ptGet.asrTime)).tz(appConfig.timezoneOption.timezone).format('HH:mm'):
 			if (appConfig.reminderOption.asr) {
 				title = 'Asr';
-				if (appConfig.reminderOption.asr.intrusiveNotification) showIntrusive = true;
+				if (appConfig.reminderOption.asr.playAdhan) playAdhan = true;
 			}
 			break;
 		case Moment(new Date(ptGet.maghribTime)).tz(appConfig.timezoneOption.timezone).format('HH:mm'):
 			if (appConfig.reminderOption.maghrib) {
 				title = 'Maghrib';
-				if (appConfig.reminderOption.maghrib.intrusiveNotification) showIntrusive = true;
+				if (appConfig.reminderOption.maghrib.playAdhan) playAdhan = true;
 			}
 			break;
 		case Moment(new Date(ptGet.ishaTime)).tz(appConfig.timezoneOption.timezone).format('HH:mm'):
 			if (appConfig.reminderOption.isha) {
 				title = 'Isha';
-				if (appConfig.reminderOption.isha.intrusiveNotification) showIntrusive = true;
+				if (appConfig.reminderOption.isha.playAdhan) playAdhan = true;
 			}
 			break;
 		default:
@@ -500,7 +500,7 @@ const checkNotifyOnTime = (now: Moment.Moment) => {
 			}
 		});
 
-		if (showIntrusive) prayerTime_IntrusiveNotification('Simple PrayerTime Reminder', body, iconPath, mainWindow!);
+		// if (playAdhan) prayerTime_IntrusiveNotification('Simple PrayerTime Reminder', body, iconPath, mainWindow!);
 	}
 };
 
@@ -509,49 +509,49 @@ const checkNotifyBefore = (now: Moment.Moment) => {
 		title,
 		subtitle = 'Prayer time',
 		body = '',
-		showIntrusive = false;
+		playAdhan = false;
 
 	// minutes before prayer
 	switch (now.format('HH:mm')) {
 		case Moment(new Date(ptGet.fajrTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.fajr.earlyTime, 'minutes').format('HH:mm'):
 			if (appConfig.reminderOption.fajr.earlyReminder) {
 				title = 'Fajr';
-				if (appConfig.reminderOption.fajr.intrusiveNotification) showIntrusive = true;
+				if (appConfig.reminderOption.fajr.playAdhan) playAdhan = true;
 			}
 			body = `${appConfig.reminderOption.fajr.earlyTime} minutes before ${title} prayer`;
 			break;
 		case Moment(new Date(ptGet.sunriseTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.sunrise.earlyTime, 'minutes').format('HH:mm'):
 			if (appConfig.reminderOption.sunrise.earlyReminder) {
 				title = 'Sunrise';
-				if (appConfig.reminderOption.sunrise.intrusiveNotification) showIntrusive = true;
+				if (appConfig.reminderOption.sunrise.playAdhan) playAdhan = true;
 			}
 			body = `${appConfig.reminderOption.sunrise.earlyTime} minutes before ${title}`;
 			break;
 		case Moment(new Date(ptGet.dhuhrTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.dhuhr.earlyTime, 'minutes').format('HH:mm'):
 			if (appConfig.reminderOption.dhuhr.earlyReminder) {
 				title = 'Dhuhr';
-				if (appConfig.reminderOption.dhuhr.intrusiveNotification) showIntrusive = true;
+				if (appConfig.reminderOption.dhuhr.playAdhan) playAdhan = true;
 			}
 			body = `${appConfig.reminderOption.dhuhr.earlyTime} minutes before ${title} prayer`;
 			break;
 		case Moment(new Date(ptGet.asrTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.asr.earlyTime, 'minutes').format('HH:mm'):
 			if (appConfig.reminderOption.asr.earlyReminder) {
 				title = 'Asr';
-				if (appConfig.reminderOption.asr.intrusiveNotification) showIntrusive = true;
+				if (appConfig.reminderOption.asr.playAdhan) playAdhan = true;
 			}
 			body = `${appConfig.reminderOption.asr.earlyTime} minutes before ${title} prayer`;
 			break;
 		case Moment(new Date(ptGet.maghribTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.maghrib.earlyTime, 'minutes').format('HH:mm'):
 			if (appConfig.reminderOption.maghrib.earlyReminder) {
 				title = 'Maghrib';
-				if (appConfig.reminderOption.maghrib.intrusiveNotification) showIntrusive = true;
+				if (appConfig.reminderOption.maghrib.playAdhan) playAdhan = true;
 			}
 			body = `${appConfig.reminderOption.maghrib.earlyTime} minutes before ${title} prayer`;
 			break;
 		case Moment(new Date(ptGet.ishaTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.isha.earlyTime, 'minutes').format('HH:mm'):
 			if (appConfig.reminderOption.isha.earlyReminder) {
 				title = 'Isha';
-				if (appConfig.reminderOption.isha.intrusiveNotification) showIntrusive = true;
+				if (appConfig.reminderOption.isha.playAdhan) playAdhan = true;
 			}
 			body = `${appConfig.reminderOption.isha.earlyTime} minutes before ${title} prayer`;
 			break;
@@ -569,7 +569,7 @@ const checkNotifyBefore = (now: Moment.Moment) => {
 			}
 		});
 
-		if (showIntrusive) prayerTime_IntrusiveNotification('Simple PrayerTime Reminder', body, iconPath, mainWindow!);
+		// if (playAdhan) prayerTime_IntrusiveNotification('Simple PrayerTime Reminder', body, iconPath, mainWindow!);
 	}
 };
 

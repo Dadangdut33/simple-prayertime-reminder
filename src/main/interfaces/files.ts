@@ -6,7 +6,7 @@ export interface reminderInterface {
 	remindWhenOnTime: boolean;
 	earlyReminder: boolean;
 	earlyTime: number;
-	intrusiveNotification: boolean;
+	playAdhan: boolean;
 }
 
 export interface calcOptionInterface {
