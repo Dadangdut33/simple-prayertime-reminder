@@ -1,6 +1,7 @@
 import './App.css';
 import './Font.css';
 import { configInterface } from 'main/interfaces';
+import { ModalContentInterface } from 'renderer/interfaces';
 import { Splashscreen, ModalPraytime, AppNav, Praytime, Settings, Schedule, About } from './components';
 import { useState, useEffect, useMemo, createContext } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
@@ -14,6 +15,8 @@ const ColorModeContext = createContext({ toggleColorMode: () => {} });
 
 // --------------------------
 export default function App() {
+	// --------------------------
+	// theme
 	const [mode, setMode] = useState<'light' | 'dark'>('light');
 	const colorMode = useMemo(
 		() => ({
@@ -41,13 +44,32 @@ export default function App() {
 			}),
 		[mode]
 	);
-	const splashShownValue = window.electron.ipcRenderer.sendSync('get-splash-shown') as boolean;
 
+	// --------------------------
+	// splash
+	const splashShownValue = window.electron.ipcRenderer.sendSync('get-splash-shown') as boolean;
 	const [showSplash, setShowSplash] = useState(!splashShownValue); // first time in session true
 	const [showMenu, setShowMenu] = useState(splashShownValue); // first time in session false
-	// get theme from settings, on app start
+
+	// --------------------------
+	// modal
+	const emptyModalContent: ModalContentInterface = {
+		title: '',
+		time: '',
+		location: '',
+		coordinates: '',
+	};
+	const [showModal, setShowModal] = useState(false);
+	const [modalContent, setModalContent] = useState<ModalContentInterface>(emptyModalContent);
+	const modalIPCHandler = (arg: any) => {
+		setShowModal(arg[0]);
+		setModalContent(arg[1]);
+	};
+
 	useEffect(() => {
 		window.electron.ipcRenderer.send('set-splash-shown');
+		window.electron.ipcRenderer.on('signal-modal-praytime', modalIPCHandler);
+
 		const currentConfig = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
 		setMode(currentConfig.theme);
 
@@ -55,6 +77,10 @@ export default function App() {
 			setShowSplash(false);
 			setShowMenu(true);
 		}, 1800);
+
+		return () => {
+			window.electron.ipcRenderer.removeEventListener('signal-modal-praytime', modalIPCHandler);
+		};
 	}, []);
 
 	// track setting changes made
@@ -65,7 +91,7 @@ export default function App() {
 			<ThemeProvider theme={theme}>
 				<Router>
 					<Splashscreen show={showSplash} theme={mode} />
-					<ModalPraytime />
+					<ModalPraytime modalContent={modalContent} showModal={showModal} setShowModal={setShowModal} />
 					<Fade in={showMenu}>
 						<Card sx={{ m: 1.5, backgroundColor: theme.palette.background.paper }} id={mode}>
 							<AppNav theme={mode} changesMade={changesMade} />

@@ -1,5 +1,5 @@
 import icon from '../../../assets/display_icon_notext.png';
-import { useState } from 'react';
+import { ModalContentInterface } from 'renderer/interfaces';
 
 // MUI
 import Box from '@mui/material/Box';
@@ -7,6 +7,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 
+// ------------------------------------------------------------
 const centeredModal = {
 	position: 'absolute' as 'absolute',
 	top: '50%',
@@ -26,15 +27,17 @@ const bold = {
 	fontWeight: 'bold',
 };
 
-export const ModalPraytime = () => {
-	const [open, setOpen] = useState(false);
-	const handleOpen = () => setOpen(true);
-	const handleClose = () => setOpen(false);
+type ModalPraytimeProps = {
+	modalContent: ModalContentInterface;
+	showModal: boolean;
+	setShowModal: (showModal: boolean) => void;
+};
 
+export const ModalPraytime = ({ modalContent, showModal, setShowModal }: ModalPraytimeProps) => {
 	return (
 		<>
-			<Button onClick={handleOpen}>Open modal</Button>
-			<Modal open={open} aria-labelledby='praytime reminder modal' aria-describedby='shows praytime reminder info'>
+			<Button onClick={() => setShowModal(true)}>Open modal</Button>
+			<Modal open={showModal} aria-labelledby='praytime reminder modal' aria-describedby='shows praytime reminder info'>
 				<Box sx={centeredModal}>
 					<Box
 						sx={{
@@ -47,11 +50,11 @@ export const ModalPraytime = () => {
 						<img src={icon} alt='spr-icon' className='modal-icon' />
 
 						<Typography sx={[textSpacing, bold]} variant='h5' component='h2'>
-							Time For Isha Prayer
+							{modalContent.title}
 						</Typography>
 
 						<Typography sx={[textSpacing]} variant='h5' component='h2'>
-							07:02 PM
+							{modalContent.time}
 						</Typography>
 
 						<Box
@@ -62,10 +65,10 @@ export const ModalPraytime = () => {
 							}}
 						>
 							<Typography sx={textSpacing} variant='subtitle1' component='h4'>
-								Jakarta
+								{modalContent.location}
 							</Typography>
 							<Typography variant='subtitle1' component='h4'>
-								(-6.1741, 106.8296)
+								({modalContent.coordinates})
 							</Typography>
 						</Box>
 					</Box>
@@ -75,7 +78,7 @@ export const ModalPraytime = () => {
 							borderRadius: 0,
 						}}
 						variant='contained'
-						onClick={handleClose}
+						onClick={() => setShowModal(false)}
 					>
 						Ok
 					</Button>
