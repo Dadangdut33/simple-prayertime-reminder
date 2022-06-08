@@ -1,6 +1,6 @@
 import icon from '../../../assets/display_icon_notext.png';
 import { ModalContentInterface } from 'renderer/interfaces';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 // @ts-ignore
 import ReactHowler from 'react-howler';
 
@@ -39,7 +39,7 @@ type ModalPraytimeProps = {
 export const ModalPraytime = ({ modalContent, showModal, setShowModal }: ModalPraytimeProps) => {
 	// adhan player object
 	const [adhanPlayer, setAdhanPlayer] = useState<any>(null);
-	const [adhan_fajr, setAdhanFajr] = useState<any>(null);
+	const [adhanFajrPlayer, setAdhanFajrPlayer] = useState<any>(null);
 
 	// adhan path
 	const adhanPath = window.electron.ipcRenderer.sendSync('get-adhan-path') as string;
@@ -47,12 +47,15 @@ export const ModalPraytime = ({ modalContent, showModal, setShowModal }: ModalPr
 
 	// Button
 	const okBtnPressed = () => {
+		// close modal
 		setShowModal(false);
-		// send ipc to kill adhan
-		adhanPlayer.stop();
-	};
-	const btn = () => {
-		setShowModal(true);
+
+		// localstorage
+		localStorage.setItem('adhan-playing', 'false');
+
+		// stop adhan
+		if (modalContent.type === 'adhan') adhanPlayer.stop();
+		if (modalContent.type === 'adhan_fajr') adhanFajrPlayer.stop();
 	};
 
 	return (
@@ -60,14 +63,37 @@ export const ModalPraytime = ({ modalContent, showModal, setShowModal }: ModalPr
 			<ReactHowler
 				// ex: src='D://Coding/@Projects/Electron/simple-prayertime-reminder/assets/adhan.mp3'
 				src={adhanPath}
-				playing={showModal}
+				playing={showModal && modalContent.type === 'adhan'}
 				ref={(ref: any) => {
 					setAdhanPlayer(ref);
 				}}
+				onEnd={() => {
+					setShowModal(false);
+					localStorage.setItem('adhan-playing', 'false');
+				}}
 			/>
-			{/* <ReactHowler src='http://goldfirestudios.com/proj/howlerjs/sound.ogg' playing={true} /> */}
+			<ReactHowler
+				src={adhanFajrPath}
+				playing={showModal && modalContent.type === 'adhan_fajr'}
+				ref={(ref: any) => {
+					setAdhanFajrPlayer(ref);
+				}}
+				onEnd={() => {
+					setShowModal(false);
+					localStorage.setItem('adhan-playing', 'false');
+				}}
+			/>
 
-			<Button onClick={() => btn()}>Open modal</Button>
+			{/* <Button
+				// debug purpose
+				onClick={() => {
+					setShowModal(true);
+					localStorage.setItem('adhan-playing', 'true');
+				}}
+			>
+				Open modal
+			</Button> */}
+
 			<Modal open={showModal} aria-labelledby='praytime reminder modal' aria-describedby='shows praytime reminder info'>
 				<Box sx={centeredModal}>
 					<Box

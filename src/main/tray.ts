@@ -35,9 +35,7 @@ export default class TrayManager {
 			const wasVisible = this.mainWindow.isVisible();
 			this.mainWindow.show();
 
-			if (!wasVisible) {
-				this.mainWindow.webContents.send('refresh-from-main');
-			}
+			if (!wasVisible) this.mainWindow.webContents.send('refresh-from-main');
 		});
 	}
 
@@ -89,9 +87,7 @@ export default class TrayManager {
 					const wasVisible = this.mainWindow.isVisible();
 					this.mainWindow.show();
 
-					if (!wasVisible) {
-						this.mainWindow.webContents.send('refresh-from-main');
-					}
+					if (!wasVisible) this.mainWindow.webContents.send('refresh-from-main');
 				},
 			},
 			{

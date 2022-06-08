@@ -54,6 +54,7 @@ export default function App() {
 	// --------------------------
 	// modal
 	const emptyModalContent: ModalContentInterface = {
+		type: '',
 		title: '',
 		time: '',
 		location: '',
@@ -62,7 +63,8 @@ export default function App() {
 	const [showModal, setShowModal] = useState(false);
 	const [modalContent, setModalContent] = useState<ModalContentInterface>(emptyModalContent);
 	const modalIPCHandler = (arg: any) => {
-		console.log(arg);
+		if (arg.type.includes('adhan')) localStorage.setItem('adhan-playing', 'true');
+
 		setShowModal(true);
 		setModalContent(arg);
 	};
