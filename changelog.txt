@@ -1,3 +1,13 @@
+[1.1.0]
+- play adhan
+- change geoloc api
+- loading indicator in setting
+- add a praytime drawer in prayertime page
+- fix check update logic in about page
+- remove popup notification option in setting
+- changes some typing 
+- rearrange some elements in the setting page
+
 [1.0.3]
 - fix window wont show up if run on app start
 
