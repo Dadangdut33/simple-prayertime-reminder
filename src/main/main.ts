@@ -537,11 +537,10 @@ const checkNotifyOnTime = (now: Moment.Moment) => {
 			}
 
 			if (mainWindow) {
-				// refresh from main because originally it will refresh the page to reset the timer ring
-				mainWindow.webContents.send('refresh-from-main');
-
-				let data = {};
+				let data: any = {};
 				if (title !== 'Sunrise') {
+					// refresh from main because originally it will refresh the page to reset the timer ring
+						mainWindow.webContents.send('refresh-from-main');
 					data = {
 						type: title === 'Fajr' ? 'adhan_fajr' : 'adhan',
 						title: `Time For ${title} Prayer`,
@@ -563,8 +562,10 @@ const checkNotifyOnTime = (now: Moment.Moment) => {
 				setTimeout(() => {
 					timeOutAutoCloseModal();
 					mainWindow!.webContents.send('signal-modal-praytime', data);
-					mainWindow!.show();
-					mainWindow!.focus();
+					if (data.type !== 'reminder') {
+						mainWindow!.show();
+						mainWindow!.focus();
+					}
 				}, 2750);
 			}
 		}
