@@ -1,8 +1,8 @@
 [1.1.0]
 - play adhan
-- change geoloc api
-- loading indicator in setting
-- add a praytime drawer in prayertime page
+- change geolocation API so now no need for an API key
+- add loading indicator in setting
+- add a praytime drawer on prayertime page
 - fix check update logic in about page
 - remove popup notification option in setting
 - changes some typing 
