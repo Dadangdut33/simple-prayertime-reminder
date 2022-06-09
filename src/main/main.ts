@@ -479,7 +479,6 @@ const checkNotifyOnTime = (now: Moment.Moment) => {
 		case Moment(new Date(ptGet.sunriseTime)).tz(appConfig.timezoneOption.timezone).format('HH:mm'):
 			if (appConfig.reminderOption.sunrise) {
 				title = 'Sunrise';
-				if (appConfig.reminderOption.sunrise.playAdhan) playAdhan = true;
 			}
 			break;
 		case Moment(new Date(ptGet.dhuhrTime)).tz(appConfig.timezoneOption.timezone).format('HH:mm'):
@@ -522,6 +521,7 @@ const checkNotifyOnTime = (now: Moment.Moment) => {
 			}
 		});
 
+		// check adhan mp3 if play adhan
 		if (playAdhan) {
 			// check using fs wether adhanPath exist on disk or not
 			const checkPath = title === 'Fajr' ? adhanFajrPath : adhanPath;
@@ -535,39 +535,38 @@ const checkNotifyOnTime = (now: Moment.Moment) => {
 				});
 				adhanNotFoundNotification.show();
 			}
+		}
 
-			if (mainWindow) {
-				let data: any = {};
-				if (title !== 'Sunrise') {
-					// refresh from main because originally it will refresh the page to reset the timer ring
-						mainWindow.webContents.send('refresh-from-main');
-					data = {
-						type: title === 'Fajr' ? 'adhan_fajr' : 'adhan',
-						title: `Time For ${title} Prayer`,
-						time: appConfig.clockStyle === '24h' ? now.format('HH:mm') : now.format('hh:mm A'),
-						location: appConfig.locationOption.city,
-						coordinates: `${appConfig.locationOption.latitude}, ${appConfig.locationOption.longitude}`,
-					};
-				} else if (title === 'Sunrise') {
-					// timeout 2.5s before showing the modal
-					data = {
-						type: 'reminder',
-						title: `Time For Sunrise`,
-						time: appConfig.clockStyle === '24h' ? now.format('HH:mm') : now.format('hh:mm A'),
-						location: appConfig.locationOption.city,
-						coordinates: `${appConfig.locationOption.latitude}, ${appConfig.locationOption.longitude}`,
-					};
-				}
-
-				setTimeout(() => {
-					timeOutAutoCloseModal();
-					mainWindow!.webContents.send('signal-modal-praytime', data);
-					if (data.type !== 'reminder') {
-						mainWindow!.show();
-						mainWindow!.focus();
-					}
-				}, 2750);
+		if (mainWindow) {
+			let data: any = {};
+			if (title !== 'Sunrise') {
+				// refresh from main because originally it will refresh the page to reset the timer ring
+				mainWindow.webContents.send('refresh-from-main');
+				data = {
+					type: title === 'Fajr' ? 'adhan_fajr' : 'adhan',
+					title: `Time For ${title} Prayer`,
+					time: appConfig.clockStyle === '24h' ? now.format('HH:mm') : now.format('hh:mm A'),
+					location: appConfig.locationOption.city,
+					coordinates: `${appConfig.locationOption.latitude}, ${appConfig.locationOption.longitude}`,
+				};
+			} else if (title === 'Sunrise') {
+				// timeout 2.5s before showing the modal
+				data = {
+					type: 'reminder',
+					title: `Time For Sunrise`,
+					time: appConfig.clockStyle === '24h' ? now.format('HH:mm') : now.format('hh:mm A'),
+					location: appConfig.locationOption.city,
+					coordinates: `${appConfig.locationOption.latitude}, ${appConfig.locationOption.longitude}`,
+				};
 			}
+
+			setTimeout(() => {
+				timeOutAutoCloseModal();
+				if (data.type !== 'reminder') {
+					mainWindow!.show();
+				}
+				mainWindow!.webContents.send('signal-modal-praytime', data);
+			}, 2750);
 		}
 	}
 };
