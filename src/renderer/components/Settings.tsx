@@ -142,7 +142,6 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	const [remind_sunrise_remindWhenOnTime, setRemind_sunrise_remindWhenOnTime] = useState<boolean>(currentConfig.reminderOption.sunrise.remindWhenOnTime);
 	const [remind_sunrise_earlyReminder, setRemind_sunrise_earlyReminder] = useState<boolean>(currentConfig.reminderOption.sunrise.earlyReminder);
 	const [remind_sunrise_earlyTime, setRemind_sunrise_earlyTime] = useState<number>(currentConfig.reminderOption.sunrise.earlyTime);
-	const [remind_sunrise_adhan, setRemind_sunrise_adhan] = useState<boolean>(currentConfig.reminderOption.sunrise.playAdhan);
 
 	const [remind_dhuhr_remindWhenOnTime, setRemind_dhuhr_remindWhenOnTime] = useState<boolean>(currentConfig.reminderOption.dhuhr.remindWhenOnTime);
 	const [remind_dhuhr_earlyReminder, setRemind_dhuhr_earlyReminder] = useState<boolean>(currentConfig.reminderOption.dhuhr.earlyReminder);
@@ -200,9 +199,8 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		isha: remind_isha_earlyTime,
 	};
 
-	const intrusiveChangeMap = {
+	const adhanChangeMap = {
 		fajr: setRemind_fajr_adhan,
-		sunrise: setRemind_sunrise_adhan,
 		dhuhr: setRemind_dhuhr_adhan,
 		asr: setRemind_asr_adhan,
 		maghrib: setRemind_maghrib_adhan,
@@ -229,8 +227,8 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		else if (varEarlyTimeChangeMap[map] > 60) earlyTimeChangeMap[map](60);
 	};
 
-	const handleIntrusiveChange = (event: ChangeEvent<HTMLInputElement>, map: prayerTimes) => {
-		intrusiveChangeMap[map](event.target.checked);
+	const handleAdhanChange = (event: ChangeEvent<HTMLInputElement>, map: 'fajr' | 'dhuhr' | 'asr' | 'maghrib' | 'isha') => {
+		adhanChangeMap[map](event.target.checked);
 		checkChanges();
 	};
 
@@ -515,7 +513,6 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		setRemind_sunrise_remindWhenOnTime(initialConfig.reminderOption.sunrise.remindWhenOnTime);
 		setRemind_sunrise_earlyReminder(initialConfig.reminderOption.sunrise.earlyReminder);
 		setRemind_sunrise_earlyTime(initialConfig.reminderOption.sunrise.earlyTime);
-		setRemind_sunrise_adhan(initialConfig.reminderOption.sunrise.playAdhan);
 		setRemind_dhuhr_remindWhenOnTime(initialConfig.reminderOption.dhuhr.remindWhenOnTime);
 		setRemind_dhuhr_earlyReminder(initialConfig.reminderOption.dhuhr.earlyReminder);
 		setRemind_dhuhr_earlyTime(initialConfig.reminderOption.dhuhr.earlyTime);
@@ -582,7 +579,6 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		currentConfig.reminderOption.sunrise.remindWhenOnTime = remind_sunrise_remindWhenOnTime;
 		currentConfig.reminderOption.sunrise.earlyReminder = remind_sunrise_earlyReminder;
 		currentConfig.reminderOption.sunrise.earlyTime = remind_sunrise_earlyTime;
-		currentConfig.reminderOption.sunrise.playAdhan = remind_sunrise_adhan;
 		currentConfig.reminderOption.dhuhr.remindWhenOnTime = remind_dhuhr_remindWhenOnTime;
 		currentConfig.reminderOption.dhuhr.earlyReminder = remind_dhuhr_earlyReminder;
 		currentConfig.reminderOption.dhuhr.earlyTime = remind_dhuhr_earlyTime;
@@ -1051,12 +1047,11 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 												<FormLabel component='legend'>Play Adhan</FormLabel>
 											</Tooltip>
 											<FormGroup>
-												<FormControlLabel control={<Checkbox checked={remind_fajr_adhan} onChange={(e) => handleIntrusiveChange(e as any, 'fajr')} />} label='Fajr' />
-												<FormControlLabel control={<Checkbox checked={remind_sunrise_adhan} onChange={(e) => handleIntrusiveChange(e as any, 'sunrise')} />} label='Sunrise' />
-												<FormControlLabel control={<Checkbox checked={remind_dhuhr_adhan} onChange={(e) => handleIntrusiveChange(e as any, 'dhuhr')} />} label='Dhuhr' />
-												<FormControlLabel control={<Checkbox checked={remind_asr_adhan} onChange={(e) => handleIntrusiveChange(e as any, 'asr')} />} label='Asr' />
-												<FormControlLabel control={<Checkbox checked={remind_maghrib_adhan} onChange={(e) => handleIntrusiveChange(e as any, 'maghrib')} />} label='Maghrib' />
-												<FormControlLabel control={<Checkbox checked={remind_isha_adhan} onChange={(e) => handleIntrusiveChange(e as any, 'isha')} />} label='Isha' />
+												<FormControlLabel control={<Checkbox checked={remind_fajr_adhan} onChange={(e) => handleAdhanChange(e as any, 'fajr')} />} label='Fajr' />
+												<FormControlLabel control={<Checkbox checked={remind_dhuhr_adhan} onChange={(e) => handleAdhanChange(e as any, 'dhuhr')} />} label='Dhuhr' />
+												<FormControlLabel control={<Checkbox checked={remind_asr_adhan} onChange={(e) => handleAdhanChange(e as any, 'asr')} />} label='Asr' />
+												<FormControlLabel control={<Checkbox checked={remind_maghrib_adhan} onChange={(e) => handleAdhanChange(e as any, 'maghrib')} />} label='Maghrib' />
+												<FormControlLabel control={<Checkbox checked={remind_isha_adhan} onChange={(e) => handleAdhanChange(e as any, 'isha')} />} label='Isha' />
 											</FormGroup>
 										</FormControl>
 
