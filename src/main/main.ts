@@ -543,12 +543,14 @@ const checkNotifyOnTime = (now: Moment.Moment) => {
 				// refresh from main because originally it will refresh the page to reset the timer ring
 				mainWindow.webContents.send('refresh-from-main');
 				data = {
-					type: title === 'Fajr' ? 'adhan_fajr' : 'adhan',
+					type: 'reminder',
 					title: `Time For ${title} Prayer`,
 					time: appConfig.clockStyle === '24h' ? now.format('HH:mm') : now.format('hh:mm A'),
 					location: appConfig.locationOption.city,
 					coordinates: `${appConfig.locationOption.latitude}, ${appConfig.locationOption.longitude}`,
 				};
+				// if play adhan set type as adhan
+				if (playAdhan) data.type = title === 'Fajr' ? 'adhan_fajr' : 'adhan';
 			} else if (title === 'Sunrise') {
 				data = {
 					type: 'reminder',
