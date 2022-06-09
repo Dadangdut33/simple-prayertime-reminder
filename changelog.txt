@@ -1,3 +1,7 @@
+[1.1.2]
+- fix not modal not showing if adhan is not on
+- remove play adhan for sunrise
+
 [1.1.1]
 - fix window showing when adhan is not enabled
 

@@ -550,7 +550,6 @@ const checkNotifyOnTime = (now: Moment.Moment) => {
 					coordinates: `${appConfig.locationOption.latitude}, ${appConfig.locationOption.longitude}`,
 				};
 			} else if (title === 'Sunrise') {
-				// timeout 2.5s before showing the modal
 				data = {
 					type: 'reminder',
 					title: `Time For Sunrise`,
@@ -560,6 +559,7 @@ const checkNotifyOnTime = (now: Moment.Moment) => {
 				};
 			}
 
+			// timeout 2.5s before showing the modal
 			setTimeout(() => {
 				timeOutAutoCloseModal();
 				if (data.type !== 'reminder') {
