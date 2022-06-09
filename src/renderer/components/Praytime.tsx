@@ -142,8 +142,8 @@ export const Praytime = ({ theme }: any) => {
 	const [remainingTime, setRemainingTime] = useState(getDifInitial());
 
 	const refreshPage = () => {
-		// do not refresh page if adhan is playing
-		if (localStorage.getItem('adhan-playing') === 'true') return;
+		// do not refresh page if modal is open
+		if (localStorage.getItem('modal-open') === 'true') return;
 
 		// check window locatiom
 		if (window.electron.ipcRenderer.sendSync('get-current-page') === '/') window.location.reload();

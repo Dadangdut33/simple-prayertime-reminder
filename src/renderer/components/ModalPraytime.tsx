@@ -51,7 +51,7 @@ export const ModalPraytime = ({ modalContent, showModal, setShowModal }: ModalPr
 		setShowModal(false);
 
 		// localstorage
-		localStorage.setItem('adhan-playing', 'false');
+		localStorage.setItem('modal-open', 'false');
 
 		// stop adhan
 		if (modalContent.type === 'adhan') adhanPlayer.stop();

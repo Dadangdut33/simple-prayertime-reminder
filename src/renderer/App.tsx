@@ -63,14 +63,13 @@ export default function App() {
 	const [showModal, setShowModal] = useState(false);
 	const [modalContent, setModalContent] = useState<ModalContentInterface>(emptyModalContent);
 	const modalIPCHandler = (arg: any) => {
-		if (arg.type.includes('adhan')) localStorage.setItem('adhan-playing', 'true');
-
 		setShowModal(true);
 		setModalContent(arg);
+		localStorage.setItem('modal-open', 'true');
 	};
 	const modalClosedFromMain = () => {
 		setShowModal(false);
-		localStorage.setItem('adhan-playing', 'false');
+		localStorage.setItem('modal-open', 'false');
 	};
 
 	// --------------------------
