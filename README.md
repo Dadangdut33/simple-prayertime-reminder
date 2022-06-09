@@ -60,7 +60,9 @@ This app is quite modern looking because of Material UI, it also have dark and l
   <summary>Preview</summary>
   <p align="center">
       <img src="https://raw.githubusercontent.com/Dadangdut33/simple-prayertime-reminder/master/preview/1.png" width="700" alt="Preview 1">
+      <img src="https://raw.githubusercontent.com/Dadangdut33/simple-prayertime-reminder/master/preview/1p.png" width="700" alt="Preview 1 modal">
       <img src="https://raw.githubusercontent.com/Dadangdut33/simple-prayertime-reminder/master/preview/1_1.png" width="700" alt="Preview 1_dark">
+      <img src="https://raw.githubusercontent.com/Dadangdut33/simple-prayertime-reminder/master/preview/1_1p.png" width="700" alt="Preview 1_dark modal">
       <img src="https://raw.githubusercontent.com/Dadangdut33/simple-prayertime-reminder/master/preview/2.png" width="700" alt="Preview 2">
       <img src="https://raw.githubusercontent.com/Dadangdut33/simple-prayertime-reminder/master/preview/3.png" width="700" alt="Preview 3">
       <img src="https://raw.githubusercontent.com/Dadangdut33/simple-prayertime-reminder/master/preview/4.png" width="700" alt="Preview 4">
