@@ -70,6 +70,7 @@ export default function App() {
 	};
 	const modalClosedFromMain = () => {
 		setShowModal(false);
+		localStorage.setItem('adhan-playing', 'false');
 	};
 
 	// --------------------------
