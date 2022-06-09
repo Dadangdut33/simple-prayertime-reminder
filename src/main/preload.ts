@@ -13,8 +13,6 @@ contextBridge.exposeInMainWorld('electron', {
 			} else {
 				throw new Error(`Invalid channel: ${channel}`);
 			}
-
-			return undefined;
 		},
 		once(channel: string, func: (...args: unknown[]) => void) {
 			const validChannels = [''];
