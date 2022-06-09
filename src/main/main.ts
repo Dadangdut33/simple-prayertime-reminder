@@ -173,8 +173,8 @@ const createWindow = async () => {
 		icon: getAssetPath('icon.png'),
 		webPreferences: {
 			preload: app.isPackaged ? path.join(__dirname, 'preload.js') : path.join(__dirname, '../../.erb/dll/preload.js'),
-			webSecurity: false,
-			allowRunningInsecureContent: true,
+			webSecurity: false, // lgtm [js/disabling-electron-websecurity]
+			allowRunningInsecureContent: true, //lgtm [js/enabling-electron-insecure-content]
 		},
 	});
 
