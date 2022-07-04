@@ -73,8 +73,8 @@ This app is quite modern looking because of Material UI, it also have dark and l
 
 # Download
 
--   [Latest release](https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest)
--   [Sourceforge](https://sourceforge.net/projects/simple-prayertime-reminder/)
+- [Latest release](https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest)
+- [Sourceforge](https://sourceforge.net/projects/simple-prayertime-reminder/)
 
 # Installation
 
@@ -155,6 +155,6 @@ MIT © [Electron React Boilerplate](https://github.com/electron-react-boilerplat
 
 # Further help
 
--   Check the [Wiki](https://github.com/Dadangdut33/simple-prayertime-reminder/wiki/)
--   Submit an [Issue](https://github.com/Dadangdut33/simple-prayertime-reminder/issues)
--   Ask in [Discussion](https://github.com/Dadangdut33/simple-prayertime-reminder/discussions)
+- Check the [Wiki](https://github.com/Dadangdut33/simple-prayertime-reminder/wiki/)
+- Submit an [Issue](https://github.com/Dadangdut33/simple-prayertime-reminder/issues)
+- Ask in [Discussion](https://github.com/Dadangdut33/simple-prayertime-reminder/discussions)

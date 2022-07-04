@@ -38,7 +38,6 @@ export const Praytime = ({ theme }: any) => {
 	const [clockValueNow, setClockValueNow] = useState(new Date());
 	const [randomColorList, setRandomColorList] = useState<ColorHex[]>([]);
 	const [colorChangeSecondsList, setColorChangeSecondsList] = useState<number[]>([]);
-	const forbiddenColor = ['#dfdfdf', '#d9d9d9', '#e9e9e9', '#e2e2e2', '#dadada', '#e1e1d7', '#deb4ac', '#db918a', '#82c0c2']; // Mostly gray
 	const amountDivider = 75;
 
 	// chip shrink expand
@@ -58,18 +57,13 @@ export const Praytime = ({ theme }: any) => {
 		let colorList: ColorHex[] = [],
 			secondsList: number[] = [];
 		for (let i = 0; i < amount; i++) {
-			let colorGet = ('#' + Math.floor(Math.random() * 16777215).toString(16)) as ColorHex;
+			let color: ColorHex = '#';
+			for (let i = 0; i < 3; i++) color += ('0' + Math.floor((Math.random() * Math.pow(16, 2)) / 2).toString(16)).slice(-2);
 
-			// make sure it's not a forbidden color
-			while (forbiddenColor.includes(colorGet)) {
-				colorGet = ('#' + Math.floor(Math.random() * 16777215).toString(16)) as ColorHex;
-			}
-
-			colorList.push(colorGet);
-
-			let seconds = i * amountDivider;
-			secondsList.push(seconds);
+			colorList.push(color);
+			secondsList.push(i * amountDivider);
 		}
+
 		setRandomColorList(colorList);
 		setColorChangeSecondsList(secondsList.reverse());
 

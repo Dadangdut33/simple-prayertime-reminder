@@ -7,7 +7,7 @@ body {
 .checkver-span {
 	text-decoration: underline;
 	cursor: pointer;
-	color: blueviolet
+	color: blueviolet;
 }
 
 .subtle-text {
@@ -38,8 +38,8 @@ body {
 }
 
 .splash-img#dark {
-	-webkit-box-shadow: 0 0.25rem 1rem rgb(255, 255, 255, .275) !important;
-	box-shadow: 0 0.25rem 1rem rgb(255, 255, 255, .275) !important;
+	-webkit-box-shadow: 0 0.25rem 1rem rgb(255, 255, 255, 0.275) !important;
+	box-shadow: 0 0.25rem 1rem rgb(255, 255, 255, 0.275) !important;
 }
 
 .splash-img#light {
@@ -47,10 +47,9 @@ body {
 	box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1) !important;
 }
 
-
 /* --------------------------- */
 /* clock timer */
-#the-clock>div:first-of-type {
+#the-clock > div:first-of-type {
 	position: absolute !important;
 	margin-left: -23px;
 	margin-top: -23px;
@@ -59,14 +58,14 @@ body {
 	height: 294px !important;
 }
 
-.light-clock>div:first-of-type {
+.light-clock > div:first-of-type {
 	-webkit-box-shadow: 0 0 30px 15px rgba(0, 0, 0, 0.1);
 	box-shadow: 0 0 30px 15px rgba(0, 0, 0, 0.1);
 }
 
-.dark-clock>div:first-of-type {
-	-webkit-box-shadow: 0 0.25rem 1rem rgb(255, 255, 255, .275);
-	box-shadow: 0 0.25rem 1rem rgb(255, 255, 255, .275);
+.dark-clock > div:first-of-type {
+	-webkit-box-shadow: 0 0.25rem 1rem rgb(255, 255, 255, 0.275);
+	box-shadow: 0 0.25rem 1rem rgb(255, 255, 255, 0.275);
 }
 
 #the-clock div svg {
@@ -80,8 +79,8 @@ body {
 /* the circle */
 .analogue#dark .react-clock__face {
 	border-color: #00d2ff;
-	box-shadow: 0 0.25rem 1rem rgb(0, 210, 255, .275);
-	-webkit-box-shadow: 0 0.25rem 1rem rgb(0, 210, 255, .275);
+	box-shadow: 0 0.25rem 1rem rgb(0, 210, 255, 0.275);
+	-webkit-box-shadow: 0 0.25rem 1rem rgb(0, 210, 255, 0.275);
 }
 
 .analogue#light .react-clock__face {
@@ -135,8 +134,8 @@ body {
 }
 
 .MuiCard-root#dark {
-	-webkit-box-shadow: 0 0.25rem 1rem rgb(255, 255, 255, .275) !important;
-	box-shadow: 0 0.25rem 1rem rgb(255, 255, 255, .275) !important;
+	-webkit-box-shadow: 0 0.25rem 1rem rgb(255, 255, 255, 0.275) !important;
+	box-shadow: 0 0.25rem 1rem rgb(255, 255, 255, 0.275) !important;
 }
 
 .MuiCalendarPicker-root {

@@ -270,7 +270,8 @@ if (!gotTheLock) {
 		}
 	});
 
-	app.whenReady()
+	app
+		.whenReady()
 		.then(async () => {
 			await checkConfigOnStart();
 			await createWindow();
