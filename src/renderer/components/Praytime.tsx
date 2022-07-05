@@ -216,7 +216,7 @@ export const Praytime = ({ theme }: any) => {
 						<Typography sx={{ fontWeight: 'bold', ml: 'auto', mr: 'auto' }} variant='h5' component='h2'>
 							Wind Direction
 						</Typography>
-						<Typography sx={{ fontWeight: 'bold', ml: 'auto', mr: 'auto' }} variant='subtitle1' component='h5'>
+						<Typography sx={{ ml: 'auto', mr: 'auto' }} variant='subtitle1' component='h5'>
 							{currentPt.qibla.toFixed(2)}° ({windDirectionToWord(currentPt.qibla)})
 						</Typography>
 					</Box>

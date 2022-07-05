@@ -147,6 +147,11 @@ body {
 	transform: scale(1.1);
 }
 
+/* date picker */
+.css-1dozdou {
+	padding-top: 1rem;
+}
+
 /* --------------------------- */
 /* custom scrollbar */
 ::-webkit-scrollbar {
