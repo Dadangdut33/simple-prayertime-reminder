@@ -31,7 +31,7 @@ export const Praytime = ({ theme }: any) => {
 	// ----------------------------------------------------------------------------------------------------------------------
 	const [key, setKey] = useState(0);
 	// Config
-	const [currentPt, setCurrentPt] = useState(window.electron.ipcRenderer.sendSync('get-this-pt') as getPrayerTimes_I)!;
+	const [currentPt, setCurrentPt] = useState<getPrayerTimes_I>(window.electron.ipcRenderer.sendSync('get-this-pt') as getPrayerTimes_I);
 	const timezone = window.electron.ipcRenderer.sendSync('get-timezone') as string;
 	const appSettings = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
 
@@ -57,7 +57,7 @@ export const Praytime = ({ theme }: any) => {
 	const check_00_fajr = () => {
 		const checkNow = Moment().tz(timezone);
 		const before = Moment('00:00:00', 'HH:mm:ss').tz(timezone);
-		const after = Moment(new Date(currentPt.fajrTime), 'HH:mm:ss').tz(timezone);
+		const after = Moment(new Date(currentPt!.fajrTime), 'HH:mm:ss').tz(timezone);
 		if (checkNow.isBetween(before, after)) {
 			return true;
 		} else {
@@ -65,20 +65,20 @@ export const Praytime = ({ theme }: any) => {
 		}
 	};
 
-	const getDifCurrent = () => {
+	const getPtDif = () => {
 		const start = Moment(new Date(pt_Map[currentPt.current])).tz(timezone);
 		const end = Moment(new Date(pt_Map[currentPt.next])).tz(timezone);
-		if (currentPt.next === 'fajr' && !check_00_fajr()) end.add(1, 'day');
+		if (currentPt!.next === 'fajr' && !check_00_fajr()) end.add(1, 'day');
 
 		const duration = Moment.duration(start.diff(end));
 
 		return Math.abs(duration.asSeconds());
 	};
 
-	const getDifInitial = () => {
+	const getPtDif_Initial = () => {
 		const startInitial = Moment(new Date()).tz(timezone);
 		const end = Moment(new Date(pt_Map[currentPt.next])).tz(timezone);
-		if (currentPt.next === 'fajr' && !check_00_fajr()) end.add(1, 'day');
+		if (currentPt!.next === 'fajr' && !check_00_fajr()) end.add(1, 'day');
 
 		const durationInitial = Moment.duration(startInitial.diff(end));
 
@@ -97,67 +97,72 @@ export const Praytime = ({ theme }: any) => {
 		return `${hours}:${minutes}:${seconds}`;
 	};
 
+	// timer color
+	const generateRandomHexColor = (amount: number) => {
+		let colorList: ColorHex[] = [],
+			secondsList: number[] = [];
+		for (let i = 0; i < amount; i++) {
+			let color: ColorHex = '#';
+			for (let i = 0; i < 3; i++) color += ('0' + Math.floor((Math.random() * Math.pow(16, 2)) / 2).toString(16)).slice(-2);
+
+			colorList.push(color);
+			secondsList.push(i * amountDivider);
+		}
+
+		setRandomColorList(colorList);
+		setColorChangeSecondsList(secondsList.reverse());
+
+		const saved: colorCache = {
+			current: currentPt!.current,
+			colors: colorList,
+			intervals: secondsList,
+		};
+
+		window.electron.ipcRenderer.send('save-cache-color', saved);
+	};
+
 	// --------------------------------------------------------
 	// Timer
-	const timerClock_durationOpen = getDifCurrent();
-	const timerClock_durationOpenInitial = getDifInitial();
+	const [timerClock_duration, setTimeClockDuration] = useState<number>(2000);
+	const [timeClock_timeDif, setTimeClockTimeDif] = useState<number>(0);
+	const [timeToStr, setTimeToStr] = useState<number>(0);
 	const updatePTData_RefreshTimer = () => {
 		setCurrentPt(window.electron.ipcRenderer.sendSync('get-this-pt') as getPrayerTimes_I); // update pt
+		setTimeClockDuration(getPtDif());
+		setTimeClockTimeDif(getPtDif_Initial());
+		setTimeToStr(getPtDif_Initial());
 		setKey((prevKey) => prevKey + 1); // refresh timer
-
-		setTimeout(() => {
-			console.log(currentPt);
-		}, 1000);
 	};
 
 	// ---------------------------------------------------------
 	useEffect(() => {
+		setTimeClockDuration(getPtDif());
+		setTimeClockTimeDif(getPtDif_Initial());
+		setKey((prevKey) => prevKey + 1); // refresh timer
+
 		// get chip state from localstorage
 		const chipState = localStorage.getItem('chip-state');
 		if (chipState === 'true') setChipExpanded(true);
 
-		const generateRandomHexColor = (amount: number) => {
-			let colorList: ColorHex[] = [],
-				secondsList: number[] = [];
-			for (let i = 0; i < amount; i++) {
-				let color: ColorHex = '#';
-				for (let i = 0; i < 3; i++) color += ('0' + Math.floor((Math.random() * Math.pow(16, 2)) / 2).toString(16)).slice(-2);
+		// timer
+		let timer_clock_Interval: NodeJS.Timer,
+			toExactSecond = 1000 - (new Date().getTime() % 1000),
+			timeoutTimer = setTimeout(() => {
+				timer_clock_Interval = setInterval(() => {
+					setClockValueNow(new Date()); // update clock value
+					setTimeToStr((prevTimeToStr) => prevTimeToStr - 1); // update timer value by substracting it
+				}, 1000);
 
-				colorList.push(color);
-				secondsList.push(i * amountDivider);
-			}
-
-			setRandomColorList(colorList);
-			setColorChangeSecondsList(secondsList.reverse());
-
-			const saved: colorCache = {
-				current: currentPt.current,
-				colors: colorList,
-				intervals: secondsList,
-			};
-
-			window.electron.ipcRenderer.send('save-cache-color', saved);
-		};
-
-		let timer_clock_Interval: NodeJS.Timer;
-		let toExactSecond = 1000 - (new Date().getTime() % 1000);
-		let timeoutTimer = setTimeout(() => {
-			timer_clock_Interval = setInterval(() => {
-				// update clock value
 				setClockValueNow(new Date());
-				// update timer value
-			}, 1000);
-
-			setClockValueNow(new Date());
-			// setRemainTimeFunc();
-		}, toExactSecond); // match second
+				setTimeToStr(getPtDif_Initial());
+			}, toExactSecond); // match second
 
 		const getCacheColor = window.electron.ipcRenderer.sendSync('get-cache-color') as colorCacheGet;
 		if (getCacheColor.success && getCacheColor.data.current === currentPt.current && getCacheColor.data.colors.length > 0 && getCacheColor.data.intervals.length > 0) {
 			setRandomColorList(getCacheColor.data.colors);
 			setColorChangeSecondsList(getCacheColor.data.intervals);
 		} else {
-			generateRandomHexColor(getDifCurrent() / amountDivider);
+			generateRandomHexColor(getPtDif() / amountDivider);
 		}
 
 		// listener
@@ -213,8 +218,8 @@ export const Praytime = ({ theme }: any) => {
 						<CountdownCircleTimer
 							key={key}
 							isPlaying
-							duration={timerClock_durationOpen}
-							initialRemainingTime={timerClock_durationOpenInitial}
+							duration={timerClock_duration}
+							initialRemainingTime={timeClock_timeDif}
 							colors={randomColorList as any}
 							colorsTime={colorChangeSecondsList as any}
 							strokeWidth={4}
@@ -246,7 +251,7 @@ export const Praytime = ({ theme }: any) => {
 									flexWrap: 'wrap',
 								}}
 							>
-								<DoubleArrowIcon color='primary' style={{ fontSize: '26px' }} /> <h2>{formatTimerWithHours(timerClock_durationOpenInitial)}</h2>
+								<DoubleArrowIcon color='primary' style={{ fontSize: '26px' }} /> <h2>{formatTimerWithHours(timeToStr)}</h2>
 							</div>
 						</Box>
 
