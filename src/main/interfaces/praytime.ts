@@ -9,6 +9,7 @@ export interface getPrayerTimes_I {
 	ishaTime: string;
 	current: string;
 	next: string;
+	qibla: number;
 }
 
 export type prayerTimes = 'fajr' | 'sunrise' | 'dhuhr' | 'asr' | 'maghrib' | 'isha';

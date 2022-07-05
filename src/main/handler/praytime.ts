@@ -1,6 +1,6 @@
-import adhan, { Coordinates, CalculationMethod } from 'adhan';
+import adhan, { Coordinates, CalculationMethod, Qibla } from 'adhan';
 import Moment from 'moment-timezone';
-import { configInterface } from 'main/interfaces';
+import { configInterface, getPrayerTimes_I } from 'main/interfaces';
 
 const methodMap: any = {
 	MuslimWorldLeague: CalculationMethod.MuslimWorldLeague,
@@ -32,7 +32,7 @@ const beforeMap: any = {
 	isha: 'maghrib',
 };
 
-export const getPrayerTimes = (settings: configInterface, customDate: string = '') => {
+export const getPrayerTimes = (settings: configInterface, customDate: string = ''): getPrayerTimes_I => {
 	const date = customDate !== '' ? new Date(customDate) : new Date(),
 		params = methodMap[settings.calcOption.method](),
 		coordinates = new Coordinates(parseFloat(settings.locationOption.latitude), parseFloat(settings.locationOption.longitude));
@@ -63,7 +63,8 @@ export const getPrayerTimes = (settings: configInterface, customDate: string = '
 		maghribTime = Moment(prayerGet.maghrib).tz(settings.timezoneOption.timezone).toString(),
 		ishaTime = Moment(prayerGet.isha).tz(settings.timezoneOption.timezone).toString(),
 		current = prayerGet.currentPrayer().toString(),
-		next = prayerGet.nextPrayer().toString();
+		next = prayerGet.nextPrayer().toString(),
+		qibla = Qibla(coordinates);
 
 	if (next === 'none') next = 'fajr';
 	if (current === 'none') current = beforeMap[next];
@@ -78,5 +79,6 @@ export const getPrayerTimes = (settings: configInterface, customDate: string = '
 		ishaTime,
 		current,
 		next,
+		qibla,
 	};
 };

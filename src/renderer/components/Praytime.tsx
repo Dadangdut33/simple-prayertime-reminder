@@ -1,3 +1,4 @@
+import winDir from '../../../assets/windir.png';
 import { useState, useEffect } from 'react';
 import { configInterface, getPrayerTimes_I, ColorHex, colorCache, colorCacheGet } from 'main/interfaces';
 
@@ -27,6 +28,21 @@ import Moment from 'moment-timezone';
 const moment = require('moment-hijri');
 moment.locale('en');
 
+// modal
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
+import Button from '@mui/material/Button';
+const centeredModal = {
+	position: 'absolute' as 'absolute',
+	top: '50%',
+	left: '50%',
+	transform: 'translate(-50%, -50%)',
+	width: '700px',
+	bgcolor: 'background.paper',
+	borderRadius: '4px',
+	boxShadow: 24,
+};
+
 export const Praytime = ({ theme }: any) => {
 	// ----------------------------------------------------------------------------------------------------------------------
 	const [key, setKey] = useState(0);
@@ -43,6 +59,7 @@ export const Praytime = ({ theme }: any) => {
 
 	// chip shrink expand
 	const [chipExpanded, setChipExpanded] = useState(false);
+	const [modalOpened, setModalOpened] = useState(false);
 
 	// ----------------------------------------------------------------------------------------------------------------------
 	const pt_Map: any = {
@@ -121,6 +138,12 @@ export const Praytime = ({ theme }: any) => {
 		window.electron.ipcRenderer.send('save-cache-color', saved);
 	};
 
+	// wind direction to word
+	const windDirectionToWord = (direction: number) => {
+		const directions = ['N', 'N/NE', 'NE', 'E/NE', 'E', 'E/SE', 'SE', 'S/SE', 'S', 'S/SW', 'SW', 'W/SW', 'W', 'W/NW', 'NW', 'N/NW', 'N'];
+		return directions[Math.round((direction % 360) / 22.5)];
+	};
+
 	// --------------------------------------------------------
 	// Timer
 	const [timerClock_duration, setTimeClockDuration] = useState<number>(2000);
@@ -186,6 +209,29 @@ export const Praytime = ({ theme }: any) => {
 	return (
 		<>
 			<CssBaseline />
+			<Modal open={modalOpened}>
+				<Box sx={centeredModal}>
+					<img src={winDir} alt='compass guide' style={{ width: 700 }} />
+					<Box sx={{ display: 'flex', flexDirection: 'column' }}>
+						<Typography sx={{ fontWeight: 'bold', ml: 'auto', mr: 'auto' }} variant='h5' component='h2'>
+							Wind Direction
+						</Typography>
+						<Typography sx={{ fontWeight: 'bold', ml: 'auto', mr: 'auto' }} variant='subtitle1' component='h5'>
+							{currentPt.qibla.toFixed(2)}° ({windDirectionToWord(currentPt.qibla)})
+						</Typography>
+					</Box>
+					<Button
+						sx={{
+							width: 700,
+							borderRadius: 0,
+						}}
+						variant='contained'
+						onClick={() => setModalOpened(!modalOpened)}
+					>
+						Ok
+					</Button>
+				</Box>
+			</Modal>
 			<Fade in={true}>
 				<Box
 					sx={{
@@ -334,6 +380,12 @@ export const Praytime = ({ theme }: any) => {
 									</div>
 								</Box>
 							</Stack>
+							<Box sx={{ display: 'flex', direction: 'row', pt: 3 }}>
+								Qibla direction :
+								<span onClick={() => setModalOpened(!modalOpened)} className='qibla-span' style={{ paddingLeft: '6px' }}>
+									{currentPt.qibla.toFixed(2)}° ({windDirectionToWord(currentPt.qibla)})
+								</span>
+							</Box>
 						</Box>
 					</Collapse>
 				</Box>

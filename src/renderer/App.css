@@ -10,6 +10,11 @@ body {
 	color: blueviolet;
 }
 
+.qibla-span {
+	cursor: pointer;
+	color: blueviolet;
+}
+
 .subtle-text {
 	color: #999;
 }
