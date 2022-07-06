@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { configInterface, getPrayerTimes_I } from 'main/interfaces';
 
 // export
@@ -48,38 +48,53 @@ const moment = require('moment-hijri');
 moment.locale('en');
 
 export const Schedule = () => {
-	const { fajrTime, sunriseTime, dhuhrTime, asrTime, maghribTime, ishaTime } = window.electron.ipcRenderer.sendSync('get-this-pt', '') as getPrayerTimes_I;
-	const timezone = window.electron.ipcRenderer.sendSync('get-timezone') as string;
-	const appSettings = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
-	const versionGet: string = window.electron.ipcRenderer.sendSync('get-version') as any;
+	const [ptTime, setPtTime] = useState < getPrayerTimes_I | null>(null);
+	const [timezone, setTimezone] = useState<string>('');
+	const [appSettings, setAppSettings] = useState<configInterface| null>(null);
+	const [versionGet, setVersionGet] = useState<string>('');
 
-	const [pt_fajr, setPt_fajr] = useState<string>(fajrTime);
-	const [pt_sunrise, setPt_sunrise] = useState<string>(sunriseTime);
-	const [pt_dhuhr, setPt_dhuhr] = useState<string>(dhuhrTime);
-	const [pt_asr, setPt_asr] = useState<string>(asrTime);
-	const [pt_maghrib, setPt_maghrib] = useState<string>(maghribTime);
-	const [pt_isha, setPt_isha] = useState<string>(ishaTime);
-
-	const [selected, setSelected] = useState<Date | null>(new Date());
+	const [selected, setSelected] = useState<Date | null>(null);
 	const [modalOpened, setModalOpened] = useState(false);
 
-	const [startDate, setStartDate] = useState<Date | null>(new Date()); // start date
-	const [endDate, setEndDate] = useState<Date | null>(new Date()); // end date
+	const [startDate, setStartDate] = useState<Date | null>(null); // start date
+	const [endDate, setEndDate] = useState<Date | null>(null); // end date
 	const [exportType, setExportType] = useState<string>('pdf'); // export type
 
+	useEffect(() => {
+		setPtTime(window.electron.ipcRenderer.sendSync('get-this-pt') as getPrayerTimes_I);
+		setTimezone(window.electron.ipcRenderer.sendSync('get-timezone') as string);
+		setAppSettings(window.electron.ipcRenderer.sendSync('get-config') as configInterface);
+		setVersionGet(window.electron.ipcRenderer.sendSync('get-version') as string);
+		setSelected(new Date());
+		setStartDate(new Date());
+		setEndDate(new Date());
+	}, []);
+
+	const getGregorianDate = (date: Date | null) => {
+		if (!appSettings) return '';
+
+		return Moment(date).tz(timezone).format('dddd, D MMMM YYYY')
+	}
+
 	const getHijriDate = (date: Date | null) => {
+		if (!appSettings) return '';
+
 		return appSettings.hijriCalendarOffset < 0
 			? moment(date).subtract(Math.abs(appSettings.hijriCalendarOffset), 'days').tz(timezone).format('iD iMMMM iYYYY')
 			: moment(date).add(appSettings.hijriCalendarOffset, 'days').tz(timezone).format('iD iMMMM iYYYY');
 	};
 
 	const getPtTime = (date: string) => {
+		if (!appSettings) return '';
+		
 		return Moment(new Date(date))
 			.tz(timezone)
 			.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A');
 	};
 
-	const exportSchedule = () => {
+	const exportSchedule = async () => {
+		if (!appSettings) return;
+
 		// if endDate < startDate
 		if (endDate!.valueOf() < startDate!.valueOf() && endDate!.valueOf() !== startDate!.valueOf()) {
 			alert('End date must be greater than start date');
@@ -128,7 +143,7 @@ export const Schedule = () => {
 			dataExport.push(['']);
 			dataExport.push([`©Simple PrayerTime Reminder v${versionGet}`]);
 			dataExport.push([`https://bit.ly/SPRRepo`]);
-			dataExport.push([`${Moment().tz(timezone).format('D MMMM YYYY, h:mm:ss a')}`]);
+			dataExport.push([`${Moment().tz(timezone).format('D MMMM YYYY, HH:mm:ss')}`]);
 
 			// save data
 			const workBook = XLSX.utils.book_new();
@@ -142,25 +157,7 @@ export const Schedule = () => {
 			const doc = new jsPDF();
 			const dataExport = [];
 
-			let pushLines = [];
-			pushLines.push(`Prayer schedules for ${appSettings.locationOption.city}`);
-			pushLines.push('');
-			pushLines.push('Details:');
-			pushLines.push('Timezone: ' + timezone);
-			pushLines.push('Latitude: ' + appSettings.locationOption.latitude);
-			pushLines.push('Longitude: ' + appSettings.locationOption.longitude);
-			pushLines.push('Hijri Offset: ' + appSettings.hijriCalendarOffset);
-			pushLines.push('Calculation Method: ' + appSettings.calcOption.method);
-			pushLines.push('Madhab: ' + appSettings.calcOption.madhab);
-			pushLines.push('High Lat Rule: ' + appSettings.calcOption.highLatitudeRule);
-			pushLines.push(
-				`Offsets: [${appSettings.calcOption.adjustments.fajr}, ${appSettings.calcOption.adjustments.sunrise}, ${appSettings.calcOption.adjustments.dhuhr}, ${appSettings.calcOption.adjustments.asr}, ${appSettings.calcOption.adjustments.maghrib}, ${appSettings.calcOption.adjustments.isha}]`,
-			);
-			pushLines.push('');
-			pushLines.push(`©Simple PrayerTime Reminder v${versionGet}`);
-			pushLines.push(`https://bit.ly/SPRRepo`);
-			pushLines.push(`${Moment().tz(timezone).format('D MMMM YYYY, h:mm:ss a')}`);
-			doc.text(pushLines, 10, 20)
+			doc.text(`Prayer schedules for ${appSettings.locationOption.city}`, doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
 
 			for (let i = 0; i <= days; i++) {
 				const day = moment(startDate).add(i, 'days');
@@ -178,16 +175,33 @@ export const Schedule = () => {
 			}
 
 			autoTable(doc, {
-				startY: 120,
+				startY: 25,
 				margin: 10,
 				head: [['Gregorian Date', 'Hijri Date', 'Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha']],
 				body: dataExport
 			});
 
+			let pushLines = [];
+			doc.addPage();
+			pushLines.push('Details:');
+			pushLines.push('Timezone: ' + timezone);
+			pushLines.push('Latitude: ' + appSettings.locationOption.latitude);
+			pushLines.push('Longitude: ' + appSettings.locationOption.longitude);
+			pushLines.push('Hijri Offset: ' + appSettings.hijriCalendarOffset);
+			pushLines.push('Calculation Method: ' + appSettings.calcOption.method);
+			pushLines.push('Madhab: ' + appSettings.calcOption.madhab);
+			pushLines.push('High Lat Rule: ' + appSettings.calcOption.highLatitudeRule);
+			pushLines.push(
+				`Offsets: [${appSettings.calcOption.adjustments.fajr}, ${appSettings.calcOption.adjustments.sunrise}, ${appSettings.calcOption.adjustments.dhuhr}, ${appSettings.calcOption.adjustments.asr}, ${appSettings.calcOption.adjustments.maghrib}, ${appSettings.calcOption.adjustments.isha}]`,
+			);
+			pushLines.push('');
+			pushLines.push(`©Simple PrayerTime Reminder v${versionGet}`);
+			pushLines.push(`https://bit.ly/SPRRepo`);
+			pushLines.push(`${Moment().tz(timezone).format('D MMMM YYYY, HH:mm:ss')}`);
+			doc.text(pushLines, 10, 20)
+
 			doc.save(`${appSettings.locationOption.city}_${Moment(startDate).tz(timezone).format('D MMMM YYYY')}_${Moment(endDate).tz(timezone).format('D MMMM YYYY')}.pdf`);
 		}
-
-		setModalOpened(!modalOpened);
 	};
 
 	return (
@@ -212,8 +226,9 @@ export const Schedule = () => {
 									flexDirection: 'column',
 									alignItems: 'center',
 								}}
-							>
-								{Moment(startDate).tz(timezone).format('dddd, D MMMM YYYY')}
+							>	
+							
+								{getGregorianDate(startDate)}
 								<Typography variant='caption' display='block' className='subtle-text'>
 									({getHijriDate(startDate)})
 								</Typography>
@@ -226,7 +241,7 @@ export const Schedule = () => {
 									alignItems: 'center',
 								}}
 							>
-								{Moment(endDate).tz(timezone).format('dddd, D MMMM YYYY')}
+								{getGregorianDate(endDate)}
 								<Typography variant='caption' display='block' className='subtle-text'>
 									({getHijriDate(endDate)})
 								</Typography>
@@ -275,7 +290,7 @@ export const Schedule = () => {
 							exportSchedule();
 						}}
 					>
-						OK
+						Export
 					</Button>
 					<Button
 						sx={{
@@ -286,7 +301,7 @@ export const Schedule = () => {
 						onClick={() => setModalOpened(!modalOpened)}
 						color='error'
 					>
-						Cancel
+						Close
 					</Button>
 				</Box>
 			</Modal>
@@ -299,14 +314,16 @@ export const Schedule = () => {
 								date={selected}
 								onChange={(newValue) => {
 									setSelected(newValue);
-									const pt = window.electron.ipcRenderer.sendSync('get-this-pt', newValue?.toString()) as getPrayerTimes_I;
+									setPtTime(window.electron.ipcRenderer.sendSync('get-this-pt', newValue?.toString()) as getPrayerTimes_I);
+
+									// const pt = window.electron.ipcRenderer.sendSync('get-this-pt', newValue?.toString()) as getPrayerTimes_I;
 									// set new prayer times with the adjustment
-									setPt_fajr(pt.fajrTime);
-									setPt_sunrise(pt.sunriseTime);
-									setPt_dhuhr(pt.dhuhrTime);
-									setPt_asr(pt.asrTime);
-									setPt_maghrib(pt.maghribTime);
-									setPt_isha(pt.ishaTime);
+									// setPt_fajr(pt.fajrTime);
+									// setPt_sunrise(pt.sunriseTime);
+									// setPt_dhuhr(pt.dhuhrTime);
+									// setPt_asr(pt.asrTime);
+									// setPt_maghrib(pt.maghribTime);
+									// setPt_isha(pt.ishaTime);
 								}}
 								minDate={new Date('1937-03-14')}
 								// hijri calendar have to be limited to 2076...
@@ -317,7 +334,7 @@ export const Schedule = () => {
 					</LocalizationProvider>
 					<Box sx={{ display: 'flex', flexDirection: 'column' }}>
 						<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'start' }}>
-							{Moment(selected).tz(timezone).format('dddd, D MMMM YYYY')} -{' '}
+							{getGregorianDate(selected)} -{' '}
 							<span className='subtle-text' style={{ marginLeft: '3px' }}>
 								{getHijriDate(selected)}
 							</span>
@@ -330,29 +347,29 @@ export const Schedule = () => {
 						<Stack direction='row' divider={<Divider orientation='vertical' flexItem />} spacing={2} sx={{ mt: 3, justifyContent: 'space-between' }}>
 							<Box sx={{ display: 'flex', flexDirection: 'column' }}>
 								<div>
-									<strong>{getPtTime(pt_fajr)}</strong>
+									<strong>{ptTime ?  getPtTime(ptTime.fajrTime) : ''}</strong>
 									<span className='prayername'>Fajr</span>
 								</div>
 								<div>
-									<strong>{getPtTime(pt_sunrise)}</strong>
+									<strong>{ptTime ? getPtTime(ptTime.sunriseTime): ''}</strong>
 									<span className='prayername'>Sunrise</span>
 								</div>
 								<div>
-									<strong>{getPtTime(pt_dhuhr)}</strong>
+									<strong>{ptTime ? getPtTime(ptTime.dhuhrTime): ''}</strong>
 									<span className='prayername'>Dhuhr</span>
 								</div>
 							</Box>
 							<Box sx={{ display: 'flex', flexDirection: 'column' }}>
 								<div>
-									<strong>{getPtTime(pt_asr)}</strong>
+									<strong>{ptTime ? getPtTime(ptTime.asrTime): ''}</strong>
 									<span className='prayername'>Asr</span>
 								</div>
 								<div>
-									<strong>{getPtTime(pt_maghrib)}</strong>
+									<strong>{ptTime ? getPtTime(ptTime.maghribTime): ''}</strong>
 									<span className='prayername'>Maghrib</span>
 								</div>
 								<div>
-									<strong>{getPtTime(pt_isha)}</strong>
+									<strong>{ptTime ? getPtTime(ptTime.ishaTime): ''}</strong>
 									<span className='prayername'>Isha</span>
 								</div>
 							</Box>
