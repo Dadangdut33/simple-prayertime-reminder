@@ -1,3 +1,10 @@
+[1.2.0]
+- improve color gen and clock page
+- setting reminder redesign
+- adhan is now customizable
+- add qibla direction
+- add export praytime schedule
+
 [1.1.4]
 - fix page refresh even though modal is open 
 
