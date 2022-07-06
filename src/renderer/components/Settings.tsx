@@ -2,6 +2,10 @@ import { ColorModeContextInterface } from 'renderer/interfaces';
 import { configInterface, getPosition_absolute_I, calcMethod, madhab, highLatitudeRule_T, prayerTimes } from 'main/interfaces';
 import { useContext, forwardRef, useState, ChangeEvent, useEffect } from 'react';
 
+// Audio player
+// @ts-ignore
+import ReactHowler from 'react-howler';
+
 // MUI
 import Fade from '@mui/material/Fade';
 import Divider from '@mui/material/Divider';
@@ -29,7 +33,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Checkbox from '@mui/material/Checkbox';
 import MuiInput from '@mui/material/Input';
 import Autocomplete from '@mui/material/Autocomplete';
-import Select from '@mui/material/Select';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 
@@ -55,6 +59,7 @@ import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import PauseIcon from '@mui/icons-material/Pause';
 import StopIcon from '@mui/icons-material/Stop';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
 export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) => {
 	// helper
@@ -438,13 +443,69 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	// --------------------------------------------------------------------------
 	// adhanPath
-	const [adhanInput, setAdhanInput] = useState('');
+	const [adhanInput, setAdhanInput] = useState(initialConfig.adhanSoundPath.fajr === 'auto' ? (window.electron.ipcRenderer.sendSync('get-default-adhan-fajr') as string) : initialConfig.adhanSoundPath.fajr);
 	const [adhanFajr, setAdhanFajr] = useState('');
 	const [adhanNormal, setAdhanNormal] = useState('');
 	const [selectAdhan, setSelectAdhan] = useState('Fajr');
 	const [adhanPlaying, setAdhanPlaying] = useState(false);
+	const [adhanPlayer, setAdhanPlayer] = useState<any>(null);
 
-	const handleAdhanInput = (e: React.ChangeEvent<HTMLInputElement>) => {};
+	const handleSelectAdhan = (e: SelectChangeEvent) => {
+		// stop player and set not playing
+		if (adhanPlayer) adhanPlayer.stop();
+		setAdhanPlaying(false);
+
+		setSelectAdhan(e.target.value);
+		setAdhanInput(
+			e.target.value === 'Fajr'
+				? adhanFajr === 'auto'
+					? (window.electron.ipcRenderer.sendSync('get-default-adhan-fajr') as string)
+					: adhanFajr
+				: adhanNormal === 'auto'
+				? (window.electron.ipcRenderer.sendSync('get-default-adhan-normal') as string)
+				: adhanNormal
+		);
+	};
+
+	const handleAdhanInput = () => {
+		// stop player and set not playing
+		if (adhanPlayer) adhanPlayer.stop();
+		setAdhanPlaying(false);
+
+		// open dialog get input
+		const dialog: any = window.electron.ipcRenderer.sendSync('file-dialog', {
+			title: 'Select Adhan File (.mp3)',
+			message: 'Select Adhan File',
+			filters: [{ name: 'Audio', extensions: ['mp3'] }],
+		});
+
+		// set input
+		if (dialog) {
+			setAdhanInput(dialog as string);
+			if (selectAdhan === 'Fajr') {
+				setAdhanFajr(dialog[0] as string);
+			} else {
+				setAdhanNormal(dialog[0] as string);
+			}
+
+			checkChanges();
+		}
+	};
+
+	const handlerRestoreDefaultAdhan = () => {
+		// stop player and set not playing
+		if (adhanPlayer) adhanPlayer.stop();
+		setAdhanPlaying(false);
+
+		setAdhanInput(window.electron.ipcRenderer.sendSync(`get-default-adhan-${selectAdhan.toLowerCase()}`) as unknown as string);
+		if (selectAdhan === 'Fajr') {
+			setAdhanFajr('auto');
+		} else {
+			setAdhanNormal('auto');
+		}
+
+		checkChanges();
+	};
 
 	// --------------------------------------------------------------------------
 	// location
@@ -738,9 +799,9 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		setIsha_number_before(initialConfig.reminderOption.isha.earlyTime);
 		setIsha_number_after(initialConfig.reminderOption.isha.afterTime);
 		// -----
-		setAdhanInput(initialConfig.adhanSoundPath.fajr === 'auto' ? (window.electron.ipcRenderer.sendSync('get-adhan-path-fajr') as string) : initialConfig.adhanSoundPath.fajr);
-		setAdhanFajr(initialConfig.adhanSoundPath.fajr === 'auto' ? (window.electron.ipcRenderer.sendSync('get-adhan-path-fajr') as string) : initialConfig.adhanSoundPath.fajr);
-		setAdhanNormal(initialConfig.adhanSoundPath.normal === 'auto' ? (window.electron.ipcRenderer.sendSync('get-adhan-path') as string) : initialConfig.adhanSoundPath.normal);
+		setAdhanInput(initialConfig.adhanSoundPath.fajr === 'auto' ? (window.electron.ipcRenderer.sendSync('get-default-adhan-fajr') as string) : initialConfig.adhanSoundPath.fajr);
+		setAdhanFajr(initialConfig.adhanSoundPath.fajr === 'auto' ? (window.electron.ipcRenderer.sendSync('get-default-adhan-fajr') as string) : initialConfig.adhanSoundPath.fajr);
+		setAdhanNormal(initialConfig.adhanSoundPath.normal === 'auto' ? (window.electron.ipcRenderer.sendSync('get-default-adhan-normal') as string) : initialConfig.adhanSoundPath.normal);
 		// -----
 		setLocMode(initialConfig.locationOption.mode);
 		setLocCity(initialConfig.locationOption.city);
@@ -875,6 +936,12 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 			setShowSnackbar(true);
 			setSnackbarSeverity('success');
 			setSnackbarMsg('Changes saved successfully.');
+
+			// check if path differs from original or not
+			if (currentConfig.adhanSoundPath.fajr !== initialConfig.adhanSoundPath.fajr || currentConfig.adhanSoundPath.normal !== initialConfig.adhanSoundPath.normal) {
+				// signal ipc path is updated
+				window.electron.ipcRenderer.send('update-path');
+			}
 		} else {
 			// show snackbar
 			setShowSnackbar(true);
@@ -930,6 +997,18 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 					{snackbarMsg}
 				</Alert>
 			</Snackbar>
+			{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
+			<ReactHowler
+				// ex: src='D://Coding/@Projects/Electron/simple-prayertime-reminder/assets/adhan.mp3'
+				src={adhanInput}
+				playing={adhanPlaying}
+				ref={(ref: any) => {
+					setAdhanPlayer(ref);
+				}}
+				onEnd={() => {
+					setAdhanPlaying(false);
+				}}
+			/>
 			{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
 			<Fade in={true}>
 				<Box
@@ -1140,7 +1219,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 								</FormControl>
 							</Box>
 						</Grid>
-
+						{/* reminder */}
 						<Grid item xs={6}>
 							<div
 								style={{
@@ -1163,7 +1242,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 							<Box sx={{ display: 'flex', flexDirection: 'row' }}>
 								<FormControl sx={{ minWidth: '120px', mr: 2, pt: 1 }}>
 									<FormLabel>Adhan Type</FormLabel>
-									<Select size='small' value={selectAdhan} onChange={(v) => setSelectAdhan(v.target.value)}>
+									<Select size='small' value={selectAdhan} onChange={handleSelectAdhan}>
 										<MenuItem value='Fajr'>Fajr</MenuItem>
 										<MenuItem value='Normal'>Normal</MenuItem>
 									</Select>
@@ -1177,23 +1256,17 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 										variant='outlined'
 										size='small'
 										value={adhanInput}
-										onChange={handleAdhanInput}
 										InputProps={{
+											readOnly: true,
 											endAdornment: (
 												<InputAdornment position='end'>
-													<IconButton
-														aria-label='Open Folder'
-														onClick={() => {
-															/**changeAdhanMp3 */
-														}}
-														edge='end'
-													>
+													<IconButton aria-label='Open Folder' onClick={handleAdhanInput} edge='end'>
 														<FolderOpenIcon />
 													</IconButton>
 													<IconButton
 														aria-label='Play adhan'
 														onClick={() => {
-															/**playAdhan */
+															setAdhanPlaying(!adhanPlaying);
 														}}
 														edge='end'
 													>
@@ -1202,12 +1275,24 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 													<IconButton
 														aria-label='Stop adhan'
 														onClick={() => {
-															/**stopAdhan */
+															adhanPlayer.stop();
+															setAdhanPlaying(false);
 														}}
 														edge='end'
 													>
 														<StopIcon />
 													</IconButton>
+													<Tooltip title='Click to restore default adhan path' arrow>
+														<IconButton
+															aria-label='Restore default'
+															onClick={() => {
+																handlerRestoreDefaultAdhan();
+															}}
+															edge='end'
+														>
+															<RestartAltIcon />
+														</IconButton>
+													</Tooltip>
 												</InputAdornment>
 											),
 										}}

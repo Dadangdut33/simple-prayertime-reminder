@@ -1,6 +1,6 @@
 import icon from '../../../assets/display_icon_notext.png';
 import { ModalContentInterface } from 'renderer/interfaces';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 // @ts-ignore
 import ReactHowler from 'react-howler';
 
@@ -42,8 +42,16 @@ export const ModalPraytime = ({ modalContent, showModal, setShowModal }: ModalPr
 	const [adhanFajrPlayer, setAdhanFajrPlayer] = useState<any>(null);
 
 	// adhan path
-	const adhanPath = window.electron.ipcRenderer.sendSync('get-adhan-path') as string;
-	const adhanFajrPath = window.electron.ipcRenderer.sendSync('get-adhan-path-fajr') as string;
+	const [adhanPath, setAdhanPath] = useState(
+		(window.electron.ipcRenderer.sendSync('get-adhan-path-normal') as string) === 'auto'
+			? (window.electron.ipcRenderer.sendSync('get-default-adhan-normal') as string)
+			: (window.electron.ipcRenderer.sendSync('get-adhan-path-normal') as string)
+	);
+	const [adhanFajrPath, setAdhanFajrPath] = useState(
+		(window.electron.ipcRenderer.sendSync('get-adhan-path-fajr') as string) === 'auto'
+			? (window.electron.ipcRenderer.sendSync('get-default-adhan-fajr') as string)
+			: (window.electron.ipcRenderer.sendSync('get-adhan-path-fajr') as string)
+	);
 
 	// Button
 	const okBtnPressed = () => {
@@ -57,6 +65,27 @@ export const ModalPraytime = ({ modalContent, showModal, setShowModal }: ModalPr
 		if (modalContent.type === 'adhan') adhanPlayer.stop();
 		if (modalContent.type === 'adhan_fajr') adhanFajrPlayer.stop();
 	};
+
+	const updatePath = () => {
+		setAdhanPath(
+			(window.electron.ipcRenderer.sendSync('get-adhan-path-normal') as string) === 'auto'
+				? (window.electron.ipcRenderer.sendSync('get-default-adhan-normal') as string)
+				: (window.electron.ipcRenderer.sendSync('get-adhan-path-normal') as string)
+		);
+		setAdhanFajrPath(
+			(window.electron.ipcRenderer.sendSync('get-adhan-path-fajr') as string) === 'auto'
+				? (window.electron.ipcRenderer.sendSync('get-default-adhan-fajr') as string)
+				: (window.electron.ipcRenderer.sendSync('get-adhan-path-fajr') as string)
+		);
+	};
+
+	useEffect(() => {
+		window.electron.ipcRenderer.on('path-updated', updatePath);
+
+		return () => {
+			window.electron.ipcRenderer.removeEventListener('path-updated', updatePath);
+		};
+	}, []);
 
 	return (
 		<>

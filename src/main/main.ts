@@ -22,7 +22,7 @@ import { resolveHtmlPath } from './util';
 import { configInterface, getPrayerTimes_I } from './interfaces';
 import { initialConfig, writeConfig, readConfig } from './handler/files';
 import { getPrayerTimes } from './handler/praytime';
-import { onUnresponsiveWindow, errorBox, NoYesBox } from './handler/messageBox';
+import { onUnresponsiveWindow, errorBox, NoYesBox, openFile } from './handler/messageBox';
 import { getLatLong_FromCitiesName, getPosition_absolute, verifyKey } from './handler/getPos';
 
 // -------------------------------------------------------------------------------------
@@ -43,8 +43,6 @@ let mainWindow: BrowserWindow | null = null,
 	},
 	autoLauncher = new autoLaunch(launcherOption),
 	modalTimeout: NodeJS.Timeout,
-	adhanPath = '',
-	adhanFajrPath = '',
 	menuBuilder: MenuBuilder,
 	trayManager: TrayManager,
 	session_shown_splash = false,
@@ -182,6 +180,8 @@ const createWindow = async () => {
 		height: 728,
 		minWidth: 900,
 		minHeight: 600,
+		x: 0,
+		y: 0,
 		icon: getAssetPath('icon.png'),
 		webPreferences: {
 			preload: app.isPackaged ? path.join(__dirname, 'preload.js') : path.join(__dirname, '../../.erb/dll/preload.js'),
@@ -297,8 +297,6 @@ if (!gotTheLock) {
 
 			// get paths
 			iconPath = getAssetPath('icon.png');
-			adhanPath = getAssetPath('adhan.mp3');
-			adhanFajrPath = getAssetPath('adhan_fajr.mp3');
 
 			// start notification interval
 			notifyInterval();
@@ -343,12 +341,24 @@ ipcMain.on('update-tray', (_event, _arg) => {
 
 // ----------------------------------------------------
 // adhan
-ipcMain.on('get-adhan-path', (event, _arg) => {
-	event.returnValue = adhanPath.replace(/\\/g, '/');
+ipcMain.on('update-path', (_event, _arg) => {
+	if (mainWindow) mainWindow.webContents.send('path-updated');
 });
 
 ipcMain.on('get-adhan-path-fajr', (event, _arg) => {
-	event.returnValue = adhanFajrPath.replace(/\\/g, '/');
+	event.returnValue = appConfig.adhanSoundPath.fajr;
+});
+
+ipcMain.on('get-adhan-path-normal', (event, _arg) => {
+	event.returnValue = appConfig.adhanSoundPath.normal;
+});
+
+ipcMain.on('get-default-adhan-fajr', (event, _arg) => {
+	event.returnValue = getAssetPath('adhan_fajr.mp3').replace(/\\/g, '/');
+});
+
+ipcMain.on('get-default-adhan-normal', (event, _arg) => {
+	event.returnValue = getAssetPath('adhan.mp3').replace(/\\/g, '/');
 });
 
 // ----------------------------------------------------
@@ -462,6 +472,11 @@ ipcMain.on('yesno-dialog', (event, arg: any) => {
 	event.returnValue = result;
 });
 
+ipcMain.on('file-dialog', (event, arg: any) => {
+	const result = openFile(mainWindow as BrowserWindow, arg.title, arg.message, arg.filters);
+	event.returnValue = result;
+});
+
 // ----------------------------------------------------
 // praytime
 ipcMain.on('get-this-pt', (event, arg) => {
@@ -544,7 +559,15 @@ const checkNotifyOnTime = (now: Moment.Moment) => {
 		// check adhan mp3 if play adhan
 		if (playAdhan) {
 			// check using fs wether adhanPath exist on disk or not
-			const checkPath = title === 'Fajr' ? adhanFajrPath : adhanPath;
+			const checkPath =
+				title === 'Fajr'
+					? appConfig.adhanSoundPath.fajr === 'auto'
+						? getAssetPath('adhan_fajr.mp3').replace(/\\/g, '/')
+						: appConfig.adhanSoundPath.fajr
+					: appConfig.adhanSoundPath.normal === 'auto'
+					? getAssetPath('adhan.mp3').replace(/\\/g, '/')
+					: appConfig.adhanSoundPath.normal;
+
 			if (!existsSync(checkPath)) {
 				// notify missing adhan file
 				const adhanNotFoundNotification = new Notification({

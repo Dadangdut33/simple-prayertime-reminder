@@ -56,9 +56,12 @@ export function openDirectory(window: BrowserWindow) {
 	});
 }
 
-export function openFile(window: BrowserWindow) {
+export function openFile(window: BrowserWindow, title: string, message: string, filters: any) {
 	return dialog.showOpenDialogSync(window, {
 		properties: ['openFile'],
+		filters: filters,
+		title: title,
+		message: message,
 	});
 }
 
