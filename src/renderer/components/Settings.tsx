@@ -15,6 +15,7 @@ const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) 
 	return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
 });
 import CircularProgress from '@mui/material/CircularProgress';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 // Form
 import IconButton from '@mui/material/IconButton';
@@ -134,103 +135,304 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	// --------------------------------------------------------------------------
 	// reminder option
-	const [remind_fajr_remindWhenOnTime, setRemind_fajr_remindWhenOnTime] = useState<boolean>(true);
-	const [remind_fajr_earlyReminder, setRemind_fajr_earlyReminder] = useState<boolean>(true);
-	const [remind_fajr_earlyTime, setRemind_fajr_earlyTime] = useState<number>(15);
-	const [remind_fajr_adhan, setRemind_fajr_adhan] = useState<boolean>(true);
+	const [rm_fjr_bool_ontime, setFjr_bool_ontime] = useState<boolean>(true);
+	const [rm_fjr_bool_before, setFjr_bool_before] = useState<boolean>(true);
+	const [rm_fjr_bool_after, setFjr_bool_after] = useState<boolean>(true);
+	const [rm_fjr_bool_adhan, setFjr_bool_adhan] = useState<boolean>(true);
+	const [rm_fjr_bool_popup, setFjr_bool_popup] = useState<boolean>(true);
+	const [rm_fjr_number_before, setFjr_number_before] = useState<number>(15);
+	const [rm_fjr_number_after, setFjr_number_after] = useState<number>(15);
 
-	const [remind_sunrise_remindWhenOnTime, setRemind_sunrise_remindWhenOnTime] = useState<boolean>(true);
-	const [remind_sunrise_earlyReminder, setRemind_sunrise_earlyReminder] = useState<boolean>(true);
-	const [remind_sunrise_earlyTime, setRemind_sunrise_earlyTime] = useState<number>(15);
+	const [rm_snr_bool_ontime, setSnr_bool_ontime] = useState<boolean>(true);
+	const [rm_snr_bool_before, setSnr_bool_before] = useState<boolean>(true);
+	const [rm_snr_bool_after, setSnr_bool_after] = useState<boolean>(true);
+	const [rm_snr_bool_popup, setSnr_bool_popup] = useState<boolean>(true);
+	const [rm_snr_number_before, setSnr_number_before] = useState<number>(15);
+	const [rm_snr_number_after, setSnr_number_after] = useState<number>(15);
 
-	const [remind_dhuhr_remindWhenOnTime, setRemind_dhuhr_remindWhenOnTime] = useState<boolean>(true);
-	const [remind_dhuhr_earlyReminder, setRemind_dhuhr_earlyReminder] = useState<boolean>(true);
-	const [remind_dhuhr_earlyTime, setRemind_dhuhr_earlyTime] = useState<number>(15);
-	const [remind_dhuhr_adhan, setRemind_dhuhr_adhan] = useState<boolean>(true);
+	const [rm_dhr_bool_ontime, setDhr_bool_ontime] = useState<boolean>(true);
+	const [rm_dhr_bool_before, setDhr_bool_before] = useState<boolean>(true);
+	const [rm_dhr_bool_after, setDhr_bool_after] = useState<number>(15);
+	const [rm_dhr_bool_adhan, setDhr_bool_adhan] = useState<boolean>(true);
+	const [rm_dhr_bool_popup, setDhr_bool_popup] = useState<boolean>(true);
+	const [rm_dhr_number_before, setDhr_number_before] = useState<number>(15);
+	const [rm_dhr_number_after, setDhr_number_after] = useState<number>(15);
 
-	const [remind_asr_remindWhenOnTime, setRemind_asr_remindWhenOnTime] = useState<boolean>(true);
-	const [remind_asr_earlyReminder, setRemind_asr_earlyReminder] = useState<boolean>(true);
-	const [remind_asr_earlyTime, setRemind_asr_earlyTime] = useState<number>(15);
-	const [remind_asr_adhan, setRemind_asr_adhan] = useState<boolean>(true);
+	const [rm_asr_bool_ontime, setAsr_bool_ontime] = useState<boolean>(true);
+	const [rm_asr_bool_before, setAsr_bool_before] = useState<boolean>(true);
+	const [rm_asr_bool_after, setAsr_bool_after] = useState<number>(15);
+	const [rm_asr_bool_adhan, setAsr_bool_adhan] = useState<boolean>(true);
+	const [rm_asr_bool_popup, setAsr_bool_popup] = useState<boolean>(true);
+	const [rm_asr_number_before, setAsr_number_before] = useState<number>(15);
+	const [rm_asr_number_after, setAsr_number_after] = useState<number>(15);
 
-	const [remind_maghrib_remindWhenOnTime, setRemind_maghrib_remindWhenOnTime] = useState<boolean>(true);
-	const [remind_maghrib_earlyReminder, setRemind_maghrib_earlyReminder] = useState<boolean>(true);
-	const [remind_maghrib_earlyTime, setRemind_maghrib_earlyTime] = useState<number>(15);
-	const [remind_maghrib_adhan, setRemind_maghrib_adhan] = useState<boolean>(true);
+	const [rm_mgr_bool_ontime, setMgr_bool_ontime] = useState<boolean>(true);
+	const [rm_mgr_bool_before, setMgr_bool_before] = useState<boolean>(true);
+	const [rm_mgr_bool_after, setMgr_bool_after] = useState<number>(15);
+	const [rm_mgr_bool_adhan, setMgr_bool_adhan] = useState<boolean>(true);
+	const [rm_mgr_bool_popup, setMgr_bool_popup] = useState<boolean>(true);
+	const [rm_mgr_number_before, setMgr_number_before] = useState<number>(15);
+	const [rm_mgr_number_after, setMgr_number_after] = useState<number>(15);
 
-	const [remind_isha_remindWhenOnTime, setRemind_isha_remindWhenOnTime] = useState<boolean>(true);
-	const [remind_isha_earlyReminder, setRemind_isha_earlyReminder] = useState<boolean>(true);
-	const [remind_isha_earlyTime, setRemind_isha_earlyTime] = useState<number>(15);
-	const [remind_isha_adhan, setRemind_isha_adhan] = useState<boolean>(true);
+	const [rm_isha_bool_ontime, setIsha_bool_ontime] = useState<boolean>(true);
+	const [rm_isha_bool_before, setIsha_bool_before] = useState<boolean>(true);
+	const [rm_isha_bool_after, setIsha_bool_after] = useState<number>(15);
+	const [rm_isha_bool_adhan, setIsha_bool_adhan] = useState<boolean>(true);
+	const [rm_isha_bool_popup, setIsha_bool_popup] = useState<boolean>(true);
+	const [rm_isha_number_before, setIsha_number_before] = useState<number>(15);
+	const [rm_isha_number_after, setIsha_number_after] = useState<number>(15);
 
-	const remindWhenOnTimeChangeMap = {
-		fajr: setRemind_fajr_remindWhenOnTime,
-		sunrise: setRemind_sunrise_remindWhenOnTime,
-		dhuhr: setRemind_dhuhr_remindWhenOnTime,
-		asr: setRemind_asr_remindWhenOnTime,
-		maghrib: setRemind_maghrib_remindWhenOnTime,
-		isha: setRemind_isha_remindWhenOnTime,
+	const bool_rmOnTimeMap: any = {
+		1: setFjr_bool_ontime,
+		2: setSnr_bool_ontime,
+		3: setDhr_bool_ontime,
+		4: setAsr_bool_ontime,
+		5: setMgr_bool_ontime,
+		6: setIsha_bool_ontime,
 	};
 
-	const earlyReminderChangeMap = {
-		fajr: setRemind_fajr_earlyReminder,
-		sunrise: setRemind_sunrise_earlyReminder,
-		dhuhr: setRemind_dhuhr_earlyReminder,
-		asr: setRemind_asr_earlyReminder,
-		maghrib: setRemind_maghrib_earlyReminder,
-		isha: setRemind_isha_earlyReminder,
+	const bool_rmBeforeMap: any = {
+		1: setFjr_bool_before,
+		2: setSnr_bool_before,
+		3: setDhr_bool_before,
+		4: setAsr_bool_before,
+		5: setMgr_bool_before,
+		6: setIsha_bool_before,
 	};
 
-	const earlyTimeChangeMap = {
-		fajr: setRemind_fajr_earlyTime,
-		sunrise: setRemind_sunrise_earlyTime,
-		dhuhr: setRemind_dhuhr_earlyTime,
-		asr: setRemind_asr_earlyTime,
-		maghrib: setRemind_maghrib_earlyTime,
-		isha: setRemind_isha_earlyTime,
+	const bool_rmAfterMap: any = {
+		1: setFjr_bool_after,
+		2: setSnr_bool_after,
+		3: setDhr_bool_after,
+		4: setAsr_bool_after,
+		5: setMgr_bool_after,
+		6: setIsha_bool_after,
 	};
 
-	const varEarlyTimeChangeMap = {
-		fajr: remind_fajr_earlyTime,
-		sunrise: remind_sunrise_earlyTime,
-		dhuhr: remind_dhuhr_earlyTime,
-		asr: remind_asr_earlyTime,
-		maghrib: remind_maghrib_earlyTime,
-		isha: remind_isha_earlyTime,
+	const bool_rmAdhanMap: any = {
+		1: setFjr_bool_adhan,
+		3: setDhr_bool_adhan,
+		4: setAsr_bool_adhan,
+		5: setMgr_bool_adhan,
+		6: setIsha_bool_adhan,
 	};
 
-	const adhanChangeMap = {
-		fajr: setRemind_fajr_adhan,
-		dhuhr: setRemind_dhuhr_adhan,
-		asr: setRemind_asr_adhan,
-		maghrib: setRemind_maghrib_adhan,
-		isha: setRemind_isha_adhan,
+	const bool_rmPopupMap: any = {
+		1: setFjr_bool_popup,
+		2: setSnr_bool_popup,
+		3: setDhr_bool_popup,
+		4: setAsr_bool_popup,
+		5: setMgr_bool_popup,
+		6: setIsha_bool_popup,
 	};
 
-	const handleRemindWhenOnTimeChange = (event: ChangeEvent<HTMLInputElement>, map: prayerTimes) => {
-		remindWhenOnTimeChangeMap[map](event.target.checked);
-		checkChanges();
+	const time_rmBeforeMap: any = {
+		1: setFjr_number_before,
+		2: setSnr_number_before,
+		3: setDhr_number_before,
+		4: setAsr_number_before,
+		5: setMgr_number_before,
+		6: setIsha_number_before,
 	};
 
-	const handleEarlyReminderChange = (event: ChangeEvent<HTMLInputElement>, map: prayerTimes) => {
-		earlyReminderChangeMap[map](event.target.checked);
-		checkChanges();
+	const time_rmAfterMap: any = {
+		1: setFjr_number_after,
+		2: setSnr_number_after,
+		3: setDhr_number_after,
+		4: setAsr_number_after,
+		5: setMgr_number_after,
+		6: setIsha_number_after,
 	};
 
-	const handleEarlyTimeChange = (event: ChangeEvent<HTMLInputElement>, map: prayerTimes) => {
-		earlyTimeChangeMap[map](Number(event.target.value) || 1);
-		checkChanges();
-	};
+	const reminderGridColumns: GridColDef[] = [
+		{ field: 'type', headerName: 'Type', editable: false, hideable: false, sortable: false, description: 'Prayer Types' },
+		{
+			field: 'minute_before',
+			headerName: 'Minute Before',
+			type: 'number',
+			width: 110,
+			editable: true,
+			hideable: false,
+			sortable: false,
+			description: 'Minutes for reminder before for each prayer times (Range from 0-60)',
+			valueParser: (value, params) => {
+				if (value === '' || value === null || value < 0) {
+					time_rmBeforeMap[params!.id](0);
+					return 0;
+				} else if (value > 60) {
+					time_rmBeforeMap[params!.id](60);
+					return 60;
+				} else {
+					time_rmBeforeMap[params!.id](value);
+					return value;
+				}
+			},
+		},
+		{
+			field: 'minute_after',
+			headerName: 'Minute After',
+			type: 'number',
+			width: 100,
+			editable: true,
+			hideable: false,
+			sortable: false,
+			description: 'Minutes for reminder after each prayer times (Range from 0-60)',
+			valueParser: (value, params) => {
+				if (value === '' || value === null || value < 0) {
+					time_rmAfterMap[params!.id](0);
+					return 0;
+				} else if (value > 60) {
+					time_rmAfterMap[params!.id](60);
+					return 60;
+				} else {
+					time_rmAfterMap[params!.id](value);
+					return value;
+				}
+			},
+		},
+		{
+			field: 'reminder_before',
+			headerName: 'Reminder Before',
+			type: 'boolean',
+			width: 125,
+			editable: true,
+			hideable: false,
+			sortable: false,
+			description: "Enable or disable each prayer's early reminder (reminder before the praytime)",
+			valueParser: (value, params) => {
+				bool_rmBeforeMap[params!.id.valueOf()](value as boolean);
+				return value;
+			},
+		},
+		{
+			field: 'reminder_after',
+			headerName: 'Reminder After',
+			type: 'boolean',
+			width: 120,
+			editable: true,
+			hideable: false,
+			sortable: false,
+			description: "Enable or disable each prayer's after reminder (reminder after the praytime)",
+			valueParser: (value, params) => {
+				bool_rmAfterMap[params!.id.valueOf()](value as boolean);
+				return value;
+			},
+		},
+		{
+			field: 'reminder_ontime',
+			headerName: 'Reminder On Time',
+			type: 'boolean',
+			width: 140,
+			editable: true,
+			hideable: false,
+			sortable: false,
+			description: "Enable or disable each prayer's on time reminder (reminder when it's prayertime)",
+			valueParser: (value, params) => {
+				bool_rmOnTimeMap[params!.id.valueOf()](value as boolean);
+				return value;
+			},
+		},
+		{
+			field: 'adhan',
+			headerName: 'Adhan',
+			type: 'boolean',
+			width: 75,
+			editable: true,
+			hideable: false,
+			sortable: false,
+			description: "Enable or disable adhan for each prayer when it's prayertime. (Adhan will not play on sunrise)",
+			valueParser: (value, params) => {
+				if (params!.id === 2) {
+					return false;
+				} else {
+					bool_rmAdhanMap[params!.id.valueOf()](value as boolean);
+					return value;
+				}
+			},
+		},
+		{
+			field: 'popup',
+			headerName: 'Popup',
+			type: 'boolean',
+			width: 75,
+			editable: true,
+			hideable: false,
+			sortable: false,
+			description: 'Enable or disable messagebox popup for each reminder',
+			valueParser: (value, params) => {
+				bool_rmPopupMap[params!.id.valueOf()](value as boolean);
+				return value;
+			},
+		},
+	];
 
-	const blurEarlyTime = (map: prayerTimes) => {
-		if (varEarlyTimeChangeMap[map] < 1) earlyTimeChangeMap[map](1);
-		else if (varEarlyTimeChangeMap[map] > 60) earlyTimeChangeMap[map](60);
-	};
-
-	const handleAdhanChange = (event: ChangeEvent<HTMLInputElement>, map: 'fajr' | 'dhuhr' | 'asr' | 'maghrib' | 'isha') => {
-		adhanChangeMap[map](event.target.checked);
-		checkChanges();
-	};
+	const reminderGridRowsProp = [
+		{
+			id: 1,
+			type: 'Fajr',
+			minute_before: rm_fjr_number_before,
+			minute_after: rm_fjr_number_after,
+			reminder_before: rm_fjr_bool_before,
+			reminder_after: rm_fjr_bool_after,
+			reminder_ontike: rm_fjr_bool_ontime,
+			adhan: rm_fjr_bool_adhan,
+			popup: rm_fjr_bool_popup,
+		},
+		{
+			id: 2,
+			type: 'Sunrise',
+			minute_before: rm_snr_number_before,
+			minute_after: rm_snr_number_after,
+			reminder_before: rm_snr_bool_before,
+			reminder_after: rm_snr_bool_after,
+			reminder_ontike: rm_snr_bool_ontime,
+			popup: rm_snr_bool_popup,
+		},
+		{
+			id: 3,
+			type: 'Dhuhr',
+			minute_before: rm_dhr_number_before,
+			minute_after: rm_dhr_number_after,
+			reminder_before: rm_dhr_bool_before,
+			reminder_after: rm_dhr_bool_after,
+			reminder_ontike: rm_dhr_bool_ontime,
+			adhan: rm_dhr_bool_adhan,
+			popup: rm_dhr_bool_popup,
+		},
+		{
+			id: 4,
+			type: 'Asr',
+			minute_before: rm_asr_number_before,
+			minute_after: rm_asr_number_after,
+			reminder_before: rm_asr_bool_before,
+			reminder_after: rm_asr_bool_after,
+			reminder_ontike: rm_asr_bool_ontime,
+			adhan: rm_asr_bool_adhan,
+			popup: rm_asr_bool_popup,
+		},
+		{
+			id: 5,
+			type: 'Maghrib',
+			minute_before: rm_mgr_number_before,
+			minute_after: rm_mgr_number_after,
+			reminder_before: rm_mgr_bool_before,
+			reminder_after: rm_mgr_bool_after,
+			reminder_ontike: rm_mgr_bool_ontime,
+			adhan: rm_mgr_bool_adhan,
+			popup: rm_mgr_bool_popup,
+		},
+		{
+			id: 6,
+			type: 'Isha',
+			minute_before: rm_isha_number_before,
+			minute_after: rm_isha_number_after,
+			reminder_before: rm_isha_bool_before,
+			reminder_after: rm_isha_bool_after,
+			reminder_ontike: rm_isha_bool_ontime,
+			adhan: rm_isha_bool_adhan,
+			popup: rm_isha_bool_popup,
+		},
+	];
 
 	// --------------------------------------------------------------------------
 	// location
@@ -373,38 +575,6 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	};
 
 	// --------------------------------------------------------------------------
-	// geoloc
-	// const [geolocMode, setGeolocMode] = useState<'auto' | 'manual'>(currentConfig.geoLocAPIKey.mode);
-	// const [geolocKey, setGeolocKey] = useState<string>(currentConfig.geoLocAPIKey.key);
-
-	// const handleGeolocModeChange = (e: ChangeEvent<HTMLInputElement>) => {
-	// 	setGeolocMode(e.target.value as 'auto' | 'manual');
-
-	// 	if (e.target.value === 'auto') setGeolocKey('');
-	// 	checkChanges();
-	// };
-
-	// const handleGeolocKeyChange = (e: ChangeEvent<HTMLInputElement>) => {
-	// 	setGeolocKey(e.target.value);
-	// 	checkChanges();
-	// };
-
-	// const verifyKey = () => {
-	// 	const { success, data }: any = window.electron.ipcRenderer.sendSync('verify-geoloc-key', geolocKey);
-	// 	if (success) {
-	// 		setShowSnackbar(true);
-	// 		setSnackbarSeverity('success');
-	// 		setSnackbarMsg('API key verified successfully!');
-	// 	} else {
-	// 		setShowSnackbar(true);
-	// 		setSnackbarSeverity('error');
-	// 		setSnackbarMsg(data.message ? data.message : data); // error message
-	// 	}
-	// };
-
-	// --------------------------------------------------------------------------
-
-	// --------------------------------------------------------------------------
 	// App Setting
 	const colorMode = useContext(ColorModeContext) as ColorModeContextInterface;
 
@@ -506,29 +676,29 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		setCalcOptAdjustment_Asr(initialConfig.calcOption.adjustments.asr);
 		setCalcOptAdjustment_Maghrib(initialConfig.calcOption.adjustments.maghrib);
 		setCalcOptAdjustment_Isha(initialConfig.calcOption.adjustments.isha);
-		setRemind_fajr_remindWhenOnTime(initialConfig.reminderOption.fajr.remindWhenOnTime);
-		setRemind_fajr_earlyReminder(initialConfig.reminderOption.fajr.earlyReminder);
-		setRemind_fajr_earlyTime(initialConfig.reminderOption.fajr.earlyTime);
-		setRemind_fajr_adhan(initialConfig.reminderOption.fajr.playAdhan);
-		setRemind_sunrise_remindWhenOnTime(initialConfig.reminderOption.sunrise.remindWhenOnTime);
-		setRemind_sunrise_earlyReminder(initialConfig.reminderOption.sunrise.earlyReminder);
-		setRemind_sunrise_earlyTime(initialConfig.reminderOption.sunrise.earlyTime);
-		setRemind_dhuhr_remindWhenOnTime(initialConfig.reminderOption.dhuhr.remindWhenOnTime);
-		setRemind_dhuhr_earlyReminder(initialConfig.reminderOption.dhuhr.earlyReminder);
-		setRemind_dhuhr_earlyTime(initialConfig.reminderOption.dhuhr.earlyTime);
-		setRemind_dhuhr_adhan(initialConfig.reminderOption.dhuhr.playAdhan);
-		setRemind_asr_remindWhenOnTime(initialConfig.reminderOption.asr.remindWhenOnTime);
-		setRemind_asr_earlyReminder(initialConfig.reminderOption.asr.earlyReminder);
-		setRemind_asr_earlyTime(initialConfig.reminderOption.asr.earlyTime);
-		setRemind_asr_adhan(initialConfig.reminderOption.asr.playAdhan);
-		setRemind_maghrib_remindWhenOnTime(initialConfig.reminderOption.maghrib.remindWhenOnTime);
-		setRemind_maghrib_earlyReminder(initialConfig.reminderOption.maghrib.earlyReminder);
-		setRemind_maghrib_earlyTime(initialConfig.reminderOption.maghrib.earlyTime);
-		setRemind_maghrib_adhan(initialConfig.reminderOption.maghrib.playAdhan);
-		setRemind_isha_remindWhenOnTime(initialConfig.reminderOption.isha.remindWhenOnTime);
-		setRemind_isha_earlyReminder(initialConfig.reminderOption.isha.earlyReminder);
-		setRemind_isha_earlyTime(initialConfig.reminderOption.isha.earlyTime);
-		setRemind_isha_adhan(initialConfig.reminderOption.isha.playAdhan);
+		setFjr_bool_ontime(initialConfig.reminderOption.fajr.remindWhenOnTime);
+		setFjr_bool_before(initialConfig.reminderOption.fajr.earlyReminder);
+		setFjr_number_before(initialConfig.reminderOption.fajr.earlyTime);
+		setFjr_bool_adhan(initialConfig.reminderOption.fajr.playAdhan);
+		setSnr_bool_ontime(initialConfig.reminderOption.sunrise.remindWhenOnTime);
+		setSnr_bool_before(initialConfig.reminderOption.sunrise.earlyReminder);
+		setSnr_number_before(initialConfig.reminderOption.sunrise.earlyTime);
+		setDhr_bool_ontime(initialConfig.reminderOption.dhuhr.remindWhenOnTime);
+		setDhr_bool_before(initialConfig.reminderOption.dhuhr.earlyReminder);
+		setDhr_number_before(initialConfig.reminderOption.dhuhr.earlyTime);
+		setDhr_bool_adhan(initialConfig.reminderOption.dhuhr.playAdhan);
+		setAsr_bool_ontime(initialConfig.reminderOption.asr.remindWhenOnTime);
+		setAsr_bool_before(initialConfig.reminderOption.asr.earlyReminder);
+		setAsr_number_before(initialConfig.reminderOption.asr.earlyTime);
+		setAsr_bool_adhan(initialConfig.reminderOption.asr.playAdhan);
+		setMgr_bool_ontime(initialConfig.reminderOption.maghrib.remindWhenOnTime);
+		setMgr_bool_before(initialConfig.reminderOption.maghrib.earlyReminder);
+		setMgr_number_before(initialConfig.reminderOption.maghrib.earlyTime);
+		setMgr_bool_adhan(initialConfig.reminderOption.maghrib.playAdhan);
+		setIsha_bool_ontime(initialConfig.reminderOption.isha.remindWhenOnTime);
+		setIsha_bool_before(initialConfig.reminderOption.isha.earlyReminder);
+		setIsha_number_before(initialConfig.reminderOption.isha.earlyTime);
+		setIsha_bool_adhan(initialConfig.reminderOption.isha.playAdhan);
 		setLocMode(initialConfig.locationOption.mode);
 		setLocCity(initialConfig.locationOption.city);
 		setLocLat(initialConfig.locationOption.latitude);
@@ -572,29 +742,29 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		currentConfig.calcOption.adjustments.asr = calcOptAdjustment_Asr;
 		currentConfig.calcOption.adjustments.maghrib = calcOptAdjustment_Maghrib;
 		currentConfig.calcOption.adjustments.isha = calcOptAdjustment_Isha;
-		currentConfig.reminderOption.fajr.remindWhenOnTime = remind_fajr_remindWhenOnTime;
-		currentConfig.reminderOption.fajr.earlyReminder = remind_fajr_earlyReminder;
-		currentConfig.reminderOption.fajr.earlyTime = remind_fajr_earlyTime;
-		currentConfig.reminderOption.fajr.playAdhan = remind_fajr_adhan;
-		currentConfig.reminderOption.sunrise.remindWhenOnTime = remind_sunrise_remindWhenOnTime;
-		currentConfig.reminderOption.sunrise.earlyReminder = remind_sunrise_earlyReminder;
-		currentConfig.reminderOption.sunrise.earlyTime = remind_sunrise_earlyTime;
-		currentConfig.reminderOption.dhuhr.remindWhenOnTime = remind_dhuhr_remindWhenOnTime;
-		currentConfig.reminderOption.dhuhr.earlyReminder = remind_dhuhr_earlyReminder;
-		currentConfig.reminderOption.dhuhr.earlyTime = remind_dhuhr_earlyTime;
-		currentConfig.reminderOption.dhuhr.playAdhan = remind_dhuhr_adhan;
-		currentConfig.reminderOption.asr.remindWhenOnTime = remind_asr_remindWhenOnTime;
-		currentConfig.reminderOption.asr.earlyReminder = remind_asr_earlyReminder;
-		currentConfig.reminderOption.asr.earlyTime = remind_asr_earlyTime;
-		currentConfig.reminderOption.asr.playAdhan = remind_asr_adhan;
-		currentConfig.reminderOption.maghrib.remindWhenOnTime = remind_maghrib_remindWhenOnTime;
-		currentConfig.reminderOption.maghrib.earlyReminder = remind_maghrib_earlyReminder;
-		currentConfig.reminderOption.maghrib.earlyTime = remind_maghrib_earlyTime;
-		currentConfig.reminderOption.maghrib.playAdhan = remind_maghrib_adhan;
-		currentConfig.reminderOption.isha.remindWhenOnTime = remind_isha_remindWhenOnTime;
-		currentConfig.reminderOption.isha.earlyReminder = remind_isha_earlyReminder;
-		currentConfig.reminderOption.isha.earlyTime = remind_isha_earlyTime;
-		currentConfig.reminderOption.isha.playAdhan = remind_isha_adhan;
+		currentConfig.reminderOption.fajr.remindWhenOnTime = rm_fjr_bool_ontime;
+		currentConfig.reminderOption.fajr.earlyReminder = rm_fjr_bool_before;
+		currentConfig.reminderOption.fajr.earlyTime = rm_fjr_number_before;
+		currentConfig.reminderOption.fajr.playAdhan = rm_fjr_bool_adhan;
+		currentConfig.reminderOption.sunrise.remindWhenOnTime = rm_snr_bool_ontime;
+		currentConfig.reminderOption.sunrise.earlyReminder = rm_snr_bool_before;
+		currentConfig.reminderOption.sunrise.earlyTime = rm_snr_number_before;
+		currentConfig.reminderOption.dhuhr.remindWhenOnTime = rm_dhr_bool_ontime;
+		currentConfig.reminderOption.dhuhr.earlyReminder = rm_dhr_bool_before;
+		currentConfig.reminderOption.dhuhr.earlyTime = rm_dhr_number_before;
+		currentConfig.reminderOption.dhuhr.playAdhan = rm_dhr_bool_adhan;
+		currentConfig.reminderOption.asr.remindWhenOnTime = rm_asr_bool_ontime;
+		currentConfig.reminderOption.asr.earlyReminder = rm_asr_bool_before;
+		currentConfig.reminderOption.asr.earlyTime = rm_asr_number_before;
+		currentConfig.reminderOption.asr.playAdhan = rm_asr_bool_adhan;
+		currentConfig.reminderOption.maghrib.remindWhenOnTime = rm_mgr_bool_ontime;
+		currentConfig.reminderOption.maghrib.earlyReminder = rm_mgr_bool_before;
+		currentConfig.reminderOption.maghrib.earlyTime = rm_mgr_number_before;
+		currentConfig.reminderOption.maghrib.playAdhan = rm_mgr_bool_adhan;
+		currentConfig.reminderOption.isha.remindWhenOnTime = rm_isha_bool_ontime;
+		currentConfig.reminderOption.isha.earlyReminder = rm_isha_bool_before;
+		currentConfig.reminderOption.isha.earlyTime = rm_isha_number_before;
+		currentConfig.reminderOption.isha.playAdhan = rm_isha_bool_adhan;
 		currentConfig.locationOption.mode = locMode;
 		currentConfig.locationOption.city = locCity;
 		currentConfig.locationOption.latitude = locLat;
@@ -911,178 +1081,13 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 								<TimerOutlinedIcon color='primary' /> <h3 style={{ paddingLeft: '.5rem' }}>Reminder</h3>
 							</div>
 							<Box
-								component={'form'}
-								noValidate
-								autoComplete='off'
 								sx={{
+									height: 350,
 									display: 'flex',
-									flexDirection: 'row',
-									'& .MuiTextField-root': { m: 1, ml: 0.5 },
+									flexGrow: '1',
 								}}
 							>
-								<Box
-									sx={{
-										display: 'flex',
-										flexDirection: 'column',
-										'& .MuiFormControl-root': { mr: 2.5 },
-									}}
-								>
-									<FormLabel id='reminder-time-fajr'>Minutes Before</FormLabel>
-									<Box
-										sx={{
-											display: 'flex',
-											flexDirection: 'row',
-										}}
-									>
-										<FormControl>
-											<FormLabel id='reminder-time-fajr'>Fajr</FormLabel>
-											<MuiInput
-												style={{ marginTop: '4px' }}
-												value={remind_fajr_earlyTime}
-												onChange={(e) => handleEarlyTimeChange(e as any, 'fajr')}
-												onBlur={() => blurEarlyTime('fajr')}
-												inputProps={{
-													step: 1,
-													min: 1,
-													max: 60,
-													type: 'number',
-													'aria-labelledby': 'input-slider',
-												}}
-											/>
-										</FormControl>
-
-										<FormControl>
-											<FormLabel id='reminder-time-sunrise'>Sunrise</FormLabel>
-											<MuiInput
-												style={{ marginTop: '4px' }}
-												value={remind_sunrise_earlyTime}
-												onChange={(e) => handleEarlyTimeChange(e as any, 'sunrise')}
-												onBlur={() => blurEarlyTime('sunrise')}
-												inputProps={{
-													step: 1,
-													min: 1,
-													max: 60,
-													type: 'number',
-													'aria-labelledby': 'input-slider',
-												}}
-											/>
-										</FormControl>
-
-										<FormControl>
-											<FormLabel id='reminder-time-dhuhr'>Dhuhr</FormLabel>
-											<MuiInput
-												style={{ marginTop: '4px' }}
-												value={remind_dhuhr_earlyTime}
-												onChange={(e) => handleEarlyTimeChange(e as any, 'dhuhr')}
-												onBlur={() => blurEarlyTime('dhuhr')}
-												inputProps={{
-													step: 1,
-													min: 1,
-													max: 60,
-													type: 'number',
-													'aria-labelledby': 'input-slider',
-												}}
-											/>
-										</FormControl>
-
-										<FormControl>
-											<FormLabel id='reminder-time-asr'>Asr</FormLabel>
-											<MuiInput
-												style={{ marginTop: '4px' }}
-												value={remind_asr_earlyTime}
-												onChange={(e) => handleEarlyTimeChange(e as any, 'asr')}
-												onBlur={() => blurEarlyTime('asr')}
-												inputProps={{
-													step: 1,
-													min: 1,
-													max: 60,
-													type: 'number',
-													'aria-labelledby': 'input-slider',
-												}}
-											/>
-										</FormControl>
-
-										<FormControl>
-											<FormLabel id='reminder-time-maghrib'>Maghrib</FormLabel>
-											<MuiInput
-												style={{ marginTop: '4px' }}
-												value={remind_maghrib_earlyTime}
-												onChange={(e) => handleEarlyTimeChange(e as any, 'maghrib')}
-												onBlur={() => blurEarlyTime('maghrib')}
-												inputProps={{
-													step: 1,
-													min: 1,
-													max: 60,
-													type: 'number',
-													'aria-labelledby': 'input-slider',
-												}}
-											/>
-										</FormControl>
-
-										<FormControl>
-											<FormLabel id='reminder-time-isha'>Isha</FormLabel>
-											<MuiInput
-												style={{ marginTop: '4px' }}
-												value={remind_isha_earlyTime}
-												onChange={(e) => handleEarlyTimeChange(e as any, 'isha')}
-												onBlur={() => blurEarlyTime('isha')}
-												inputProps={{
-													step: 1,
-													min: 1,
-													max: 60,
-													type: 'number',
-													'aria-labelledby': 'input-slider',
-												}}
-											/>
-										</FormControl>
-									</Box>
-
-									<Box
-										sx={{
-											display: 'flex',
-											mt: 2,
-										}}
-									>
-										<FormControl component='fieldset' variant='standard'>
-											<Tooltip title='Will show up reminder as an interruptive message box' placement='top' arrow>
-												<FormLabel component='legend'>Play Adhan</FormLabel>
-											</Tooltip>
-											<FormGroup>
-												<FormControlLabel control={<Checkbox checked={remind_fajr_adhan} onChange={(e) => handleAdhanChange(e as any, 'fajr')} />} label='Fajr' />
-												<FormControlLabel control={<Checkbox checked={remind_dhuhr_adhan} onChange={(e) => handleAdhanChange(e as any, 'dhuhr')} />} label='Dhuhr' />
-												<FormControlLabel control={<Checkbox checked={remind_asr_adhan} onChange={(e) => handleAdhanChange(e as any, 'asr')} />} label='Asr' />
-												<FormControlLabel control={<Checkbox checked={remind_maghrib_adhan} onChange={(e) => handleAdhanChange(e as any, 'maghrib')} />} label='Maghrib' />
-												<FormControlLabel control={<Checkbox checked={remind_isha_adhan} onChange={(e) => handleAdhanChange(e as any, 'isha')} />} label='Isha' />
-											</FormGroup>
-										</FormControl>
-
-										<FormControl sx={{ ml: 3 }} component='fieldset' variant='standard'>
-											<FormLabel component='legend'>On Time Reminder</FormLabel>
-											<FormGroup>
-												<FormControlLabel control={<Checkbox checked={remind_fajr_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'fajr')} />} label='Fajr' />
-												{/* prettier-ignore */}
-												<FormControlLabel control={<Checkbox checked={remind_sunrise_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'sunrise')} />} label='Sunrise'/>
-												<FormControlLabel control={<Checkbox checked={remind_dhuhr_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'dhuhr')} />} label='Dhuhr' />
-												<FormControlLabel control={<Checkbox checked={remind_asr_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'asr')} />} label='Asr' />
-												{/* prettier-ignore */}
-												<FormControlLabel control={<Checkbox checked={remind_maghrib_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'maghrib')} />} label='Maghrib'/>
-												<FormControlLabel control={<Checkbox checked={remind_isha_remindWhenOnTime} onChange={(e) => handleRemindWhenOnTimeChange(e as any, 'isha')} />} label='Isha' />
-											</FormGroup>
-										</FormControl>
-
-										<FormControl sx={{ ml: 3 }} component='fieldset' variant='standard'>
-											<FormLabel component='legend'>Early Reminder</FormLabel>
-											<FormGroup>
-												<FormControlLabel control={<Checkbox checked={remind_fajr_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'fajr')} />} label='Fajr' />
-												<FormControlLabel control={<Checkbox checked={remind_sunrise_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'sunrise')} />} label='Sunrise' />
-												<FormControlLabel control={<Checkbox checked={remind_dhuhr_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'dhuhr')} />} label='Dhuhr' />
-												<FormControlLabel control={<Checkbox checked={remind_asr_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'asr')} />} label='Asr' />
-												<FormControlLabel control={<Checkbox checked={remind_maghrib_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'maghrib')} />} label='Maghrib' />
-												<FormControlLabel control={<Checkbox checked={remind_isha_earlyReminder} onChange={(e) => handleEarlyReminderChange(e as any, 'isha')} />} label='Isha' />
-											</FormGroup>
-										</FormControl>
-									</Box>
-								</Box>
+								<DataGrid rows={reminderGridRowsProp} columns={reminderGridColumns} experimentalFeatures={{ newEditingApi: true }} hideFooter={true} />
 							</Box>
 						</Grid>
 					</Grid>
@@ -1232,59 +1237,6 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 									<MenuItem value='24h'>24h</MenuItem>
 								</Select>
 							</FormControl>
-
-							{/* <Divider sx={{ pt: 2 }} /> */}
-							{/* api keys */}
-							{/* <div
-								style={{
-									display: 'flex',
-									alignItems: 'center',
-									flexWrap: 'wrap',
-								}}
-							>
-								<KeyIcon color='primary' /> <h3 style={{ paddingLeft: '.5rem' }}>API Key</h3>
-							</div>
-							<Box
-								component={'form'}
-								noValidate
-								autoComplete='off'
-								sx={{
-									display: 'flex',
-									flexDirection: 'column',
-									'& .MuiTextField-root': { m: 1, ml: 0.5 },
-								}}
-							>
-								<FormControl>
-									<FormLabel id='location-mode-formlabel' sx={{ ml: 0.5 }}>
-										Mode
-									</FormLabel>
-									<RadioGroup sx={{ ml: 0.5 }} row aria-labelledby='location-mode' name='row-radio-buttons-location-mode' value={geolocMode} onChange={handleGeolocModeChange}>
-										<FormControlLabel value='auto' control={<Radio />} label='Auto' />
-										<FormControlLabel value='manual' control={<Radio />} label='Manual' />
-									</RadioGroup>
-
-									<TextField
-										id='freegeoip'
-										label='Freegeoip.app API Key'
-										variant='outlined'
-										size='small'
-										value={geolocKey}
-										onChange={handleGeolocKeyChange}
-										disabled={geolocMode === 'auto' ? true : false}
-										InputProps={{
-											endAdornment: (
-												<Tooltip title='Click to verify API key inputted' placement='top' arrow>
-													<InputAdornment position='end'>
-														<IconButton aria-label="Get inputted city's lattitude/langitude" onClick={verifyKey} edge='end' disabled={geolocMode === 'auto' ? true : false}>
-															<SearchIcon />
-														</IconButton>
-													</InputAdornment>
-												</Tooltip>
-											),
-										}}
-									/>
-								</FormControl>
-							</Box> */}
 						</Grid>
 					</Grid>
 					{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}

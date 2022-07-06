@@ -1,7 +1,7 @@
 body {
 	position: relative;
 	font-family: 'Roboto', sans-serif;
-	overflow-y: auto;
+	overflow-y: scroll;
 }
 
 .checkver-span {
@@ -156,7 +156,7 @@ body {
 /* custom scrollbar */
 ::-webkit-scrollbar {
 	width: 20px;
-	display: none;
+	/* display: none; */
 }
 
 ::-webkit-scrollbar-track {
