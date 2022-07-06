@@ -65,7 +65,7 @@ export function openFile(window: BrowserWindow, title: string, message: string, 
 	});
 }
 
-export function prayerTime_IntrusiveNotification(title: string, msg: string, icon: string, mainWindow: BrowserWindow) {
+export function prayerTime_IntrusiveNotification(title: string, msg: string, icon: string, mainWindow?: BrowserWindow) {
 	if (mainWindow)
 		dialog.showMessageBox(mainWindow, {
 			title: title,
@@ -75,11 +75,17 @@ export function prayerTime_IntrusiveNotification(title: string, msg: string, ico
 			icon: icon,
 		});
 	else
-		dialog.showMessageBox({
-			title: title,
-			buttons: ['Ok'],
-			type: 'info',
-			message: msg,
-			icon: icon,
-		});
+		dialog.showMessageBox(
+			new BrowserWindow({
+				show: false,
+				alwaysOnTop: true,
+			}),
+			{
+				title: title,
+				buttons: ['Ok'],
+				type: 'info',
+				message: msg,
+				icon: icon,
+			}
+		);
 }

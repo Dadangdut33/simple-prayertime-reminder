@@ -22,7 +22,7 @@ import { resolveHtmlPath } from './util';
 import { configInterface, getPrayerTimes_I } from './interfaces';
 import { initialConfig, writeConfig, readConfig } from './handler/files';
 import { getPrayerTimes } from './handler/praytime';
-import { onUnresponsiveWindow, errorBox, NoYesBox, openFile } from './handler/messageBox';
+import { onUnresponsiveWindow, errorBox, NoYesBox, openFile, prayerTime_IntrusiveNotification } from './handler/messageBox';
 import { getLatLong_FromCitiesName, getPosition_absolute, verifyKey } from './handler/getPos';
 
 // -------------------------------------------------------------------------------------
@@ -497,57 +497,163 @@ const timeOutAutoCloseModal = () => {
 	}, 600000); // 10 minutes
 };
 
+const checkPopup = (pt: string) => {
+	const ptMap: any = {
+		fajr: appConfig.reminderOption.fajr.popup,
+		sunrise: appConfig.reminderOption.sunrise.popup,
+		dhuhr: appConfig.reminderOption.dhuhr.popup,
+		asr: appConfig.reminderOption.asr.popup,
+		maghrib: appConfig.reminderOption.maghrib.popup,
+		isha: appConfig.reminderOption.isha.popup,
+	};
+
+	return ptMap[pt];
+};
+
 const checkNotifyOnTime = (now: Moment.Moment) => {
 	let notification = null,
 		title: string | null = null,
 		subtitle = 'Prayer time',
-		body,
-		playAdhan = false;
+		notifBody = '',
+		playAdhan = false,
+		data = {
+			type: 'reminder',
+			title: '',
+			time: appConfig.clockStyle === '24h' ? now.format('HH:mm') : now.format('hh:mm A'),
+			location: appConfig.locationOption.city,
+			coordinates: `${appConfig.locationOption.latitude}, ${appConfig.locationOption.longitude}`,
+		};
 
 	switch (now.format('HH:mm')) {
+		// ----------------------
+		// on Time
+		// ----------------------
 		case Moment(new Date(ptGet.fajrTime)).tz(appConfig.timezoneOption.timezone).format('HH:mm'):
-			if (appConfig.reminderOption.fajr) {
+			if (appConfig.reminderOption.fajr.remindWhenOnTime) {
 				title = 'Fajr';
+				notifBody = `It's Time For ${title} Prayer`;
 				if (appConfig.reminderOption.fajr.playAdhan) playAdhan = true;
 			}
 			break;
 		case Moment(new Date(ptGet.sunriseTime)).tz(appConfig.timezoneOption.timezone).format('HH:mm'):
-			if (appConfig.reminderOption.sunrise) {
+			if (appConfig.reminderOption.sunrise.remindWhenOnTime) {
 				title = 'Sunrise';
+				notifBody = `It's Time For Sunrise`;
 			}
 			break;
 		case Moment(new Date(ptGet.dhuhrTime)).tz(appConfig.timezoneOption.timezone).format('HH:mm'):
-			if (appConfig.reminderOption.dhuhr) {
+			if (appConfig.reminderOption.dhuhr.remindWhenOnTime) {
 				title = 'Dhuhr';
+				notifBody = `It's Time For ${title} Prayer`;
 				if (appConfig.reminderOption.dhuhr.playAdhan) playAdhan = true;
 			}
 			break;
 		case Moment(new Date(ptGet.asrTime)).tz(appConfig.timezoneOption.timezone).format('HH:mm'):
-			if (appConfig.reminderOption.asr) {
+			if (appConfig.reminderOption.asr.remindWhenOnTime) {
 				title = 'Asr';
+				notifBody = `It's Time For ${title} Prayer`;
 				if (appConfig.reminderOption.asr.playAdhan) playAdhan = true;
 			}
 			break;
 		case Moment(new Date(ptGet.maghribTime)).tz(appConfig.timezoneOption.timezone).format('HH:mm'):
-			if (appConfig.reminderOption.maghrib) {
+			if (appConfig.reminderOption.maghrib.remindWhenOnTime) {
 				title = 'Maghrib';
+				notifBody = `It's Time For ${title} Prayer`;
 				if (appConfig.reminderOption.maghrib.playAdhan) playAdhan = true;
 			}
 			break;
 		case Moment(new Date(ptGet.ishaTime)).tz(appConfig.timezoneOption.timezone).format('HH:mm'):
-			if (appConfig.reminderOption.isha) {
+			if (appConfig.reminderOption.isha.remindWhenOnTime) {
 				title = 'Isha';
+				notifBody = `It's Time For ${title} Prayer`;
 				if (appConfig.reminderOption.isha.playAdhan) playAdhan = true;
 			}
 			break;
+		// ----------------------
+		// Early reminder
+		// ----------------------
+		case Moment(new Date(ptGet.fajrTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.fajr.earlyTime, 'minutes').format('HH:mm'):
+			if (appConfig.reminderOption.fajr.earlyReminder) {
+				title = 'Fajr';
+				notifBody = `It's ${appConfig.reminderOption.fajr.earlyTime} Minutes Before ${title} Prayer`;
+			}
+			break;
+		case Moment(new Date(ptGet.sunriseTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.sunrise.earlyTime, 'minutes').format('HH:mm'):
+			if (appConfig.reminderOption.sunrise.earlyReminder) {
+				title = 'Sunrise';
+				notifBody = `It's ${appConfig.reminderOption.sunrise.earlyTime} Minutes Before ${title}`;
+			}
+			break;
+		case Moment(new Date(ptGet.dhuhrTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.dhuhr.earlyTime, 'minutes').format('HH:mm'):
+			if (appConfig.reminderOption.dhuhr.earlyReminder) {
+				title = 'Dhuhr';
+				notifBody = `It's ${appConfig.reminderOption.dhuhr.earlyTime} Minutes Before ${title} Prayer`;
+			}
+			break;
+		case Moment(new Date(ptGet.asrTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.asr.earlyTime, 'minutes').format('HH:mm'):
+			if (appConfig.reminderOption.asr.earlyReminder) {
+				title = 'Asr';
+				notifBody = `It's ${appConfig.reminderOption.asr.earlyTime} Minutes Before ${title} Prayer`;
+			}
+			break;
+		case Moment(new Date(ptGet.maghribTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.maghrib.earlyTime, 'minutes').format('HH:mm'):
+			if (appConfig.reminderOption.maghrib.earlyReminder) {
+				title = 'Maghrib';
+				notifBody = `It's ${appConfig.reminderOption.maghrib.earlyTime} Minutes Before ${title} Prayer`;
+			}
+			break;
+		case Moment(new Date(ptGet.ishaTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.isha.earlyTime, 'minutes').format('HH:mm'):
+			if (appConfig.reminderOption.isha.earlyReminder) {
+				title = 'Isha';
+				notifBody = `It's ${appConfig.reminderOption.isha.earlyTime} Minutes Before ${title} Prayer`;
+			}
+			break;
+		// ----------------------
+		// after reminder
+		// ----------------------
+		case Moment(new Date(ptGet.fajrTime)).tz(appConfig.timezoneOption.timezone).add(appConfig.reminderOption.fajr.afterTime, 'minutes').format('HH:mm'):
+			if (appConfig.reminderOption.fajr.afterReminder) {
+				title = 'Fajr';
+				notifBody = `It's ${appConfig.reminderOption.fajr.afterTime} Minutes After ${title} Prayer`;
+			}
+			break;
+		case Moment(new Date(ptGet.sunriseTime)).tz(appConfig.timezoneOption.timezone).add(appConfig.reminderOption.sunrise.afterTime, 'minutes').format('HH:mm'):
+			if (appConfig.reminderOption.sunrise.afterReminder) {
+				title = 'Sunrise';
+				notifBody = `It's ${appConfig.reminderOption.sunrise.afterTime} Minutes After ${title}`;
+			}
+			break;
+		case Moment(new Date(ptGet.dhuhrTime)).tz(appConfig.timezoneOption.timezone).add(appConfig.reminderOption.dhuhr.afterTime, 'minutes').format('HH:mm'):
+			if (appConfig.reminderOption.dhuhr.afterReminder) {
+				title = 'Dhuhr';
+				notifBody = `It's ${appConfig.reminderOption.dhuhr.afterTime} Minutes After ${title} Prayer`;
+			}
+			break;
+		case Moment(new Date(ptGet.asrTime)).tz(appConfig.timezoneOption.timezone).add(appConfig.reminderOption.asr.afterTime, 'minutes').format('HH:mm'):
+			if (appConfig.reminderOption.asr.afterReminder) {
+				title = 'Asr';
+				notifBody = `It's ${appConfig.reminderOption.asr.afterTime} Minutes After ${title} Prayer`;
+			}
+			break;
+		case Moment(new Date(ptGet.maghribTime)).tz(appConfig.timezoneOption.timezone).add(appConfig.reminderOption.maghrib.afterTime, 'minutes').format('HH:mm'):
+			if (appConfig.reminderOption.maghrib.afterReminder) {
+				title = 'Maghrib';
+				notifBody = `It's ${appConfig.reminderOption.maghrib.afterTime} Minutes After ${title} Prayer`;
+			}
+			break;
+		case Moment(new Date(ptGet.ishaTime)).tz(appConfig.timezoneOption.timezone).add(appConfig.reminderOption.isha.afterTime, 'minutes').format('HH:mm'):
+			if (appConfig.reminderOption.isha.afterReminder) {
+				title = 'Isha';
+				notifBody = `It's ${appConfig.reminderOption.isha.afterTime} Minutes After ${title} Prayer`;
+			}
+			break;
+		// ----------------------
 		default:
 			break;
 	}
 
 	if (title) {
-		body = `It's Time For ${title === 'Sunrise' ? 'Sunrise' : title + ' Prayer'}`;
-
-		notification = new Notification({ title, subtitle, body, icon: iconPath });
+		notification = new Notification({ title, subtitle, body: notifBody, icon: iconPath });
 		notification.show();
 		notification.addListener('click', () => {
 			if (mainWindow) {
@@ -573,116 +679,32 @@ const checkNotifyOnTime = (now: Moment.Moment) => {
 				const adhanNotFoundNotification = new Notification({
 					title: `${title === 'Fajr' ? 'adhan' : 'adhan_fajr'}.mp3 file missing`,
 					subtitle: '',
-					body: `You can try to reinstall or copy your own ${title === 'Fajr' ? 'adhan' : 'adhan_fajr'}.mp3 to the assets folder of the app`,
+					body: `Please check your setting.`,
 					icon: iconPath,
 				});
 				adhanNotFoundNotification.show();
 			}
 		}
-
 		// mainWindow object must have been set before this point
 		if (!mainWindow) return;
-		let data: any = {};
-		if (title !== 'Sunrise') {
-			// refresh from main because originally it will refresh the page to reset the timer ring
-			mainWindow.webContents.send('refresh-from-main');
-			data = {
-				type: 'reminder',
-				title: `Time For ${title} Prayer`,
-				time: appConfig.clockStyle === '24h' ? now.format('HH:mm') : now.format('hh:mm A'),
-				location: appConfig.locationOption.city,
-				coordinates: `${appConfig.locationOption.latitude}, ${appConfig.locationOption.longitude}`,
-			};
-			// if play adhan set type as adhan
-			if (playAdhan) data.type = title === 'Fajr' ? 'adhan_fajr' : 'adhan';
-		} else if (title === 'Sunrise') {
-			data = {
-				type: 'reminder',
-				title: `Time For Sunrise`,
-				time: appConfig.clockStyle === '24h' ? now.format('HH:mm') : now.format('hh:mm A'),
-				location: appConfig.locationOption.city,
-				coordinates: `${appConfig.locationOption.latitude}, ${appConfig.locationOption.longitude}`,
-			};
-			// sunrise no adhan
-		}
 
-		// timeout 2.5s before showing the modal
-		timeOutAutoCloseModal();
-		// if adhan show the main window
-		if (data.type !== 'reminder') mainWindow!.show();
-		mainWindow!.webContents.send('signal-modal-praytime', data);
-	}
-};
+		// popup if enabled
+		if (checkPopup(title.toLowerCase())) prayerTime_IntrusiveNotification(`${title} Reminder`, notifBody, iconPath);
 
-const checkNotifyBefore = (now: Moment.Moment) => {
-	let notification = null,
-		title,
-		subtitle = 'Prayer time',
-		body = '';
+		// data to send
+		data.title = notifBody.replace("It's", '').trim(); // set title (modal title in app) as notification body
+		if (playAdhan) data.type = title === 'Fajr' ? 'adhan_fajr' : 'adhan'; // if play adhan set type as adhan
 
-	// minutes before prayer
-	switch (now.format('HH:mm')) {
-		case Moment(new Date(ptGet.fajrTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.fajr.earlyTime, 'minutes').format('HH:mm'):
-			if (appConfig.reminderOption.fajr.earlyReminder) title = 'Fajr';
-
-			body = `${appConfig.reminderOption.fajr.earlyTime} Minutes Before ${title} Prayer`;
-			break;
-		case Moment(new Date(ptGet.sunriseTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.sunrise.earlyTime, 'minutes').format('HH:mm'):
-			if (appConfig.reminderOption.sunrise.earlyReminder) title = 'Sunrise';
-
-			body = `${appConfig.reminderOption.sunrise.earlyTime} Minutes Before ${title}`;
-			break;
-		case Moment(new Date(ptGet.dhuhrTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.dhuhr.earlyTime, 'minutes').format('HH:mm'):
-			if (appConfig.reminderOption.dhuhr.earlyReminder) title = 'Dhuhr';
-
-			body = `${appConfig.reminderOption.dhuhr.earlyTime} Minutes Before ${title} Prayer`;
-			break;
-		case Moment(new Date(ptGet.asrTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.asr.earlyTime, 'minutes').format('HH:mm'):
-			if (appConfig.reminderOption.asr.earlyReminder) title = 'Asr';
-
-			body = `${appConfig.reminderOption.asr.earlyTime} Minutes Before ${title} Prayer`;
-			break;
-		case Moment(new Date(ptGet.maghribTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.maghrib.earlyTime, 'minutes').format('HH:mm'):
-			if (appConfig.reminderOption.maghrib.earlyReminder) title = 'Maghrib';
-
-			body = `${appConfig.reminderOption.maghrib.earlyTime} Minutes Before ${title} Prayer`;
-			break;
-		case Moment(new Date(ptGet.ishaTime)).tz(appConfig.timezoneOption.timezone).subtract(appConfig.reminderOption.isha.earlyTime, 'minutes').format('HH:mm'):
-			if (appConfig.reminderOption.isha.earlyReminder) title = 'Isha';
-
-			body = `${appConfig.reminderOption.isha.earlyTime} Minutes Before ${title} Prayer`;
-			break;
-		default:
-			break;
-	}
-
-	if (title) {
-		notification = new Notification({ title, subtitle, body, icon: iconPath });
-		notification.show();
-		notification.addListener('click', () => {
-			if (mainWindow) {
-				mainWindow.show();
-				mainWindow.focus();
-			}
-		});
-
-		if (!mainWindow) return;
-		mainWindow.webContents.send('signal-modal-praytime', {
-			type: 'reminder',
-			title: body,
-			time: appConfig.clockStyle === '24h' ? now.format('HH:mm') : now.format('hh:mm A'),
-			location: appConfig.locationOption.city,
-			coordinates: `${appConfig.locationOption.latitude}, ${appConfig.locationOption.longitude}`,
-		});
-		timeOutAutoCloseModal();
+		// modal
+		timeOutAutoCloseModal(); // close modal after timeout
+		if (data.type !== 'reminder') mainWindow!.show(); // if adhan show the main window
+		mainWindow!.webContents.send('signal-modal-praytime', data); // send data to mainWindow
 	}
 };
 
 const intervalFunc = () => {
 	const now = new Date();
 	const nowMoment = Moment(now).tz(appConfig.timezoneOption.timezone);
-
-	checkNotifyBefore(nowMoment);
 	checkNotifyOnTime(nowMoment);
 
 	// check if 1 day has passed
