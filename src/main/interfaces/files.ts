@@ -5,8 +5,11 @@ export type highLatitudeRule_T = 'MiddleOfTheNight' | 'SeventhOfTheNight' | 'Twi
 export interface reminderInterface {
 	remindWhenOnTime: boolean;
 	earlyReminder: boolean;
-	earlyTime: number;
+	afterReminder: boolean;
 	playAdhan: boolean;
+	popup: boolean;
+	earlyTime: number;
+	afterTime: number;
 }
 
 export interface calcOptionInterface {
@@ -25,6 +28,10 @@ export interface calcOptionInterface {
 }
 
 export interface configInterface {
+	window: {
+		width: number;
+		height: number;
+	};
 	locationOption: {
 		mode: 'auto' | 'manual';
 		city: string;
@@ -45,9 +52,9 @@ export interface configInterface {
 		maghrib: reminderInterface;
 		isha: reminderInterface;
 	};
-	geoLocAPIKey: {
-		mode: 'auto' | 'manual';
-		key: string;
+	adhanSoundPath: {
+		fajr: string;
+		normal: string;
 	};
 	runAtStartup: boolean;
 	checkUpdateAtStartup: boolean;

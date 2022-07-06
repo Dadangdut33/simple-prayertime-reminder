@@ -159,6 +159,18 @@ const updateTimezoneOnStart = () => {
 	}
 };
 
+const onResizeWindow = () => {
+	if (mainWindow) {
+		const size = mainWindow.getSize();
+
+		// save size
+		appConfig.window.width = size[0];
+		appConfig.window.height = size[1];
+
+		writeConfig('app', appConfig);
+	}
+};
+
 const createWindow = async () => {
 	if (isDevelopment) {
 		await installExtensions();
@@ -182,6 +194,9 @@ const createWindow = async () => {
 
 	// unresponsive
 	mainWindow.on('unresponsive', onUnresponsiveWindow);
+
+	// on resize
+	mainWindow.on('resize', onResizeWindow);
 
 	menuBuilder = new MenuBuilder(mainWindow);
 	menuBuilder.buildMenu();
@@ -275,6 +290,10 @@ if (!gotTheLock) {
 		.then(async () => {
 			await checkConfigOnStart();
 			await createWindow();
+
+			if (mainWindow) {
+				if (appConfig.window.width && appConfig.window.height) mainWindow.setSize(appConfig.window.width, appConfig.window.height); // resize window
+			}
 
 			// get paths
 			iconPath = getAssetPath('icon.png');

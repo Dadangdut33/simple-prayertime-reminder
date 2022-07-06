@@ -11,6 +11,10 @@ type validDict = 'app' | 'color';
 
 // -------------------------------------------------------------------------------------
 export const initialConfig: configInterface = {
+	window: {
+		width: 1200,
+		height: 728,
+	},
 	locationOption: {
 		mode: 'auto',
 		city: '',
@@ -20,7 +24,7 @@ export const initialConfig: configInterface = {
 	},
 	timezoneOption: {
 		mode: 'auto',
-		timezone: '',
+		timezone: 'UTC',
 	},
 	calcOption: {
 		mode: 'default',
@@ -40,44 +44,61 @@ export const initialConfig: configInterface = {
 		fajr: {
 			remindWhenOnTime: true,
 			earlyReminder: true,
-			earlyTime: 15,
+			afterReminder: true,
 			playAdhan: false,
+			popup: false,
+			earlyTime: 15,
+			afterTime: 15,
 		},
 		sunrise: {
 			remindWhenOnTime: true,
 			earlyReminder: true,
-			earlyTime: 15,
+			afterReminder: true,
 			playAdhan: false,
+			popup: false,
+			earlyTime: 15,
+			afterTime: 15,
 		},
 		dhuhr: {
 			remindWhenOnTime: true,
 			earlyReminder: true,
-			earlyTime: 15,
+			afterReminder: true,
 			playAdhan: false,
+			popup: false,
+			earlyTime: 15,
+			afterTime: 15,
 		},
 		asr: {
 			remindWhenOnTime: true,
 			earlyReminder: true,
-			earlyTime: 15,
+			afterReminder: true,
 			playAdhan: false,
+			popup: false,
+			earlyTime: 15,
+			afterTime: 15,
 		},
 		maghrib: {
 			remindWhenOnTime: true,
 			earlyReminder: true,
-			earlyTime: 15,
+			afterReminder: true,
 			playAdhan: false,
+			popup: false,
+			earlyTime: 15,
+			afterTime: 15,
 		},
 		isha: {
 			remindWhenOnTime: true,
 			earlyReminder: true,
-			earlyTime: 15,
+			afterReminder: true,
 			playAdhan: false,
+			popup: false,
+			earlyTime: 15,
+			afterTime: 15,
 		},
 	},
-	geoLocAPIKey: {
-		// deprecated
-		mode: 'auto',
-		key: '',
+	adhanSoundPath: {
+		fajr: 'auto',
+		normal: 'auto',
 	},
 	runAtStartup: true,
 	clockStyle: 'AM/PM',

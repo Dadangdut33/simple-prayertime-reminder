@@ -30,7 +30,6 @@ import Checkbox from '@mui/material/Checkbox';
 import MuiInput from '@mui/material/Input';
 import Autocomplete from '@mui/material/Autocomplete';
 import Select from '@mui/material/Select';
-import FormGroup from '@mui/material/FormGroup';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 
@@ -49,10 +48,13 @@ import SaveIcon from '@mui/icons-material/Save';
 import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
 import Button from '@mui/material/Button';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
-// import KeyIcon from '@mui/icons-material/Key';
 import MiscellaneousServicesOutlinedIcon from '@mui/icons-material/MiscellaneousServicesOutlined';
 import CalculateOutlinedIcon from '@mui/icons-material/CalculateOutlined';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
+import PlayCircleIcon from '@mui/icons-material/PlayCircle';
+import PauseIcon from '@mui/icons-material/Pause';
+import StopIcon from '@mui/icons-material/Stop';
 
 export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) => {
 	// helper
@@ -152,7 +154,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	const [rm_dhr_bool_ontime, setDhr_bool_ontime] = useState<boolean>(true);
 	const [rm_dhr_bool_before, setDhr_bool_before] = useState<boolean>(true);
-	const [rm_dhr_bool_after, setDhr_bool_after] = useState<number>(15);
+	const [rm_dhr_bool_after, setDhr_bool_after] = useState<boolean>(true);
 	const [rm_dhr_bool_adhan, setDhr_bool_adhan] = useState<boolean>(true);
 	const [rm_dhr_bool_popup, setDhr_bool_popup] = useState<boolean>(true);
 	const [rm_dhr_number_before, setDhr_number_before] = useState<number>(15);
@@ -160,7 +162,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	const [rm_asr_bool_ontime, setAsr_bool_ontime] = useState<boolean>(true);
 	const [rm_asr_bool_before, setAsr_bool_before] = useState<boolean>(true);
-	const [rm_asr_bool_after, setAsr_bool_after] = useState<number>(15);
+	const [rm_asr_bool_after, setAsr_bool_after] = useState<boolean>(true);
 	const [rm_asr_bool_adhan, setAsr_bool_adhan] = useState<boolean>(true);
 	const [rm_asr_bool_popup, setAsr_bool_popup] = useState<boolean>(true);
 	const [rm_asr_number_before, setAsr_number_before] = useState<number>(15);
@@ -168,7 +170,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	const [rm_mgr_bool_ontime, setMgr_bool_ontime] = useState<boolean>(true);
 	const [rm_mgr_bool_before, setMgr_bool_before] = useState<boolean>(true);
-	const [rm_mgr_bool_after, setMgr_bool_after] = useState<number>(15);
+	const [rm_mgr_bool_after, setMgr_bool_after] = useState<boolean>(true);
 	const [rm_mgr_bool_adhan, setMgr_bool_adhan] = useState<boolean>(true);
 	const [rm_mgr_bool_popup, setMgr_bool_popup] = useState<boolean>(true);
 	const [rm_mgr_number_before, setMgr_number_before] = useState<number>(15);
@@ -176,7 +178,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	const [rm_isha_bool_ontime, setIsha_bool_ontime] = useState<boolean>(true);
 	const [rm_isha_bool_before, setIsha_bool_before] = useState<boolean>(true);
-	const [rm_isha_bool_after, setIsha_bool_after] = useState<number>(15);
+	const [rm_isha_bool_after, setIsha_bool_after] = useState<boolean>(true);
 	const [rm_isha_bool_adhan, setIsha_bool_adhan] = useState<boolean>(true);
 	const [rm_isha_bool_popup, setIsha_bool_popup] = useState<boolean>(true);
 	const [rm_isha_number_before, setIsha_number_before] = useState<number>(15);
@@ -374,7 +376,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 			minute_after: rm_fjr_number_after,
 			reminder_before: rm_fjr_bool_before,
 			reminder_after: rm_fjr_bool_after,
-			reminder_ontike: rm_fjr_bool_ontime,
+			reminder_ontime: rm_fjr_bool_ontime,
 			adhan: rm_fjr_bool_adhan,
 			popup: rm_fjr_bool_popup,
 		},
@@ -385,7 +387,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 			minute_after: rm_snr_number_after,
 			reminder_before: rm_snr_bool_before,
 			reminder_after: rm_snr_bool_after,
-			reminder_ontike: rm_snr_bool_ontime,
+			reminder_ontime: rm_snr_bool_ontime,
 			popup: rm_snr_bool_popup,
 		},
 		{
@@ -395,7 +397,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 			minute_after: rm_dhr_number_after,
 			reminder_before: rm_dhr_bool_before,
 			reminder_after: rm_dhr_bool_after,
-			reminder_ontike: rm_dhr_bool_ontime,
+			reminder_ontime: rm_dhr_bool_ontime,
 			adhan: rm_dhr_bool_adhan,
 			popup: rm_dhr_bool_popup,
 		},
@@ -406,7 +408,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 			minute_after: rm_asr_number_after,
 			reminder_before: rm_asr_bool_before,
 			reminder_after: rm_asr_bool_after,
-			reminder_ontike: rm_asr_bool_ontime,
+			reminder_ontime: rm_asr_bool_ontime,
 			adhan: rm_asr_bool_adhan,
 			popup: rm_asr_bool_popup,
 		},
@@ -417,7 +419,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 			minute_after: rm_mgr_number_after,
 			reminder_before: rm_mgr_bool_before,
 			reminder_after: rm_mgr_bool_after,
-			reminder_ontike: rm_mgr_bool_ontime,
+			reminder_ontime: rm_mgr_bool_ontime,
 			adhan: rm_mgr_bool_adhan,
 			popup: rm_mgr_bool_popup,
 		},
@@ -428,11 +430,21 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 			minute_after: rm_isha_number_after,
 			reminder_before: rm_isha_bool_before,
 			reminder_after: rm_isha_bool_after,
-			reminder_ontike: rm_isha_bool_ontime,
+			reminder_ontime: rm_isha_bool_ontime,
 			adhan: rm_isha_bool_adhan,
 			popup: rm_isha_bool_popup,
 		},
 	];
+
+	// --------------------------------------------------------------------------
+	// adhanPath
+	const [adhanInput, setAdhanInput] = useState('');
+	const [adhanFajr, setAdhanFajr] = useState('');
+	const [adhanNormal, setAdhanNormal] = useState('');
+	const [selectAdhan, setSelectAdhan] = useState('Fajr');
+	const [adhanPlaying, setAdhanPlaying] = useState(false);
+
+	const handleAdhanInput = (e: React.ChangeEvent<HTMLInputElement>) => {};
 
 	// --------------------------------------------------------------------------
 	// location
@@ -550,7 +562,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	// timezone
 	const [tzMode, setTzMode] = useState<'auto' | 'manual'>('auto');
-	const [timezone, setTimezone] = useState<string>('');
+	const [timezone, setTimezone] = useState<string>('UTC');
 	const [tzInput, setTzInput] = useState<string>('');
 
 	const handleTzModeChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -666,48 +678,79 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	// --------------------------------------------------------------------------
 	const setInitialValue = () => {
+		// -----
 		setCalcOptMode(initialConfig.calcOption.mode);
 		setCalcOptMethod(initialConfig.calcOption.method);
 		setCalcOptMadhab(initialConfig.calcOption.madhab);
 		setCalcOptHighLatRule(initialConfig.calcOption.highLatitudeRule);
+		// -----
 		setCalcOptAdjustment_Fajr(initialConfig.calcOption.adjustments.fajr);
 		setCalcOptAdjustment_Sunrise(initialConfig.calcOption.adjustments.sunrise);
 		setCalcOptAdjustment_Dhuhr(initialConfig.calcOption.adjustments.dhuhr);
 		setCalcOptAdjustment_Asr(initialConfig.calcOption.adjustments.asr);
 		setCalcOptAdjustment_Maghrib(initialConfig.calcOption.adjustments.maghrib);
 		setCalcOptAdjustment_Isha(initialConfig.calcOption.adjustments.isha);
+		// -----
 		setFjr_bool_ontime(initialConfig.reminderOption.fajr.remindWhenOnTime);
 		setFjr_bool_before(initialConfig.reminderOption.fajr.earlyReminder);
-		setFjr_number_before(initialConfig.reminderOption.fajr.earlyTime);
+		setFjr_bool_after(initialConfig.reminderOption.fajr.afterReminder);
 		setFjr_bool_adhan(initialConfig.reminderOption.fajr.playAdhan);
+		setFjr_bool_popup(initialConfig.reminderOption.fajr.popup);
+		setFjr_number_before(initialConfig.reminderOption.fajr.earlyTime);
+		setFjr_number_after(initialConfig.reminderOption.fajr.afterTime);
+		// -----
 		setSnr_bool_ontime(initialConfig.reminderOption.sunrise.remindWhenOnTime);
 		setSnr_bool_before(initialConfig.reminderOption.sunrise.earlyReminder);
+		setSnr_bool_after(initialConfig.reminderOption.sunrise.afterReminder);
+		setSnr_bool_popup(initialConfig.reminderOption.sunrise.popup);
 		setSnr_number_before(initialConfig.reminderOption.sunrise.earlyTime);
+		setSnr_number_after(initialConfig.reminderOption.sunrise.afterTime);
+		// -----
 		setDhr_bool_ontime(initialConfig.reminderOption.dhuhr.remindWhenOnTime);
 		setDhr_bool_before(initialConfig.reminderOption.dhuhr.earlyReminder);
-		setDhr_number_before(initialConfig.reminderOption.dhuhr.earlyTime);
+		setDhr_bool_after(initialConfig.reminderOption.dhuhr.afterReminder);
 		setDhr_bool_adhan(initialConfig.reminderOption.dhuhr.playAdhan);
+		setDhr_bool_popup(initialConfig.reminderOption.dhuhr.popup);
+		setDhr_number_before(initialConfig.reminderOption.dhuhr.earlyTime);
+		setDhr_number_after(initialConfig.reminderOption.dhuhr.afterTime);
+		// -----
 		setAsr_bool_ontime(initialConfig.reminderOption.asr.remindWhenOnTime);
 		setAsr_bool_before(initialConfig.reminderOption.asr.earlyReminder);
-		setAsr_number_before(initialConfig.reminderOption.asr.earlyTime);
+		setAsr_bool_after(initialConfig.reminderOption.asr.afterReminder);
 		setAsr_bool_adhan(initialConfig.reminderOption.asr.playAdhan);
+		setAsr_bool_popup(initialConfig.reminderOption.asr.popup);
+		setAsr_number_before(initialConfig.reminderOption.asr.earlyTime);
+		setAsr_number_after(initialConfig.reminderOption.asr.afterTime);
+		// -----
 		setMgr_bool_ontime(initialConfig.reminderOption.maghrib.remindWhenOnTime);
 		setMgr_bool_before(initialConfig.reminderOption.maghrib.earlyReminder);
-		setMgr_number_before(initialConfig.reminderOption.maghrib.earlyTime);
+		setMgr_bool_after(initialConfig.reminderOption.maghrib.afterReminder);
 		setMgr_bool_adhan(initialConfig.reminderOption.maghrib.playAdhan);
+		setMgr_bool_popup(initialConfig.reminderOption.maghrib.popup);
+		setMgr_number_before(initialConfig.reminderOption.maghrib.earlyTime);
+		setMgr_number_after(initialConfig.reminderOption.maghrib.afterTime);
+		// -----
 		setIsha_bool_ontime(initialConfig.reminderOption.isha.remindWhenOnTime);
 		setIsha_bool_before(initialConfig.reminderOption.isha.earlyReminder);
-		setIsha_number_before(initialConfig.reminderOption.isha.earlyTime);
+		setIsha_bool_after(initialConfig.reminderOption.isha.afterReminder);
 		setIsha_bool_adhan(initialConfig.reminderOption.isha.playAdhan);
+		setIsha_bool_popup(initialConfig.reminderOption.isha.popup);
+		setIsha_number_before(initialConfig.reminderOption.isha.earlyTime);
+		setIsha_number_after(initialConfig.reminderOption.isha.afterTime);
+		// -----
+		setAdhanInput(initialConfig.adhanSoundPath.fajr === 'auto' ? (window.electron.ipcRenderer.sendSync('get-adhan-path-fajr') as string) : initialConfig.adhanSoundPath.fajr);
+		setAdhanFajr(initialConfig.adhanSoundPath.fajr === 'auto' ? (window.electron.ipcRenderer.sendSync('get-adhan-path-fajr') as string) : initialConfig.adhanSoundPath.fajr);
+		setAdhanNormal(initialConfig.adhanSoundPath.normal === 'auto' ? (window.electron.ipcRenderer.sendSync('get-adhan-path') as string) : initialConfig.adhanSoundPath.normal);
+		// -----
 		setLocMode(initialConfig.locationOption.mode);
 		setLocCity(initialConfig.locationOption.city);
 		setLocLat(initialConfig.locationOption.latitude);
 		setLocLang(initialConfig.locationOption.longitude);
 		setLocUpdateEveryStartup(initialConfig.locationOption.updateEveryStartup);
+		// -----
 		setTzMode(initialConfig.timezoneOption.mode);
 		setTimezone(initialConfig.timezoneOption.timezone);
-		// setGeolocMode(initialConfig.geoLocAPIKey.mode);
-		// setGeolocKey(initialConfig.geoLocAPIKey.key);
+		// -----
 		setRunAtStartup(initialConfig.runAtStartup);
 		setcheckUpdateStartup(initialConfig.checkUpdateAtStartup);
 		setClockStyle(initialConfig.clockStyle);
@@ -735,6 +778,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		currentConfig.calcOption.mode = calcOptMode;
 		currentConfig.calcOption.method = calcOptMethod;
 		currentConfig.calcOption.madhab = calcOptMadhab;
+		// -----
 		currentConfig.calcOption.highLatitudeRule = calcOptHighLatRule;
 		currentConfig.calcOption.adjustments.fajr = calcOptAdjustment_Fajr;
 		currentConfig.calcOption.adjustments.sunrise = calcOptAdjustment_Sunrise;
@@ -742,38 +786,65 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		currentConfig.calcOption.adjustments.asr = calcOptAdjustment_Asr;
 		currentConfig.calcOption.adjustments.maghrib = calcOptAdjustment_Maghrib;
 		currentConfig.calcOption.adjustments.isha = calcOptAdjustment_Isha;
+		// -----
 		currentConfig.reminderOption.fajr.remindWhenOnTime = rm_fjr_bool_ontime;
 		currentConfig.reminderOption.fajr.earlyReminder = rm_fjr_bool_before;
-		currentConfig.reminderOption.fajr.earlyTime = rm_fjr_number_before;
+		currentConfig.reminderOption.fajr.afterReminder = rm_fjr_bool_after;
 		currentConfig.reminderOption.fajr.playAdhan = rm_fjr_bool_adhan;
+		currentConfig.reminderOption.fajr.popup = rm_fjr_bool_popup;
+		currentConfig.reminderOption.fajr.earlyTime = rm_fjr_number_before;
+		currentConfig.reminderOption.fajr.afterTime = rm_fjr_number_after;
+		// -----
 		currentConfig.reminderOption.sunrise.remindWhenOnTime = rm_snr_bool_ontime;
 		currentConfig.reminderOption.sunrise.earlyReminder = rm_snr_bool_before;
+		currentConfig.reminderOption.sunrise.afterReminder = rm_snr_bool_after;
+		currentConfig.reminderOption.sunrise.popup = rm_snr_bool_popup;
 		currentConfig.reminderOption.sunrise.earlyTime = rm_snr_number_before;
+		currentConfig.reminderOption.sunrise.afterTime = rm_snr_number_after;
+		// -----
 		currentConfig.reminderOption.dhuhr.remindWhenOnTime = rm_dhr_bool_ontime;
 		currentConfig.reminderOption.dhuhr.earlyReminder = rm_dhr_bool_before;
-		currentConfig.reminderOption.dhuhr.earlyTime = rm_dhr_number_before;
+		currentConfig.reminderOption.dhuhr.afterReminder = rm_dhr_bool_after;
 		currentConfig.reminderOption.dhuhr.playAdhan = rm_dhr_bool_adhan;
+		currentConfig.reminderOption.dhuhr.popup = rm_dhr_bool_popup;
+		currentConfig.reminderOption.dhuhr.earlyTime = rm_dhr_number_before;
+		currentConfig.reminderOption.dhuhr.afterTime = rm_dhr_number_after;
+		// -----
 		currentConfig.reminderOption.asr.remindWhenOnTime = rm_asr_bool_ontime;
 		currentConfig.reminderOption.asr.earlyReminder = rm_asr_bool_before;
-		currentConfig.reminderOption.asr.earlyTime = rm_asr_number_before;
+		currentConfig.reminderOption.asr.afterReminder = rm_asr_bool_after;
 		currentConfig.reminderOption.asr.playAdhan = rm_asr_bool_adhan;
+		currentConfig.reminderOption.asr.popup = rm_asr_bool_popup;
+		currentConfig.reminderOption.asr.earlyTime = rm_asr_number_before;
+		currentConfig.reminderOption.asr.afterTime = rm_asr_number_after;
+		// -----
 		currentConfig.reminderOption.maghrib.remindWhenOnTime = rm_mgr_bool_ontime;
 		currentConfig.reminderOption.maghrib.earlyReminder = rm_mgr_bool_before;
-		currentConfig.reminderOption.maghrib.earlyTime = rm_mgr_number_before;
+		currentConfig.reminderOption.maghrib.afterReminder = rm_mgr_bool_after;
 		currentConfig.reminderOption.maghrib.playAdhan = rm_mgr_bool_adhan;
+		currentConfig.reminderOption.maghrib.popup = rm_mgr_bool_popup;
+		currentConfig.reminderOption.maghrib.earlyTime = rm_mgr_number_before;
+		currentConfig.reminderOption.maghrib.afterTime = rm_mgr_number_after;
+		// -----
 		currentConfig.reminderOption.isha.remindWhenOnTime = rm_isha_bool_ontime;
 		currentConfig.reminderOption.isha.earlyReminder = rm_isha_bool_before;
-		currentConfig.reminderOption.isha.earlyTime = rm_isha_number_before;
+		currentConfig.reminderOption.isha.afterReminder = rm_isha_bool_after;
 		currentConfig.reminderOption.isha.playAdhan = rm_isha_bool_adhan;
+		currentConfig.reminderOption.isha.earlyTime = rm_isha_number_before;
+		currentConfig.reminderOption.isha.afterTime = rm_isha_number_after;
+		// -----
+		currentConfig.adhanSoundPath.fajr = adhanFajr === 'auto' ? 'auto' : adhanFajr;
+		currentConfig.adhanSoundPath.normal = adhanNormal === 'auto' ? 'auto' : adhanNormal;
+		// -----
 		currentConfig.locationOption.mode = locMode;
 		currentConfig.locationOption.city = locCity;
 		currentConfig.locationOption.latitude = locLat;
 		currentConfig.locationOption.longitude = locLang;
 		currentConfig.locationOption.updateEveryStartup = locUpdateEveryStartup;
+		// -----
 		currentConfig.timezoneOption.mode = tzMode;
 		currentConfig.timezoneOption.timezone = timezone;
-		// currentConfig.geoLocAPIKey.mode = geolocMode;
-		// currentConfig.geoLocAPIKey.key = geolocKey;
+		// -----
 		currentConfig.runAtStartup = runAtStartup;
 		currentConfig.checkUpdateAtStartup = checkUpdateStartup;
 		currentConfig.clockStyle = clockStyle;
@@ -1088,6 +1159,60 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 								}}
 							>
 								<DataGrid rows={reminderGridRowsProp} columns={reminderGridColumns} experimentalFeatures={{ newEditingApi: true }} hideFooter={true} />
+							</Box>
+							<Box sx={{ display: 'flex', flexDirection: 'row' }}>
+								<FormControl sx={{ minWidth: '120px', mr: 2, pt: 1 }}>
+									<FormLabel>Adhan Type</FormLabel>
+									<Select size='small' value={selectAdhan} onChange={(v) => setSelectAdhan(v.target.value)}>
+										<MenuItem value='Fajr'>Fajr</MenuItem>
+										<MenuItem value='Normal'>Normal</MenuItem>
+									</Select>
+								</FormControl>
+								<span style={{ paddingTop: '30px', width: '800px' }}>
+									<TextField
+										fullWidth
+										helperText='Must be a valid .mp3 file'
+										id='filepath'
+										label='File Path'
+										variant='outlined'
+										size='small'
+										value={adhanInput}
+										onChange={handleAdhanInput}
+										InputProps={{
+											endAdornment: (
+												<InputAdornment position='end'>
+													<IconButton
+														aria-label='Open Folder'
+														onClick={() => {
+															/**changeAdhanMp3 */
+														}}
+														edge='end'
+													>
+														<FolderOpenIcon />
+													</IconButton>
+													<IconButton
+														aria-label='Play adhan'
+														onClick={() => {
+															/**playAdhan */
+														}}
+														edge='end'
+													>
+														{adhanPlaying ? <PauseIcon /> : <PlayCircleIcon />}
+													</IconButton>
+													<IconButton
+														aria-label='Stop adhan'
+														onClick={() => {
+															/**stopAdhan */
+														}}
+														edge='end'
+													>
+														<StopIcon />
+													</IconButton>
+												</InputAdornment>
+											),
+										}}
+									/>
+								</span>
 							</Box>
 						</Grid>
 					</Grid>
