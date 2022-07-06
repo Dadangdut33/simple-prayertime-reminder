@@ -891,6 +891,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		currentConfig.reminderOption.isha.earlyReminder = rm_isha_bool_before;
 		currentConfig.reminderOption.isha.afterReminder = rm_isha_bool_after;
 		currentConfig.reminderOption.isha.playAdhan = rm_isha_bool_adhan;
+		currentConfig.reminderOption.isha.popup = rm_isha_bool_popup;
 		currentConfig.reminderOption.isha.earlyTime = rm_isha_number_before;
 		currentConfig.reminderOption.isha.afterTime = rm_isha_number_after;
 		// -----
