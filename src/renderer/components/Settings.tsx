@@ -61,21 +61,21 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	// config on tab open
 	const initialConfig = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
-	const [currentConfig, setCurrentConfig] = useState<configInterface>(window.electron.ipcRenderer.sendSync('get-config') as configInterface); // current config
+	const [currentConfig, setCurrentConfig] = useState<configInterface>(initialConfig); // current config
 	const [destination, setDestination] = useState<string>(''); // destination path
 
 	// --------------------------------------------------------------------------
 	// calcOption
-	const [calcOptMode, setCalcOptMode] = useState<'default' | 'manual'>(currentConfig.calcOption.mode);
-	const [calcOptMethod, setCalcOptMethod] = useState<calcMethod>(currentConfig.calcOption.method);
-	const [calcOptMadhab, setCalcOptMadhab] = useState<madhab>(currentConfig.calcOption.madhab);
-	const [calcOptHighLatRule, setCalcOptHighLatRule] = useState<highLatitudeRule_T>(currentConfig.calcOption.highLatitudeRule);
-	const [calcOptAdjustment_Fajr, setCalcOptAdjustment_Fajr] = useState<number>(currentConfig.calcOption.adjustments.fajr);
-	const [calcOptAdjustment_Sunrise, setCalcOptAdjustment_Sunrise] = useState<number>(currentConfig.calcOption.adjustments.sunrise);
-	const [calcOptAdjustment_Dhuhr, setCalcOptAdjustment_Dhuhr] = useState<number>(currentConfig.calcOption.adjustments.dhuhr);
-	const [calcOptAdjustment_Asr, setCalcOptAdjustment_Asr] = useState<number>(currentConfig.calcOption.adjustments.asr);
-	const [calcOptAdjustment_Maghrib, setCalcOptAdjustment_Maghrib] = useState<number>(currentConfig.calcOption.adjustments.maghrib);
-	const [calcOptAdjustment_Isha, setCalcOptAdjustment_Isha] = useState<number>(currentConfig.calcOption.adjustments.isha);
+	const [calcOptMode, setCalcOptMode] = useState<'default' | 'manual'>('default');
+	const [calcOptMethod, setCalcOptMethod] = useState<calcMethod>('MuslimWorldLeague');
+	const [calcOptMadhab, setCalcOptMadhab] = useState<madhab>('Shafi');
+	const [calcOptHighLatRule, setCalcOptHighLatRule] = useState<highLatitudeRule_T>('MiddleOfTheNight');
+	const [calcOptAdjustment_Fajr, setCalcOptAdjustment_Fajr] = useState<number>(0);
+	const [calcOptAdjustment_Sunrise, setCalcOptAdjustment_Sunrise] = useState<number>(0);
+	const [calcOptAdjustment_Dhuhr, setCalcOptAdjustment_Dhuhr] = useState<number>(0);
+	const [calcOptAdjustment_Asr, setCalcOptAdjustment_Asr] = useState<number>(0);
+	const [calcOptAdjustment_Maghrib, setCalcOptAdjustment_Maghrib] = useState<number>(0);
+	const [calcOptAdjustment_Isha, setCalcOptAdjustment_Isha] = useState<number>(0);
 
 	const methodList = ['MuslimWorldLeague', 'Egyptian', 'Karachi', 'UmmAlQura', 'Dubai', 'MoonsightingCommittee', 'NorthAmerica', 'Kuwait', 'Qatar', 'Singapore', 'Tehran', 'Turkey'];
 	const madhabList = ['Shafi', 'Hanafi'];
@@ -134,34 +134,34 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	// --------------------------------------------------------------------------
 	// reminder option
-	const [remind_fajr_remindWhenOnTime, setRemind_fajr_remindWhenOnTime] = useState<boolean>(currentConfig.reminderOption.fajr.remindWhenOnTime);
-	const [remind_fajr_earlyReminder, setRemind_fajr_earlyReminder] = useState<boolean>(currentConfig.reminderOption.fajr.earlyReminder);
-	const [remind_fajr_earlyTime, setRemind_fajr_earlyTime] = useState<number>(currentConfig.reminderOption.fajr.earlyTime);
-	const [remind_fajr_adhan, setRemind_fajr_adhan] = useState<boolean>(currentConfig.reminderOption.fajr.playAdhan);
+	const [remind_fajr_remindWhenOnTime, setRemind_fajr_remindWhenOnTime] = useState<boolean>(true);
+	const [remind_fajr_earlyReminder, setRemind_fajr_earlyReminder] = useState<boolean>(true);
+	const [remind_fajr_earlyTime, setRemind_fajr_earlyTime] = useState<number>(15);
+	const [remind_fajr_adhan, setRemind_fajr_adhan] = useState<boolean>(true);
 
-	const [remind_sunrise_remindWhenOnTime, setRemind_sunrise_remindWhenOnTime] = useState<boolean>(currentConfig.reminderOption.sunrise.remindWhenOnTime);
-	const [remind_sunrise_earlyReminder, setRemind_sunrise_earlyReminder] = useState<boolean>(currentConfig.reminderOption.sunrise.earlyReminder);
-	const [remind_sunrise_earlyTime, setRemind_sunrise_earlyTime] = useState<number>(currentConfig.reminderOption.sunrise.earlyTime);
+	const [remind_sunrise_remindWhenOnTime, setRemind_sunrise_remindWhenOnTime] = useState<boolean>(true);
+	const [remind_sunrise_earlyReminder, setRemind_sunrise_earlyReminder] = useState<boolean>(true);
+	const [remind_sunrise_earlyTime, setRemind_sunrise_earlyTime] = useState<number>(15);
 
-	const [remind_dhuhr_remindWhenOnTime, setRemind_dhuhr_remindWhenOnTime] = useState<boolean>(currentConfig.reminderOption.dhuhr.remindWhenOnTime);
-	const [remind_dhuhr_earlyReminder, setRemind_dhuhr_earlyReminder] = useState<boolean>(currentConfig.reminderOption.dhuhr.earlyReminder);
-	const [remind_dhuhr_earlyTime, setRemind_dhuhr_earlyTime] = useState<number>(currentConfig.reminderOption.dhuhr.earlyTime);
-	const [remind_dhuhr_adhan, setRemind_dhuhr_adhan] = useState<boolean>(currentConfig.reminderOption.dhuhr.playAdhan);
+	const [remind_dhuhr_remindWhenOnTime, setRemind_dhuhr_remindWhenOnTime] = useState<boolean>(true);
+	const [remind_dhuhr_earlyReminder, setRemind_dhuhr_earlyReminder] = useState<boolean>(true);
+	const [remind_dhuhr_earlyTime, setRemind_dhuhr_earlyTime] = useState<number>(15);
+	const [remind_dhuhr_adhan, setRemind_dhuhr_adhan] = useState<boolean>(true);
 
-	const [remind_asr_remindWhenOnTime, setRemind_asr_remindWhenOnTime] = useState<boolean>(currentConfig.reminderOption.asr.remindWhenOnTime);
-	const [remind_asr_earlyReminder, setRemind_asr_earlyReminder] = useState<boolean>(currentConfig.reminderOption.asr.earlyReminder);
-	const [remind_asr_earlyTime, setRemind_asr_earlyTime] = useState<number>(currentConfig.reminderOption.asr.earlyTime);
-	const [remind_asr_adhan, setRemind_asr_adhan] = useState<boolean>(currentConfig.reminderOption.asr.playAdhan);
+	const [remind_asr_remindWhenOnTime, setRemind_asr_remindWhenOnTime] = useState<boolean>(true);
+	const [remind_asr_earlyReminder, setRemind_asr_earlyReminder] = useState<boolean>(true);
+	const [remind_asr_earlyTime, setRemind_asr_earlyTime] = useState<number>(15);
+	const [remind_asr_adhan, setRemind_asr_adhan] = useState<boolean>(true);
 
-	const [remind_maghrib_remindWhenOnTime, setRemind_maghrib_remindWhenOnTime] = useState<boolean>(currentConfig.reminderOption.maghrib.remindWhenOnTime);
-	const [remind_maghrib_earlyReminder, setRemind_maghrib_earlyReminder] = useState<boolean>(currentConfig.reminderOption.maghrib.earlyReminder);
-	const [remind_maghrib_earlyTime, setRemind_maghrib_earlyTime] = useState<number>(currentConfig.reminderOption.maghrib.earlyTime);
-	const [remind_maghrib_adhan, setRemind_maghrib_adhan] = useState<boolean>(currentConfig.reminderOption.maghrib.playAdhan);
+	const [remind_maghrib_remindWhenOnTime, setRemind_maghrib_remindWhenOnTime] = useState<boolean>(true);
+	const [remind_maghrib_earlyReminder, setRemind_maghrib_earlyReminder] = useState<boolean>(true);
+	const [remind_maghrib_earlyTime, setRemind_maghrib_earlyTime] = useState<number>(15);
+	const [remind_maghrib_adhan, setRemind_maghrib_adhan] = useState<boolean>(true);
 
-	const [remind_isha_remindWhenOnTime, setRemind_isha_remindWhenOnTime] = useState<boolean>(currentConfig.reminderOption.isha.remindWhenOnTime);
-	const [remind_isha_earlyReminder, setRemind_isha_earlyReminder] = useState<boolean>(currentConfig.reminderOption.isha.earlyReminder);
-	const [remind_isha_earlyTime, setRemind_isha_earlyTime] = useState<number>(currentConfig.reminderOption.isha.earlyTime);
-	const [remind_isha_adhan, setRemind_isha_adhan] = useState<boolean>(currentConfig.reminderOption.isha.playAdhan);
+	const [remind_isha_remindWhenOnTime, setRemind_isha_remindWhenOnTime] = useState<boolean>(true);
+	const [remind_isha_earlyReminder, setRemind_isha_earlyReminder] = useState<boolean>(true);
+	const [remind_isha_earlyTime, setRemind_isha_earlyTime] = useState<number>(15);
+	const [remind_isha_adhan, setRemind_isha_adhan] = useState<boolean>(true);
 
 	const remindWhenOnTimeChangeMap = {
 		fajr: setRemind_fajr_remindWhenOnTime,
@@ -234,11 +234,11 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	// --------------------------------------------------------------------------
 	// location
-	const [locMode, setLocMode] = useState<'auto' | 'manual'>(currentConfig.locationOption.mode);
-	const [locCity, setLocCity] = useState(currentConfig.locationOption.city);
-	const [locLat, setLocLat] = useState(currentConfig.locationOption.latitude);
-	const [locLang, setLocLang] = useState(currentConfig.locationOption.longitude);
-	const [locUpdateEveryStartup, setLocUpdateEveryStartup] = useState(currentConfig.locationOption.updateEveryStartup);
+	const [locMode, setLocMode] = useState<'auto' | 'manual'>('auto');
+	const [locCity, setLocCity] = useState<string>('');
+	const [locLat, setLocLat] = useState<string>('');
+	const [locLang, setLocLang] = useState<string>('');
+	const [locUpdateEveryStartup, setLocUpdateEveryStartup] = useState<boolean>(false);
 	const handleLocModeChange = async (e: ChangeEvent<HTMLInputElement>) => {
 		setLocMode(e.target.value as 'auto' | 'manual');
 		// if auto, fetch location
@@ -347,8 +347,8 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	const tzList = window.electron.ipcRenderer.sendSync('get-tz-list') as string[];
 
 	// timezone
-	const [tzMode, setTzMode] = useState<'auto' | 'manual'>(currentConfig.timezoneOption.mode);
-	const [timezone, setTimezone] = useState<string>(currentConfig.timezoneOption.timezone);
+	const [tzMode, setTzMode] = useState<'auto' | 'manual'>('auto');
+	const [timezone, setTimezone] = useState<string>('');
 	const [tzInput, setTzInput] = useState<string>('');
 
 	const handleTzModeChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -413,11 +413,11 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		checkChanges();
 	};
 
-	const [runAtStartup, setRunAtStartup] = useState(currentConfig.runAtStartup);
-	const [checkUpdateStartup, setcheckUpdateStartup] = useState(currentConfig.checkUpdateAtStartup);
-	const [clockStyle, setClockStyle] = useState(currentConfig.clockStyle);
-	const [hijriCalendarOffset, setHijriCalendarOffset] = useState(currentConfig.hijriCalendarOffset);
-	const [detectTimeChange, setDetectTimeChange] = useState(currentConfig.detectTimeChange);
+	const [runAtStartup, setRunAtStartup] = useState<boolean>(true);
+	const [checkUpdateStartup, setcheckUpdateStartup] = useState<boolean>(true);
+	const [clockStyle, setClockStyle] = useState<string | 'AM/PM' | '24h'>('AM/PM');
+	const [hijriCalendarOffset, setHijriCalendarOffset] = useState<number>(-1);
+	const [detectTimeChange, setDetectTimeChange] = useState<boolean>(false);
 
 	const handleHijriCalendarOffsetChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setHijriCalendarOffset(Number(e.target.value) || 0);
@@ -454,7 +454,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	// --------------------------------------------------------------------------
 	// snackbar
-	const [snackbarLoading, setSnackbarLoading] = useState(false);
+	const [snackbarLoading, setSnackbarLoading] = useState<boolean>(false);
 	const [showSnackbar, setShowSnackbar] = useState<boolean>(false);
 	const [snackbarMsg, setSnackbarMsg] = useState<string>('');
 	const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'info' | 'warning' | 'error'>('info');
@@ -549,7 +549,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	const resetConfig = () => {
 		if (currentConfig.theme !== appTheme) colorMode.toggleColorMode();
 		setChangesMade(false);
-		setCurrentConfig(initialConfig);
+		setCurrentConfig(window.electron.ipcRenderer.sendSync('get-config') as configInterface);
 
 		// setting var
 		setInitialValue();
@@ -657,6 +657,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 
 	// --------------------------------------------------------------------------
 	useEffect(() => {
+		setInitialValue();
 		// listener for page switching
 		window.electron.ipcRenderer.on('open-changes-made', openChangesMadeFunc);
 

@@ -48,9 +48,9 @@ const moment = require('moment-hijri');
 moment.locale('en');
 
 export const Schedule = () => {
-	const [ptTime, setPtTime] = useState < getPrayerTimes_I | null>(null);
+	const [ptTime, setPtTime] = useState<getPrayerTimes_I | null>(null);
 	const [timezone, setTimezone] = useState<string>('');
-	const [appSettings, setAppSettings] = useState<configInterface| null>(null);
+	const [appSettings, setAppSettings] = useState<configInterface | null>(null);
 	const [versionGet, setVersionGet] = useState<string>('');
 
 	const [selected, setSelected] = useState<Date | null>(null);
@@ -73,8 +73,8 @@ export const Schedule = () => {
 	const getGregorianDate = (date: Date | null) => {
 		if (!appSettings) return '';
 
-		return Moment(date).tz(timezone).format('dddd, D MMMM YYYY')
-	}
+		return Moment(date).tz(timezone).format('dddd, D MMMM YYYY');
+	};
 
 	const getHijriDate = (date: Date | null) => {
 		if (!appSettings) return '';
@@ -86,7 +86,7 @@ export const Schedule = () => {
 
 	const getPtTime = (date: string) => {
 		if (!appSettings) return '';
-		
+
 		return Moment(new Date(date))
 			.tz(timezone)
 			.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A');
@@ -103,7 +103,7 @@ export const Schedule = () => {
 
 		// get days dif between start and end date using moment
 		const days = moment(endDate).diff(moment(startDate), 'days');
-		if (exportType === 'csv' || exportType === 'xlsx' || exportType === "html") {
+		if (exportType === 'csv' || exportType === 'xlsx' || exportType === 'html') {
 			const dataExport = [];
 			dataExport.push([`Prayer schedules for ${appSettings.locationOption.city}`]);
 			dataExport.push([`${Moment(startDate).tz(timezone).format('D MMMM YYYY')} - ${Moment(endDate).tz(timezone).format('D MMMM YYYY')}`]);
@@ -152,8 +152,7 @@ export const Schedule = () => {
 
 			// save data
 			XLSX.writeFile(workBook, `${appSettings.locationOption.city}_${Moment(startDate).tz(timezone).format('D MMMM YYYY')}_${Moment(endDate).tz(timezone).format('D MMMM YYYY')}.${exportType}`);
-		} else
-		if (exportType === "pdf") {
+		} else if (exportType === 'pdf') {
 			const doc = new jsPDF();
 			const dataExport = [];
 
@@ -178,7 +177,7 @@ export const Schedule = () => {
 				startY: 25,
 				margin: 10,
 				head: [['Gregorian Date', 'Hijri Date', 'Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha']],
-				body: dataExport
+				body: dataExport,
 			});
 
 			let pushLines = [];
@@ -192,13 +191,13 @@ export const Schedule = () => {
 			pushLines.push('Madhab: ' + appSettings.calcOption.madhab);
 			pushLines.push('High Lat Rule: ' + appSettings.calcOption.highLatitudeRule);
 			pushLines.push(
-				`Offsets: [${appSettings.calcOption.adjustments.fajr}, ${appSettings.calcOption.adjustments.sunrise}, ${appSettings.calcOption.adjustments.dhuhr}, ${appSettings.calcOption.adjustments.asr}, ${appSettings.calcOption.adjustments.maghrib}, ${appSettings.calcOption.adjustments.isha}]`,
+				`Offsets: [${appSettings.calcOption.adjustments.fajr}, ${appSettings.calcOption.adjustments.sunrise}, ${appSettings.calcOption.adjustments.dhuhr}, ${appSettings.calcOption.adjustments.asr}, ${appSettings.calcOption.adjustments.maghrib}, ${appSettings.calcOption.adjustments.isha}]`
 			);
 			pushLines.push('');
 			pushLines.push(`©Simple PrayerTime Reminder v${versionGet}`);
 			pushLines.push(`https://bit.ly/SPRRepo`);
 			pushLines.push(`${Moment().tz(timezone).format('D MMMM YYYY, HH:mm:ss')}`);
-			doc.text(pushLines, 10, 20)
+			doc.text(pushLines, 10, 20);
 
 			doc.save(`${appSettings.locationOption.city}_${Moment(startDate).tz(timezone).format('D MMMM YYYY')}_${Moment(endDate).tz(timezone).format('D MMMM YYYY')}.pdf`);
 		}
@@ -226,8 +225,7 @@ export const Schedule = () => {
 									flexDirection: 'column',
 									alignItems: 'center',
 								}}
-							>	
-							
+							>
 								{getGregorianDate(startDate)}
 								<Typography variant='caption' display='block' className='subtle-text'>
 									({getHijriDate(startDate)})
@@ -347,29 +345,29 @@ export const Schedule = () => {
 						<Stack direction='row' divider={<Divider orientation='vertical' flexItem />} spacing={2} sx={{ mt: 3, justifyContent: 'space-between' }}>
 							<Box sx={{ display: 'flex', flexDirection: 'column' }}>
 								<div>
-									<strong>{ptTime ?  getPtTime(ptTime.fajrTime) : ''}</strong>
+									<strong>{ptTime ? getPtTime(ptTime.fajrTime) : ''}</strong>
 									<span className='prayername'>Fajr</span>
 								</div>
 								<div>
-									<strong>{ptTime ? getPtTime(ptTime.sunriseTime): ''}</strong>
+									<strong>{ptTime ? getPtTime(ptTime.sunriseTime) : ''}</strong>
 									<span className='prayername'>Sunrise</span>
 								</div>
 								<div>
-									<strong>{ptTime ? getPtTime(ptTime.dhuhrTime): ''}</strong>
+									<strong>{ptTime ? getPtTime(ptTime.dhuhrTime) : ''}</strong>
 									<span className='prayername'>Dhuhr</span>
 								</div>
 							</Box>
 							<Box sx={{ display: 'flex', flexDirection: 'column' }}>
 								<div>
-									<strong>{ptTime ? getPtTime(ptTime.asrTime): ''}</strong>
+									<strong>{ptTime ? getPtTime(ptTime.asrTime) : ''}</strong>
 									<span className='prayername'>Asr</span>
 								</div>
 								<div>
-									<strong>{ptTime ? getPtTime(ptTime.maghribTime): ''}</strong>
+									<strong>{ptTime ? getPtTime(ptTime.maghribTime) : ''}</strong>
 									<span className='prayername'>Maghrib</span>
 								</div>
 								<div>
-									<strong>{ptTime ? getPtTime(ptTime.ishaTime): ''}</strong>
+									<strong>{ptTime ? getPtTime(ptTime.ishaTime) : ''}</strong>
 									<span className='prayername'>Isha</span>
 								</div>
 							</Box>
