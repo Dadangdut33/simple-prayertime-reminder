@@ -1,6 +1,7 @@
 import winDir from '../../../assets/windir.png';
 import { useState, useEffect } from 'react';
 import { configInterface, getPrayerTimes_I, ColorHex, colorCache, colorCacheGet } from 'main/interfaces';
+import { Timer } from './Timer';
 
 // Clocks
 import { CountdownCircleTimer } from 'react-countdown-circle-timer';
@@ -16,10 +17,10 @@ import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 import Chip from '@mui/material/Chip';
 import Collapse from '@mui/material/Collapse';
+import Skeleton from '@mui/material/Skeleton';
 
 // Icons
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 
@@ -47,8 +48,8 @@ export const Praytime = ({ theme }: any) => {
 	// ----------------------------------------------------------------------------------------------------------------------
 	const [key, setKey] = useState(0);
 	// Config
-	const [currentPt, setCurrentPt] = useState<getPrayerTimes_I>(window.electron.ipcRenderer.sendSync('get-this-pt') as getPrayerTimes_I);
-	const timezone = window.electron.ipcRenderer.sendSync('get-timezone') as string;
+	const [currentPt, setCurrentPt] = useState<getPrayerTimes_I | null>(null);
+	const timezone = window.electron.ipcRenderer.sendSync('get-timezone') as string; // TODO: use method above if it works
 	const appSettings = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
 
 	// clock
@@ -62,16 +63,20 @@ export const Praytime = ({ theme }: any) => {
 	const [modalOpened, setModalOpened] = useState(false);
 
 	// ----------------------------------------------------------------------------------------------------------------------
-	const pt_Map: any = {
-		fajr: currentPt.fajrTime,
-		sunrise: currentPt.sunriseTime,
-		dhuhr: currentPt.dhuhrTime,
-		asr: currentPt.asrTime,
-		maghrib: currentPt.maghribTime,
-		isha: currentPt.ishaTime,
+	const pt_Map = (key: string, currentPt: getPrayerTimes_I) => {
+		const map: any = {
+			fajr: currentPt.fajrTime,
+			sunrise: currentPt.sunriseTime,
+			dhuhr: currentPt.dhuhrTime,
+			asr: currentPt.asrTime,
+			maghrib: currentPt.maghribTime,
+			isha: currentPt.ishaTime,
+		};
+
+		return map[key];
 	};
 
-	const check_00_fajr = () => {
+	const check_00_fajr = (currentPt: getPrayerTimes_I) => {
 		const checkNow = Moment().tz(timezone);
 		const before = Moment('00:00:00', 'HH:mm:ss').tz(timezone);
 		const after = Moment(new Date(currentPt!.fajrTime), 'HH:mm:ss').tz(timezone);
@@ -82,60 +87,24 @@ export const Praytime = ({ theme }: any) => {
 		}
 	};
 
-	const getPtDif = () => {
-		const start = Moment(new Date(pt_Map[currentPt.current])).tz(timezone);
-		const end = Moment(new Date(pt_Map[currentPt.next])).tz(timezone);
-		if (currentPt!.next === 'fajr' && !check_00_fajr()) end.add(1, 'day');
+	const getPtDif = (currentPt: getPrayerTimes_I) => {
+		const start = Moment(new Date(pt_Map(currentPt.current, currentPt))).tz(timezone);
+		const end = Moment(new Date(pt_Map(currentPt.next, currentPt))).tz(timezone);
+		if (currentPt!.next === 'fajr' && !check_00_fajr(currentPt)) end.add(1, 'day');
 
 		const duration = Moment.duration(start.diff(end));
 
 		return Math.abs(duration.asSeconds());
 	};
 
-	const getPtDif_Initial = () => {
+	const getPtDif_Initial = (currentPt: getPrayerTimes_I) => {
 		const startInitial = Moment(new Date()).tz(timezone);
-		const end = Moment(new Date(pt_Map[currentPt.next])).tz(timezone);
-		if (currentPt!.next === 'fajr' && !check_00_fajr()) end.add(1, 'day');
+		const end = Moment(new Date(pt_Map(currentPt.next, currentPt))).tz(timezone);
+		if (currentPt!.next === 'fajr' && !check_00_fajr(currentPt)) end.add(1, 'day');
 
 		const durationInitial = Moment.duration(startInitial.diff(end));
 
 		return Math.ceil(Math.abs(durationInitial.asSeconds()));
-	};
-
-	const formatTimerWithHours = (time: number) => {
-		let hours: string | number = Math.floor(time / 3600);
-		let minutes: string | number = Math.floor((time - hours * 3600) / 60);
-		let seconds: string | number = time - hours * 3600 - minutes * 60;
-
-		if (hours < 10) hours = `0${hours}`.slice(-2);
-		if (minutes < 10) minutes = `0${minutes}`.slice(-2);
-		if (seconds < 10) seconds = `0${seconds}`.slice(-2);
-
-		return `${hours}:${minutes}:${seconds}`;
-	};
-
-	// timer color
-	const generateRandomHexColor = (amount: number) => {
-		let colorList: ColorHex[] = [],
-			secondsList: number[] = [];
-		for (let i = 0; i < amount; i++) {
-			let color: ColorHex = '#';
-			for (let i = 0; i < 3; i++) color += ('0' + Math.floor((Math.random() * Math.pow(16, 2)) / 2).toString(16)).slice(-2);
-
-			colorList.push(color);
-			secondsList.push(i * amountDivider);
-		}
-
-		setRandomColorList(colorList);
-		setColorChangeSecondsList(secondsList.reverse());
-
-		const saved: colorCache = {
-			current: currentPt!.current,
-			colors: colorList,
-			intervals: secondsList,
-		};
-
-		window.electron.ipcRenderer.send('save-cache-color', saved);
 	};
 
 	// wind direction to word
@@ -148,19 +117,19 @@ export const Praytime = ({ theme }: any) => {
 	// Timer
 	const [timerClock_duration, setTimeClockDuration] = useState<number>(2000);
 	const [timeClock_timeDif, setTimeClockTimeDif] = useState<number>(0);
-	const [timeToStr, setTimeToStr] = useState<number>(0);
 	const updatePTData_RefreshTimer = () => {
-		setCurrentPt(window.electron.ipcRenderer.sendSync('get-this-pt') as getPrayerTimes_I); // update pt
-		setTimeClockDuration(getPtDif());
-		setTimeClockTimeDif(getPtDif_Initial());
-		setTimeToStr(getPtDif_Initial());
+		const lcl_cPt = window.electron.ipcRenderer.sendSync('get-this-pt') as getPrayerTimes_I;
+		setTimeClockDuration(getPtDif(lcl_cPt));
+		setTimeClockTimeDif(getPtDif_Initial(lcl_cPt));
 		setKey((prevKey) => prevKey + 1); // refresh timer
 	};
 
 	// ---------------------------------------------------------
 	useEffect(() => {
-		setTimeClockDuration(getPtDif());
-		setTimeClockTimeDif(getPtDif_Initial());
+		const lcl_cPt = window.electron.ipcRenderer.sendSync('get-this-pt') as getPrayerTimes_I;
+		setCurrentPt(lcl_cPt);
+		setTimeClockDuration(getPtDif(lcl_cPt));
+		setTimeClockTimeDif(getPtDif_Initial(lcl_cPt));
 		setKey((prevKey) => prevKey + 1); // refresh timer
 
 		// get chip state from localstorage
@@ -168,24 +137,45 @@ export const Praytime = ({ theme }: any) => {
 		if (chipState === 'true') setChipExpanded(true);
 
 		// timer
-		let timer_clock_Interval: NodeJS.Timer,
+		let timer_clock_interval: NodeJS.Timer,
 			toExactSecond = 1000 - (new Date().getTime() % 1000),
 			timeoutTimer = setTimeout(() => {
-				timer_clock_Interval = setInterval(() => {
+				timer_clock_interval = setInterval(() => {
 					setClockValueNow(new Date()); // update clock value
-					setTimeToStr((prevTimeToStr) => prevTimeToStr - 1); // update timer value by substracting it
 				}, 1000);
-
 				setClockValueNow(new Date());
-				setTimeToStr(getPtDif_Initial());
 			}, toExactSecond); // match second
 
+		// timer color
+		const generateRandomHexColor = (amount: number) => {
+			let colorList: ColorHex[] = [],
+				secondsList: number[] = [];
+			for (let i = 0; i < amount; i++) {
+				let color: ColorHex = '#';
+				for (let i = 0; i < 3; i++) color += ('0' + Math.floor((Math.random() * Math.pow(16, 2)) / 2).toString(16)).slice(-2);
+
+				colorList.push(color);
+				secondsList.push(i * amountDivider);
+			}
+
+			setRandomColorList(colorList);
+			setColorChangeSecondsList(secondsList.reverse());
+
+			const saved: colorCache = {
+				current: lcl_cPt.current,
+				colors: colorList,
+				intervals: secondsList,
+			};
+
+			window.electron.ipcRenderer.send('save-cache-color', saved);
+		};
+
 		const getCacheColor = window.electron.ipcRenderer.sendSync('get-cache-color') as colorCacheGet;
-		if (getCacheColor.success && getCacheColor.data.current === currentPt.current && getCacheColor.data.colors.length > 0 && getCacheColor.data.intervals.length > 0) {
+		if (getCacheColor.success && getCacheColor.data.current === lcl_cPt.current && getCacheColor.data.colors.length > 0 && getCacheColor.data.intervals.length > 0) {
 			setRandomColorList(getCacheColor.data.colors);
 			setColorChangeSecondsList(getCacheColor.data.intervals);
 		} else {
-			generateRandomHexColor(getPtDif() / amountDivider);
+			generateRandomHexColor(getPtDif(lcl_cPt) / amountDivider);
 		}
 
 		// listener
@@ -193,7 +183,7 @@ export const Praytime = ({ theme }: any) => {
 		return () => {
 			window.electron.ipcRenderer.removeEventListener('refresh-from-main', updatePTData_RefreshTimer);
 			clearTimeout(timeoutTimer);
-			clearInterval(timer_clock_Interval);
+			clearInterval(timer_clock_interval);
 		};
 	}, []);
 
@@ -216,9 +206,13 @@ export const Praytime = ({ theme }: any) => {
 						<Typography sx={{ fontWeight: 'bold', ml: 'auto', mr: 'auto' }} variant='h5' component='h2'>
 							Wind Direction
 						</Typography>
-						<Typography sx={{ ml: 'auto', mr: 'auto' }} variant='subtitle1' component='h5'>
-							{currentPt.qibla.toFixed(2)}° ({windDirectionToWord(currentPt.qibla)})
-						</Typography>
+						{currentPt ? (
+							<Typography sx={{ ml: 'auto', mr: 'auto' }} variant='subtitle1' component='h5'>
+								{currentPt.qibla.toFixed(2)}° ({windDirectionToWord(currentPt.qibla)})
+							</Typography>
+						) : (
+							<Skeleton />
+						)}
 					</Box>
 					<Button
 						sx={{
@@ -281,34 +275,36 @@ export const Praytime = ({ theme }: any) => {
 
 					<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', mt: 6 }}>
 						<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-							<h3>{currentPt.current.charAt(0).toUpperCase() + currentPt.current.slice(1)}</h3>
-							<p>
-								{Moment(new Date(pt_Map[currentPt.current]))
-									.tz(timezone)
-									.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
-							</p>
+							{currentPt ? (
+								<>
+									<h3>{currentPt.current.charAt(0).toUpperCase() + currentPt.current.slice(1)}</h3>
+									<p>
+										{Moment(new Date(pt_Map(currentPt.current, currentPt)))
+											.tz(timezone)
+											.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
+									</p>
+								</>
+							) : (
+								<Skeleton />
+							)}
 						</Box>
 
-						<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', ml: 6, mr: 6 }}>
-							<div
-								style={{
-									display: 'flex',
-									alignItems: 'center',
-									flexWrap: 'wrap',
-								}}
-							>
-								<DoubleArrowIcon color='primary' style={{ fontSize: '26px' }} /> <h2>{formatTimerWithHours(timeToStr)}</h2>
-							</div>
-						</Box>
+						<Timer key={key} initialTime={timeClock_timeDif} />
 
 						<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-							<h3>{currentPt.next.charAt(0).toUpperCase() + currentPt.next.slice(1)}</h3>
+							{currentPt ? (
+								<>
+									<h3>{currentPt.next.charAt(0).toUpperCase() + currentPt.next.slice(1)}</h3>
 
-							<p>
-								{Moment(new Date(pt_Map[currentPt.next]))
-									.tz(timezone)
-									.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
-							</p>
+									<p>
+										{Moment(new Date(pt_Map(currentPt.next, currentPt)))
+											.tz(timezone)
+											.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
+									</p>
+								</>
+							) : (
+								<Skeleton />
+							)}
 						</Box>
 					</Box>
 
@@ -327,64 +323,74 @@ export const Praytime = ({ theme }: any) => {
 								</span>
 							</Box>
 							<Stack direction='row' divider={<Divider orientation='vertical' flexItem />} spacing={2} sx={{ mt: 3, justifyContent: 'space-between' }}>
-								<Box sx={{ display: 'flex', flexDirection: 'column' }}>
-									<div>
-										<strong>
-											{Moment(new Date(currentPt.fajrTime))
-												.tz(timezone)
-												.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
-										</strong>
-										<span className={currentPt.current === 'fajr' ? 'prayername' : 'prayername subtle-text'}>Fajr</span>
-									</div>
-									<div>
-										<strong>
-											{Moment(new Date(currentPt.sunriseTime))
-												.tz(timezone)
-												.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
-										</strong>
-										<span className={currentPt.current === 'sunrise' ? 'prayername' : 'prayername subtle-text'}>Sunrise</span>
-									</div>
-									<div>
-										<strong>
-											{Moment(new Date(currentPt.dhuhrTime))
-												.tz(timezone)
-												.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
-										</strong>
-										<span className={currentPt.current === 'dhuhr' ? 'prayername' : 'prayername subtle-text'}>Dhuhr</span>
-									</div>
-								</Box>
-								<Box sx={{ display: 'flex', flexDirection: 'column' }}>
-									<div>
-										<strong>
-											{Moment(new Date(currentPt.asrTime))
-												.tz(timezone)
-												.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
-										</strong>
-										<span className={currentPt.current === 'asr' ? 'prayername' : 'prayername subtle-text'}>Asr</span>
-									</div>
-									<div>
-										<strong>
-											{Moment(new Date(currentPt.maghribTime))
-												.tz(timezone)
-												.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
-										</strong>
-										<span className={currentPt.current === 'maghrib' ? 'prayername' : 'prayername subtle-text'}>Maghrib</span>
-									</div>
-									<div>
-										<strong>
-											{Moment(new Date(currentPt.ishaTime))
-												.tz(timezone)
-												.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
-										</strong>
-										<span className={currentPt.current === 'isha' ? 'prayername' : 'prayername subtle-text'}>Isha</span>
-									</div>
-								</Box>
+								{currentPt ? (
+									<>
+										<Box sx={{ display: 'flex', flexDirection: 'column' }}>
+											<div>
+												<strong>
+													{Moment(new Date(currentPt.fajrTime))
+														.tz(timezone)
+														.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
+												</strong>
+												<span className={currentPt.current === 'fajr' ? 'prayername' : 'prayername subtle-text'}>Fajr</span>
+											</div>
+											<div>
+												<strong>
+													{Moment(new Date(currentPt.sunriseTime))
+														.tz(timezone)
+														.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
+												</strong>
+												<span className={currentPt.current === 'sunrise' ? 'prayername' : 'prayername subtle-text'}>Sunrise</span>
+											</div>
+											<div>
+												<strong>
+													{Moment(new Date(currentPt.dhuhrTime))
+														.tz(timezone)
+														.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
+												</strong>
+												<span className={currentPt.current === 'dhuhr' ? 'prayername' : 'prayername subtle-text'}>Dhuhr</span>
+											</div>
+										</Box>
+										<Box sx={{ display: 'flex', flexDirection: 'column' }}>
+											<div>
+												<strong>
+													{Moment(new Date(currentPt.asrTime))
+														.tz(timezone)
+														.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
+												</strong>
+												<span className={currentPt.current === 'asr' ? 'prayername' : 'prayername subtle-text'}>Asr</span>
+											</div>
+											<div>
+												<strong>
+													{Moment(new Date(currentPt.maghribTime))
+														.tz(timezone)
+														.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
+												</strong>
+												<span className={currentPt.current === 'maghrib' ? 'prayername' : 'prayername subtle-text'}>Maghrib</span>
+											</div>
+											<div>
+												<strong>
+													{Moment(new Date(currentPt.ishaTime))
+														.tz(timezone)
+														.format(appSettings.clockStyle === '24h' ? 'HH:mm' : 'hh:mm A')}
+												</strong>
+												<span className={currentPt.current === 'isha' ? 'prayername' : 'prayername subtle-text'}>Isha</span>
+											</div>
+										</Box>
+									</>
+								) : (
+									<Skeleton />
+								)}
 							</Stack>
 							<Box sx={{ display: 'flex', direction: 'row', pt: 3 }}>
 								Qibla direction :
-								<span onClick={() => setModalOpened(!modalOpened)} className='qibla-span' style={{ paddingLeft: '6px' }}>
-									{currentPt.qibla.toFixed(2)}° ({windDirectionToWord(currentPt.qibla)})
-								</span>
+								{currentPt ? (
+									<span onClick={() => setModalOpened(!modalOpened)} className='qibla-span' style={{ paddingLeft: '6px' }}>
+										{currentPt.qibla.toFixed(2)}° ({windDirectionToWord(currentPt.qibla)})
+									</span>
+								) : (
+									<Skeleton />
+								)}
 							</Box>
 						</Box>
 					</Collapse>

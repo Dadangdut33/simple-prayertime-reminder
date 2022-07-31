@@ -494,7 +494,7 @@ const timeOutAutoCloseModal = () => {
 	clearTimeout(modalTimeout);
 	modalTimeout = setTimeout(() => {
 		mainWindow!.webContents.send('close-modal');
-	}, 600000); // 10 minutes
+	}, 450000); // 7.5 minutes
 };
 
 const checkPopup = (pt: string) => {
@@ -653,6 +653,9 @@ const checkNotifyOnTime = (now: Moment.Moment) => {
 	}
 
 	if (title) {
+		// modal
+		timeOutAutoCloseModal(); // close modal after timeout
+
 		notification = new Notification({ title, subtitle, body: notifBody, icon: iconPath });
 		notification.show();
 		notification.addListener('click', () => {
@@ -695,8 +698,6 @@ const checkNotifyOnTime = (now: Moment.Moment) => {
 		data.title = notifBody.replace("It's", '').trim(); // set title (modal title in app) as notification body
 		if (playAdhan) data.type = title === 'Fajr' ? 'adhan_fajr' : 'adhan'; // if play adhan set type as adhan
 
-		// modal
-		timeOutAutoCloseModal(); // close modal after timeout
 		if (data.type !== 'reminder') mainWindow!.show(); // if adhan show the main window
 		mainWindow!.webContents.send('signal-modal-praytime', data); // send data to mainWindow
 	}
