@@ -79,11 +79,7 @@ export const Praytime = ({ theme }: any) => {
 		const checkNow = Moment().tz(timezone);
 		const before = Moment('00:00:00', 'HH:mm:ss').tz(timezone);
 		const after = Moment(new Date(currentPt!.fajrTime), 'HH:mm:ss').tz(timezone);
-		if (checkNow.isBetween(before, after)) {
-			return true;
-		} else {
-			return false;
-		}
+		return checkNow.isBetween(before, after);
 	};
 
 	const getPtDif = (currentPt: getPrayerTimes_I) => {
@@ -92,7 +88,6 @@ export const Praytime = ({ theme }: any) => {
 		if (currentPt!.next === 'fajr' && !check_00_fajr(currentPt)) end.add(1, 'day');
 
 		const duration = Moment.duration(start.diff(end));
-
 		return Math.abs(duration.asSeconds());
 	};
 
@@ -102,7 +97,6 @@ export const Praytime = ({ theme }: any) => {
 		if (currentPt!.next === 'fajr' && !check_00_fajr(currentPt)) end.add(1, 'day');
 
 		const durationInitial = Moment.duration(startInitial.diff(end));
-
 		return Math.ceil(Math.abs(durationInitial.asSeconds()));
 	};
 
