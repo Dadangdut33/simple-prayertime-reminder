@@ -56,7 +56,6 @@ export const Praytime = ({ theme }: any) => {
 	const [clockValueNow, setClockValueNow] = useState<Date | null>(null);
 	const [randomColorList, setRandomColorList] = useState<ColorHex[]>([]);
 	const [colorChangeSecondsList, setColorChangeSecondsList] = useState<number[]>([]);
-	const amountDivider = 75;
 
 	// chip shrink expand
 	const [chipExpanded, setChipExpanded] = useState(false);
@@ -127,6 +126,7 @@ export const Praytime = ({ theme }: any) => {
 	// ---------------------------------------------------------
 	useEffect(() => {
 		const lcl_cPt = window.electron.ipcRenderer.sendSync('get-this-pt') as getPrayerTimes_I;
+		const amountDivider = 75;
 		setCurrentPt(lcl_cPt);
 		setTimeClockDuration(getPtDif(lcl_cPt));
 		setTimeClockTimeDif(getPtDif_Initial(lcl_cPt));
@@ -147,10 +147,14 @@ export const Praytime = ({ theme }: any) => {
 			}, toExactSecond); // match second
 
 		// timer color
-		const generateRandomHexColor = (amount: number) => {
+		const getCacheColor = window.electron.ipcRenderer.sendSync('get-cache-color') as colorCacheGet;
+		if (getCacheColor.success && getCacheColor.data.current === lcl_cPt.current && getCacheColor.data.colors.length > 0 && getCacheColor.data.intervals.length > 0) {
+			setRandomColorList(getCacheColor.data.colors);
+			setColorChangeSecondsList(getCacheColor.data.intervals);
+		} else {
 			let colorList: ColorHex[] = [],
 				secondsList: number[] = [];
-			for (let i = 0; i < amount; i++) {
+			for (let i = 0; i < getPtDif(lcl_cPt) / amountDivider; i++) {
 				let color: ColorHex = '#';
 				for (let i = 0; i < 3; i++) color += ('0' + Math.floor((Math.random() * Math.pow(16, 2)) / 2).toString(16)).slice(-2);
 
@@ -168,14 +172,6 @@ export const Praytime = ({ theme }: any) => {
 			};
 
 			window.electron.ipcRenderer.send('save-cache-color', saved);
-		};
-
-		const getCacheColor = window.electron.ipcRenderer.sendSync('get-cache-color') as colorCacheGet;
-		if (getCacheColor.success && getCacheColor.data.current === lcl_cPt.current && getCacheColor.data.colors.length > 0 && getCacheColor.data.intervals.length > 0) {
-			setRandomColorList(getCacheColor.data.colors);
-			setColorChangeSecondsList(getCacheColor.data.intervals);
-		} else {
-			generateRandomHexColor(getPtDif(lcl_cPt) / amountDivider);
 		}
 
 		// listener
