@@ -19,18 +19,11 @@ export const Timer = ({ initialTime }: { initialTime: number }) => {
 
 	// function to verify if seconds left is accurate
 	const getAccurateSeconds = (time: number) => {
-		// get the seconds only
-		const fullTime = formatTimerWithHours(time);
-		const seconds = fullTime.split(':')[2];
-
-		// compare with date now
-		const now = new Date();
-		const nowSeconds = 60 - now.getSeconds();
-
+		const seconds = formatTimerWithHours(time).split(':')[2]; // get the seconds only
+		const nowSeconds = 60 - new Date().getSeconds(); // compare with date now
 		// get the dif between seconds now and the seconds in the timer
 		let dif = Math.abs(nowSeconds - parseInt(seconds));
 		if (parseInt(seconds) < 6) dif = 1; // this is a little hack for 0-5 it gonna return wrong stuff so just set dif to 1
-
 		return dif;
 	};
 
@@ -38,16 +31,9 @@ export const Timer = ({ initialTime }: { initialTime: number }) => {
 		// timer
 		let timer_clock_interval: NodeJS.Timer,
 			toExactSecond = 1000 - (new Date().getTime() % 1000),
-			validateCounter = 0,
 			timeoutTimer = setTimeout(() => {
 				timer_clock_interval = setInterval(() => {
-					setTimeToStr((prevTimeToStr) => prevTimeToStr - 1); // update timer value by substracting it
-					validateCounter++;
-					// validate every 15 seconds
-					if (validateCounter > 14) {
-						setTimeToStr((prevTimeToStr) => prevTimeToStr - getAccurateSeconds(prevTimeToStr));
-						validateCounter = 0;
-					}
+					setTimeToStr((prevTimeToStr) => prevTimeToStr - getAccurateSeconds(prevTimeToStr)); // update timer value by substracting it
 				}, 1000);
 				setTimeToStr(initialTime - getAccurateSeconds(initialTime));
 			}, toExactSecond); // match second
