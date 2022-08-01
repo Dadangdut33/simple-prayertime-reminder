@@ -1,3 +1,7 @@
+[1.2.1]
+- add adhan volume to setting
+- fix clock display sync issue
+
 [1.2.0]
 - improve color gen and clock page
 - setting reminder redesign
