@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 
-export const Timer = ({ initialTime }: { initialTime: number }) => {
+interface TimerProps {
+	initialTime: number;
+	setClockValueNow: (value: Date) => void;
+}
+
+export const Timer = ({ initialTime, setClockValueNow }: TimerProps) => {
 	const [timeToStr, setTimeToStr] = useState<number>(0);
 
 	const formatTimerWithHours = (time: number) => {
@@ -33,8 +38,10 @@ export const Timer = ({ initialTime }: { initialTime: number }) => {
 			toExactSecond = 1000 - (new Date().getTime() % 1000),
 			timeoutTimer = setTimeout(() => {
 				timer_clock_interval = setInterval(() => {
+					setClockValueNow(new Date()); // set the clock value to now
 					setTimeToStr((prevTimeToStr) => prevTimeToStr - getAccurateSeconds(prevTimeToStr)); // update timer value by substracting it
 				}, 1000);
+				setClockValueNow(new Date()); // set the clock value to now
 				setTimeToStr(initialTime - getAccurateSeconds(initialTime));
 			}, toExactSecond); // match second
 

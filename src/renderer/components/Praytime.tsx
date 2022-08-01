@@ -134,12 +134,8 @@ export const Praytime = ({ theme }: any) => {
 		if (chipState === 'true') setChipExpanded(true);
 
 		// timer
-		let timer_clock_interval: NodeJS.Timer,
-			toExactSecond = 1000 - (new Date().getTime() % 1000),
+		let toExactSecond = 1000 - (new Date().getTime() % 1000),
 			timeoutTimer = setTimeout(() => {
-				timer_clock_interval = setInterval(() => {
-					setClockValueNow(new Date()); // update clock value
-				}, 1000);
 				setClockValueNow(new Date());
 			}, toExactSecond); // match second
 
@@ -176,7 +172,6 @@ export const Praytime = ({ theme }: any) => {
 		return () => {
 			window.electron.ipcRenderer.removeEventListener('refresh-from-main', updatePTData_RefreshTimer);
 			clearTimeout(timeoutTimer);
-			clearInterval(timer_clock_interval);
 		};
 	}, []);
 
@@ -292,7 +287,7 @@ export const Praytime = ({ theme }: any) => {
 							)}
 						</Box>
 
-						{clockValueNow ? <Timer key={key} initialTime={timeClock_timeDif} /> : <Skeleton width={175} sx={{ marginLeft: '20px', marginRight: '20px' }} />}
+						{clockValueNow ? <Timer key={key} initialTime={timeClock_timeDif} setClockValueNow={setClockValueNow} /> : <Skeleton width={175} sx={{ marginLeft: '20px', marginRight: '20px' }} />}
 
 						<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 							{currentPt && appSettings ? (
