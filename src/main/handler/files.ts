@@ -99,7 +99,7 @@ export const initialConfig: configInterface = {
 	adhanSoundPath: {
 		fajr: 'auto',
 		normal: 'auto',
-		volume: 0.5,
+		volume: 50,
 	},
 	runAtStartup: true,
 	clockStyle: 'AM/PM',
