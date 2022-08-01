@@ -55,6 +55,7 @@ export interface configInterface {
 	adhanSoundPath: {
 		fajr: string;
 		normal: string;
+		volume: number;
 	};
 	runAtStartup: boolean;
 	checkUpdateAtStartup: boolean;

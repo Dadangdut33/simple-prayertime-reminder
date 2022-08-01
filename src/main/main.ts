@@ -353,6 +353,10 @@ ipcMain.on('get-adhan-path-normal', (event, _arg) => {
 	event.returnValue = appConfig.adhanSoundPath.normal;
 });
 
+ipcMain.on('get-adhan-volume', (event, _arg) => {
+	event.returnValue = appConfig.adhanSoundPath.volume;
+});
+
 ipcMain.on('get-default-adhan-fajr', (event, _arg) => {
 	event.returnValue = getAssetPath('adhan_fajr.mp3').replace(/\\/g, '/');
 });

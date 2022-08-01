@@ -20,6 +20,8 @@ const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) 
 });
 import CircularProgress from '@mui/material/CircularProgress';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import Stack from '@mui/material/Stack';
+import Slider from '@mui/material/Slider';
 
 // Form
 import IconButton from '@mui/material/IconButton';
@@ -60,6 +62,8 @@ import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import PauseIcon from '@mui/icons-material/Pause';
 import StopIcon from '@mui/icons-material/Stop';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import VolumeDown from '@mui/icons-material/VolumeDown';
+import VolumeUp from '@mui/icons-material/VolumeUp';
 
 export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) => {
 	// helper
@@ -449,6 +453,11 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 	const [selectAdhan, setSelectAdhan] = useState('Fajr');
 	const [adhanPlaying, setAdhanPlaying] = useState(false);
 	const [adhanPlayer, setAdhanPlayer] = useState<any>(null);
+	const [adhanVolume, setAdhanVolume] = useState(50);
+
+	const handleAdhanVolume = (_event: Event, newValue: number | number[]) => {
+		setAdhanVolume(newValue as number);
+	};
 
 	const handleSelectAdhan = (e: SelectChangeEvent) => {
 		// stop player and set not playing
@@ -802,6 +811,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		setAdhanInput(initialConfig.adhanSoundPath.fajr === 'auto' ? (window.electron.ipcRenderer.sendSync('get-default-adhan-fajr') as string) : initialConfig.adhanSoundPath.fajr);
 		setAdhanFajr(initialConfig.adhanSoundPath.fajr === 'auto' ? (window.electron.ipcRenderer.sendSync('get-default-adhan-fajr') as string) : initialConfig.adhanSoundPath.fajr);
 		setAdhanNormal(initialConfig.adhanSoundPath.normal === 'auto' ? (window.electron.ipcRenderer.sendSync('get-default-adhan-normal') as string) : initialConfig.adhanSoundPath.normal);
+		setAdhanVolume(initialConfig.adhanSoundPath.volume);
 		// -----
 		setLocMode(initialConfig.locationOption.mode);
 		setLocCity(initialConfig.locationOption.city);
@@ -897,6 +907,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 		// -----
 		currentConfig.adhanSoundPath.fajr = adhanFajr === 'auto' ? 'auto' : adhanFajr;
 		currentConfig.adhanSoundPath.normal = adhanNormal === 'auto' ? 'auto' : adhanNormal;
+		currentConfig.adhanSoundPath.volume = adhanVolume;
 		// -----
 		currentConfig.locationOption.mode = locMode;
 		currentConfig.locationOption.city = locCity;
@@ -938,8 +949,12 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 			setSnackbarSeverity('success');
 			setSnackbarMsg('Changes saved successfully.');
 
-			// check if path differs from original or not
-			if (currentConfig.adhanSoundPath.fajr !== initialConfig.adhanSoundPath.fajr || currentConfig.adhanSoundPath.normal !== initialConfig.adhanSoundPath.normal) {
+			// check if path / volume differs from original or not
+			if (
+				currentConfig.adhanSoundPath.fajr !== initialConfig.adhanSoundPath.fajr ||
+				currentConfig.adhanSoundPath.normal !== initialConfig.adhanSoundPath.normal ||
+				currentConfig.adhanSoundPath.volume !== initialConfig.adhanSoundPath.volume
+			) {
 				// signal ipc path is updated
 				window.electron.ipcRenderer.send('update-path');
 			}
@@ -1009,6 +1024,7 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 				onEnd={() => {
 					setAdhanPlaying(false);
 				}}
+				volume={adhanVolume / 100}
 			/>
 			{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
 			<Fade in={true}>
@@ -1241,12 +1257,17 @@ export const Settings = ({ appTheme, ColorModeContext, setChangesMade }: any) =>
 								<DataGrid rows={reminderGridRowsProp} columns={reminderGridColumns} experimentalFeatures={{ newEditingApi: true }} hideFooter={true} />
 							</Box>
 							<Box sx={{ display: 'flex', flexDirection: 'row' }}>
-								<FormControl sx={{ minWidth: '120px', mr: 2, pt: 1 }}>
+								<FormControl sx={{ minWidth: '150px', mr: 2, pt: 1 }}>
 									<FormLabel>Adhan Type</FormLabel>
 									<Select size='small' value={selectAdhan} onChange={handleSelectAdhan}>
 										<MenuItem value='Fajr'>Fajr</MenuItem>
 										<MenuItem value='Normal'>Normal</MenuItem>
 									</Select>
+									<Stack spacing={1} direction='row' sx={{ mb: 1 }} alignItems='center'>
+										<VolumeDown />
+										<Slider aria-label='Volume' value={adhanVolume} onChange={handleAdhanVolume} />
+										<VolumeUp />
+									</Stack>
 								</FormControl>
 								<span style={{ paddingTop: '30px', width: '800px' }}>
 									<TextField

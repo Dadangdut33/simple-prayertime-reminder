@@ -40,18 +40,11 @@ export const ModalPraytime = ({ modalContent, showModal, setShowModal }: ModalPr
 	// adhan player object
 	const [adhanPlayer, setAdhanPlayer] = useState<any>(null);
 	const [adhanFajrPlayer, setAdhanFajrPlayer] = useState<any>(null);
+	const [adhanVolume, setAdhanVolume] = useState<number>(0.5);
 
 	// adhan path
-	const [adhanPath, setAdhanPath] = useState(
-		(window.electron.ipcRenderer.sendSync('get-adhan-path-normal') as string) === 'auto'
-			? (window.electron.ipcRenderer.sendSync('get-default-adhan-normal') as string)
-			: (window.electron.ipcRenderer.sendSync('get-adhan-path-normal') as string)
-	);
-	const [adhanFajrPath, setAdhanFajrPath] = useState(
-		(window.electron.ipcRenderer.sendSync('get-adhan-path-fajr') as string) === 'auto'
-			? (window.electron.ipcRenderer.sendSync('get-default-adhan-fajr') as string)
-			: (window.electron.ipcRenderer.sendSync('get-adhan-path-fajr') as string)
-	);
+	const [adhanPath, setAdhanPath] = useState('');
+	const [adhanFajrPath, setAdhanFajrPath] = useState('');
 
 	// Button
 	const okBtnPressed = () => {
@@ -66,7 +59,7 @@ export const ModalPraytime = ({ modalContent, showModal, setShowModal }: ModalPr
 		if (modalContent.type === 'adhan_fajr') adhanFajrPlayer.stop();
 	};
 
-	const updatePath = () => {
+	const updateData = () => {
 		setAdhanPath(
 			(window.electron.ipcRenderer.sendSync('get-adhan-path-normal') as string) === 'auto'
 				? (window.electron.ipcRenderer.sendSync('get-default-adhan-normal') as string)
@@ -77,41 +70,49 @@ export const ModalPraytime = ({ modalContent, showModal, setShowModal }: ModalPr
 				? (window.electron.ipcRenderer.sendSync('get-default-adhan-fajr') as string)
 				: (window.electron.ipcRenderer.sendSync('get-adhan-path-fajr') as string)
 		);
+		setAdhanVolume(window.electron.ipcRenderer.sendSync('get-adhan-volume') as number);
 	};
 
 	useEffect(() => {
-		window.electron.ipcRenderer.on('path-updated', updatePath);
+		updateData();
+		window.electron.ipcRenderer.on('path-updated', updateData);
 
 		return () => {
-			window.electron.ipcRenderer.removeEventListener('path-updated', updatePath);
+			window.electron.ipcRenderer.removeEventListener('path-updated', updateData);
 		};
 	}, []);
 
 	return (
 		<>
-			<ReactHowler
-				// ex: src='D://Coding/@Projects/Electron/simple-prayertime-reminder/assets/adhan.mp3'
-				src={adhanPath}
-				playing={showModal && modalContent.type === 'adhan'}
-				ref={(ref: any) => {
-					setAdhanPlayer(ref);
-				}}
-				onEnd={() => {
-					setShowModal(false);
-					localStorage.setItem('adhan-playing', 'false');
-				}}
-			/>
-			<ReactHowler
-				src={adhanFajrPath}
-				playing={showModal && modalContent.type === 'adhan_fajr'}
-				ref={(ref: any) => {
-					setAdhanFajrPlayer(ref);
-				}}
-				onEnd={() => {
-					setShowModal(false);
-					localStorage.setItem('adhan-playing', 'false');
-				}}
-			/>
+			{adhanPath !== '' ? (
+				<>
+					<ReactHowler
+						// ex: src='D://Coding/@Projects/Electron/simple-prayertime-reminder/assets/adhan.mp3'
+						src={adhanPath}
+						playing={showModal && modalContent.type === 'adhan'}
+						ref={(ref: any) => {
+							setAdhanPlayer(ref);
+						}}
+						onEnd={() => {
+							setShowModal(false);
+							localStorage.setItem('adhan-playing', 'false');
+						}}
+						volume={adhanVolume / 100}
+					/>
+					<ReactHowler
+						src={adhanFajrPath}
+						playing={showModal && modalContent.type === 'adhan_fajr'}
+						ref={(ref: any) => {
+							setAdhanFajrPlayer(ref);
+						}}
+						onEnd={() => {
+							setShowModal(false);
+							localStorage.setItem('adhan-playing', 'false');
+						}}
+						volume={adhanVolume / 100}
+					/>
+				</>
+			) : null}
 
 			{/* <Button
 				// debug purpose
