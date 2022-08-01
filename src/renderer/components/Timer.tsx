@@ -29,7 +29,7 @@ export const Timer = ({ initialTime }: { initialTime: number }) => {
 
 		// get the dif between seconds now and the seconds in the timer
 		let dif = Math.abs(nowSeconds - parseInt(seconds));
-		if (parseInt(seconds) < 3) dif = 1; // this is a little hack for 0-2 it gonna return wrong stuff so just set dif to 1
+		if (parseInt(seconds) < 6) dif = 1; // this is a little hack for 0-5 it gonna return wrong stuff so just set dif to 1
 
 		return dif;
 	};
