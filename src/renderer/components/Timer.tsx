@@ -17,8 +17,24 @@ export const Timer = ({ initialTime }: { initialTime: number }) => {
 		return `${hours}:${minutes}:${seconds}`;
 	};
 
+	// function to verify if seconds left is accurate
+	const getAccurateSeconds = (time: number) => {
+		// get the seconds only
+		const fullTime = formatTimerWithHours(time);
+		const seconds = fullTime.split(':')[2];
+
+		// compare with date now
+		const now = new Date();
+		const nowSeconds = 60 - now.getSeconds();
+
+		// get the dif between seconds now and the seconds in the timer
+		let dif = Math.abs(nowSeconds - parseInt(seconds));
+		if (parseInt(seconds) === 0) dif = 60 - nowSeconds; // if seconds is 0, dif is 60 - nowSeconds
+
+		return dif;
+	};
+
 	useEffect(() => {
-		setTimeToStr(initialTime - 1);
 		// timer
 		let timer_clock_interval: NodeJS.Timer,
 			toExactSecond = 1000 - (new Date().getTime() % 1000),
@@ -26,6 +42,7 @@ export const Timer = ({ initialTime }: { initialTime: number }) => {
 				timer_clock_interval = setInterval(() => {
 					setTimeToStr((prevTimeToStr) => prevTimeToStr - 1); // update timer value by substracting it
 				}, 1000);
+				setTimeToStr(initialTime - getAccurateSeconds(initialTime));
 			}, toExactSecond); // match second
 
 		return () => {
