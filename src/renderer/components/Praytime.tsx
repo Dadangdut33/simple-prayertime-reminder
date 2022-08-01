@@ -204,7 +204,7 @@ export const Praytime = ({ theme }: any) => {
 								{currentPt.qibla.toFixed(2)}° ({windDirectionToWord(currentPt.qibla)})
 							</Typography>
 						) : (
-							<Skeleton />
+							<Skeleton width={100} />
 						)}
 					</Box>
 					<Button
@@ -246,28 +246,34 @@ export const Praytime = ({ theme }: any) => {
 									{appSettings.locationOption.city} ({appSettings.locationOption.latitude}, {appSettings.locationOption.longitude})
 								</h2>
 							) : (
-								<Skeleton />
+								<Skeleton width={100} />
 							)}
 						</div>
 					</Box>
 
-					<Box id='the-clock' className={theme + '-clock'} sx={{ mt: 3, mb: 3 }}>
-						<CountdownCircleTimer
-							key={key}
-							isPlaying
-							duration={timerClock_duration}
-							initialRemainingTime={timeClock_timeDif}
-							colors={randomColorList as any}
-							colorsTime={colorChangeSecondsList as any}
-							strokeWidth={4}
-							size={290}
-							onComplete={() => {
-								updatePTData_RefreshTimer();
-							}}
-						/>
-						<div className='analogue' id={theme}>
-							<Clock key={key} value={clockValueNow} renderNumbers={true} size={250} minuteHandWidth={3} hourHandWidth={5} secondHandWidth={2} />
-						</div>
+					<Box id='the-clock' className={theme + '-clock'} sx={{ mt: clockValueNow ? 3 : 0.6, mb: clockValueNow ? 3 : 0.6 }}>
+						{clockValueNow ? (
+							<>
+								<CountdownCircleTimer
+									key={key}
+									isPlaying
+									duration={timerClock_duration}
+									initialRemainingTime={timeClock_timeDif}
+									colors={randomColorList as any}
+									colorsTime={colorChangeSecondsList as any}
+									strokeWidth={4}
+									size={290}
+									onComplete={() => {
+										updatePTData_RefreshTimer();
+									}}
+								/>
+								<div className='analogue' id={theme}>
+									<Clock key={key} value={clockValueNow} renderNumbers={true} size={250} minuteHandWidth={3} hourHandWidth={5} secondHandWidth={2} />
+								</div>
+							</>
+						) : (
+							<Skeleton variant='circular' width={275} height={275} />
+						)}
 					</Box>
 
 					<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', mt: 6 }}>
@@ -282,11 +288,11 @@ export const Praytime = ({ theme }: any) => {
 									</p>
 								</>
 							) : (
-								<Skeleton />
+								<Skeleton width={100} />
 							)}
 						</Box>
 
-						<Timer key={key} initialTime={timeClock_timeDif} />
+						{clockValueNow ? <Timer key={key} initialTime={timeClock_timeDif} /> : <Skeleton width={175} sx={{ marginLeft: '20px', marginRight: '20px' }} />}
 
 						<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 							{currentPt && appSettings ? (
@@ -300,7 +306,7 @@ export const Praytime = ({ theme }: any) => {
 									</p>
 								</>
 							) : (
-								<Skeleton />
+								<Skeleton width={100} />
 							)}
 						</Box>
 					</Box>
@@ -312,15 +318,17 @@ export const Praytime = ({ theme }: any) => {
 					<Collapse in={chipExpanded}>
 						<Box sx={{ display: 'flex', flexDirection: 'column', mt: 3 }}>
 							<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'start' }}>
-								{Moment(clockValueNow).tz(timezone).format('dddd, D MMMM YYYY')} -{' '}
-								{appSettings ? (
-									<span className='subtle-text' style={{ marginLeft: '3px' }}>
-										{appSettings.hijriCalendarOffset < 0
-											? moment(clockValueNow).subtract(Math.abs(appSettings.hijriCalendarOffset), 'days').tz(timezone).format('iD iMMMM iYYYY')
-											: moment(clockValueNow).add(appSettings.hijriCalendarOffset, 'days').tz(timezone).format('iD iMMMM iYYYY')}
-									</span>
+								{appSettings && clockValueNow ? (
+									<>
+										{Moment(clockValueNow).tz(timezone).format('dddd, D MMMM YYYY')} -{' '}
+										<span className='subtle-text' style={{ marginLeft: '3px' }}>
+											{appSettings.hijriCalendarOffset < 0
+												? moment(clockValueNow).subtract(Math.abs(appSettings.hijriCalendarOffset), 'days').tz(timezone).format('iD iMMMM iYYYY')
+												: moment(clockValueNow).add(appSettings.hijriCalendarOffset, 'days').tz(timezone).format('iD iMMMM iYYYY')}
+										</span>
+									</>
 								) : (
-									<Skeleton />
+									<Skeleton width={100} />
 								)}
 							</Box>
 							<Stack direction='row' divider={<Divider orientation='vertical' flexItem />} spacing={2} sx={{ mt: 3, justifyContent: 'space-between' }}>
@@ -380,7 +388,7 @@ export const Praytime = ({ theme }: any) => {
 										</Box>
 									</>
 								) : (
-									<Skeleton />
+									<Skeleton width={100} />
 								)}
 							</Stack>
 							<Box sx={{ display: 'flex', direction: 'row', pt: 3 }}>
@@ -390,7 +398,7 @@ export const Praytime = ({ theme }: any) => {
 										{currentPt.qibla.toFixed(2)}° ({windDirectionToWord(currentPt.qibla)})
 									</span>
 								) : (
-									<Skeleton />
+									<Skeleton width={100} />
 								)}
 							</Box>
 						</Box>
