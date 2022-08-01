@@ -1,3 +1,6 @@
+[1.2.2]
+- fix clock diplay sync when open from notification
+
 [1.2.1]
 - add adhan volume to setting
 - fix clock display sync issue

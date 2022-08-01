@@ -666,6 +666,8 @@ const checkNotifyOnTime = (now: Moment.Moment) => {
 			if (mainWindow) {
 				mainWindow.show();
 				mainWindow.focus();
+
+				mainWindow.webContents.send('refresh-from-main');
 			}
 		});
 
@@ -702,8 +704,11 @@ const checkNotifyOnTime = (now: Moment.Moment) => {
 		data.title = notifBody.replace("It's", '').trim(); // set title (modal title in app) as notification body
 		if (playAdhan) data.type = title === 'Fajr' ? 'adhan_fajr' : 'adhan'; // if play adhan set type as adhan
 
-		if (data.type !== 'reminder') mainWindow!.show(); // if adhan show the main window
-		mainWindow!.webContents.send('signal-modal-praytime', data); // send data to mainWindow
+		if (data.type !== 'reminder') {
+			mainWindow.show(); // if adhan show the main window
+			mainWindow.webContents.send('refresh-from-main');
+		}
+		mainWindow.webContents.send('signal-modal-praytime', data); // send data to mainWindow
 	}
 };
 
