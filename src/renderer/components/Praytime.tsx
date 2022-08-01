@@ -112,6 +112,7 @@ export const Praytime = ({ theme }: any) => {
 	const [timeClock_timeDif, setTimeClockTimeDif] = useState<number>(0);
 	const updatePTData_RefreshTimer = () => {
 		const lcl_cPt = window.electron.ipcRenderer.sendSync('get-this-pt') as getPrayerTimes_I;
+		setCurrentPt(lcl_cPt);
 		setTimeClockDuration(getPtDif(lcl_cPt));
 		setTimeClockTimeDif(getPtDif_Initial(lcl_cPt));
 		setKey((prevKey) => prevKey + 1); // refresh timer
