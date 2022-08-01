@@ -43,8 +43,8 @@ export const Timer = ({ initialTime }: { initialTime: number }) => {
 				timer_clock_interval = setInterval(() => {
 					setTimeToStr((prevTimeToStr) => prevTimeToStr - 1); // update timer value by substracting it
 					validateCounter++;
-					// validate every 17 seconds
-					if (validateCounter === 17) {
+					// validate every 15 seconds
+					if (validateCounter > 14) {
 						setTimeToStr((prevTimeToStr) => prevTimeToStr - getAccurateSeconds(prevTimeToStr));
 						validateCounter = 0;
 					}
