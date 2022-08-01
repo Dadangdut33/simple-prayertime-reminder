@@ -49,8 +49,8 @@ export const Praytime = ({ theme }: any) => {
 	const [key, setKey] = useState(0);
 	// Config
 	const [currentPt, setCurrentPt] = useState<getPrayerTimes_I | null>(null);
-	const timezone = window.electron.ipcRenderer.sendSync('get-timezone') as string; // TODO: use method above if it works
-	const appSettings = window.electron.ipcRenderer.sendSync('get-config') as configInterface;
+	const [timezone, setTimezone] = useState('UTC');
+	const [appSettings, setAppSettings] = useState<configInterface | null>(null);
 
 	// clock
 	const [clockValueNow, setClockValueNow] = useState<Date | null>(null);
@@ -122,6 +122,8 @@ export const Praytime = ({ theme }: any) => {
 	useEffect(() => {
 		const lcl_cPt = window.electron.ipcRenderer.sendSync('get-this-pt') as getPrayerTimes_I;
 		const amountDivider = 75;
+		setTimezone(window.electron.ipcRenderer.sendSync('get-timezone') as string);
+		setAppSettings(window.electron.ipcRenderer.sendSync('get-config') as configInterface);
 		setCurrentPt(lcl_cPt);
 		setTimeClockDuration(getPtDif(lcl_cPt));
 		setTimeClockTimeDif(getPtDif_Initial(lcl_cPt));
@@ -239,9 +241,13 @@ export const Praytime = ({ theme }: any) => {
 							}}
 						>
 							<LocationOnIcon style={{ paddingBottom: '4px', fontSize: '28px' }} color='primary' />{' '}
-							<h2>
-								{appSettings.locationOption.city} ({appSettings.locationOption.latitude}, {appSettings.locationOption.longitude})
-							</h2>
+							{appSettings ? (
+								<h2>
+									{appSettings.locationOption.city} ({appSettings.locationOption.latitude}, {appSettings.locationOption.longitude})
+								</h2>
+							) : (
+								<Skeleton />
+							)}
 						</div>
 					</Box>
 
@@ -266,7 +272,7 @@ export const Praytime = ({ theme }: any) => {
 
 					<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', mt: 6 }}>
 						<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-							{currentPt ? (
+							{currentPt && appSettings ? (
 								<>
 									<h3>{currentPt.current.charAt(0).toUpperCase() + currentPt.current.slice(1)}</h3>
 									<p>
@@ -283,7 +289,7 @@ export const Praytime = ({ theme }: any) => {
 						<Timer key={key} initialTime={timeClock_timeDif} />
 
 						<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-							{currentPt ? (
+							{currentPt && appSettings ? (
 								<>
 									<h3>{currentPt.next.charAt(0).toUpperCase() + currentPt.next.slice(1)}</h3>
 
@@ -307,14 +313,18 @@ export const Praytime = ({ theme }: any) => {
 						<Box sx={{ display: 'flex', flexDirection: 'column', mt: 3 }}>
 							<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'start' }}>
 								{Moment(clockValueNow).tz(timezone).format('dddd, D MMMM YYYY')} -{' '}
-								<span className='subtle-text' style={{ marginLeft: '3px' }}>
-									{appSettings.hijriCalendarOffset < 0
-										? moment(clockValueNow).subtract(Math.abs(appSettings.hijriCalendarOffset), 'days').tz(timezone).format('iD iMMMM iYYYY')
-										: moment(clockValueNow).add(appSettings.hijriCalendarOffset, 'days').tz(timezone).format('iD iMMMM iYYYY')}
-								</span>
+								{appSettings ? (
+									<span className='subtle-text' style={{ marginLeft: '3px' }}>
+										{appSettings.hijriCalendarOffset < 0
+											? moment(clockValueNow).subtract(Math.abs(appSettings.hijriCalendarOffset), 'days').tz(timezone).format('iD iMMMM iYYYY')
+											: moment(clockValueNow).add(appSettings.hijriCalendarOffset, 'days').tz(timezone).format('iD iMMMM iYYYY')}
+									</span>
+								) : (
+									<Skeleton />
+								)}
 							</Box>
 							<Stack direction='row' divider={<Divider orientation='vertical' flexItem />} spacing={2} sx={{ mt: 3, justifyContent: 'space-between' }}>
-								{currentPt ? (
+								{currentPt && appSettings ? (
 									<>
 										<Box sx={{ display: 'flex', flexDirection: 'column' }}>
 											<div>
