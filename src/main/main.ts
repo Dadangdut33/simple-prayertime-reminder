@@ -698,7 +698,7 @@ const checkNotifyOnTime = (now: Moment.Moment) => {
 		if (!mainWindow) return;
 
 		// popup if enabled
-		if (checkPopup(title.toLowerCase())) prayerTime_IntrusiveNotification(`${title} Reminder`, notifBody, iconPath);
+		if (checkPopup(title.toLowerCase())) prayerTime_IntrusiveNotification(`${title} Reminder`, `[${now.format('HH:mm')}]` + notifBody, iconPath);
 
 		// data to send
 		data.title = notifBody.replace("It's", '').trim(); // set title (modal title in app) as notification body
