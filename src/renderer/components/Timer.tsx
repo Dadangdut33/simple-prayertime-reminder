@@ -29,7 +29,7 @@ export const Timer = ({ initialTime }: { initialTime: number }) => {
 
 		// get the dif between seconds now and the seconds in the timer
 		let dif = Math.abs(nowSeconds - parseInt(seconds));
-		if (parseInt(seconds) === 0) dif = 60 - nowSeconds; // if seconds is 0, dif is 60 - nowSeconds
+		if (parseInt(seconds) < 3) dif = 1; // this is a little hack for 0-2 it gonna return wrong stuff so just set dif to 1
 
 		return dif;
 	};
@@ -38,9 +38,16 @@ export const Timer = ({ initialTime }: { initialTime: number }) => {
 		// timer
 		let timer_clock_interval: NodeJS.Timer,
 			toExactSecond = 1000 - (new Date().getTime() % 1000),
+			validateCounter = 0,
 			timeoutTimer = setTimeout(() => {
 				timer_clock_interval = setInterval(() => {
 					setTimeToStr((prevTimeToStr) => prevTimeToStr - 1); // update timer value by substracting it
+					validateCounter++;
+					// validate every 17 seconds
+					if (validateCounter === 17) {
+						setTimeToStr((prevTimeToStr) => prevTimeToStr - getAccurateSeconds(prevTimeToStr));
+						validateCounter = 0;
+					}
 				}, 1000);
 				setTimeToStr(initialTime - getAccurateSeconds(initialTime));
 			}, toExactSecond); // match second
