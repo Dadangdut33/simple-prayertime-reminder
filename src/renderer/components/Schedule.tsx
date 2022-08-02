@@ -35,6 +35,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
+import Skeleton from '@mui/material/Skeleton';
 
 // Datepicker
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -303,7 +304,7 @@ export const Schedule = () => {
 					</Button>
 				</Box>
 			</Modal>
-
+			{/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
 			<Fade in={true}>
 				<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center', justifyContent: 'center', color: 'text.primary', borderRadius: 1, p: 3, mt: 1 }}>
 					<LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -313,15 +314,6 @@ export const Schedule = () => {
 								onChange={(newValue) => {
 									setSelected(newValue);
 									setPtTime(window.electron.ipcRenderer.sendSync('get-this-pt', newValue?.toString()) as getPrayerTimes_I);
-
-									// const pt = window.electron.ipcRenderer.sendSync('get-this-pt', newValue?.toString()) as getPrayerTimes_I;
-									// set new prayer times with the adjustment
-									// setPt_fajr(pt.fajrTime);
-									// setPt_sunrise(pt.sunriseTime);
-									// setPt_dhuhr(pt.dhuhrTime);
-									// setPt_asr(pt.asrTime);
-									// setPt_maghrib(pt.maghribTime);
-									// setPt_isha(pt.ishaTime);
 								}}
 								minDate={new Date('1937-03-14')}
 								// hijri calendar have to be limited to 2076...
@@ -345,29 +337,29 @@ export const Schedule = () => {
 						<Stack direction='row' divider={<Divider orientation='vertical' flexItem />} spacing={2} sx={{ mt: 3, justifyContent: 'space-between' }}>
 							<Box sx={{ display: 'flex', flexDirection: 'column' }}>
 								<div>
-									<strong>{ptTime ? getPtTime(ptTime.fajrTime) : ''}</strong>
+									<strong>{ptTime ? getPtTime(ptTime.fajrTime) : <Skeleton width={75} />}</strong>
 									<span className='prayername'>Fajr</span>
 								</div>
 								<div>
-									<strong>{ptTime ? getPtTime(ptTime.sunriseTime) : ''}</strong>
+									<strong>{ptTime ? getPtTime(ptTime.sunriseTime) : <Skeleton width={75} />}</strong>
 									<span className='prayername'>Sunrise</span>
 								</div>
 								<div>
-									<strong>{ptTime ? getPtTime(ptTime.dhuhrTime) : ''}</strong>
+									<strong>{ptTime ? getPtTime(ptTime.dhuhrTime) : <Skeleton width={75} />}</strong>
 									<span className='prayername'>Dhuhr</span>
 								</div>
 							</Box>
 							<Box sx={{ display: 'flex', flexDirection: 'column' }}>
 								<div>
-									<strong>{ptTime ? getPtTime(ptTime.asrTime) : ''}</strong>
+									<strong>{ptTime ? getPtTime(ptTime.asrTime) : <Skeleton width={75} />}</strong>
 									<span className='prayername'>Asr</span>
 								</div>
 								<div>
-									<strong>{ptTime ? getPtTime(ptTime.maghribTime) : ''}</strong>
+									<strong>{ptTime ? getPtTime(ptTime.maghribTime) : <Skeleton width={75} />}</strong>
 									<span className='prayername'>Maghrib</span>
 								</div>
 								<div>
-									<strong>{ptTime ? getPtTime(ptTime.ishaTime) : ''}</strong>
+									<strong>{ptTime ? getPtTime(ptTime.ishaTime) : <Skeleton width={75} />}</strong>
 									<span className='prayername'>Isha</span>
 								</div>
 							</Box>

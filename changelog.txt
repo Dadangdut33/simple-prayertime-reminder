@@ -1,3 +1,6 @@
+[1.2.3]
+- fix timer & clock offset sync by 1 or 2 seconds 
+
 [1.2.2]
 - fix clock diplay sync when open from notification
 
