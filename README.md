@@ -24,6 +24,7 @@ A simple muslim prayertime reminder app for desktop. Made using [Electron](https
 
 - [Table of Contents](#table-of-contents)
 - [FAQ](#faq)
+- [Features](#features)
 - [Showcase](#showcase)
 - [Download](#download)
 - [Installation](#installation)
@@ -52,6 +53,14 @@ A simple muslim prayertime reminder app for desktop. Made using [Electron](https
    **A:** You can set the location manually in the settings. For more info check on the [options](https://github.com/Dadangdut33/simple-prayertime-reminder/wiki/Options) section of the wiki.
 5. **Q:** Does this work offline?\
    **A:** Yes, the app works offline, internet connection is only needed for location detecting (there is also an offline method if an internet connection is not present) and version checking.
+
+# Features
+
+- prayer times with customizable reminder/notification
+- Prayer times schedule (calendar)
+- Export prayer times schedule
+- Adhan
+- Qibla direction
 
 # Showcase
 
