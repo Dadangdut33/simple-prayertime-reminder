@@ -56,7 +56,7 @@ A simple muslim prayertime reminder app for desktop. Made using [Electron](https
 
 # Features
 
-- prayer times with customizable reminder/notification
+- Prayer times with customizable reminder/notification
 - Prayer times schedule (calendar)
 - Export prayer times schedule
 - Adhan
