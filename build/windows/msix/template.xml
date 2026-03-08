@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MsixPackagingToolTemplate
+    xmlns="http://schemas.microsoft.com/msix/packaging/msixpackagingtool/template/2022">
+    <Settings
+        AllowTelemetry="false"
+        ApplyACLsToPackageFiles="true"
+        GenerateCommandLineFile="true"
+        AllowPromptForPassword="false">
+    </Settings>
+    <Installer
+        Path="simple-prayertime-reminder"
+        Arguments=""
+        InstallLocation="C:\Program Files\Dadangdut33\Simple PrayerTime Reminder">
+    </Installer>
+    <PackageInformation
+        PackageName="Simple PrayerTime Reminder"
+        PackageDisplayName="Simple PrayerTime Reminder"
+        PublisherName="CN=Dadangdut33"
+        PublisherDisplayName="Dadangdut33"
+        Version="2.0.0.0"
+        PackageDescription="A Muslim Companion Desktop App">
+        <Capabilities>
+            <Capability Name="runFullTrust" />
+            
+        </Capabilities>
+        <Applications>
+            <Application
+                Id="com.dadangdut33.simple-prayertime-reminder"
+                Description="A Muslim Companion Desktop App"
+                DisplayName="Simple PrayerTime Reminder"
+                ExecutableName="simple-prayertime-reminder"
+                EntryPoint="Windows.FullTrustApplication">
+                
+            </Application>
+        </Applications>
+        <Resources>
+            <Resource Language="en-us" />
+        </Resources>
+        <Dependencies>
+            <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.19041.0" />
+        </Dependencies>
+        <Properties>
+            <Framework>false</Framework>
+            <DisplayName>Simple PrayerTime Reminder</DisplayName>
+            <PublisherDisplayName>Dadangdut33</PublisherDisplayName>
+            <Description>A Muslim Companion Desktop App</Description>
+            <Logo>Assets\AppIcon.png</Logo>
+        </Properties>
+    </PackageInformation>
+    <SaveLocation PackagePath="simple-prayertime-reminder.msix" />
+    <PackageIntegrity>
+        <CertificatePath></CertificatePath>
+    </PackageIntegrity>
+</MsixPackagingToolTemplate>

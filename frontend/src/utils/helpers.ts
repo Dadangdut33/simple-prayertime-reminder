@@ -1,0 +1,244 @@
+import type { DigitalClockFormatPreset, HijriDate } from '../types';
+import { DIGITAL_CLOCK_FORMAT_PRESETS } from '../types';
+
+/** Format a date string from the backend (RFC3339) as a local time string */
+export function formatTime(isoOrTimeStr: string, format: '12h' | '24h' = '24h'): string {
+  if (!isoOrTimeStr) return '--:--';
+  const date = new Date(isoOrTimeStr);
+  if (isNaN(date.getTime())) return '--:--';
+  return date.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: format === '12h',
+  });
+}
+
+/** Return a "HH:mm:ss" countdown string from now until a future time */
+export function getCountdown(toIso: string): string {
+  const to = new Date(toIso);
+  const diff = to.getTime() - Date.now();
+  if (diff <= 0) return '00:00:00';
+  const h = Math.floor(diff / 3_600_000);
+  const m = Math.floor((diff % 3_600_000) / 60_000);
+  const s = Math.floor((diff % 60_000) / 1_000);
+  return [h, m, s].map((n) => String(n).padStart(2, '0')).join(':');
+}
+
+/** Convert total seconds to H h M m display string */
+export function formatDuration(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
+/** Normalize a bearing into the 0-360 range */
+export function normalizeBearing(bearing: number): number {
+  return ((bearing % 360) + 360) % 360;
+}
+
+/** Convert a bearing to a detailed 32-point compass abbreviation */
+export function bearingToCardinal(bearing: number): string {
+  const directions = [
+    'N',
+    'NbE',
+    'NNE',
+    'NEbN',
+    'NE',
+    'NEbE',
+    'ENE',
+    'EbN',
+    'E',
+    'EbS',
+    'ESE',
+    'SEbE',
+    'SE',
+    'SEbS',
+    'SSE',
+    'SbE',
+    'S',
+    'SbW',
+    'SSW',
+    'SWbS',
+    'SW',
+    'SWbW',
+    'WSW',
+    'WbS',
+    'W',
+    'WbN',
+    'WNW',
+    'NWbW',
+    'NW',
+    'NWbN',
+    'NNW',
+    'NbW',
+  ];
+  const normalized = normalizeBearing(bearing);
+  return directions[Math.round(normalized / 11.25) % 32];
+}
+
+/** Convert a bearing to a detailed human-readable compass label */
+export function bearingToCompassLabel(bearing: number): string {
+  const labels: Record<string, string> = {
+    N: 'North',
+    NbE: 'North by East',
+    NNE: 'North-Northeast',
+    NEbN: 'Northeast by North',
+    NE: 'Northeast',
+    NEbE: 'Northeast by East',
+    ENE: 'East-Northeast',
+    EbN: 'East by North',
+    E: 'East',
+    EbS: 'East by South',
+    ESE: 'East-Southeast',
+    SEbE: 'Southeast by East',
+    SE: 'Southeast',
+    SEbS: 'Southeast by South',
+    SSE: 'South-Southeast',
+    SbE: 'South by East',
+    S: 'South',
+    SbW: 'South by West',
+    SSW: 'South-Southwest',
+    SWbS: 'Southwest by South',
+    SW: 'Southwest',
+    SWbW: 'Southwest by West',
+    WSW: 'West-Southwest',
+    WbS: 'West by South',
+    W: 'West',
+    WbN: 'West by North',
+    WNW: 'West-Northwest',
+    NWbW: 'Northwest by West',
+    NW: 'Northwest',
+    NWbN: 'Northwest by North',
+    NNW: 'North-Northwest',
+    NbW: 'North by West',
+  };
+  const abbreviation = bearingToCardinal(bearing);
+  return `${labels[abbreviation]} (${abbreviation})`;
+}
+
+/** Format today's date as 'Monday, 5 March 2026' */
+export function formatLongDate(date: Date = new Date()): string {
+  return date.toLocaleDateString(undefined, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
+/** Format date to ISO yyyy-MM-dd */
+export function toISODate(date: Date): string {
+  return date.toISOString().split('T')[0];
+}
+
+/** Get number of days in a month */
+export function daysInMonth(year: number, month: number): number {
+  return new Date(year, month, 0).getDate();
+}
+
+/** Format hijri date from HijriDate object */
+export function formatHijri(h: HijriDate | null): string {
+  if (!h) return '';
+  const months = [
+    '',
+    'Muharram',
+    'Safar',
+    "Rabi' al-Awwal",
+    "Rabi' al-Thani",
+    'Jumada al-Awwal',
+    'Jumada al-Thani',
+    'Rajab',
+    "Sha'ban",
+    'Ramadan',
+    'Shawwal',
+    "Dhu al-Qi'dah",
+    'Dhu al-Hijjah',
+  ];
+  const monthName = months[h.month] ?? h.month;
+  return `${h.day} ${monthName} ${h.year} H`;
+}
+
+/** Get prayer times for a DaySchedule as a named list */
+export function getPrayerList(schedule: {
+  fajr: string;
+  sunrise: string;
+  zuhr: string;
+  asr: string;
+  maghrib: string;
+  isha: string;
+}) {
+  return [
+    { name: 'Fajr', time: schedule.fajr },
+    { name: 'Sunrise', time: schedule.sunrise },
+    { name: 'Zuhr', time: schedule.zuhr },
+    { name: 'Asr', time: schedule.asr },
+    { name: 'Maghrib', time: schedule.maghrib },
+    { name: 'Isha', time: schedule.isha },
+  ] as const;
+}
+
+/** Clamp a number between min and max */
+export function clamp(v: number, min: number, max: number): number {
+  return Math.min(Math.max(v, min), max);
+}
+
+function pad(value: number, length = 2): string {
+  return String(value).padStart(length, '0');
+}
+
+export function resolveDigitalClockFormat(preset: DigitalClockFormatPreset, customFormat?: string): string {
+  if (preset === 'custom') {
+    const trimmed = customFormat?.trim();
+    return trimmed || 'HH:mm:ss';
+  }
+
+  return DIGITAL_CLOCK_FORMAT_PRESETS.find((option) => option.value === preset)?.format || 'HH:mm:ss';
+}
+
+export function formatDigitalClock(date: Date, preset: DigitalClockFormatPreset, customFormat?: string): string {
+  const format = resolveDigitalClockFormat(preset, customFormat);
+  const hours24 = date.getHours();
+  const hours12 = hours24 % 12 || 12;
+  const minutes = date.getMinutes();
+  const seconds = date.getSeconds();
+  const weekdayShort = date.toLocaleDateString(undefined, {
+    weekday: 'short',
+  });
+  const weekdayLong = date.toLocaleDateString(undefined, {
+    weekday: 'long',
+  });
+  const monthShort = date.toLocaleDateString(undefined, {
+    month: 'short',
+  });
+  const monthLong = date.toLocaleDateString(undefined, {
+    month: 'long',
+  });
+
+  const tokens: Record<string, string> = {
+    YYYY: String(date.getFullYear()),
+    YY: pad(date.getFullYear() % 100),
+    MMMM: monthLong,
+    MMM: monthShort,
+    MM: pad(date.getMonth() + 1),
+    M: String(date.getMonth() + 1),
+    dddd: weekdayLong,
+    ddd: weekdayShort,
+    DD: pad(date.getDate()),
+    D: String(date.getDate()),
+    HH: pad(hours24),
+    H: String(hours24),
+    hh: pad(hours12),
+    h: String(hours12),
+    mm: pad(minutes),
+    m: String(minutes),
+    ss: pad(seconds),
+    s: String(seconds),
+    A: hours24 >= 12 ? 'PM' : 'AM',
+    a: hours24 >= 12 ? 'pm' : 'am',
+  };
+
+  const tokenPattern = /YYYY|MMMM|dddd|MMM|ddd|YY|MM|DD|HH|hh|mm|ss|M|D|H|h|m|s|A|a/g;
+
+  return format.replace(tokenPattern, (token) => tokens[token] ?? token);
+}

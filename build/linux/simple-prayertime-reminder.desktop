@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=simple-prayertime-reminder
+Exec=simple-prayertime-reminder
+Icon=simple-prayertime-reminder
+Categories=Development;
+Terminal=false
+Keywords=wails
+Version=1.0
+StartupNotify=false
