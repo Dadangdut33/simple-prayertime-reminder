@@ -88,12 +88,19 @@ type DashboardSettings struct {
 	ShowAllClockHours  bool   `json:"showAllClockHours"`
 }
 
+// PrayerTimesSettings controls how the monthly prayer-times page is shown.
+type PrayerTimesSettings struct {
+	ViewMode       string `json:"viewMode"`       // "table" or "calendar"
+	CalendarSystem string `json:"calendarSystem"` // "gregorian", "hijri", or "side-by-side"
+}
+
 // Settings is the root configuration struct
 type Settings struct {
 	Location        LocationSettings     `json:"location"`
 	Prayer          PrayerSettings       `json:"prayer"`
 	Notification    NotificationSettings `json:"notification"`
 	Dashboard       DashboardSettings    `json:"dashboard"`
+	PrayerTimes     PrayerTimesSettings  `json:"prayerTimes"`
 	Theme           string               `json:"theme"` // "light", "dark", "system"
 	ThemePreset     string               `json:"themePreset"`
 	Language        string               `json:"language"` // "en", "id", etc
@@ -152,6 +159,10 @@ func defaultSettings() Settings {
 			DigitalClockCustom: "HH:mm:ss",
 			AnalogClockSize:    200,
 			ShowAllClockHours:  false,
+		},
+		PrayerTimes: PrayerTimesSettings{
+			ViewMode:       "table",
+			CalendarSystem: "gregorian",
 		},
 		Theme:           "system",
 		ThemePreset:     "indigo",

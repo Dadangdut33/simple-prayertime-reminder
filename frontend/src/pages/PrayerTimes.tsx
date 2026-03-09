@@ -1,275 +1,131 @@
-import { useEffect, useState } from 'react';
-import { getMonthSchedule, exportToCSV, exportToExcel } from '../bindings';
-import type { DaySchedule } from '../types';
-import { formatTime, toISODate } from '../utils/helpers';
-import {
-  Box,
-  Typography,
-  Button,
-  IconButton,
-  Card,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  CircularProgress,
-} from '@mui/material';
-import DownloadIcon from '@mui/icons-material/Download';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import { useEffect, useMemo, useState } from 'react';
+import dayjs, { type Dayjs } from 'dayjs';
+import { exportToCSV, exportToExcel, getMonthHijriDates, getMonthSchedule } from '../bindings';
+import PrayerTimesHeader from '../components/pages/prayer-times/PrayerTimesHeader';
+import PrayerTimesControls from '../components/pages/prayer-times/PrayerTimesControls';
+import PrayerTimesTableView from '../components/pages/prayer-times/PrayerTimesTableView';
+import PrayerTimesCalendarView from '../components/pages/prayer-times/PrayerTimesCalendarView';
+import { formatMonthHeading } from '../components/pages/prayer-times/helpers';
+import { useAppStore } from '../store/appStore';
+import type { DaySchedule, HijriCalendarDay, PrayerCalendarSystem, PrayerTimesViewMode } from '../types';
+import { Box } from '@mui/material';
 
-const MONTHS = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
+function moveToMonth(current: Dayjs, nextMonth: Dayjs): Dayjs {
+  const safeDay = Math.min(current.date(), nextMonth.daysInMonth());
+  return nextMonth.date(safeDay);
+}
 
 export default function PrayerTimes() {
-  const today = new Date();
-  const [currentYear, setCurrentYear] = useState(today.getFullYear());
-  const [currentMonth, setCurrentMonth] = useState(today.getMonth() + 1); // 1-12
+  const { settings } = useAppStore();
+  const [selectedDate, setSelectedDate] = useState(() => dayjs());
+  const [viewMode, setViewMode] = useState<PrayerTimesViewMode>('table');
+  const [calendarSystem, setCalendarSystem] = useState<PrayerCalendarSystem>('gregorian');
+  const [useArabicIndicDigits, setUseArabicIndicDigits] = useState(true);
   const [schedules, setSchedules] = useState<DaySchedule[]>([]);
+  const [hijriDays, setHijriDays] = useState<HijriCalendarDay[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const activeMonth = useMemo(() => selectedDate.startOf('month'), [selectedDate]);
+
+  useEffect(() => {
+    if (!settings) {
+      return;
+    }
+
+    setViewMode(settings.prayerTimes.viewMode);
+    setCalendarSystem(settings.prayerTimes.calendarSystem);
+  }, [settings]);
 
   useEffect(() => {
     let active = true;
     setLoading(true);
-    getMonthSchedule(currentYear, currentMonth)
-      .then((res) => {
+
+    Promise.all([
+      getMonthSchedule(activeMonth.year(), activeMonth.month() + 1),
+      getMonthHijriDates(activeMonth.year(), activeMonth.month() + 1),
+    ])
+      .then(([scheduleRows, hijriRows]) => {
+        if (!active) {
+          return;
+        }
+
+        setSchedules(scheduleRows);
+        setHijriDays(hijriRows);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error(error);
         if (active) {
-          setSchedules(res);
           setLoading(false);
         }
-      })
-      .catch(console.error);
+      });
+
     return () => {
       active = false;
     };
-  }, [currentYear, currentMonth]);
+  }, [activeMonth]);
 
-  const nextMonth = () => {
-    if (currentMonth === 12) {
-      setCurrentMonth(1);
-      setCurrentYear((y) => y + 1);
-    } else {
-      setCurrentMonth((m) => m + 1);
-    }
-  };
-
-  const prevMonth = () => {
-    if (currentMonth === 1) {
-      setCurrentMonth(12);
-      setCurrentYear((y) => y - 1);
-    } else {
-      setCurrentMonth((m) => m - 1);
-    }
+  const setMonth = (month: Dayjs) => {
+    setSelectedDate((current) => moveToMonth(current, month.startOf('month')));
   };
 
   const handleExport = async (format: 'csv' | 'excel') => {
     try {
-      const fileName = `prayertimes_${currentYear}_${currentMonth.toString().padStart(2, '0')}`;
+      const fileName = `prayertimes_${activeMonth.year()}_${String(activeMonth.month() + 1).padStart(2, '0')}`;
       const path = format === 'csv' ? `${fileName}.csv` : `${fileName}.xlsx`;
 
       if (format === 'csv') {
-        await exportToCSV(currentYear, currentMonth, path);
+        await exportToCSV(activeMonth.year(), activeMonth.month() + 1, path);
       } else {
-        await exportToExcel(currentYear, currentMonth, path);
+        await exportToExcel(activeMonth.year(), activeMonth.month() + 1, path);
       }
+
       alert(`Exported successfully to app directory as ${path}`);
-    } catch (err) {
-      alert(`Export failed: ${err}`);
+    } catch (error) {
+      alert(`Export failed: ${error}`);
     }
   };
 
-  const todayIso = toISODate(new Date());
-
   return (
     <Box p={4} mx="auto">
-      {/* Header */}
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems={{ xs: 'flex-start', md: 'center' }}
-        flexDirection={{ xs: 'column', md: 'row' }}
-        gap={2}
-        mb={4}
-      >
-        <Box>
-          <Box display="flex" alignItems="center" gap={1.5} mb={1.5}>
-            <Box
-              sx={{
-                width: 40,
-                height: 40,
-                borderRadius: 0.5,
-                display: 'grid',
-                placeItems: 'center',
-                background: (theme) =>
-                  `linear-gradient(135deg, ${theme.palette.primary.main}22, ${theme.palette.secondary.main}26)`,
-                color: 'primary.main',
-              }}
-            >
-              <CalendarMonthIcon fontSize="small" />
-            </Box>
-            <Typography variant="h2">Monthly Schedule</Typography>
-          </Box>
-          <Typography variant="body2" color="text.secondary">
-            View and export prayer times for the month
-          </Typography>
-        </Box>
-        <Box display="flex" gap={1}>
-          <Button variant="outlined" size="small" startIcon={<DownloadIcon />} onClick={() => handleExport('csv')}>
-            CSV
-          </Button>
-          <Button variant="outlined" size="small" startIcon={<DownloadIcon />} onClick={() => handleExport('excel')}>
-            Excel
-          </Button>
-        </Box>
-      </Box>
+      <PrayerTimesHeader onExport={handleExport} />
 
-      <Card sx={{ p: 3, borderRadius: 0.5 }}>
-        {/* Month Navigation */}
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-          <Box display="flex" alignItems="center" gap={1.5}>
-            <CalendarMonthIcon color="primary" />
-            <Typography variant="h3">
-              {MONTHS[currentMonth - 1]} {currentYear}
-            </Typography>
-          </Box>
-          <Box display="flex" gap={1} alignItems="center">
-            <IconButton onClick={prevMonth} size="small">
-              <ChevronLeftIcon />
-            </IconButton>
-            <Button
-              variant="text"
-              color="inherit"
-              size="small"
-              onClick={() => {
-                setCurrentYear(new Date().getFullYear());
-                setCurrentMonth(new Date().getMonth() + 1);
-              }}
-            >
-              Today
-            </Button>
-            <IconButton onClick={nextMonth} size="small">
-              <ChevronRightIcon />
-            </IconButton>
-          </Box>
-        </Box>
+      <PrayerTimesControls
+        activeMonthLabel={formatMonthHeading(activeMonth)}
+        viewMode={viewMode}
+        calendarSystem={calendarSystem}
+        useArabicIndicDigits={useArabicIndicDigits}
+        onViewModeChange={setViewMode}
+        onCalendarSystemChange={setCalendarSystem}
+        onArabicDigitToggle={setUseArabicIndicDigits}
+        onToday={() => setSelectedDate(dayjs())}
+      />
 
-        {/* Calendar Grid */}
-        <TableContainer>
-          <Table size="small">
-            <TableHead>
-              <TableRow sx={{ bgcolor: 'action.hover' }}>
-                <TableCell>
-                  <Typography variant="overline" fontWeight={600}>
-                    Date
-                  </Typography>
-                </TableCell>
-                <TableCell align="center">
-                  <Typography variant="overline" fontWeight={600}>
-                    Fajr
-                  </Typography>
-                </TableCell>
-                <TableCell align="center">
-                  <Typography variant="overline" fontWeight={600}>
-                    Sunrise
-                  </Typography>
-                </TableCell>
-                <TableCell align="center">
-                  <Typography variant="overline" fontWeight={600}>
-                    Zuhr
-                  </Typography>
-                </TableCell>
-                <TableCell align="center">
-                  <Typography variant="overline" fontWeight={600}>
-                    Asr
-                  </Typography>
-                </TableCell>
-                <TableCell align="center">
-                  <Typography variant="overline" fontWeight={600}>
-                    Maghrib
-                  </Typography>
-                </TableCell>
-                <TableCell align="center">
-                  <Typography variant="overline" fontWeight={600}>
-                    Isha
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
-                    <CircularProgress />
-                  </TableCell>
-                </TableRow>
-              ) : (
-                schedules.map((s) => {
-                  const isToday = s.date.startsWith(todayIso);
-                  return (
-                    <TableRow
-                      key={s.date}
-                      sx={{
-                        ...(isToday && {
-                          bgcolor: (theme) => `rgba(79, 100, 240, 0.08)`,
-                        }),
-                        '&:hover': { bgcolor: 'action.hover' },
-                      }}
-                    >
-                      <TableCell>
-                        <Typography
-                          variant="body2"
-                          fontWeight={isToday ? 700 : 500}
-                          color={isToday ? 'primary.main' : 'text.primary'}
-                        >
-                          {formatDateShort(s.date)}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="center" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                        {formatTime(s.fajr)}
-                      </TableCell>
-                      <TableCell align="center" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                        {formatTime(s.sunrise)}
-                      </TableCell>
-                      <TableCell align="center" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                        {formatTime(s.zuhr)}
-                      </TableCell>
-                      <TableCell align="center" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                        {formatTime(s.asr)}
-                      </TableCell>
-                      <TableCell align="center" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                        {formatTime(s.maghrib)}
-                      </TableCell>
-                      <TableCell align="center" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                        {formatTime(s.isha)}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Card>
+      {viewMode === 'table' ? (
+        <PrayerTimesTableView
+          activeMonth={activeMonth}
+          loading={loading}
+          schedules={schedules}
+          hijriDays={hijriDays}
+          timeFormat={settings?.timeFormat ?? '24h'}
+          onPrevMonth={() => setMonth(activeMonth.subtract(1, 'month'))}
+          onNextMonth={() => setMonth(activeMonth.add(1, 'month'))}
+          onToday={() => setSelectedDate(dayjs())}
+        />
+      ) : (
+        <PrayerTimesCalendarView
+          activeMonth={activeMonth}
+          selectedDate={selectedDate}
+          schedules={schedules}
+          hijriDays={hijriDays}
+          loading={loading}
+          calendarSystem={calendarSystem}
+          timeFormat={settings?.timeFormat ?? '24h'}
+          useArabicIndicDigits={useArabicIndicDigits}
+          onSelectedDateChange={setSelectedDate}
+          onMonthChange={setMonth}
+        />
+      )}
     </Box>
   );
-}
-
-function formatDateShort(iso: string) {
-  const d = new Date(iso);
-  return isNaN(d.getTime()) ? iso.split('T')[0] : d.toLocaleDateString(undefined, { day: '2-digit', month: 'short' });
 }

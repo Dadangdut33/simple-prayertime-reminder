@@ -23,6 +23,7 @@ frontend/node_modules/
 bin/
 build/bin/
 frontend/dist/
+./simple-prayertime-reminder
 
 # Legacy Electron outputs kept out of Git during migration cleanup
 release/app/dist/

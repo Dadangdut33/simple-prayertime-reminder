@@ -1,0 +1,158 @@
+import dayjs, { type Dayjs } from 'dayjs';
+import {
+  Box,
+  Button,
+  Card,
+  CircularProgress,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import type { DaySchedule, HijriCalendarDay } from '../../../types';
+import { formatTime } from '../../../utils/helpers';
+import { buildHijriMap, formatHijriDateShort } from './helpers';
+
+interface PrayerTimesTableViewProps {
+  activeMonth: Dayjs;
+  loading: boolean;
+  schedules: DaySchedule[];
+  hijriDays: HijriCalendarDay[];
+  timeFormat: '12h' | '24h';
+  onPrevMonth: () => void;
+  onNextMonth: () => void;
+  onToday: () => void;
+}
+
+function formatDateShort(dateStr: string): string {
+  return dayjs(dateStr).format('ddd, D MMM');
+}
+
+export default function PrayerTimesTableView({
+  activeMonth,
+  loading,
+  schedules,
+  hijriDays,
+  timeFormat,
+  onPrevMonth,
+  onNextMonth,
+  onToday,
+}: PrayerTimesTableViewProps) {
+  const todayIso = dayjs().format('YYYY-MM-DD');
+  const hijriByDate = buildHijriMap(hijriDays);
+
+  return (
+    <Card sx={{ p: 3, borderRadius: 0.5 }}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
+        <Box display="flex" alignItems="center" gap={1.5}>
+          <CalendarMonthIcon color="primary" />
+          <Typography variant="h3">{activeMonth.format('MMMM YYYY')}</Typography>
+        </Box>
+
+        <Box display="flex" gap={1} alignItems="center">
+          <IconButton onClick={onPrevMonth} size="small">
+            <ChevronLeftIcon />
+          </IconButton>
+          <Button variant="text" color="inherit" size="small" onClick={onToday}>
+            Today
+          </Button>
+          <IconButton onClick={onNextMonth} size="small">
+            <ChevronRightIcon />
+          </IconButton>
+        </Box>
+      </Box>
+
+      <TableContainer>
+        <Table size="small">
+          <TableHead>
+            <TableRow sx={{ bgcolor: 'action.hover' }}>
+              {['Date', 'Fajr', 'Sunrise', 'Zuhr', 'Asr', 'Maghrib', 'Isha'].map(
+                (label, index) => (
+                  <TableCell key={label} align={index === 0 ? 'left' : 'center'}>
+                    <Typography variant="overline" fontWeight={600}>
+                      {label}
+                    </Typography>
+                  </TableCell>
+                ),
+              )}
+            </TableRow>
+          </TableHead>
+
+          <TableBody>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
+                  <CircularProgress />
+                </TableCell>
+              </TableRow>
+            ) : (
+              schedules.map((schedule) => {
+                const isToday = schedule.date.startsWith(todayIso);
+                const hijriDate = hijriByDate[schedule.date.slice(0, 10)];
+
+                return (
+                  <TableRow
+                    key={schedule.date}
+                    sx={{
+                      ...(isToday && {
+                        bgcolor: (theme) => `${theme.palette.primary.main}12`,
+                      }),
+                      '&:hover': { bgcolor: 'action.hover' },
+                    }}
+                    >
+                      <TableCell>
+                        <Typography
+                          variant="body2"
+                          fontWeight={isToday ? 700 : 500}
+                          color={isToday ? 'primary.main' : 'text.primary'}
+                        >
+                          {formatDateShort(schedule.date)}
+                        </Typography>
+                        {hijriDate ? (
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ display: 'block', mt: 0.25 }}
+                          >
+                            {formatHijriDateShort(hijriDate)}
+                          </Typography>
+                        ) : null}
+                      </TableCell>
+                    {[
+                      schedule.fajr,
+                      schedule.sunrise,
+                      schedule.zuhr,
+                      schedule.asr,
+                      schedule.maghrib,
+                      schedule.isha,
+                    ].map((value, index) => (
+                      <TableCell
+                        key={`${schedule.date}-${index}`}
+                        align="center"
+                        sx={{ fontVariantNumeric: 'tabular-nums' }}
+                      >
+                        {formatTime(value, timeFormat)}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Card>
+  );
+}

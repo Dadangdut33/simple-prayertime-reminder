@@ -6,6 +6,38 @@
 import { Create as $Create } from "@wailsio/runtime";
 
 /**
+ * CalendarDay associates a Gregorian ISO date with its Hijri equivalent.
+ */
+export class CalendarDay {
+    "date": string;
+    "hijri": HijriDate;
+
+    /** Creates a new CalendarDay instance. */
+    constructor($$source: Partial<CalendarDay> = {}) {
+        if (!("date" in $$source)) {
+            this["date"] = "";
+        }
+        if (!("hijri" in $$source)) {
+            this["hijri"] = (new HijriDate());
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new CalendarDay instance from a string or object.
+     */
+    static createFrom($$source: any = {}): CalendarDay {
+        const $$createField1_0 = $$createType0;
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        if ("hijri" in $$parsedSource) {
+            $$parsedSource["hijri"] = $$createField1_0($$parsedSource["hijri"]);
+        }
+        return new CalendarDay($$parsedSource as Partial<CalendarDay>);
+    }
+}
+
+/**
  * HijriDate represents a date in the Islamic (Hijri) calendar
  */
 export class HijriDate {
@@ -36,3 +68,6 @@ export class HijriDate {
         return new HijriDate($$parsedSource as Partial<HijriDate>);
     }
 }
+
+// Private type creation functions
+const $$createType0 = HijriDate.createFrom;

@@ -362,6 +362,74 @@ export default function GeneralSettingsTab({
               })}
             </Box>
           </Box>
+
+          <Box
+            mt={3}
+            p={2.5}
+            borderRadius={0.5}
+            border="1px solid"
+            borderColor="divider"
+            bgcolor="background.paper"
+          >
+            <Typography variant="subtitle2" mb={0.75}>
+              Prayer Times Page
+            </Typography>
+            <Typography variant="body2" color="text.secondary" mb={2.5}>
+              Choose whether the monthly schedule opens as a table or as a calendar, and which calendar system to use
+              by default.
+            </Typography>
+
+            <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={3}>
+              <Box>
+                <Typography variant="caption" color="text.secondary" mb={1} display="block">
+                  Default Layout
+                </Typography>
+                <Select
+                  size="small"
+                  fullWidth
+                  value={local.prayerTimes.viewMode}
+                  onChange={(event) =>
+                    setLocal({
+                      ...local,
+                      prayerTimes: {
+                        ...local.prayerTimes,
+                        viewMode: event.target.value as 'table' | 'calendar',
+                      },
+                    })
+                  }
+                >
+                  <MenuItem value="table">Table</MenuItem>
+                  <MenuItem value="calendar">Calendar</MenuItem>
+                </Select>
+              </Box>
+
+              {local.prayerTimes.viewMode === 'calendar' && (
+                <Box>
+                  <Typography variant="caption" color="text.secondary" mb={1} display="block">
+                    Default Calendar System
+                  </Typography>
+                  <Select
+                    size="small"
+                    fullWidth
+                    value={local.prayerTimes.calendarSystem}
+                    onChange={(event) =>
+                      setLocal({
+                        ...local,
+                        prayerTimes: {
+                          ...local.prayerTimes,
+                          calendarSystem: event.target.value as 'gregorian' | 'hijri' | 'side-by-side',
+                        },
+                      })
+                    }
+                  >
+                    <MenuItem value="gregorian">Gregorian</MenuItem>
+                    <MenuItem value="hijri">Hijri</MenuItem>
+                    <MenuItem value="side-by-side">Side by side</MenuItem>
+                  </Select>
+                </Box>
+              )}
+            </Box>
+          </Box>
         </Box>
 
         <Box

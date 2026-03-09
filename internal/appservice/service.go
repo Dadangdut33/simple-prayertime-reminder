@@ -166,6 +166,27 @@ func (s *Service) GetMonthSchedule(year, month int) ([]prayer.DaySchedule, error
 	return s.prayerSvc.GetMonthSchedule(year, month)
 }
 
+func (s *Service) GetMonthHijriDates(year, month int) ([]hijri.CalendarDay, error) {
+	cfg := s.settingsSvc.Get()
+	loc, err := time.LoadLocation(cfg.Location.Timezone)
+	if err != nil {
+		loc = time.Local
+	}
+
+	start := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, loc)
+	end := start.AddDate(0, 1, 0)
+
+	result := make([]hijri.CalendarDay, 0, 31)
+	for current := start; current.Before(end); current = current.AddDate(0, 0, 1) {
+		result = append(result, hijri.CalendarDay{
+			Date:  current.Format("2006-01-02"),
+			Hijri: hijri.ToHijri(current, cfg.HijriDateOffset),
+		})
+	}
+
+	return result, nil
+}
+
 func (s *Service) GetNextPrayer() (prayer.NextPrayerInfo, error) {
 	return s.prayerSvc.GetNextPrayer(time.Now())
 }

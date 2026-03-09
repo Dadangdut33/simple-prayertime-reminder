@@ -2,6 +2,7 @@ import * as AppService from '../../bindings/github.com/dadangdut33/simple-prayer
 import type {
   AppInfo,
   DaySchedule,
+  HijriCalendarDay,
   HijriDate,
   Location,
   NextPrayerInfo,
@@ -33,6 +34,11 @@ export const getMonthSchedule = (
   year: number,
   month: number,
 ): Promise<DaySchedule[]> => AppService.GetMonthSchedule(year, month) as any;
+export const getMonthHijriDates = (
+  year: number,
+  month: number,
+): Promise<HijriCalendarDay[]> =>
+  AppService.GetMonthHijriDates(year, month) as any;
 export const getNextPrayer = (): Promise<NextPrayerInfo> =>
   AppService.GetNextPrayer() as any;
 

@@ -10,5 +10,6 @@ export {
     PrayerNotificationSetting,
     PrayerOffsets,
     PrayerSettings,
+    PrayerTimesSettings,
     Settings
 } from "./models.js";

@@ -355,6 +355,41 @@ export class PrayerSettings {
 }
 
 /**
+ * PrayerTimesSettings controls how the monthly prayer-times page is shown.
+ */
+export class PrayerTimesSettings {
+    /**
+     * "table" or "calendar"
+     */
+    "viewMode": string;
+
+    /**
+     * "gregorian", "hijri", or "side-by-side"
+     */
+    "calendarSystem": string;
+
+    /** Creates a new PrayerTimesSettings instance. */
+    constructor($$source: Partial<PrayerTimesSettings> = {}) {
+        if (!("viewMode" in $$source)) {
+            this["viewMode"] = "";
+        }
+        if (!("calendarSystem" in $$source)) {
+            this["calendarSystem"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new PrayerTimesSettings instance from a string or object.
+     */
+    static createFrom($$source: any = {}): PrayerTimesSettings {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new PrayerTimesSettings($$parsedSource as Partial<PrayerTimesSettings>);
+    }
+}
+
+/**
  * Settings is the root configuration struct
  */
 export class Settings {
@@ -362,6 +397,7 @@ export class Settings {
     "prayer": PrayerSettings;
     "notification": NotificationSettings;
     "dashboard": DashboardSettings;
+    "prayerTimes": PrayerTimesSettings;
 
     /**
      * "light", "dark", "system"
@@ -399,6 +435,9 @@ export class Settings {
         if (!("dashboard" in $$source)) {
             this["dashboard"] = (new DashboardSettings());
         }
+        if (!("prayerTimes" in $$source)) {
+            this["prayerTimes"] = (new PrayerTimesSettings());
+        }
         if (!("theme" in $$source)) {
             this["theme"] = "";
         }
@@ -429,6 +468,7 @@ export class Settings {
         const $$createField1_0 = $$createType4;
         const $$createField2_0 = $$createType5;
         const $$createField3_0 = $$createType6;
+        const $$createField4_0 = $$createType7;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("location" in $$parsedSource) {
             $$parsedSource["location"] = $$createField0_0($$parsedSource["location"]);
@@ -442,6 +482,9 @@ export class Settings {
         if ("dashboard" in $$parsedSource) {
             $$parsedSource["dashboard"] = $$createField3_0($$parsedSource["dashboard"]);
         }
+        if ("prayerTimes" in $$parsedSource) {
+            $$parsedSource["prayerTimes"] = $$createField4_0($$parsedSource["prayerTimes"]);
+        }
         return new Settings($$parsedSource as Partial<Settings>);
     }
 }
@@ -454,3 +497,4 @@ const $$createType3 = LocationSettings.createFrom;
 const $$createType4 = PrayerSettings.createFrom;
 const $$createType5 = NotificationSettings.createFrom;
 const $$createType6 = DashboardSettings.createFrom;
+const $$createType7 = PrayerTimesSettings.createFrom;

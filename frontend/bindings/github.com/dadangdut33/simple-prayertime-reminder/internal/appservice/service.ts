@@ -77,15 +77,21 @@ export function GetLocation(): $CancellablePromise<location$0.Location> {
     });
 }
 
+export function GetMonthHijriDates(year: number, month: number): $CancellablePromise<hijri$0.CalendarDay[]> {
+    return $Call.ByID(3210272434, year, month).then(($result: any) => {
+        return $$createType4($result);
+    });
+}
+
 export function GetMonthSchedule(year: number, month: number): $CancellablePromise<prayer$0.DaySchedule[]> {
     return $Call.ByID(107226984, year, month).then(($result: any) => {
-        return $$createType4($result);
+        return $$createType6($result);
     });
 }
 
 export function GetNextPrayer(): $CancellablePromise<prayer$0.NextPrayerInfo> {
     return $Call.ByID(3689796055).then(($result: any) => {
-        return $$createType5($result);
+        return $$createType7($result);
     });
 }
 
@@ -99,13 +105,13 @@ export function GetQiblaDirectionFor(lat: number, lon: number): $CancellableProm
 
 export function GetScheduleForDate(dateStr: string): $CancellablePromise<prayer$0.DaySchedule> {
     return $Call.ByID(2969710027, dateStr).then(($result: any) => {
-        return $$createType3($result);
+        return $$createType5($result);
     });
 }
 
 export function GetSettings(): $CancellablePromise<settings$0.Settings> {
     return $Call.ByID(1855413340).then(($result: any) => {
-        return $$createType6($result);
+        return $$createType8($result);
     });
 }
 
@@ -117,7 +123,7 @@ export function GetTodayHijri(): $CancellablePromise<hijri$0.HijriDate> {
 
 export function GetTodaySchedule(): $CancellablePromise<prayer$0.DaySchedule> {
     return $Call.ByID(1655258847).then(($result: any) => {
-        return $$createType3($result);
+        return $$createType5($result);
     });
 }
 
@@ -135,7 +141,7 @@ export function PlayAdhan(isFajr: boolean): $CancellablePromise<void> {
 
 export function ResetSettings(): $CancellablePromise<settings$0.Settings> {
     return $Call.ByID(1081576467).then(($result: any) => {
-        return $$createType6($result);
+        return $$createType8($result);
     });
 }
 
@@ -159,7 +165,9 @@ export function StopAdhan(): $CancellablePromise<void> {
 const $$createType0 = location$0.Location.createFrom;
 const $$createType1 = $models.AppInfo.createFrom;
 const $$createType2 = hijri$0.HijriDate.createFrom;
-const $$createType3 = prayer$0.DaySchedule.createFrom;
+const $$createType3 = hijri$0.CalendarDay.createFrom;
 const $$createType4 = $Create.Array($$createType3);
-const $$createType5 = prayer$0.NextPrayerInfo.createFrom;
-const $$createType6 = settings$0.Settings.createFrom;
+const $$createType5 = prayer$0.DaySchedule.createFrom;
+const $$createType6 = $Create.Array($$createType5);
+const $$createType7 = prayer$0.NextPrayerInfo.createFrom;
+const $$createType8 = settings$0.Settings.createFrom;

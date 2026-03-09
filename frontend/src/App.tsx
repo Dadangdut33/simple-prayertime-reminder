@@ -1,18 +1,22 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useAppStore } from './store/appStore';
 
 import {
   Box,
+  IconButton,
   Drawer,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Tooltip,
   Typography,
   CircularProgress,
   Divider,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -20,9 +24,12 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import SettingsIcon from '@mui/icons-material/Settings';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
+import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import appLogo from '../../assets/icons/icon.png';
 
 const DRAWER_WIDTH = 240;
+const DRAWER_COLLAPSED_WIDTH = 78;
 
 const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', icon: DashboardIcon, end: true },
@@ -35,6 +42,9 @@ const NAV_ITEMS = [
 export default function App() {
   const { initialize, loading, initialized } = useAppStore();
   const location = useLocation();
+  const theme = useTheme();
+  const shouldAutoCollapse = useMediaQuery(theme.breakpoints.down('lg'));
+  const [drawerCollapsed, setDrawerCollapsed] = useState(shouldAutoCollapse);
 
   // Reminder window lives on its own route with no sidebar
   const isReminder = location.pathname === '/reminder';
@@ -42,6 +52,10 @@ export default function App() {
   useEffect(() => {
     if (!initialized) initialize();
   }, [initialize, initialized]);
+
+  useEffect(() => {
+    setDrawerCollapsed(shouldAutoCollapse);
+  }, [shouldAutoCollapse]);
 
   if (isReminder) {
     return <Outlet />;
@@ -58,23 +72,47 @@ export default function App() {
     );
   }
 
+  const drawerWidth = drawerCollapsed ? DRAWER_COLLAPSED_WIDTH : DRAWER_WIDTH;
+
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
       <Drawer
         variant="permanent"
         sx={{
-          width: DRAWER_WIDTH,
+          width: drawerWidth,
           flexShrink: 0,
           '& .MuiDrawer-paper': {
-            width: DRAWER_WIDTH,
+            width: drawerWidth,
             boxSizing: 'border-box',
+            display: 'flex',
+            flexDirection: 'column',
             borderRight: '1px solid',
             borderColor: 'divider',
             background: 'var(--mui-palette-background-paper)',
+            overflowX: 'hidden',
+            transition: theme.transitions.create('width', {
+              duration: theme.transitions.duration.shorter,
+            }),
           },
         }}
       >
-        <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+        <Box
+          sx={{
+            p: drawerCollapsed ? 1.5 : 2,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: drawerCollapsed ? 'center' : 'space-between',
+            gap: 1.5,
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.5,
+              minWidth: 0,
+            }}
+          >
           <Box
             sx={{
               width: 38,
@@ -105,56 +143,90 @@ export default function App() {
               }}
             />
           </Box>
-          <Box>
-            <Typography variant="subtitle2" fontWeight="bold" lineHeight={1.2}>
-              Simple Prayertime Reminder
-            </Typography>
+            {!drawerCollapsed && (
+              <Box>
+                <Typography variant="subtitle2" fontWeight="bold" lineHeight={1.2}>
+                  Simple Prayertime Reminder
+                </Typography>
+              </Box>
+            )}
           </Box>
+
+          {!drawerCollapsed && (
+            <Tooltip title="Collapse sidebar">
+              <IconButton
+                size="small"
+                onClick={() => setDrawerCollapsed(true)}
+                sx={{ flexShrink: 0 }}
+              >
+                <KeyboardDoubleArrowLeftIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
         </Box>
 
         <Divider sx={{ mb: 2 }} />
 
-        <List sx={{ px: 2 }}>
+        <List sx={{ px: drawerCollapsed ? 1 : 2 }}>
           {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => {
             const isActive = end ? location.pathname === to : location.pathname.startsWith(to);
             return (
               <ListItem key={to} disablePadding sx={{ mb: 0.5 }}>
-                <ListItemButton
-                  component={NavLink}
-                  to={to}
-                  sx={{
-                    borderRadius: 0.5,
-                    ...(isActive && {
-                      bgcolor: 'action.selected',
-                      color: 'primary.main',
-                      boxShadow: '0 0 12px rgba(79, 100, 240, 0.15)',
-                    }),
-                    '&:hover': {
-                      bgcolor: isActive ? 'action.selected' : 'action.hover',
-                    },
-                  }}
-                >
-                  <ListItemIcon
+                <Tooltip title={drawerCollapsed ? label : ''} placement="right">
+                  <ListItemButton
+                    component={NavLink}
+                    to={to}
                     sx={{
-                      minWidth: 40,
-                      color: isActive ? 'primary.main' : 'text.secondary',
+                      minHeight: 44,
+                      px: drawerCollapsed ? 1.25 : 1.5,
+                      justifyContent: drawerCollapsed ? 'center' : 'flex-start',
+                      borderRadius: 0.5,
+                      ...(isActive && {
+                        bgcolor: 'action.selected',
+                        color: 'primary.main',
+                        boxShadow: '0 0 12px rgba(79, 100, 240, 0.15)',
+                      }),
+                      '&:hover': {
+                        bgcolor: isActive ? 'action.selected' : 'action.hover',
+                      },
                     }}
                   >
-                    <Icon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={label}
-                    primaryTypographyProps={{
-                      variant: 'body2',
-                      fontWeight: isActive ? 600 : 500,
-                      color: isActive ? 'primary.main' : 'text.secondary',
-                    }}
-                  />
-                </ListItemButton>
+                    <ListItemIcon
+                      sx={{
+                        minWidth: drawerCollapsed ? 0 : 40,
+                        mr: drawerCollapsed ? 0 : 1,
+                        justifyContent: 'center',
+                        color: isActive ? 'primary.main' : 'text.secondary',
+                      }}
+                    >
+                      <Icon fontSize="small" />
+                    </ListItemIcon>
+                    {!drawerCollapsed && (
+                      <ListItemText
+                        primary={label}
+                        primaryTypographyProps={{
+                          variant: 'body2',
+                          fontWeight: isActive ? 600 : 500,
+                          color: isActive ? 'primary.main' : 'text.secondary',
+                        }}
+                      />
+                    )}
+                  </ListItemButton>
+                </Tooltip>
               </ListItem>
             );
           })}
         </List>
+
+        {drawerCollapsed && (
+          <Box sx={{ mt: 'auto', p: 1.5, display: 'flex', justifyContent: 'center' }}>
+            <Tooltip title="Expand sidebar" placement="right">
+              <IconButton size="small" onClick={() => setDrawerCollapsed(false)}>
+                <KeyboardDoubleArrowRightIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        )}
       </Drawer>
 
       <Box

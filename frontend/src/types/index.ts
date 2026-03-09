@@ -22,6 +22,11 @@ export interface HijriDate {
   year: number;
 }
 
+export interface HijriCalendarDay {
+  date: string;
+  hijri: HijriDate;
+}
+
 // ---- Location ----
 export interface Location {
   city: string;
@@ -104,6 +109,8 @@ export type DigitalClockFormatPreset =
   | 'weekday-date'
   | 'custom';
 export type ThemePreset = 'indigo' | 'emerald' | 'sunset' | 'rose' | 'ocean';
+export type PrayerTimesViewMode = 'table' | 'calendar';
+export type PrayerCalendarSystem = 'gregorian' | 'hijri' | 'side-by-side';
 
 export interface DashboardSettings {
   showClock: boolean;
@@ -114,11 +121,17 @@ export interface DashboardSettings {
   showAllClockHours: boolean;
 }
 
+export interface PrayerTimesSettings {
+  viewMode: PrayerTimesViewMode;
+  calendarSystem: PrayerCalendarSystem;
+}
+
 export interface Settings {
   location: LocationSettings;
   prayer: PrayerSettings;
   notification: NotificationSettings;
   dashboard: DashboardSettings;
+  prayerTimes: PrayerTimesSettings;
   theme: string;
   themePreset: ThemePreset;
   language: string;

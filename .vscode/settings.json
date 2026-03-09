@@ -1,23 +1,15 @@
 {
-	"files.associations": {
-		".eslintrc": "jsonc",
-		".prettierrc": "jsonc",
-		".eslintignore": "ignore"
-	},
-
-	"javascript.validate.enable": false,
-	"javascript.format.enable": false,
-	"typescript.format.enable": false,
-
-	"search.exclude": {
-		".git": true,
-		".eslintcache": true,
-		".erb/dll": true,
-		"release/{build,app/dist}": true,
-		"node_modules": true,
-		"npm-debug.log.*": true,
-		"test/**/__snapshots__": true,
-		"package-lock.json": true,
-		"*.{css,sass,scss}.d.ts": true
-	}
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": false,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "never",
+    "source.fixAll": "never"
+  },
+  "[typescript]": {
+    "editor.tabSize": 2
+  },
+  "[javascript]": {
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }

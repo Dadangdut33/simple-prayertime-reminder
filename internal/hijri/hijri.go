@@ -12,6 +12,12 @@ type HijriDate struct {
 	Year  int `json:"year"`
 }
 
+// CalendarDay associates a Gregorian ISO date with its Hijri equivalent.
+type CalendarDay struct {
+	Date  string    `json:"date"`
+	Hijri HijriDate `json:"hijri"`
+}
+
 // HijriMonths contains English names for Hijri months
 var HijriMonths = [13]string{
 	"", // 1-indexed
