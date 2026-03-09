@@ -17,6 +17,11 @@ import (
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
+const (
+	appName        = "Simple PrayerTime Reminder"
+	appDescription = "A simple, Muslim companion app."
+)
+
 func shouldStartHidden(args []string) bool {
 	for _, arg := range args {
 		if arg == autostart.BackgroundArg {
@@ -61,8 +66,8 @@ func main() {
 	appSvc := appservice.New(prayerSvc2, locSvc2, settingsSvc2, audioSvc2)
 
 	app := application.New(application.Options{
-		Name:        "Simple PrayerTime Reminder",
-		Description: "A simple, Muslim companion app.",
+		Name:        appName,
+		Description: appDescription,
 		Icon:        appIcon,
 		Services: []application.Service{
 			application.NewService(appSvc),
@@ -83,7 +88,7 @@ func main() {
 
 	// Main window
 	mainWindow := app.Window.NewWithOptions(application.WebviewWindowOptions{
-		Title:            "Simple PrayerTime Reminder",
+		Title:            appName,
 		Width:            1024,
 		Height:           700,
 		MinWidth:         800,
@@ -116,31 +121,4 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func setupTray(app *application.App, appSvc *appservice.Service, mainWindow application.Window) {
-	tray := app.SystemTray.New()
-	tray.SetLabel("Simple PrayerTime Reminder")
-	tray.SetIcon(appIcon)
-
-	menu := app.Menu.New()
-	menu.Add("Show App").OnClick(func(_ *application.Context) {
-		mainWindow.Show()
-		mainWindow.Focus()
-	})
-	menu.AddSeparator()
-
-	menu.Add("Quit").OnClick(func(_ *application.Context) {
-		app.Quit()
-	})
-
-	tray.SetMenu(menu)
-	tray.OnClick(func() {
-		if mainWindow.IsVisible() {
-			mainWindow.Hide()
-		} else {
-			mainWindow.Show()
-			mainWindow.Focus()
-		}
-	})
 }
