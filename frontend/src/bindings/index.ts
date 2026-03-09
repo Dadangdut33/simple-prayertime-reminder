@@ -1,4 +1,4 @@
-import * as AppService from '../../bindings/github.com/dadangdut33/simple-prayertime-reminder/internal/appservice/service';
+import { Service as AppService } from '../../bindings/github.com/dadangdut33/simple-prayertime-reminder/internal/appservice/index.ts';
 import type {
   AppInfo,
   DaySchedule,
@@ -7,6 +7,7 @@ import type {
   Location,
   NextPrayerInfo,
   Settings,
+  UpdateInfo,
 } from '../types';
 
 // ---- Settings ----
@@ -115,6 +116,8 @@ export const getCurrentTime = (): Promise<string> =>
 // ---- App Info ----
 export const getAppInfo = (): Promise<AppInfo> =>
   AppService.GetAppInfo() as any;
+export const checkForUpdates = (): Promise<UpdateInfo> =>
+  AppService.CheckForUpdates() as any;
 export const openConfigLocation = (): Promise<void> =>
   AppService.OpenConfigLocation() as any;
 export const openURL = (url: string): Promise<void> =>

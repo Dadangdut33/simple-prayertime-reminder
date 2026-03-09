@@ -430,6 +430,72 @@ export default function GeneralSettingsTab({
               )}
             </Box>
           </Box>
+
+          <Box
+            mt={3}
+            p={2.5}
+            borderRadius={0.5}
+            border="1px solid"
+            borderColor="divider"
+            bgcolor="background.paper"
+          >
+            <Typography variant="subtitle2" mb={0.75}>
+              Startup
+            </Typography>
+            <Typography variant="body2" color="text.secondary" mb={2}>
+              Launch the app automatically when you sign in. Autostart launches the app in background mode so it stays
+              in the tray instead of opening the main window immediately.
+            </Typography>
+
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={local.autoStart}
+                  onChange={(event) =>
+                    setLocal({
+                      ...local,
+                      autoStart: event.target.checked,
+                    })
+                  }
+                />
+              }
+              label="Launch in background on startup"
+              sx={{ m: 0 }}
+            />
+          </Box>
+
+          <Box
+            mt={3}
+            p={2.5}
+            borderRadius={0.5}
+            border="1px solid"
+            borderColor="divider"
+            bgcolor="background.paper"
+          >
+            <Typography variant="subtitle2" mb={0.75}>
+              Updates
+            </Typography>
+            <Typography variant="body2" color="text.secondary" mb={2}>
+              Automatically check for a newer version whenever the app starts. If one is available, the app will show
+              a notice with update instructions based on how this copy was installed.
+            </Typography>
+
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={local.autoCheckUpdates}
+                  onChange={(event) =>
+                    setLocal({
+                      ...local,
+                      autoCheckUpdates: event.target.checked,
+                    })
+                  }
+                />
+              }
+              label="Check for updates on startup"
+              sx={{ m: 0 }}
+            />
+          </Box>
         </Box>
 
         <Box

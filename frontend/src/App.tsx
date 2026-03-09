@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useAppStore } from './store/appStore';
+import * as api from './bindings';
+import UpdateAvailableDialog from './components/app/UpdateAvailableDialog';
+import type { UpdateInfo } from './types';
 
 import {
   Box,
@@ -40,11 +43,13 @@ const NAV_ITEMS = [
 ];
 
 export default function App() {
-  const { initialize, loading, initialized } = useAppStore();
+  const { initialize, loading, initialized, settings } = useAppStore();
   const location = useLocation();
   const theme = useTheme();
   const shouldAutoCollapse = useMediaQuery(theme.breakpoints.down('lg'));
   const [drawerCollapsed, setDrawerCollapsed] = useState(shouldAutoCollapse);
+  const [startupUpdateInfo, setStartupUpdateInfo] = useState<UpdateInfo | null>(null);
+  const [startupUpdateCheckDone, setStartupUpdateCheckDone] = useState(false);
 
   // Reminder window lives on its own route with no sidebar
   const isReminder = location.pathname === '/reminder';
@@ -56,6 +61,34 @@ export default function App() {
   useEffect(() => {
     setDrawerCollapsed(shouldAutoCollapse);
   }, [shouldAutoCollapse]);
+
+  useEffect(() => {
+    if (!initialized || !settings || startupUpdateCheckDone || !settings.autoCheckUpdates) {
+      return;
+    }
+
+    let active = true;
+    setStartupUpdateCheckDone(true);
+
+    async function checkForUpdates() {
+      try {
+        const update = await api.checkForUpdates();
+        if (!active || !update.hasUpdate) {
+          return;
+        }
+
+        setStartupUpdateInfo(update);
+      } catch {
+        // Silent failure: startup update checks should not interrupt app launch.
+      }
+    }
+
+    void checkForUpdates();
+
+    return () => {
+      active = false;
+    };
+  }, [initialized, settings, startupUpdateCheckDone]);
 
   if (isReminder) {
     return <Outlet />;
@@ -76,6 +109,17 @@ export default function App() {
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+      {startupUpdateInfo ? (
+        <UpdateAvailableDialog
+          open
+          update={startupUpdateInfo}
+          onClose={() => setStartupUpdateInfo(null)}
+          onOpenAction={async () => {
+            await api.openURL(startupUpdateInfo.releaseUrl);
+          }}
+        />
+      ) : null}
+
       <Drawer
         variant="permanent"
         sx={{

@@ -97,21 +97,22 @@ type PrayerTimesSettings struct {
 
 // Settings is the root configuration struct
 type Settings struct {
-	Location        LocationSettings     `json:"location"`
-	Prayer          PrayerSettings       `json:"prayer"`
-	Notification    NotificationSettings `json:"notification"`
-	Dashboard       DashboardSettings    `json:"dashboard"`
-	PrayerTimes     PrayerTimesSettings  `json:"prayerTimes"`
-	Theme           string               `json:"theme"` // "light", "dark", "system"
-	ThemePreset     string               `json:"themePreset"`
-	Language        string               `json:"language"` // "en", "id", etc
-	AutoStart       bool                 `json:"autoStart"`
-	HijriDateOffset int                  `json:"hijriDateOffset"` // -2 to +2 days
-	TimeFormat      string               `json:"timeFormat"`      // "12h" or "24h"
+	Location         LocationSettings     `json:"location"`
+	Prayer           PrayerSettings       `json:"prayer"`
+	Notification     NotificationSettings `json:"notification"`
+	Dashboard        DashboardSettings    `json:"dashboard"`
+	PrayerTimes      PrayerTimesSettings  `json:"prayerTimes"`
+	Theme            string               `json:"theme"` // "light", "dark", "system"
+	ThemePreset      string               `json:"themePreset"`
+	Language         string               `json:"language"` // "en", "id", etc
+	AutoStart        bool                 `json:"autoStart"`
+	AutoCheckUpdates bool                 `json:"autoCheckUpdates"`
+	HijriDateOffset  int                  `json:"hijriDateOffset"` // -2 to +2 days
+	TimeFormat       string               `json:"timeFormat"`      // "12h" or "24h"
 }
 
-// defaultSettings returns the default application settings
-func defaultSettings() Settings {
+// DefaultSettings returns the default application settings.
+func DefaultSettings() Settings {
 	defaultPrayerNotif := PrayerNotificationSetting{
 		Enabled:       true,
 		BeforeMinutes: 10,
@@ -166,12 +167,13 @@ func defaultSettings() Settings {
 			CalendarSystem:       "gregorian",
 			UseArabicIndicDigits: true,
 		},
-		Theme:           "system",
-		ThemePreset:     "indigo",
-		Language:        "en",
-		AutoStart:       false,
-		HijriDateOffset: 0,
-		TimeFormat:      "24h",
+		Theme:            "system",
+		ThemePreset:      "indigo",
+		Language:         "en",
+		AutoStart:        false,
+		AutoCheckUpdates: true,
+		HijriDateOffset:  0,
+		TimeFormat:       "24h",
 	}
 }
 
@@ -189,7 +191,7 @@ func NewService(configDir string) (*Service, error) {
 
 	svc := &Service{
 		configPath: filepath.Join(configDir, "settings.json"),
-		settings:   defaultSettings(),
+		settings:   DefaultSettings(),
 	}
 
 	if err := svc.Load(); err != nil && !os.IsNotExist(err) {
@@ -206,7 +208,7 @@ func (s *Service) Load() error {
 		return err
 	}
 
-	loaded := defaultSettings()
+	loaded := DefaultSettings()
 	if err := json.Unmarshal(data, &loaded); err != nil {
 		return fmt.Errorf("invalid settings JSON: %w", err)
 	}
@@ -245,4 +247,8 @@ func (s *Service) UpdatePartial(updater func(*Settings)) error {
 func (s *Service) Reset() error {
 	s.settings = defaultSettings()
 	return s.Save()
+}
+
+func defaultSettings() Settings {
+	return DefaultSettings()
 }

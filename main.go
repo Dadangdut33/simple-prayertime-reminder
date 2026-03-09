@@ -3,9 +3,11 @@ package main
 import (
 	"embed"
 	"log"
+	"os"
 
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/appservice"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/audio"
+	"github.com/dadangdut33/simple-prayertime-reminder/internal/autostart"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/location"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/notification"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/prayer"
@@ -15,10 +17,25 @@ import (
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
+func shouldStartHidden(args []string) bool {
+	for _, arg := range args {
+		if arg == autostart.BackgroundArg {
+			return true
+		}
+	}
+
+	return false
+}
+
+//go:embed assets/icon.png
+var appIcon []byte
+
 //go:embed all:frontend/dist
 var assets embed.FS
 
 func main() {
+	startHidden := shouldStartHidden(os.Args[1:])
+
 	// Initialize core services
 	configPath, _ := appservice.ConfigDirectory()
 	settingsSvc2, _ := settings.NewService(configPath)
@@ -46,6 +63,7 @@ func main() {
 	app := application.New(application.Options{
 		Name:        "Simple PrayerTime Reminder",
 		Description: "A simple, Muslim companion app.",
+		Icon:        appIcon,
 		Services: []application.Service{
 			application.NewService(appSvc),
 		},
@@ -70,6 +88,7 @@ func main() {
 		Height:           700,
 		MinWidth:         800,
 		MinHeight:        580,
+		Hidden:           startHidden,
 		URL:              "/",
 		BackgroundColour: application.NewRGB(15, 15, 25),
 		Mac: application.MacWindow{
@@ -102,6 +121,7 @@ func main() {
 func setupTray(app *application.App, appSvc *appservice.Service, mainWindow application.Window) {
 	tray := app.SystemTray.New()
 	tray.SetLabel("Simple PrayerTime Reminder")
+	tray.SetIcon(appIcon)
 
 	menu := app.Menu.New()
 	menu.Add("Show App").OnClick(func(_ *application.Context) {

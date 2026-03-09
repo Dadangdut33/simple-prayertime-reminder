@@ -33,9 +33,15 @@ import * as settings$0 from "../settings/models.js";
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
+export function CheckForUpdates(): $CancellablePromise<$models.UpdateInfo> {
+    return $Call.ByID(2121986746).then(($result: any) => {
+        return $$createType0($result);
+    });
+}
+
 export function DetectLocation(): $CancellablePromise<location$0.Location> {
     return $Call.ByID(3572912391).then(($result: any) => {
-        return $$createType0($result);
+        return $$createType1($result);
     });
 }
 
@@ -61,7 +67,7 @@ export function ExportToExcel($0: number, $1: number, startDate: string, endDate
 
 export function GetAppInfo(): $CancellablePromise<$models.AppInfo> {
     return $Call.ByID(4277767660).then(($result: any) => {
-        return $$createType1($result);
+        return $$createType2($result);
     });
 }
 
@@ -75,37 +81,37 @@ export function GetCurrentTime(): $CancellablePromise<string> {
 
 export function GetHijriDateRange(startDate: string, endDate: string): $CancellablePromise<hijri$0.CalendarDay[]> {
     return $Call.ByID(709292810, startDate, endDate).then(($result: any) => {
-        return $$createType3($result);
+        return $$createType4($result);
     });
 }
 
 export function GetHijriForDate(dateStr: string): $CancellablePromise<hijri$0.HijriDate> {
     return $Call.ByID(2391955296, dateStr).then(($result: any) => {
-        return $$createType4($result);
+        return $$createType5($result);
     });
 }
 
 export function GetLocation(): $CancellablePromise<location$0.Location> {
     return $Call.ByID(3694251338).then(($result: any) => {
-        return $$createType0($result);
+        return $$createType1($result);
     });
 }
 
 export function GetMonthHijriDates(year: number, month: number): $CancellablePromise<hijri$0.CalendarDay[]> {
     return $Call.ByID(3210272434, year, month).then(($result: any) => {
-        return $$createType3($result);
+        return $$createType4($result);
     });
 }
 
 export function GetMonthSchedule(year: number, month: number): $CancellablePromise<prayer$0.DaySchedule[]> {
     return $Call.ByID(107226984, year, month).then(($result: any) => {
-        return $$createType6($result);
+        return $$createType7($result);
     });
 }
 
 export function GetNextPrayer(): $CancellablePromise<prayer$0.NextPrayerInfo> {
     return $Call.ByID(3689796055).then(($result: any) => {
-        return $$createType7($result);
+        return $$createType8($result);
     });
 }
 
@@ -119,31 +125,31 @@ export function GetQiblaDirectionFor(lat: number, lon: number): $CancellableProm
 
 export function GetScheduleForDate(dateStr: string): $CancellablePromise<prayer$0.DaySchedule> {
     return $Call.ByID(2969710027, dateStr).then(($result: any) => {
-        return $$createType5($result);
+        return $$createType6($result);
     });
 }
 
 export function GetScheduleRange(startDate: string, endDate: string): $CancellablePromise<prayer$0.DaySchedule[]> {
     return $Call.ByID(2289686101, startDate, endDate).then(($result: any) => {
-        return $$createType6($result);
+        return $$createType7($result);
     });
 }
 
 export function GetSettings(): $CancellablePromise<settings$0.Settings> {
     return $Call.ByID(1855413340).then(($result: any) => {
-        return $$createType8($result);
+        return $$createType9($result);
     });
 }
 
 export function GetTodayHijri(): $CancellablePromise<hijri$0.HijriDate> {
     return $Call.ByID(4192043028).then(($result: any) => {
-        return $$createType4($result);
+        return $$createType5($result);
     });
 }
 
 export function GetTodaySchedule(): $CancellablePromise<prayer$0.DaySchedule> {
     return $Call.ByID(1655258847).then(($result: any) => {
-        return $$createType5($result);
+        return $$createType6($result);
     });
 }
 
@@ -161,7 +167,7 @@ export function PlayAdhan(isFajr: boolean): $CancellablePromise<void> {
 
 export function ResetSettings(): $CancellablePromise<settings$0.Settings> {
     return $Call.ByID(1081576467).then(($result: any) => {
-        return $$createType8($result);
+        return $$createType9($result);
     });
 }
 
@@ -186,12 +192,13 @@ export function StopAdhan(): $CancellablePromise<void> {
 }
 
 // Private type creation functions
-const $$createType0 = location$0.Location.createFrom;
-const $$createType1 = $models.AppInfo.createFrom;
-const $$createType2 = hijri$0.CalendarDay.createFrom;
-const $$createType3 = $Create.Array($$createType2);
-const $$createType4 = hijri$0.HijriDate.createFrom;
-const $$createType5 = prayer$0.DaySchedule.createFrom;
-const $$createType6 = $Create.Array($$createType5);
-const $$createType7 = prayer$0.NextPrayerInfo.createFrom;
-const $$createType8 = settings$0.Settings.createFrom;
+const $$createType0 = $models.UpdateInfo.createFrom;
+const $$createType1 = location$0.Location.createFrom;
+const $$createType2 = $models.AppInfo.createFrom;
+const $$createType3 = hijri$0.CalendarDay.createFrom;
+const $$createType4 = $Create.Array($$createType3);
+const $$createType5 = hijri$0.HijriDate.createFrom;
+const $$createType6 = prayer$0.DaySchedule.createFrom;
+const $$createType7 = $Create.Array($$createType6);
+const $$createType8 = prayer$0.NextPrayerInfo.createFrom;
+const $$createType9 = settings$0.Settings.createFrom;

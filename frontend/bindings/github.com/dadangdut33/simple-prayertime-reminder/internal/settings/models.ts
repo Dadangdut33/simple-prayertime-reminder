@@ -418,6 +418,7 @@ export class Settings {
      */
     "language": string;
     "autoStart": boolean;
+    "autoCheckUpdates": boolean;
 
     /**
      * -2 to +2 days
@@ -457,6 +458,9 @@ export class Settings {
         }
         if (!("autoStart" in $$source)) {
             this["autoStart"] = false;
+        }
+        if (!("autoCheckUpdates" in $$source)) {
+            this["autoCheckUpdates"] = false;
         }
         if (!("hijriDateOffset" in $$source)) {
             this["hijriDateOffset"] = 0;

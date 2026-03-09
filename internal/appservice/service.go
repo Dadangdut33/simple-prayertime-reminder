@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/audio"
+	"github.com/dadangdut33/simple-prayertime-reminder/internal/autostart"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/export"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/hijri"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/location"
@@ -83,7 +84,17 @@ func (s *Service) GetSettings() (settings.Settings, error) {
 }
 
 func (s *Service) SaveSettings(cfg settings.Settings) error {
+	previous := s.settingsSvc.Get()
+	if previous.AutoStart != cfg.AutoStart {
+		if err := autostart.Sync(cfg.AutoStart); err != nil {
+			return err
+		}
+	}
+
 	if err := s.settingsSvc.Update(cfg); err != nil {
+		if previous.AutoStart != cfg.AutoStart {
+			_ = autostart.Sync(previous.AutoStart)
+		}
 		return err
 	}
 
@@ -99,7 +110,18 @@ func (s *Service) SaveSettings(cfg settings.Settings) error {
 }
 
 func (s *Service) ResetSettings() (settings.Settings, error) {
+	previous := s.settingsSvc.Get()
+	defaults := settings.DefaultSettings()
+	if previous.AutoStart != defaults.AutoStart {
+		if err := autostart.Sync(defaults.AutoStart); err != nil {
+			return settings.Settings{}, err
+		}
+	}
+
 	if err := s.settingsSvc.Reset(); err != nil {
+		if previous.AutoStart != defaults.AutoStart {
+			_ = autostart.Sync(previous.AutoStart)
+		}
 		return settings.Settings{}, err
 	}
 

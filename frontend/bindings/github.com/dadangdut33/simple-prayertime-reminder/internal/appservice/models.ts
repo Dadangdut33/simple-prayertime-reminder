@@ -49,3 +49,56 @@ export class AppInfo {
         return new AppInfo($$parsedSource as Partial<AppInfo>);
     }
 }
+
+export class UpdateInfo {
+    "currentVersion": string;
+    "latestVersion": string;
+    "releaseUrl": string;
+    "hasUpdate": boolean;
+    "installMethod": string;
+    "updateTitle": string;
+    "updateDetail": string;
+    "actionLabel": string;
+    "updateCommand": string;
+
+    /** Creates a new UpdateInfo instance. */
+    constructor($$source: Partial<UpdateInfo> = {}) {
+        if (!("currentVersion" in $$source)) {
+            this["currentVersion"] = "";
+        }
+        if (!("latestVersion" in $$source)) {
+            this["latestVersion"] = "";
+        }
+        if (!("releaseUrl" in $$source)) {
+            this["releaseUrl"] = "";
+        }
+        if (!("hasUpdate" in $$source)) {
+            this["hasUpdate"] = false;
+        }
+        if (!("installMethod" in $$source)) {
+            this["installMethod"] = "";
+        }
+        if (!("updateTitle" in $$source)) {
+            this["updateTitle"] = "";
+        }
+        if (!("updateDetail" in $$source)) {
+            this["updateDetail"] = "";
+        }
+        if (!("actionLabel" in $$source)) {
+            this["actionLabel"] = "";
+        }
+        if (!("updateCommand" in $$source)) {
+            this["updateCommand"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new UpdateInfo instance from a string or object.
+     */
+    static createFrom($$source: any = {}): UpdateInfo {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new UpdateInfo($$parsedSource as Partial<UpdateInfo>);
+    }
+}

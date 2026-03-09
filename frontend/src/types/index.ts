@@ -47,6 +47,18 @@ export interface AppInfo {
   executablePath: string;
 }
 
+export interface UpdateInfo {
+  currentVersion: string;
+  latestVersion: string;
+  releaseUrl: string;
+  hasUpdate: boolean;
+  installMethod: string;
+  updateTitle: string;
+  updateDetail: string;
+  actionLabel: string;
+  updateCommand: string;
+}
+
 // ---- Settings ----
 export type NotificationStyle = 'native' | 'window';
 export type AdhanSelection = 'normal' | 'fajr';
@@ -137,6 +149,7 @@ export interface Settings {
   themePreset: ThemePreset;
   language: string;
   autoStart: boolean;
+  autoCheckUpdates: boolean;
   hijriDateOffset: number;
   timeFormat: '12h' | '24h';
 }

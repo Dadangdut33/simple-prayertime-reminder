@@ -8,56 +8,13 @@ import ComputerOutlinedIcon from '@mui/icons-material/ComputerOutlined';
 import Package2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import packageJson from '../../package.json';
 import * as api from '../bindings';
-import type { AppInfo } from '../types';
+import type { AppInfo, UpdateInfo } from '../types';
 
 type LatestReleaseState = {
   status: 'idle' | 'checking' | 'success' | 'error';
-  version?: string;
-  url?: string;
+  update?: UpdateInfo;
   message?: string;
 };
-
-function normalizeVersion(version: string | undefined): string {
-  return (version || '').trim().replace(/^v/i, '');
-}
-
-async function getLatestRelease(): Promise<{ version: string; url: string }> {
-  const releaseResponse = await fetch(
-    'https://api.github.com/repos/dadangdut33/simple-prayertime-reminder/releases/latest',
-    {
-      headers: { Accept: 'application/vnd.github+json' },
-    },
-  );
-
-  if (releaseResponse.ok) {
-    const release = await releaseResponse.json();
-    return {
-      version: release.tag_name || release.name || 'unknown',
-      url: release.html_url || 'https://github.com/dadangdut33/simple-prayertime-reminder/releases',
-    };
-  }
-
-  const tagResponse = await fetch(
-    'https://api.github.com/repos/dadangdut33/simple-prayertime-reminder/tags?per_page=1',
-    {
-      headers: { Accept: 'application/vnd.github+json' },
-    },
-  );
-
-  if (!tagResponse.ok) {
-    throw new Error('Unable to check GitHub for the latest version.');
-  }
-
-  const tags = await tagResponse.json();
-  if (!Array.isArray(tags) || tags.length === 0) {
-    throw new Error('No release or tag information is available yet.');
-  }
-
-  return {
-    version: tags[0].name || 'unknown',
-    url: `https://github.com/dadangdut33/simple-prayertime-reminder/releases/tag/${tags[0].name}`,
-  };
-}
 
 export default function AboutPage() {
   const [appInfo, setAppInfo] = useState<AppInfo | null>(null);
@@ -95,29 +52,25 @@ export default function AboutPage() {
 
   const currentVersion = appInfo?.version || packageJson.version;
   const latestSummary = useMemo(() => {
-    if (latestRelease.status !== 'success' || !latestRelease.version) {
+    if (latestRelease.status !== 'success' || !latestRelease.update) {
       return null;
     }
 
-    const current = normalizeVersion(currentVersion);
-    const latest = normalizeVersion(latestRelease.version);
-
-    if (current && latest && current === latest) {
-      return `You are already on the latest version (${latestRelease.version}).`;
+    if (!latestRelease.update.hasUpdate) {
+      return `You are already on the latest version (${latestRelease.update.latestVersion}).`;
     }
 
-    return `Latest available version: ${latestRelease.version}`;
-  }, [currentVersion, latestRelease]);
+    return `Latest available version: ${latestRelease.update.latestVersion}`;
+  }, [latestRelease]);
 
   async function handleCheckLatestVersion() {
     setLatestRelease({ status: 'checking' });
 
     try {
-      const latest = await getLatestRelease();
+      const update = await api.checkForUpdates();
       setLatestRelease({
         status: 'success',
-        version: latest.version,
-        url: latest.url,
+        update,
       });
     } catch (err) {
       setLatestRelease({
@@ -137,8 +90,8 @@ export default function AboutPage() {
   }
 
   async function handleOpenLatestRelease() {
-    if (!latestRelease.url) return;
-    await api.openURL(latestRelease.url);
+    if (!latestRelease.update?.releaseUrl) return;
+    await api.openURL(latestRelease.update.releaseUrl);
   }
 
   return (
@@ -211,9 +164,9 @@ export default function AboutPage() {
                   Check Latest Version
                 </Button>
 
-                {latestRelease.url && (
+                {latestRelease.update?.releaseUrl && (
                   <Button variant="text" startIcon={<OpenInNewIcon />} onClick={handleOpenLatestRelease}>
-                    Open Latest Release
+                    {latestRelease.update.actionLabel || 'Open Latest Release'}
                   </Button>
                 )}
               </Stack>
