@@ -11,7 +11,7 @@ import (
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
-const trayRefreshInterval = 30 * time.Second
+const trayRefreshInterval = 15 * time.Minute
 
 type trayMenuState struct {
 	identityItem *application.MenuItem
