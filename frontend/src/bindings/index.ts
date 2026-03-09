@@ -1,4 +1,4 @@
-import * as AppService from '../../bindings/github.com/dadangdut33/simple-prayertime-reminder/internal/appservice/service.js';
+import * as AppService from '../../bindings/github.com/dadangdut33/simple-prayertime-reminder/internal/appservice/service';
 import type {
   AppInfo,
   DaySchedule,
@@ -34,11 +34,20 @@ export const getMonthSchedule = (
   year: number,
   month: number,
 ): Promise<DaySchedule[]> => AppService.GetMonthSchedule(year, month) as any;
+export const getScheduleRange = (
+  startDate: string,
+  endDate: string,
+): Promise<DaySchedule[]> => AppService.GetScheduleRange(startDate, endDate) as any;
 export const getMonthHijriDates = (
   year: number,
   month: number,
 ): Promise<HijriCalendarDay[]> =>
   AppService.GetMonthHijriDates(year, month) as any;
+export const getHijriDateRange = (
+  startDate: string,
+  endDate: string,
+): Promise<HijriCalendarDay[]> =>
+  AppService.GetHijriDateRange(startDate, endDate) as any;
 export const getNextPrayer = (): Promise<NextPrayerInfo> =>
   AppService.GetNextPrayer() as any;
 
@@ -67,13 +76,33 @@ export const stopAdhan = (): Promise<void> => AppService.StopAdhan() as any;
 export const exportToCSV = (
   year: number,
   month: number,
+  startDate: string,
+  endDate: string,
   path: string,
-): Promise<void> => AppService.ExportToCSV(year, month, path) as any;
+): Promise<void> =>
+  AppService.ExportToCSV(year, month, startDate, endDate, path) as any;
+export const exportRangeToCSV = (
+  startDate: string,
+  endDate: string,
+  path: string,
+): Promise<void> => AppService.ExportRangeToCSV(startDate, endDate, path) as any;
 export const exportToExcel = (
   year: number,
   month: number,
+  startDate: string,
+  endDate: string,
   path: string,
-): Promise<void> => AppService.ExportToExcel(year, month, path) as any;
+): Promise<void> =>
+  AppService.ExportToExcel(year, month, startDate, endDate, path) as any;
+export const exportRangeToExcel = (
+  startDate: string,
+  endDate: string,
+  path: string,
+): Promise<void> => AppService.ExportRangeToExcel(startDate, endDate, path) as any;
+export const saveBase64File = (
+  path: string,
+  base64Data: string,
+): Promise<void> => AppService.SaveBase64File(path, base64Data) as any;
 
 // ---- Notification ----
 export const dismissReminder = (): Promise<void> =>

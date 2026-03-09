@@ -124,6 +124,7 @@ export interface DashboardSettings {
 export interface PrayerTimesSettings {
   viewMode: PrayerTimesViewMode;
   calendarSystem: PrayerCalendarSystem;
+  useArabicIndicDigits: boolean;
 }
 
 export interface Settings {

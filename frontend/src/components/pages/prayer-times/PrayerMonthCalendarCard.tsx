@@ -3,9 +3,7 @@ import { DateCalendar, PickersDay } from '@mui/x-date-pickers';
 import type { PickersDayProps } from '@mui/x-date-pickers/PickersDay';
 import dayjs, { type Dayjs } from 'dayjs';
 import type { HijriDate } from '../../../types';
-import { formatHijriDayNumber, getHijriMonthName, toIsoDate } from './helpers';
-
-type CalendarMode = 'gregorian' | 'hijri';
+import { getCalendarDayPresentation, type CalendarMode, toIsoDate } from './helpers';
 
 interface PrayerMonthCalendarCardProps {
   title: string;
@@ -37,16 +35,8 @@ export default function PrayerMonthCalendarCard({
     const isoDate = toIsoDate(day as Dayjs);
     const hijriDate = hijriByDate[isoDate];
     const isToday = isoDate === todayIso;
-
-    const gregorianDay = String((day as Dayjs).date());
-    const gregorianMonth = (day as Dayjs).format('MMM');
-    const hijriDay = hijriDate ? formatHijriDayNumber(hijriDate.day, useArabicIndicDigits) : '';
-    const primaryLabel = mode === 'hijri' ? hijriDay : gregorianDay;
-    const primaryContext = mode === 'hijri' ? (hijriDate ? getHijriMonthName(hijriDate.month) : '') : '';
-
-    const secondaryLabel = mode === 'hijri' ? gregorianDay : hijriDay;
-    const secondaryContext =
-      mode === 'hijri' ? gregorianMonth : hijriDate ? getHijriMonthName(hijriDate.month).replace('al-', '') : '';
+    const { primaryLabel, primaryContext, secondaryLabel, secondaryContext } =
+      getCalendarDayPresentation(mode, day as Dayjs, hijriDate, useArabicIndicDigits);
 
     return (
       <PickersDay

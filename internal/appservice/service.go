@@ -1,6 +1,9 @@
 package appservice
 
 import (
+	"encoding/base64"
+	"fmt"
+	"os"
 	"time"
 
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/audio"
@@ -166,6 +169,15 @@ func (s *Service) GetMonthSchedule(year, month int) ([]prayer.DaySchedule, error
 	return s.prayerSvc.GetMonthSchedule(year, month)
 }
 
+func (s *Service) GetScheduleRange(startDate, endDate string) ([]prayer.DaySchedule, error) {
+	start, end, err := parseDateRange(startDate, endDate)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.prayerSvc.GetScheduleRange(start, end)
+}
+
 func (s *Service) GetMonthHijriDates(year, month int) ([]hijri.CalendarDay, error) {
 	cfg := s.settingsSvc.Get()
 	loc, err := time.LoadLocation(cfg.Location.Timezone)
@@ -178,6 +190,32 @@ func (s *Service) GetMonthHijriDates(year, month int) ([]hijri.CalendarDay, erro
 
 	result := make([]hijri.CalendarDay, 0, 31)
 	for current := start; current.Before(end); current = current.AddDate(0, 0, 1) {
+		result = append(result, hijri.CalendarDay{
+			Date:  current.Format("2006-01-02"),
+			Hijri: hijri.ToHijri(current, cfg.HijriDateOffset),
+		})
+	}
+
+	return result, nil
+}
+
+func (s *Service) GetHijriDateRange(startDate, endDate string) ([]hijri.CalendarDay, error) {
+	start, end, err := parseDateRange(startDate, endDate)
+	if err != nil {
+		return nil, err
+	}
+
+	cfg := s.settingsSvc.Get()
+	loc, locErr := time.LoadLocation(cfg.Location.Timezone)
+	if locErr != nil {
+		loc = time.Local
+	}
+
+	start = time.Date(start.Year(), start.Month(), start.Day(), 0, 0, 0, 0, loc)
+	end = time.Date(end.Year(), end.Month(), end.Day(), 0, 0, 0, 0, loc)
+
+	result := make([]hijri.CalendarDay, 0, int(end.Sub(start).Hours()/24)+1)
+	for current := start; !current.After(end); current = current.AddDate(0, 0, 1) {
 		result = append(result, hijri.CalendarDay{
 			Date:  current.Format("2006-01-02"),
 			Hijri: hijri.ToHijri(current, cfg.HijriDateOffset),
@@ -228,22 +266,31 @@ func (s *Service) StopAdhan() {
 	s.audioSvc.Stop()
 }
 
-func (s *Service) ExportToCSV(year, month int, outputPath string) error {
-	schedule, err := s.GetMonthSchedule(year, month)
+func (s *Service) ExportToCSV(_, _ int, startDate, endDate, outputPath string) error {
+	rows, err := s.buildRangeExportRows(startDate, endDate)
 	if err != nil {
 		return err
 	}
 
-	return export.ToCSV(schedule, outputPath)
+	return export.ToCSV(rows, outputPath)
 }
 
-func (s *Service) ExportToExcel(year, month int, outputPath string) error {
-	schedule, err := s.GetMonthSchedule(year, month)
+func (s *Service) ExportToExcel(_, _ int, startDate, endDate, outputPath string) error {
+	rows, err := s.buildRangeExportRows(startDate, endDate)
 	if err != nil {
 		return err
 	}
 
-	return export.ToExcel(schedule, outputPath)
+	return export.ToExcel(rows, outputPath)
+}
+
+func (s *Service) SaveBase64File(outputPath, base64Data string) error {
+	data, err := base64.StdEncoding.DecodeString(base64Data)
+	if err != nil {
+		return fmt.Errorf("failed to decode base64 file: %w", err)
+	}
+
+	return os.WriteFile(outputPath, data, 0644)
 }
 
 func (s *Service) DismissReminder() {
@@ -256,4 +303,75 @@ func (s *Service) DismissReminder() {
 
 func (s *Service) GetCurrentTime() string {
 	return time.Now().Format("15:04:05")
+}
+
+func (s *Service) ExportRangeToCSV(startDate, endDate, outputPath string) error {
+	rows, err := s.buildRangeExportRows(startDate, endDate)
+	if err != nil {
+		return err
+	}
+
+	return export.ToCSV(rows, outputPath)
+}
+
+func (s *Service) ExportRangeToExcel(startDate, endDate, outputPath string) error {
+	rows, err := s.buildRangeExportRows(startDate, endDate)
+	if err != nil {
+		return err
+	}
+
+	return export.ToExcel(rows, outputPath)
+}
+
+func (s *Service) buildRangeExportRows(startDate, endDate string) ([]export.MonthRow, error) {
+	schedules, err := s.GetScheduleRange(startDate, endDate)
+	if err != nil {
+		return nil, err
+	}
+
+	hijriDays, err := s.GetHijriDateRange(startDate, endDate)
+	if err != nil {
+		return nil, err
+	}
+
+	hijriByDate := make(map[string]hijri.HijriDate, len(hijriDays))
+	for _, day := range hijriDays {
+		hijriByDate[day.Date] = day.Hijri
+	}
+
+	rows := make([]export.MonthRow, 0, len(schedules))
+	for _, schedule := range schedules {
+		isoDate := schedule.Date[:10]
+		hijriDate := hijriByDate[isoDate]
+		rows = append(rows, export.MonthRow{
+			GregorianDate: isoDate,
+			HijriDate:     hijriDate.Format(),
+			Fajr:          schedule.Fajr,
+			Sunrise:       schedule.Sunrise,
+			Zuhr:          schedule.Zuhr,
+			Asr:           schedule.Asr,
+			Maghrib:       schedule.Maghrib,
+			Isha:          schedule.Isha,
+		})
+	}
+
+	return rows, nil
+}
+
+func parseDateRange(startDate, endDate string) (time.Time, time.Time, error) {
+	start, err := time.Parse("2006-01-02", startDate)
+	if err != nil {
+		return time.Time{}, time.Time{}, fmt.Errorf("invalid start date: %w", err)
+	}
+
+	end, err := time.Parse("2006-01-02", endDate)
+	if err != nil {
+		return time.Time{}, time.Time{}, fmt.Errorf("invalid end date: %w", err)
+	}
+
+	if end.Before(start) {
+		return time.Time{}, time.Time{}, fmt.Errorf("start date must be before or equal to end date")
+	}
+
+	return start, end, nil
 }

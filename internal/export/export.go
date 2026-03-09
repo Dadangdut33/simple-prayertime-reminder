@@ -3,17 +3,27 @@ package export
 import (
 	"encoding/csv"
 	"fmt"
+	"github.com/xuri/excelize/v2"
 	"os"
 	"time"
-
-	"github.com/dadangdut33/simple-prayertime-reminder/internal/prayer"
-	"github.com/xuri/excelize/v2"
 )
 
 const timeFormat = "15:04"
 
-// ToCSV exports prayer times to a CSV file
-func ToCSV(schedules []prayer.DaySchedule, filepath string) error {
+// MonthRow represents one exported prayer-time row.
+type MonthRow struct {
+	GregorianDate string
+	HijriDate     string
+	Fajr          time.Time
+	Sunrise       time.Time
+	Zuhr          time.Time
+	Asr           time.Time
+	Maghrib       time.Time
+	Isha          time.Time
+}
+
+// ToCSV exports prayer times to a CSV file.
+func ToCSV(rows []MonthRow, filepath string) error {
 	f, err := os.Create(filepath)
 	if err != nil {
 		return fmt.Errorf("failed to create CSV file: %w", err)
@@ -23,20 +33,30 @@ func ToCSV(schedules []prayer.DaySchedule, filepath string) error {
 	w := csv.NewWriter(f)
 	defer w.Flush()
 
-	header := []string{"Date", "Fajr", "Sunrise", "Zuhr", "Asr", "Maghrib", "Isha"}
+	header := []string{
+		"Gregorian Date",
+		"Hijri Date",
+		"Fajr",
+		"Sunrise",
+		"Zuhr",
+		"Asr",
+		"Maghrib",
+		"Isha",
+	}
 	if err := w.Write(header); err != nil {
 		return err
 	}
 
-	for _, s := range schedules {
+	for _, row := range rows {
 		row := []string{
-			s.Date,
-			formatTime(s.Fajr),
-			formatTime(s.Sunrise),
-			formatTime(s.Zuhr),
-			formatTime(s.Asr),
-			formatTime(s.Maghrib),
-			formatTime(s.Isha),
+			row.GregorianDate,
+			row.HijriDate,
+			formatTime(row.Fajr),
+			formatTime(row.Sunrise),
+			formatTime(row.Zuhr),
+			formatTime(row.Asr),
+			formatTime(row.Maghrib),
+			formatTime(row.Isha),
 		}
 		if err := w.Write(row); err != nil {
 			return err
@@ -45,8 +65,8 @@ func ToCSV(schedules []prayer.DaySchedule, filepath string) error {
 	return nil
 }
 
-// ToExcel exports prayer times to an Excel (.xlsx) file
-func ToExcel(schedules []prayer.DaySchedule, filepath string) error {
+// ToExcel exports prayer times to an Excel (.xlsx) file.
+func ToExcel(rows []MonthRow, filepath string) error {
 	f := excelize.NewFile()
 	defer f.Close()
 
@@ -69,8 +89,17 @@ func ToExcel(schedules []prayer.DaySchedule, filepath string) error {
 		Alignment: &excelize.Alignment{Horizontal: "center"},
 	})
 
-	headers := []string{"Date", "Fajr", "Sunrise", "Zuhr", "Asr", "Maghrib", "Isha"}
-	cols := []string{"A", "B", "C", "D", "E", "F", "G"}
+	headers := []string{
+		"Gregorian Date",
+		"Hijri Date",
+		"Fajr",
+		"Sunrise",
+		"Zuhr",
+		"Asr",
+		"Maghrib",
+		"Isha",
+	}
+	cols := []string{"A", "B", "C", "D", "E", "F", "G", "H"}
 
 	// Write header
 	for i, h := range headers {
@@ -81,7 +110,7 @@ func ToExcel(schedules []prayer.DaySchedule, filepath string) error {
 	}
 
 	// Write data
-	for rowIdx, s := range schedules {
+	for rowIdx, row := range rows {
 		excelRow := rowIdx + 2
 		rowStr := fmt.Sprintf("%d", excelRow)
 		style := evenStyle
@@ -90,13 +119,14 @@ func ToExcel(schedules []prayer.DaySchedule, filepath string) error {
 		}
 
 		values := []string{
-			s.Date,
-			formatTime(s.Fajr),
-			formatTime(s.Sunrise),
-			formatTime(s.Zuhr),
-			formatTime(s.Asr),
-			formatTime(s.Maghrib),
-			formatTime(s.Isha),
+			row.GregorianDate,
+			row.HijriDate,
+			formatTime(row.Fajr),
+			formatTime(row.Sunrise),
+			formatTime(row.Zuhr),
+			formatTime(row.Asr),
+			formatTime(row.Maghrib),
+			formatTime(row.Isha),
 		}
 
 		for i, v := range values {

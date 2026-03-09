@@ -43,12 +43,20 @@ export function DismissReminder(): $CancellablePromise<void> {
     return $Call.ByID(2073427023);
 }
 
-export function ExportToCSV(year: number, month: number, outputPath: string): $CancellablePromise<void> {
-    return $Call.ByID(3125859884, year, month, outputPath);
+export function ExportRangeToCSV(startDate: string, endDate: string, outputPath: string): $CancellablePromise<void> {
+    return $Call.ByID(2450987025, startDate, endDate, outputPath);
 }
 
-export function ExportToExcel(year: number, month: number, outputPath: string): $CancellablePromise<void> {
-    return $Call.ByID(3627630511, year, month, outputPath);
+export function ExportRangeToExcel(startDate: string, endDate: string, outputPath: string): $CancellablePromise<void> {
+    return $Call.ByID(486373810, startDate, endDate, outputPath);
+}
+
+export function ExportToCSV($0: number, $1: number, startDate: string, endDate: string, outputPath: string): $CancellablePromise<void> {
+    return $Call.ByID(3125859884, $0, $1, startDate, endDate, outputPath);
+}
+
+export function ExportToExcel($0: number, $1: number, startDate: string, endDate: string, outputPath: string): $CancellablePromise<void> {
+    return $Call.ByID(3627630511, $0, $1, startDate, endDate, outputPath);
 }
 
 export function GetAppInfo(): $CancellablePromise<$models.AppInfo> {
@@ -65,9 +73,15 @@ export function GetCurrentTime(): $CancellablePromise<string> {
     return $Call.ByID(160623751);
 }
 
+export function GetHijriDateRange(startDate: string, endDate: string): $CancellablePromise<hijri$0.CalendarDay[]> {
+    return $Call.ByID(709292810, startDate, endDate).then(($result: any) => {
+        return $$createType3($result);
+    });
+}
+
 export function GetHijriForDate(dateStr: string): $CancellablePromise<hijri$0.HijriDate> {
     return $Call.ByID(2391955296, dateStr).then(($result: any) => {
-        return $$createType2($result);
+        return $$createType4($result);
     });
 }
 
@@ -79,7 +93,7 @@ export function GetLocation(): $CancellablePromise<location$0.Location> {
 
 export function GetMonthHijriDates(year: number, month: number): $CancellablePromise<hijri$0.CalendarDay[]> {
     return $Call.ByID(3210272434, year, month).then(($result: any) => {
-        return $$createType4($result);
+        return $$createType3($result);
     });
 }
 
@@ -109,6 +123,12 @@ export function GetScheduleForDate(dateStr: string): $CancellablePromise<prayer$
     });
 }
 
+export function GetScheduleRange(startDate: string, endDate: string): $CancellablePromise<prayer$0.DaySchedule[]> {
+    return $Call.ByID(2289686101, startDate, endDate).then(($result: any) => {
+        return $$createType6($result);
+    });
+}
+
 export function GetSettings(): $CancellablePromise<settings$0.Settings> {
     return $Call.ByID(1855413340).then(($result: any) => {
         return $$createType8($result);
@@ -117,7 +137,7 @@ export function GetSettings(): $CancellablePromise<settings$0.Settings> {
 
 export function GetTodayHijri(): $CancellablePromise<hijri$0.HijriDate> {
     return $Call.ByID(4192043028).then(($result: any) => {
-        return $$createType2($result);
+        return $$createType4($result);
     });
 }
 
@@ -145,6 +165,10 @@ export function ResetSettings(): $CancellablePromise<settings$0.Settings> {
     });
 }
 
+export function SaveBase64File(outputPath: string, base64Data: string): $CancellablePromise<void> {
+    return $Call.ByID(2960550107, outputPath, base64Data);
+}
+
 export function SaveSettings(cfg: settings$0.Settings): $CancellablePromise<void> {
     return $Call.ByID(1563075575, cfg);
 }
@@ -164,9 +188,9 @@ export function StopAdhan(): $CancellablePromise<void> {
 // Private type creation functions
 const $$createType0 = location$0.Location.createFrom;
 const $$createType1 = $models.AppInfo.createFrom;
-const $$createType2 = hijri$0.HijriDate.createFrom;
-const $$createType3 = hijri$0.CalendarDay.createFrom;
-const $$createType4 = $Create.Array($$createType3);
+const $$createType2 = hijri$0.CalendarDay.createFrom;
+const $$createType3 = $Create.Array($$createType2);
+const $$createType4 = hijri$0.HijriDate.createFrom;
 const $$createType5 = prayer$0.DaySchedule.createFrom;
 const $$createType6 = $Create.Array($$createType5);
 const $$createType7 = prayer$0.NextPrayerInfo.createFrom;

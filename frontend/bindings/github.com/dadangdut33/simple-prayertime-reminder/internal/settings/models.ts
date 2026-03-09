@@ -368,6 +368,11 @@ export class PrayerTimesSettings {
      */
     "calendarSystem": string;
 
+    /**
+     * render Hijri numerals using Arabic-Indic digits
+     */
+    "useArabicIndicDigits": boolean;
+
     /** Creates a new PrayerTimesSettings instance. */
     constructor($$source: Partial<PrayerTimesSettings> = {}) {
         if (!("viewMode" in $$source)) {
@@ -375,6 +380,9 @@ export class PrayerTimesSettings {
         }
         if (!("calendarSystem" in $$source)) {
             this["calendarSystem"] = "";
+        }
+        if (!("useArabicIndicDigits" in $$source)) {
+            this["useArabicIndicDigits"] = false;
         }
 
         Object.assign(this, $$source);

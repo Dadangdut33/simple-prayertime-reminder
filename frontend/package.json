@@ -22,6 +22,8 @@
     "@mui/x-date-pickers": "^8.27.2",
     "@wailsio/runtime": "3.0.0-alpha.79",
     "dayjs": "^1.11.19",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.2.0",
     "lucide-react": "^0.577.0",
     "react": "^19.2.4",
     "react-clock": "^6.0.0",

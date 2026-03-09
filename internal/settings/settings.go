@@ -90,8 +90,9 @@ type DashboardSettings struct {
 
 // PrayerTimesSettings controls how the monthly prayer-times page is shown.
 type PrayerTimesSettings struct {
-	ViewMode       string `json:"viewMode"`       // "table" or "calendar"
-	CalendarSystem string `json:"calendarSystem"` // "gregorian", "hijri", or "side-by-side"
+	ViewMode             string `json:"viewMode"`             // "table" or "calendar"
+	CalendarSystem       string `json:"calendarSystem"`       // "gregorian", "hijri", or "side-by-side"
+	UseArabicIndicDigits bool   `json:"useArabicIndicDigits"` // render Hijri numerals using Arabic-Indic digits
 }
 
 // Settings is the root configuration struct
@@ -161,8 +162,9 @@ func defaultSettings() Settings {
 			ShowAllClockHours:  false,
 		},
 		PrayerTimes: PrayerTimesSettings{
-			ViewMode:       "table",
-			CalendarSystem: "gregorian",
+			ViewMode:             "table",
+			CalendarSystem:       "gregorian",
+			UseArabicIndicDigits: true,
 		},
 		Theme:           "system",
 		ThemePreset:     "indigo",

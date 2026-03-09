@@ -11,18 +11,18 @@ import (
 type CalculationMethod string
 
 const (
-	MethodMWL    CalculationMethod = "MWL"
-	MethodISNA   CalculationMethod = "ISNA"
-	MethodEgypt  CalculationMethod = "Egypt"
-	MethodMakkah CalculationMethod = "UmmAlQura"
+	MethodMWL     CalculationMethod = "MWL"
+	MethodISNA    CalculationMethod = "ISNA"
+	MethodEgypt   CalculationMethod = "Egypt"
+	MethodMakkah  CalculationMethod = "UmmAlQura"
 	MethodKarachi CalculationMethod = "Karachi"
 	MethodKemenag CalculationMethod = "Kemenag"
-	MethodJAKIM  CalculationMethod = "JAKIM"
-	MethodMUIS   CalculationMethod = "MUIS"
-	MethodTurkey CalculationMethod = "Diyanet"
-	MethodTehran CalculationMethod = "Tehran"
-	MethodJafari CalculationMethod = "Jafari"
-	MethodCustom CalculationMethod = "Custom"
+	MethodJAKIM   CalculationMethod = "JAKIM"
+	MethodMUIS    CalculationMethod = "MUIS"
+	MethodTurkey  CalculationMethod = "Diyanet"
+	MethodTehran  CalculationMethod = "Tehran"
+	MethodJafari  CalculationMethod = "Jafari"
+	MethodCustom  CalculationMethod = "Custom"
 )
 
 // AsrMethod represents Asr calculation convention
@@ -264,5 +264,27 @@ func (svc *Service) GetMonthSchedule(year, month int) ([]DaySchedule, error) {
 	for i := startIdx; i <= endIdx; i++ {
 		result = append(result, toDay(schedules[i]))
 	}
+	return result, nil
+}
+
+// GetScheduleRange returns prayer schedules for an inclusive date range.
+func (svc *Service) GetScheduleRange(startDate, endDate time.Time) ([]DaySchedule, error) {
+	if endDate.Before(startDate) {
+		return nil, fmt.Errorf("end date must be on or after start date")
+	}
+
+	start := time.Date(startDate.Year(), startDate.Month(), startDate.Day(), 0, 0, 0, 0, time.UTC)
+	end := time.Date(endDate.Year(), endDate.Month(), endDate.Day(), 0, 0, 0, 0, time.UTC)
+
+	result := make([]DaySchedule, 0, int(end.Sub(start).Hours()/24)+1)
+	for current := start; !current.After(end); current = current.AddDate(0, 0, 1) {
+		schedule, err := svc.GetScheduleForDate(current)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, schedule)
+	}
+
 	return result, nil
 }

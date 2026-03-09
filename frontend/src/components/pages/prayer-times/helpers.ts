@@ -1,6 +1,8 @@
 import dayjs, { type Dayjs } from 'dayjs';
 import type { DaySchedule, HijriCalendarDay, HijriDate } from '../../../types';
 
+export type CalendarMode = 'gregorian' | 'hijri';
+
 const HIJRI_MONTHS = [
   '',
   'Muharram',
@@ -103,10 +105,74 @@ export function formatMonthHeading(date: Dayjs): string {
   return date.format('MMMM YYYY');
 }
 
+export function formatExportRangeLabel(startDate: Dayjs, endDate: Dayjs): string {
+  if (startDate.isSame(endDate, 'day')) {
+    return startDate.format('D MMM YYYY');
+  }
+
+  if (startDate.isSame(endDate, 'month')) {
+    return `${startDate.format('D')} - ${endDate.format('D MMM YYYY')}`;
+  }
+
+  if (startDate.isSame(endDate, 'year')) {
+    return `${startDate.format('D MMM')} - ${endDate.format('D MMM YYYY')}`;
+  }
+
+  return `${startDate.format('D MMM YYYY')} - ${endDate.format('D MMM YYYY')}`;
+}
+
+export function getWeekdayHeaders(): string[] {
+  return ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+}
+
+export function getMonthCalendarDays(month: Dayjs): Dayjs[] {
+  const start = month.startOf('month').startOf('week');
+
+  return Array.from({ length: 42 }, (_, index) => start.add(index, 'day'));
+}
+
 export function formatLongGregorianDate(date: Dayjs): string {
   return date.format('dddd, D MMMM YYYY');
 }
 
 export function toIsoDate(date: Dayjs): string {
   return dayjs(date).format('YYYY-MM-DD');
+}
+
+export interface CalendarDayPresentation {
+  primaryLabel: string;
+  primaryContext: string;
+  secondaryLabel: string;
+  secondaryContext: string;
+}
+
+export function getCalendarDayPresentation(
+  mode: CalendarMode,
+  date: Dayjs,
+  hijriDate: HijriDate | undefined,
+  useArabicIndicDigits: boolean,
+): CalendarDayPresentation {
+  const gregorianDay = String(date.date());
+  const gregorianMonth = date.format('MMM');
+  const hijriDay = hijriDate
+    ? formatHijriDayNumber(hijriDate.day, useArabicIndicDigits)
+    : '';
+
+  if (mode === 'hijri') {
+    return {
+      primaryLabel: hijriDay,
+      primaryContext: hijriDate ? getHijriMonthName(hijriDate.month) : '',
+      secondaryLabel: gregorianDay,
+      secondaryContext: gregorianMonth,
+    };
+  }
+
+  return {
+    primaryLabel: gregorianDay,
+    primaryContext: '',
+    secondaryLabel: hijriDay,
+    secondaryContext: hijriDate
+      ? getHijriMonthName(hijriDate.month).replace('al-', '')
+      : '',
+  };
 }

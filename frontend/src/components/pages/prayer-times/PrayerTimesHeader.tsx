@@ -3,7 +3,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 interface PrayerTimesHeaderProps {
-  onExport: (format: 'csv' | 'excel') => void;
+  onExport: () => void;
 }
 
 export default function PrayerTimesHeader({ onExport }: PrayerTimesHeaderProps) {
@@ -40,11 +40,13 @@ export default function PrayerTimesHeader({ onExport }: PrayerTimesHeaderProps) 
       </Box>
 
       <Box display="flex" gap={1}>
-        <Button variant="outlined" size="small" startIcon={<DownloadIcon />} onClick={() => onExport('csv')}>
-          CSV
-        </Button>
-        <Button variant="outlined" size="small" startIcon={<DownloadIcon />} onClick={() => onExport('excel')}>
-          Excel
+        <Button
+          variant="outlined"
+          size="small"
+          startIcon={<DownloadIcon />}
+          onClick={onExport}
+        >
+          Export
         </Button>
       </Box>
     </Box>
