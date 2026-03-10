@@ -150,6 +150,7 @@ export interface Settings {
   language: string;
   autoStart: boolean;
   autoCheckUpdates: boolean;
+  trayLeftClick: 'toggle-window' | 'open-menu' | 'none';
   hijriDateOffset: number;
   timeFormat: '12h' | '24h';
 }

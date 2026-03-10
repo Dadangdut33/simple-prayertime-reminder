@@ -105,7 +105,12 @@ func main() {
 	_ = mainWindow
 
 	// System tray
-	setupTray(app, appSvc, mainWindow)
+	trayState := setupTray(app, appSvc, mainWindow)
+	appservice.SetSettingsChangedHandler(appSvc, func(cfg settings.Settings) {
+		if trayState != nil {
+			trayState.updateLeftClickAction(cfg.TrayLeftClick)
+		}
+	})
 
 	// Start scheduler
 	schedulerSvc2.Start(cfg)

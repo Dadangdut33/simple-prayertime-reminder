@@ -421,6 +421,11 @@ export class Settings {
     "autoCheckUpdates": boolean;
 
     /**
+     * "toggle-window", "open-menu", or "none"
+     */
+    "trayLeftClick": string;
+
+    /**
      * -2 to +2 days
      */
     "hijriDateOffset": number;
@@ -461,6 +466,9 @@ export class Settings {
         }
         if (!("autoCheckUpdates" in $$source)) {
             this["autoCheckUpdates"] = false;
+        }
+        if (!("trayLeftClick" in $$source)) {
+            this["trayLeftClick"] = "";
         }
         if (!("hijriDateOffset" in $$source)) {
             this["hijriDateOffset"] = 0;

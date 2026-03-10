@@ -3,6 +3,9 @@ package main
 import (
 	"fmt"
 	"runtime"
+	"strings"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/appservice"
@@ -13,15 +16,26 @@ import (
 
 const trayRefreshInterval = 15 * time.Minute
 
+const (
+	trayLeftClickToggleWindow = "toggle-window"
+	trayLeftClickOpenMenu     = "open-menu"
+	trayLeftClickNone         = "none"
+)
+
 type trayMenuState struct {
 	identityItem *application.MenuItem
 	titleItem    *application.MenuItem
 	dateItem     *application.MenuItem
 	prayerNames  []string
 	prayerItems  []*application.MenuItem
+
+	leftClickMu     sync.RWMutex
+	leftClickAction string
+	skipNextClick   atomic.Bool
+	forceMenuOnce   atomic.Bool
 }
 
-func setupTray(app *application.App, appSvc *appservice.Service, mainWindow application.Window) {
+func setupTray(app *application.App, appSvc *appservice.Service, mainWindow application.Window) *trayMenuState {
 	tray := app.SystemTray.New()
 	trayLabel := buildTrayIdentityLabel(appSvc)
 
@@ -33,18 +47,41 @@ func setupTray(app *application.App, appSvc *appservice.Service, mainWindow appl
 
 	tray.SetTooltip(trayLabel)
 	tray.SetIcon(appIcon)
-	tray.SetMenu(buildTrayMenu(app, appSvc, mainWindow, trayLabel))
-	tray.OnClick(func() {
-		if mainWindow.IsVisible() {
-			mainWindow.Hide()
-		} else {
-			mainWindow.Show()
-			mainWindow.Focus()
-		}
-	})
+	state, menu := buildTrayMenu(app, appSvc, mainWindow, trayLabel)
+	tray.SetMenu(menu)
+	state.forceMenuOnce.Store(true)
 	tray.OnRightClick(func() {
+		state.skipNextClick.Store(true)
 		tray.OpenMenu()
 	})
+	tray.OnClick(func() {
+		if state.skipNextClick.Swap(false) {
+			return
+		}
+		if state.forceMenuOnce.Swap(false) {
+			state.tryOpenMenu(tray)
+			return
+		}
+		if state.leftClickMode() == trayLeftClickNone {
+			return
+		}
+
+		if state.leftClickMode() == trayLeftClickOpenMenu {
+			state.tryOpenMenu(tray)
+			return
+		}
+
+		if mainWindow.IsVisible() {
+			mainWindow.Hide()
+			return
+		}
+
+		mainWindow.Show()
+		mainWindow.Focus()
+	})
+
+	state.updateLeftClickAction(getTrayLeftClickAction(appSvc))
+	return state
 }
 
 func buildTrayMenu(
@@ -52,7 +89,7 @@ func buildTrayMenu(
 	appSvc *appservice.Service,
 	mainWindow application.Window,
 	trayLabel string,
-) *application.Menu {
+) (*trayMenuState, *application.Menu) {
 	menu := app.Menu.New()
 	state := &trayMenuState{
 		identityItem: menu.Add(trayLabel).SetEnabled(false).SetBitmap(appIcon),
@@ -81,7 +118,7 @@ func buildTrayMenu(
 	state.refresh(appSvc)
 	startTrayRefreshLoop(app, appSvc, state)
 
-	return menu
+	return state, menu
 }
 
 func startTrayRefreshLoop(app *application.App, appSvc *appservice.Service, state *trayMenuState) {
@@ -108,6 +145,7 @@ func startTrayRefreshLoop(app *application.App, appSvc *appservice.Service, stat
 
 func (s *trayMenuState) refresh(appSvc *appservice.Service) {
 	s.identityItem.SetLabel(buildTrayIdentityLabel(appSvc))
+	s.updateLeftClickAction(getTrayLeftClickAction(appSvc))
 
 	schedule, err := appSvc.GetTodaySchedule()
 	if err != nil {
@@ -153,6 +191,49 @@ func buildTrayIdentityLabel(appSvc *appservice.Service) string {
 	}
 
 	return fmt.Sprintf("%s %s", appName, info.Version)
+}
+
+func getTrayLeftClickAction(appSvc *appservice.Service) string {
+	cfg, err := appSvc.GetSettings()
+	if err != nil {
+		return trayLeftClickToggleWindow
+	}
+
+	return normalizeTrayLeftClick(cfg.TrayLeftClick)
+}
+
+func normalizeTrayLeftClick(value string) string {
+	switch strings.TrimSpace(strings.ToLower(value)) {
+	case "open-menu":
+		return trayLeftClickOpenMenu
+	case trayLeftClickNone:
+		return trayLeftClickNone
+	default:
+		return trayLeftClickToggleWindow
+	}
+}
+
+func (s *trayMenuState) updateLeftClickAction(value string) {
+	action := normalizeTrayLeftClick(value)
+	s.leftClickMu.Lock()
+	s.leftClickAction = action
+	s.leftClickMu.Unlock()
+}
+
+func (s *trayMenuState) leftClickMode() string {
+	s.leftClickMu.RLock()
+	defer s.leftClickMu.RUnlock()
+	if s.leftClickAction == "" {
+		return trayLeftClickToggleWindow
+	}
+	return s.leftClickAction
+}
+
+func (s *trayMenuState) tryOpenMenu(tray *application.SystemTray) {
+	if runtime.GOOS == "linux" {
+		return
+	}
+	tray.OpenMenu()
 }
 
 func formatTrayScheduleDate(schedule prayer.DaySchedule) string {

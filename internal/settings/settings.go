@@ -107,6 +107,7 @@ type Settings struct {
 	Language         string               `json:"language"` // "en", "id", etc
 	AutoStart        bool                 `json:"autoStart"`
 	AutoCheckUpdates bool                 `json:"autoCheckUpdates"`
+	TrayLeftClick    string               `json:"trayLeftClick"`   // "toggle-window", "open-menu", or "none"
 	HijriDateOffset  int                  `json:"hijriDateOffset"` // -2 to +2 days
 	TimeFormat       string               `json:"timeFormat"`      // "12h" or "24h"
 }
@@ -172,6 +173,7 @@ func DefaultSettings() Settings {
 		Language:         "en",
 		AutoStart:        false,
 		AutoCheckUpdates: true,
+		TrayLeftClick:    "toggle-window",
 		HijriDateOffset:  0,
 		TimeFormat:       "24h",
 	}

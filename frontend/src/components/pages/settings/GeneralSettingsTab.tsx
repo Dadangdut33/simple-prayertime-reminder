@@ -1,5 +1,6 @@
 import { Box, FormControlLabel, MenuItem, Select, Slider, Stack, Switch, TextField, Typography } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import AppsIcon from '@mui/icons-material/Apps';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined';
 import { DIGITAL_CLOCK_FORMAT_PRESETS, THEME_PRESETS, type Settings } from '../../../types';
@@ -266,7 +267,7 @@ export default function GeneralSettingsTab({
             <Box>
               <Typography variant="subtitle1">Appearance</Typography>
               <Typography variant="body2" color="text.secondary">
-                Control theme mode, prayer-time display format, and your preferred preset colors.
+                Control the appearance of the app
               </Typography>
             </Box>
           </Box>
@@ -362,140 +363,6 @@ export default function GeneralSettingsTab({
               })}
             </Box>
           </Box>
-
-          <Box
-            mt={3}
-            p={2.5}
-            borderRadius={0.5}
-            border="1px solid"
-            borderColor="divider"
-            bgcolor="background.paper"
-          >
-            <Typography variant="subtitle2" mb={0.75}>
-              Prayer Times Page
-            </Typography>
-            <Typography variant="body2" color="text.secondary" mb={2.5}>
-              Choose whether the monthly schedule opens as a table or as a calendar, and which calendar system to use
-              by default.
-            </Typography>
-
-            <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={3}>
-              <Box>
-                <Typography variant="caption" color="text.secondary" mb={1} display="block">
-                  Default Layout
-                </Typography>
-                <Select
-                  size="small"
-                  fullWidth
-                  value={local.prayerTimes.viewMode}
-                  onChange={(event) =>
-                    setLocal({
-                      ...local,
-                      prayerTimes: {
-                        ...local.prayerTimes,
-                        viewMode: event.target.value as 'table' | 'calendar',
-                      },
-                    })
-                  }
-                >
-                  <MenuItem value="table">Table</MenuItem>
-                  <MenuItem value="calendar">Calendar</MenuItem>
-                </Select>
-              </Box>
-
-              {local.prayerTimes.viewMode === 'calendar' && (
-                <Box>
-                  <Typography variant="caption" color="text.secondary" mb={1} display="block">
-                    Default Calendar System
-                  </Typography>
-                  <Select
-                    size="small"
-                    fullWidth
-                    value={local.prayerTimes.calendarSystem}
-                    onChange={(event) =>
-                      setLocal({
-                        ...local,
-                        prayerTimes: {
-                          ...local.prayerTimes,
-                          calendarSystem: event.target.value as 'gregorian' | 'hijri' | 'side-by-side',
-                        },
-                      })
-                    }
-                  >
-                    <MenuItem value="gregorian">Gregorian</MenuItem>
-                    <MenuItem value="hijri">Hijri</MenuItem>
-                    <MenuItem value="side-by-side">Side by side</MenuItem>
-                  </Select>
-                </Box>
-              )}
-            </Box>
-          </Box>
-
-          <Box
-            mt={3}
-            p={2.5}
-            borderRadius={0.5}
-            border="1px solid"
-            borderColor="divider"
-            bgcolor="background.paper"
-          >
-            <Typography variant="subtitle2" mb={0.75}>
-              Startup
-            </Typography>
-            <Typography variant="body2" color="text.secondary" mb={2}>
-              Launch the app automatically when you sign in. Autostart launches the app in background mode so it stays
-              in the tray instead of opening the main window immediately.
-            </Typography>
-
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={local.autoStart}
-                  onChange={(event) =>
-                    setLocal({
-                      ...local,
-                      autoStart: event.target.checked,
-                    })
-                  }
-                />
-              }
-              label="Launch in background on startup"
-              sx={{ m: 0 }}
-            />
-          </Box>
-
-          <Box
-            mt={3}
-            p={2.5}
-            borderRadius={0.5}
-            border="1px solid"
-            borderColor="divider"
-            bgcolor="background.paper"
-          >
-            <Typography variant="subtitle2" mb={0.75}>
-              Updates
-            </Typography>
-            <Typography variant="body2" color="text.secondary" mb={2}>
-              Automatically check for a newer version whenever the app starts. If one is available, the app will show
-              a notice with update instructions based on how this copy was installed.
-            </Typography>
-
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={local.autoCheckUpdates}
-                  onChange={(event) =>
-                    setLocal({
-                      ...local,
-                      autoCheckUpdates: event.target.checked,
-                    })
-                  }
-                />
-              }
-              label="Check for updates on startup"
-              sx={{ m: 0 }}
-            />
-          </Box>
         </Box>
 
         <Box
@@ -562,6 +429,115 @@ export default function GeneralSettingsTab({
             <Typography variant="body2" color="text.secondary" mt={2}>
               Leave this at zero unless you intentionally need the Hijri date shown by the app to be shifted.
             </Typography>
+          </Box>
+        </Box>
+      </Box>
+      <Box p={3} border="1px solid" borderColor="divider" borderRadius={0.5}>
+        <Box display="flex" gap={1.5} alignItems="flex-start" mb={3}>
+          <Box
+            sx={{
+              width: 40,
+              height: 40,
+              borderRadius: 0.5,
+              display: 'grid',
+              placeItems: 'center',
+              background: (theme) =>
+                `linear-gradient(135deg, ${theme.palette.secondary.main}18, ${theme.palette.primary.main}12)`,
+              color: 'secondary.main',
+              flexShrink: 0,
+            }}
+          >
+            <AppsIcon fontSize="small" />
+          </Box>
+          <Box>
+            <Typography variant="subtitle1">Application Settings</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Control how the app behave
+            </Typography>
+          </Box>
+        </Box>
+
+        <Box display={'grid'} gridTemplateColumns={{ xs: '1fr', xl: '1fr 1fr' }} gap={3}>
+          <Box mt={3} p={2.5} borderRadius={0.5} border="1px solid" borderColor="divider" bgcolor="background.paper">
+            <Typography variant="subtitle2" mb={0.75}>
+              Startup
+            </Typography>
+            <Typography variant="body2" color="text.secondary" mb={2}>
+              Launch the app automatically when you sign in. Autostart launches the app in background mode so it stays
+              in the tray instead of opening the main window immediately.
+            </Typography>
+
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={local.autoStart}
+                  onChange={(event) =>
+                    setLocal({
+                      ...local,
+                      autoStart: event.target.checked,
+                    })
+                  }
+                />
+              }
+              label="Launch in background on startup"
+              sx={{ m: 0 }}
+            />
+          </Box>
+
+          <Box mt={3} p={2.5} borderRadius={0.5} border="1px solid" borderColor="divider" bgcolor="background.paper">
+            <Typography variant="subtitle2" mb={0.75}>
+              Tray
+            </Typography>
+            <Typography variant="body2" color="text.secondary" mb={2}>
+              Choose what left click does when you click the tray icon.
+            </Typography>
+
+            <Box maxWidth={320}>
+              <Typography variant="caption" color="text.secondary" mb={1} display="block">
+                Left Click Action
+              </Typography>
+              <Select
+                size="small"
+                fullWidth
+                value={local.trayLeftClick}
+                onChange={(event) =>
+                  setLocal({
+                    ...local,
+                    trayLeftClick: event.target.value as Settings['trayLeftClick'],
+                  })
+                }
+              >
+                <MenuItem value="toggle-window">Toggle window</MenuItem>
+                <MenuItem value="open-menu">Open menu</MenuItem>
+                <MenuItem value="none">Do nothing</MenuItem>
+              </Select>
+            </Box>
+          </Box>
+
+          <Box mt={3} p={2.5} borderRadius={0.5} border="1px solid" borderColor="divider" bgcolor="background.paper">
+            <Typography variant="subtitle2" mb={0.75}>
+              Updates
+            </Typography>
+            <Typography variant="body2" color="text.secondary" mb={2}>
+              Automatically check for a newer version whenever the app starts. If one is available, the app will show a
+              notice with update instructions based on how this copy was installed.
+            </Typography>
+
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={local.autoCheckUpdates}
+                  onChange={(event) =>
+                    setLocal({
+                      ...local,
+                      autoCheckUpdates: event.target.checked,
+                    })
+                  }
+                />
+              }
+              label="Check for updates on startup"
+              sx={{ m: 0 }}
+            />
           </Box>
         </Box>
       </Box>

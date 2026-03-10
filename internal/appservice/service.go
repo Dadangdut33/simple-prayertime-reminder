@@ -26,6 +26,7 @@ type Service struct {
 	audioSvc     *audio.Service
 	notifSvc     *notification.Service
 	schedulerSvc *scheduler.Service
+	onSettings   func(settings.Settings)
 }
 
 func New(
@@ -45,6 +46,15 @@ func New(
 func (s *Service) SetRuntimeServices(notifSvc *notification.Service, schedulerSvc *scheduler.Service) {
 	s.notifSvc = notifSvc
 	s.schedulerSvc = schedulerSvc
+}
+
+// SetSettingsChangedHandler registers a callback for settings updates.
+// This is used by runtime-only components like the system tray.
+func SetSettingsChangedHandler(s *Service, handler func(settings.Settings)) {
+	if s == nil {
+		return
+	}
+	s.onSettings = handler
 }
 
 func BuildPrayerConfig(cfg settings.Settings) prayer.PrayerConfig {
@@ -106,6 +116,10 @@ func (s *Service) SaveSettings(cfg settings.Settings) error {
 		s.schedulerSvc.Start(cfg)
 	}
 
+	if s.onSettings != nil {
+		s.onSettings(cfg)
+	}
+
 	return nil
 }
 
@@ -132,6 +146,10 @@ func (s *Service) ResetSettings() (settings.Settings, error) {
 	if s.schedulerSvc != nil {
 		s.schedulerSvc.Stop()
 		s.schedulerSvc.Start(cfg)
+	}
+
+	if s.onSettings != nil {
+		s.onSettings(cfg)
 	}
 
 	return cfg, nil
