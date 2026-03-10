@@ -29,7 +29,7 @@ This project was previously Electron-based. It now uses a Go backend with a Reac
 - Qibla direction
 - Monthly prayer timetable export to CSV and Excel
 - System tray integration and reminder window
-- Built-in Quran page with simple bookmarks
+- Embedded Quran page (quran.com) with simple note system
 
 ## Showcase
 

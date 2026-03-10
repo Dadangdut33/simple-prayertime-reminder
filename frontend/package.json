@@ -20,6 +20,7 @@
     "@mui/icons-material": "^7.3.9",
     "@mui/material": "^7.3.9",
     "@mui/x-date-pickers": "^8.27.2",
+    "@uiw/react-md-editor": "^4.0.11",
     "@wailsio/runtime": "3.0.0-alpha.79",
     "dayjs": "^1.11.19",
     "html2canvas": "^1.4.1",

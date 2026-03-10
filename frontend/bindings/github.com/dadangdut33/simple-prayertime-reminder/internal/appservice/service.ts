@@ -132,6 +132,12 @@ export function GetQiblaDirectionFor(lat: number, lon: number): $CancellableProm
     return $Call.ByID(4286043432, lat, lon);
 }
 
+export function GetQuranData(): $CancellablePromise<$models.QuranData> {
+    return $Call.ByID(2354148668).then(($result: any) => {
+        return $$createType10($result);
+    });
+}
+
 export function GetScheduleForDate(dateStr: string): $CancellablePromise<prayer$0.DaySchedule> {
     return $Call.ByID(2969710027, dateStr).then(($result: any) => {
         return $$createType7($result);
@@ -146,13 +152,13 @@ export function GetScheduleRange(startDate: string, endDate: string): $Cancellab
 
 export function GetSettings(): $CancellablePromise<settings$0.Settings> {
     return $Call.ByID(1855413340).then(($result: any) => {
-        return $$createType10($result);
+        return $$createType11($result);
     });
 }
 
 export function GetTimezones(): $CancellablePromise<string[]> {
     return $Call.ByID(3432876695).then(($result: any) => {
-        return $$createType11($result);
+        return $$createType12($result);
     });
 }
 
@@ -170,7 +176,7 @@ export function GetTodaySchedule(): $CancellablePromise<prayer$0.DaySchedule> {
 
 export function GetWorldPrayerTimes(cities: settings$0.WorldPrayerCity[]): $CancellablePromise<$models.WorldPrayerCitySummary[]> {
     return $Call.ByID(4281561666, cities).then(($result: any) => {
-        return $$createType13($result);
+        return $$createType14($result);
     });
 }
 
@@ -186,14 +192,22 @@ export function PlayAdhan(isFajr: boolean): $CancellablePromise<void> {
     return $Call.ByID(40014119, isFajr);
 }
 
+export function ReadTextFile(path: string): $CancellablePromise<string> {
+    return $Call.ByID(1179436650, path);
+}
+
 export function ResetSettings(): $CancellablePromise<settings$0.Settings> {
     return $Call.ByID(1081576467).then(($result: any) => {
-        return $$createType10($result);
+        return $$createType11($result);
     });
 }
 
 export function SaveBase64File(outputPath: string, base64Data: string): $CancellablePromise<void> {
     return $Call.ByID(2960550107, outputPath, base64Data);
+}
+
+export function SaveQuranData(payload: $models.QuranData): $CancellablePromise<void> {
+    return $Call.ByID(4069193973, payload);
 }
 
 export function SaveSettings(cfg: settings$0.Settings): $CancellablePromise<void> {
@@ -202,13 +216,13 @@ export function SaveSettings(cfg: settings$0.Settings): $CancellablePromise<void
 
 export function SearchCities(query: string, limit: number): $CancellablePromise<geonames$0.City[]> {
     return $Call.ByID(2775474700, query, limit).then(($result: any) => {
-        return $$createType15($result);
+        return $$createType16($result);
     });
 }
 
 export function SearchTimezones(query: string, limit: number): $CancellablePromise<string[]> {
     return $Call.ByID(3774805361, query, limit).then(($result: any) => {
-        return $$createType11($result);
+        return $$createType12($result);
     });
 }
 
@@ -241,9 +255,10 @@ const $$createType6 = hijri$0.HijriDate.createFrom;
 const $$createType7 = prayer$0.DaySchedule.createFrom;
 const $$createType8 = $Create.Array($$createType7);
 const $$createType9 = prayer$0.NextPrayerInfo.createFrom;
-const $$createType10 = settings$0.Settings.createFrom;
-const $$createType11 = $Create.Array($Create.Any);
-const $$createType12 = $models.WorldPrayerCitySummary.createFrom;
-const $$createType13 = $Create.Array($$createType12);
-const $$createType14 = geonames$0.City.createFrom;
-const $$createType15 = $Create.Array($$createType14);
+const $$createType10 = $models.QuranData.createFrom;
+const $$createType11 = settings$0.Settings.createFrom;
+const $$createType12 = $Create.Array($Create.Any);
+const $$createType13 = $models.WorldPrayerCitySummary.createFrom;
+const $$createType14 = $Create.Array($$createType13);
+const $$createType15 = geonames$0.City.createFrom;
+const $$createType16 = $Create.Array($$createType15);

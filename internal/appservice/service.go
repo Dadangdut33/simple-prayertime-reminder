@@ -35,6 +35,7 @@ type Service struct {
 	onSettings          func(settings.Settings)
 	worldPrayerMu       sync.Mutex
 	worldPrayerServices map[string]*prayer.Service
+	quranMu             sync.Mutex
 }
 
 func New(

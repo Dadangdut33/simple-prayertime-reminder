@@ -59,6 +59,28 @@ export interface UpdateInfo {
   updateCommand: string;
 }
 
+// ---- Quran ----
+export interface QuranBookmark {
+  id: string;
+  url: string;
+  note: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface QuranNote {
+  id: string;
+  title: string;
+  body: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface QuranData {
+  bookmarks: QuranBookmark[];
+  notes: QuranNote[];
+}
+
 // ---- Settings ----
 export type NotificationStyle = 'native' | 'window';
 export type AdhanSelection = 'normal' | 'fajr';

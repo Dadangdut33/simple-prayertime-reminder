@@ -9,6 +9,7 @@ import type {
   Location,
   NextPrayerInfo,
   Settings,
+  QuranData,
   WorldPrayerCitySummary,
   UpdateInfo,
 } from '../types';
@@ -142,3 +143,9 @@ export const openConfigLocation = (): Promise<void> =>
   AppService.OpenConfigLocation() as any;
 export const openURL = (url: string): Promise<void> =>
   AppService.OpenURL(url) as any;
+export const getQuranData = (): Promise<QuranData> =>
+  AppService.GetQuranData() as any;
+export const saveQuranData = (data: QuranData): Promise<void> =>
+  AppService.SaveQuranData(data as any) as any;
+export const readTextFile = (path: string): Promise<string> =>
+  AppService.ReadTextFile(path) as any;

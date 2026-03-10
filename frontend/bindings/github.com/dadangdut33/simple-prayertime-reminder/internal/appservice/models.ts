@@ -60,6 +60,113 @@ export class AppInfo {
     }
 }
 
+export class QuranBookmark {
+    "id": string;
+    "url": string;
+    "note": string;
+    "createdAt": string;
+    "updatedAt": string;
+
+    /** Creates a new QuranBookmark instance. */
+    constructor($$source: Partial<QuranBookmark> = {}) {
+        if (!("id" in $$source)) {
+            this["id"] = "";
+        }
+        if (!("url" in $$source)) {
+            this["url"] = "";
+        }
+        if (!("note" in $$source)) {
+            this["note"] = "";
+        }
+        if (!("createdAt" in $$source)) {
+            this["createdAt"] = "";
+        }
+        if (!("updatedAt" in $$source)) {
+            this["updatedAt"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new QuranBookmark instance from a string or object.
+     */
+    static createFrom($$source: any = {}): QuranBookmark {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new QuranBookmark($$parsedSource as Partial<QuranBookmark>);
+    }
+}
+
+export class QuranData {
+    "bookmarks": QuranBookmark[];
+    "notes": QuranNote[];
+
+    /** Creates a new QuranData instance. */
+    constructor($$source: Partial<QuranData> = {}) {
+        if (!("bookmarks" in $$source)) {
+            this["bookmarks"] = [];
+        }
+        if (!("notes" in $$source)) {
+            this["notes"] = [];
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new QuranData instance from a string or object.
+     */
+    static createFrom($$source: any = {}): QuranData {
+        const $$createField0_0 = $$createType1;
+        const $$createField1_0 = $$createType3;
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        if ("bookmarks" in $$parsedSource) {
+            $$parsedSource["bookmarks"] = $$createField0_0($$parsedSource["bookmarks"]);
+        }
+        if ("notes" in $$parsedSource) {
+            $$parsedSource["notes"] = $$createField1_0($$parsedSource["notes"]);
+        }
+        return new QuranData($$parsedSource as Partial<QuranData>);
+    }
+}
+
+export class QuranNote {
+    "id": string;
+    "title": string;
+    "body": string;
+    "createdAt": string;
+    "updatedAt": string;
+
+    /** Creates a new QuranNote instance. */
+    constructor($$source: Partial<QuranNote> = {}) {
+        if (!("id" in $$source)) {
+            this["id"] = "";
+        }
+        if (!("title" in $$source)) {
+            this["title"] = "";
+        }
+        if (!("body" in $$source)) {
+            this["body"] = "";
+        }
+        if (!("createdAt" in $$source)) {
+            this["createdAt"] = "";
+        }
+        if (!("updatedAt" in $$source)) {
+            this["updatedAt"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new QuranNote instance from a string or object.
+     */
+    static createFrom($$source: any = {}): QuranNote {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new QuranNote($$parsedSource as Partial<QuranNote>);
+    }
+}
+
 export class UpdateInfo {
     "currentVersion": string;
     "latestVersion": string;
@@ -145,9 +252,9 @@ export class WorldPrayerCitySummary {
      * Creates a new WorldPrayerCitySummary instance from a string or object.
      */
     static createFrom($$source: any = {}): WorldPrayerCitySummary {
-        const $$createField0_0 = $$createType0;
-        const $$createField3_0 = $$createType1;
-        const $$createField4_0 = $$createType2;
+        const $$createField0_0 = $$createType4;
+        const $$createField3_0 = $$createType5;
+        const $$createField4_0 = $$createType6;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("city" in $$parsedSource) {
             $$parsedSource["city"] = $$createField0_0($$parsedSource["city"]);
@@ -163,6 +270,10 @@ export class WorldPrayerCitySummary {
 }
 
 // Private type creation functions
-const $$createType0 = settings$0.WorldPrayerCity.createFrom;
-const $$createType1 = prayer$0.NextPrayerInfo.createFrom;
-const $$createType2 = prayer$0.DaySchedule.createFrom;
+const $$createType0 = QuranBookmark.createFrom;
+const $$createType1 = $Create.Array($$createType0);
+const $$createType2 = QuranNote.createFrom;
+const $$createType3 = $Create.Array($$createType2);
+const $$createType4 = settings$0.WorldPrayerCity.createFrom;
+const $$createType5 = prayer$0.NextPrayerInfo.createFrom;
+const $$createType6 = prayer$0.DaySchedule.createFrom;
