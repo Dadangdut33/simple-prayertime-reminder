@@ -1,13 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type DragEvent } from 'react';
 import {
   Box,
   Button,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   Paper,
+  Skeleton,
   Typography,
 } from '@mui/material';
 import * as api from '../bindings';
@@ -36,9 +36,7 @@ function sortSummaries(
   const result = [...summaries];
   switch (sortBy) {
     case 'manual':
-      result.sort(
-        (a, b) => (orderMap.get(getCityKey(a.city)) ?? 0) - (orderMap.get(getCityKey(b.city)) ?? 0),
-      );
+      result.sort((a, b) => (orderMap.get(getCityKey(a.city)) ?? 0) - (orderMap.get(getCityKey(b.city)) ?? 0));
       return result;
     case 'offset':
       result.sort((a, b) => a.offsetSeconds - b.offsetSeconds);
@@ -79,11 +77,15 @@ export default function WorldPrayerTimes() {
   const [cities, setCities] = useState<WorldPrayerCity[]>([]);
   const [sortBy, setSortBy] = useState<WorldPrayerSort>(DEFAULT_SORT);
   const [summaries, setSummaries] = useState<WorldPrayerCitySummary[]>([]);
+  const [cachedSummaries, setCachedSummaries] = useState<WorldPrayerCitySummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [pendingRemoval, setPendingRemoval] = useState<WorldPrayerCity | null>(null);
   const [now, setNow] = useState(() => new Date());
+  const [draggingKey, setDraggingKey] = useState<string | null>(null);
+  const [dragOverKey, setDragOverKey] = useState<string | null>(null);
   const skipNextPreferenceSave = useRef(false);
+  const settingsReady = Boolean(settings);
 
   const savedPreferencesKey = useMemo(() => (settings ? JSON.stringify(settings.worldPrayer ?? {}) : ''), [settings]);
   const localPreferencesKey = useMemo(
@@ -106,7 +108,7 @@ export default function WorldPrayerTimes() {
   );
 
   useEffect(() => {
-    if (!settings) {
+    if (!settingsReady) {
       return;
     }
 
@@ -149,16 +151,28 @@ export default function WorldPrayerTimes() {
   useEffect(() => {
     const interval = window.setInterval(() => {
       setNow(new Date());
-    }, 1000);
+    }, 30_000);
     return () => window.clearInterval(interval);
   }, []);
+
+  const fetchKey = useMemo(() => cities.map(getCityKey).sort().join('|'), [cities]);
+  const fetchCities = useMemo(() => {
+    const map = new Map<string, WorldPrayerCity>();
+    for (const city of cities) {
+      map.set(getCityKey(city), city);
+    }
+    return Array.from(map.keys())
+      .sort()
+      .map((key) => map.get(key)!)
+      .filter(Boolean);
+  }, [fetchKey]);
 
   useEffect(() => {
     if (!settings) {
       return;
     }
 
-    if (cities.length === 0) {
+    if (fetchCities.length === 0) {
       setSummaries([]);
       setLoading(false);
       return;
@@ -166,16 +180,18 @@ export default function WorldPrayerTimes() {
 
     let active = true;
     let initial = true;
+    const hasData = summaries.length > 0;
     const fetchData = async () => {
-      if (active && initial) setLoading(true);
+      const showLoading = active && initial && !hasData;
+      if (showLoading) setLoading(true);
       try {
-        const data = await api.getWorldPrayerTimes(cities);
+        const data = await api.getWorldPrayerTimes(fetchCities);
         if (active) setSummaries(data);
       } catch (error) {
         console.error(error);
-        if (active) setSummaries([]);
+        // Keep existing data to avoid jarring flashes.
       } finally {
-        if (active && initial) setLoading(false);
+        if (showLoading && active) setLoading(false);
         initial = false;
       }
     };
@@ -187,12 +203,23 @@ export default function WorldPrayerTimes() {
       active = false;
       window.clearInterval(interval);
     };
-  }, [cities, prayerConfigKey, settings]);
+  }, [fetchCities, prayerConfigKey, settingsReady]);
+
+  useEffect(() => {
+    if (summaries.length > 0) {
+      setCachedSummaries(summaries);
+    }
+  }, [summaries]);
+
+  const effectiveSummaries = useMemo(() => {
+    if (cities.length === 0) return [];
+    return summaries.length > 0 ? summaries : cachedSummaries;
+  }, [cachedSummaries, cities.length, summaries]);
 
   const orderMap = useMemo(() => new Map(cities.map((city, index) => [getCityKey(city), index])), [cities]);
   const sortedSummaries = useMemo(
-    () => sortSummaries(summaries, sortBy, now, orderMap),
-    [summaries, sortBy, now, orderMap],
+    () => sortSummaries(effectiveSummaries, sortBy, now, orderMap),
+    [effectiveSummaries, sortBy, now, orderMap],
   );
   const timeFormat = settings?.timeFormat === '12h' ? '12h' : '24h';
   const nowIso = now.toISOString();
@@ -211,17 +238,53 @@ export default function WorldPrayerTimes() {
     setCities((prev) => prev.filter((entry) => getCityKey(entry) !== getCityKey(city)));
   };
 
-  const moveCity = (city: WorldPrayerCity, direction: -1 | 1) => {
+  const reorderCity = (fromKey: string, toKey: string) => {
+    if (fromKey === toKey) return;
     setCities((prev) => {
-      const index = prev.findIndex((entry) => getCityKey(entry) === getCityKey(city));
-      if (index < 0) return prev;
-      const nextIndex = index + direction;
-      if (nextIndex < 0 || nextIndex >= prev.length) return prev;
+      const fromIndex = prev.findIndex((entry) => getCityKey(entry) === fromKey);
+      const toIndex = prev.findIndex((entry) => getCityKey(entry) === toKey);
+      if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return prev;
       const updated = [...prev];
-      const [moved] = updated.splice(index, 1);
-      updated.splice(nextIndex, 0, moved);
+      const [moved] = updated.splice(fromIndex, 1);
+      updated.splice(toIndex, 0, moved);
       return updated;
     });
+  };
+
+  const handleDragStart = (city: WorldPrayerCity) => (event: DragEvent) => {
+    if (sortBy !== 'manual') return;
+    const key = getCityKey(city);
+    setDraggingKey(key);
+    setDragOverKey(null);
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', key);
+  };
+
+  const handleDragEnd = () => {
+    setDraggingKey(null);
+    setDragOverKey(null);
+  };
+
+  const handleDragOver = (city: WorldPrayerCity) => (event: DragEvent) => {
+    if (sortBy !== 'manual') return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+    const key = getCityKey(city);
+    if (key !== dragOverKey) {
+      setDragOverKey(key);
+    }
+  };
+
+  const handleDrop = (city: WorldPrayerCity) => (event: DragEvent) => {
+    if (sortBy !== 'manual') return;
+    event.preventDefault();
+    const targetKey = getCityKey(city);
+    const fromKey = event.dataTransfer.getData('text/plain') || draggingKey;
+    if (fromKey) {
+      reorderCity(fromKey, targetKey);
+    }
+    setDraggingKey(null);
+    setDragOverKey(null);
   };
 
   return (
@@ -247,13 +310,36 @@ export default function WorldPrayerTimes() {
           </Typography>
         </Paper>
       ) : loading ? (
-        <Box display="flex" alignItems="center" gap={2} px={1}>
-          <CircularProgress size={22} />
-          <Typography variant="body2" color="text.secondary">
-            Loading world prayer data…
-          </Typography>
+        <Box display="flex" flexDirection="column" gap={2.5}>
+          {[0, 1, 2].map((index) => (
+            <Paper
+              key={index}
+              sx={{
+                p: 3,
+                borderRadius: 0.5,
+                border: '1px solid',
+                borderColor: 'divider',
+                bgcolor: 'background.paper',
+              }}
+            >
+              <Box display="flex" justifyContent="space-between" gap={2} mb={2}>
+                <Box flex={1}>
+                  <Skeleton variant="text" width="55%" height={28} />
+                  <Skeleton variant="text" width="35%" height={20} />
+                  <Skeleton variant="text" width="45%" height={18} />
+                </Box>
+                <Skeleton variant="circular" width={28} height={28} />
+              </Box>
+              <Box display="grid" gridTemplateColumns={{ xs: '1fr', sm: 'repeat(3, 1fr)' }} gap={1.5} mb={2}>
+                {[0, 1, 2].map((slot) => (
+                  <Skeleton key={slot} variant="rounded" height={72} />
+                ))}
+              </Box>
+              <Skeleton variant="rounded" height={140} />
+            </Paper>
+          ))}
         </Box>
-      ) : summaries.length === 0 ? (
+      ) : sortedSummaries.length === 0 ? (
         <Paper
           sx={{
             p: 3,
@@ -276,10 +362,13 @@ export default function WorldPrayerTimes() {
               timeFormat={timeFormat}
               nowIso={nowIso}
               showOrderControls={sortBy === 'manual'}
-              canMoveUp={(orderMap.get(getCityKey(summary.city)) ?? 0) > 0}
-              canMoveDown={(orderMap.get(getCityKey(summary.city)) ?? 0) < cities.length - 1}
-              onMoveUp={() => moveCity(summary.city, -1)}
-              onMoveDown={() => moveCity(summary.city, 1)}
+              draggable={sortBy === 'manual'}
+              isDragging={draggingKey === getCityKey(summary.city)}
+              isDropTarget={dragOverKey === getCityKey(summary.city)}
+              onDragStart={handleDragStart(summary.city)}
+              onDragEnd={handleDragEnd}
+              onDragOver={handleDragOver(summary.city)}
+              onDrop={handleDrop(summary.city)}
               onRemove={() => setPendingRemoval(summary.city)}
             />
           ))}
@@ -314,7 +403,7 @@ export default function WorldPrayerTimes() {
         </DialogActions>
       </Dialog>
 
-      {cities.length > 0 && summaries.length > 0 && (
+      {cities.length > 0 && sortedSummaries.length > 0 && (
         <Typography variant="caption" color="text.secondary" display="block" mt={3}>
           Time difference is shown relative to your current location.
         </Typography>

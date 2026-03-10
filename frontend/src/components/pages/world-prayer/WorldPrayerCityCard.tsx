@@ -1,9 +1,8 @@
-import { useState } from 'react';
+import { useState, type DragEvent } from 'react';
 import { Box, Card, Chip, Collapse, Divider, IconButton, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import type { WorldPrayerCitySummary } from '../../../types';
 import { formatCityLabel, formatOffsetSeconds, formatTimeInZone, getPrayerList } from '../../../utils/helpers';
 
@@ -12,10 +11,13 @@ interface WorldPrayerCityCardProps {
   timeFormat: '12h' | '24h';
   nowIso: string;
   showOrderControls?: boolean;
-  canMoveUp?: boolean;
-  canMoveDown?: boolean;
-  onMoveUp?: () => void;
-  onMoveDown?: () => void;
+  draggable?: boolean;
+  isDragging?: boolean;
+  isDropTarget?: boolean;
+  onDragStart?: (event: DragEvent) => void;
+  onDragEnd?: () => void;
+  onDragOver?: (event: DragEvent) => void;
+  onDrop?: (event: DragEvent) => void;
   onRemove: () => void;
 }
 
@@ -24,17 +26,20 @@ export default function WorldPrayerCityCard({
   timeFormat,
   nowIso,
   showOrderControls = false,
-  canMoveUp = false,
-  canMoveDown = false,
-  onMoveUp,
-  onMoveDown,
+  draggable = false,
+  isDragging = false,
+  isDropTarget = false,
+  onDragStart,
+  onDragEnd,
+  onDragOver,
+  onDrop,
   onRemove,
 }: WorldPrayerCityCardProps) {
   const [expanded, setExpanded] = useState(false);
   const { city } = summary;
   const cityLabel = formatCityLabel(city);
   const timezoneLabel = city.timezone || 'Unknown timezone';
-  const currentTimeLabel = formatTimeInZone(nowIso, timezoneLabel, timeFormat, true);
+  const currentTimeLabel = formatTimeInZone(nowIso, timezoneLabel, timeFormat);
   const nextPrayerLabel = summary.nextPrayer?.name || '--';
   const nextPrayerTime = summary.nextPrayer?.time
     ? formatTimeInZone(summary.nextPrayer.time, timezoneLabel, timeFormat)
@@ -46,10 +51,23 @@ export default function WorldPrayerCityCard({
 
   return (
     <Card
-      sx={{ p: 3, borderRadius: 0.5, cursor: 'pointer' }}
+      sx={{
+        p: 3,
+        borderRadius: 0.5,
+        cursor: 'pointer',
+        contentVisibility: 'auto',
+        containIntrinsicSize: '360px',
+        outline: '2px dashed',
+        outlineColor: isDropTarget ? 'primary.main' : 'transparent',
+        outlineOffset: 2,
+        opacity: isDragging ? 0.6 : 1,
+        transition: 'outline-color 0.2s ease, opacity 0.2s ease',
+      }}
       onClick={toggleExpanded}
       role="button"
       tabIndex={0}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
       onKeyDown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
@@ -71,30 +89,29 @@ export default function WorldPrayerCityCard({
         </Box>
         <Box display="flex" alignItems="center" gap={0.5}>
           {showOrderControls && (
-            <>
-              <IconButton
-                size="small"
-                disabled={!canMoveUp}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onMoveUp?.();
-                }}
-                aria-label={`Move ${cityLabel} up`}
-              >
-                <KeyboardArrowUpIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                size="small"
-                disabled={!canMoveDown}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onMoveDown?.();
-                }}
-                aria-label={`Move ${cityLabel} down`}
-              >
-                <KeyboardArrowDownIcon fontSize="small" />
-              </IconButton>
-            </>
+            <IconButton
+              size="small"
+              draggable={draggable}
+              onDragStart={(event) => {
+                event.stopPropagation();
+                onDragStart?.(event);
+              }}
+              onDragEnd={(event) => {
+                event.stopPropagation();
+                onDragEnd?.();
+              }}
+              onMouseDown={(event) => event.stopPropagation()}
+              onClick={(event) => event.stopPropagation()}
+              aria-label={`Reorder ${cityLabel}`}
+              sx={{
+                cursor: draggable ? 'grab' : 'default',
+                '&:active': {
+                  cursor: draggable ? 'grabbing' : 'default',
+                },
+              }}
+            >
+              <DragIndicatorIcon fontSize="small" color="action" />
+            </IconButton>
           )}
           <IconButton
             size="small"

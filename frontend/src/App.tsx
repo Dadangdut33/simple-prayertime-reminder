@@ -37,7 +37,7 @@ const DRAWER_COLLAPSED_WIDTH = 78;
 
 const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', icon: DashboardIcon, end: true },
-  { to: '/prayer-times', label: 'Prayer Times', icon: AccessTimeIcon },
+  { to: '/prayer-times', label: 'Prayer Times Schedule', icon: AccessTimeIcon },
   { to: '/world-cities', label: 'World Cities', icon: PublicIcon },
   { to: '/quran', label: 'Quran', icon: MenuBookIcon },
   { to: '/settings', label: 'Settings', icon: SettingsIcon },

@@ -1,4 +1,5 @@
 import { Box, Grid, Typography } from '@mui/material';
+import { useMemo } from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import type { Dayjs } from 'dayjs';
@@ -43,11 +44,17 @@ export default function PrayerTimesCalendarView({
   onMonthChange,
 }: PrayerTimesCalendarViewProps) {
   const isSideBySide = calendarSystem === 'side-by-side';
-  const schedulesByDate = buildScheduleMap(schedules);
-  const hijriByDate = buildHijriMap(hijriDays);
-  const selectedSchedule = schedulesByDate[selectedDate.format('YYYY-MM-DD')] ?? null;
-  const selectedHijri = hijriByDate[selectedDate.format('YYYY-MM-DD')] ?? null;
-  const hijriRangeLabel = getHijriMonthRangeLabel(hijriDays);
+  const schedulesByDate = useMemo(() => buildScheduleMap(schedules), [schedules]);
+  const hijriByDate = useMemo(() => buildHijriMap(hijriDays), [hijriDays]);
+  const selectedSchedule = useMemo(
+    () => schedulesByDate[selectedDate.format('YYYY-MM-DD')] ?? null,
+    [schedulesByDate, selectedDate],
+  );
+  const selectedHijri = useMemo(
+    () => hijriByDate[selectedDate.format('YYYY-MM-DD')] ?? null,
+    [hijriByDate, selectedDate],
+  );
+  const hijriRangeLabel = useMemo(() => getHijriMonthRangeLabel(hijriDays), [hijriDays]);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>

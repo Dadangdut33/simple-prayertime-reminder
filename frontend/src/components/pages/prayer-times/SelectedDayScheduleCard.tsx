@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { Box, Card, Chip, Divider, Typography } from '@mui/material';
+import { Box, Card, Chip, Divider, Skeleton, Typography } from '@mui/material';
 import type { Dayjs } from 'dayjs';
 import type { DaySchedule, HijriDate } from '../../../types';
 import { formatTime, getPrayerList } from '../../../utils/helpers';
@@ -44,9 +44,21 @@ export default function SelectedDayScheduleCard({
       <Divider sx={{ mb: 2 }} />
 
       {loading ? (
-        <Typography variant="body2" color="text.secondary">
-          Loading selected-day schedule…
-        </Typography>
+        <Box display="flex" flexDirection="column" gap={2}>
+          <Skeleton variant="text" width="45%" height={26} />
+          <Skeleton variant="text" width="70%" height={20} />
+          <Skeleton variant="text" width="55%" height={18} />
+          <Box
+            display="grid"
+            gridTemplateColumns={{ xs: '1fr', sm: '1fr 1fr' }}
+            gap={1.5}
+            mt={1}
+          >
+            {Array.from({ length: 6 }).map((_, index) => (
+              <Skeleton key={index} variant="rounded" height={68} />
+            ))}
+          </Box>
+        </Box>
       ) : schedule ? (
         <Box
           display="grid"

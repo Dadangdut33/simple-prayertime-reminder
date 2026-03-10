@@ -178,7 +178,8 @@ export default function PrayerTimes() {
   const tablePdfRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const skipNextPreferenceSave = useRef(false);
 
-  const activeMonth = useMemo(() => selectedDate.startOf('month'), [selectedDate]);
+  const activeMonthKey = useMemo(() => selectedDate.format('YYYY-MM'), [selectedDate]);
+  const activeMonth = useMemo(() => selectedDate.startOf('month'), [activeMonthKey]);
   const exportRangeLabel = useMemo(
     () => formatExportRangeLabel(exportStartDate, exportEndDate),
     [exportEndDate, exportStartDate],
