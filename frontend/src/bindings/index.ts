@@ -1,7 +1,9 @@
 import { Service as AppService } from '../../bindings/github.com/dadangdut33/simple-prayertime-reminder/internal/appservice/index.ts';
 import type {
   AppInfo,
+  CitySearchResult,
   DaySchedule,
+  GeonamesInfo,
   HijriCalendarDay,
   HijriDate,
   Location,
@@ -21,6 +23,20 @@ export const resetSettings = (): Promise<Settings> =>
 // ---- Location ----
 export const getLocation = (): Promise<Location> =>
   AppService.GetLocation() as any;
+export const searchCities = (
+  query: string,
+  limit: number,
+): Promise<CitySearchResult[]> => AppService.SearchCities(query, limit) as any;
+export const getTimezones = (): Promise<string[]> =>
+  AppService.GetTimezones() as any;
+export const searchTimezones = (
+  query: string,
+  limit: number,
+): Promise<string[]> => AppService.SearchTimezones(query, limit) as any;
+export const getGeonamesInfo = (): Promise<GeonamesInfo> =>
+  AppService.GetGeonamesInfo() as any;
+export const updateGeonamesData = (): Promise<GeonamesInfo> =>
+  AppService.UpdateGeonamesData() as any;
 export const detectLocation = (): Promise<Location> =>
   AppService.DetectLocation() as any;
 export const setManualLocation = (loc: Location): Promise<void> =>

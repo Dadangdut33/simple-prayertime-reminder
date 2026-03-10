@@ -87,12 +87,30 @@ export interface NotificationSettings {
 
 export interface LocationSettings {
   autoDetect: boolean;
+  inputMode: 'list' | 'custom';
   city: string;
   country: string;
   latitude: number;
   longitude: number;
   elevation: number;
   timezone: string;
+}
+
+export interface CitySearchResult {
+  id: number;
+  name: string;
+  countryCode: string;
+  admin1: string;
+  latitude: number;
+  longitude: number;
+  elevation: number;
+  timezone: string;
+  label: string;
+}
+
+export interface GeonamesInfo {
+  source: string;
+  lastUpdated: string;
 }
 
 export interface PrayerOffsets {

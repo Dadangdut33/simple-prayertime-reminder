@@ -51,6 +51,7 @@ type NotificationSettings struct {
 // LocationSettings stores location configuration
 type LocationSettings struct {
 	AutoDetect bool    `json:"autoDetect"`
+	InputMode  string  `json:"inputMode"` // "list" or "custom"
 	City       string  `json:"city"`
 	Country    string  `json:"country"`
 	Latitude   float64 `json:"latitude"`
@@ -128,6 +129,7 @@ func DefaultSettings() Settings {
 	return Settings{
 		Location: LocationSettings{
 			AutoDetect: true,
+			InputMode:  "custom",
 			City:       "",
 			Country:    "",
 			Latitude:   -6.2,

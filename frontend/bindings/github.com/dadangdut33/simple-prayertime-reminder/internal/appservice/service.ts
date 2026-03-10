@@ -12,6 +12,9 @@ import { Call as $Call, CancellablePromise as $CancellablePromise, Create as $Cr
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
+import * as geonames$0 from "../geonames/models.js";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
 import * as hijri$0 from "../hijri/models.js";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
@@ -79,15 +82,21 @@ export function GetCurrentTime(): $CancellablePromise<string> {
     return $Call.ByID(160623751);
 }
 
+export function GetGeonamesInfo(): $CancellablePromise<geonames$0.DataInfo> {
+    return $Call.ByID(498202194).then(($result: any) => {
+        return $$createType3($result);
+    });
+}
+
 export function GetHijriDateRange(startDate: string, endDate: string): $CancellablePromise<hijri$0.CalendarDay[]> {
     return $Call.ByID(709292810, startDate, endDate).then(($result: any) => {
-        return $$createType4($result);
+        return $$createType5($result);
     });
 }
 
 export function GetHijriForDate(dateStr: string): $CancellablePromise<hijri$0.HijriDate> {
     return $Call.ByID(2391955296, dateStr).then(($result: any) => {
-        return $$createType5($result);
+        return $$createType6($result);
     });
 }
 
@@ -99,19 +108,19 @@ export function GetLocation(): $CancellablePromise<location$0.Location> {
 
 export function GetMonthHijriDates(year: number, month: number): $CancellablePromise<hijri$0.CalendarDay[]> {
     return $Call.ByID(3210272434, year, month).then(($result: any) => {
-        return $$createType4($result);
+        return $$createType5($result);
     });
 }
 
 export function GetMonthSchedule(year: number, month: number): $CancellablePromise<prayer$0.DaySchedule[]> {
     return $Call.ByID(107226984, year, month).then(($result: any) => {
-        return $$createType7($result);
+        return $$createType8($result);
     });
 }
 
 export function GetNextPrayer(): $CancellablePromise<prayer$0.NextPrayerInfo> {
     return $Call.ByID(3689796055).then(($result: any) => {
-        return $$createType8($result);
+        return $$createType9($result);
     });
 }
 
@@ -125,31 +134,37 @@ export function GetQiblaDirectionFor(lat: number, lon: number): $CancellableProm
 
 export function GetScheduleForDate(dateStr: string): $CancellablePromise<prayer$0.DaySchedule> {
     return $Call.ByID(2969710027, dateStr).then(($result: any) => {
-        return $$createType6($result);
+        return $$createType7($result);
     });
 }
 
 export function GetScheduleRange(startDate: string, endDate: string): $CancellablePromise<prayer$0.DaySchedule[]> {
     return $Call.ByID(2289686101, startDate, endDate).then(($result: any) => {
-        return $$createType7($result);
+        return $$createType8($result);
     });
 }
 
 export function GetSettings(): $CancellablePromise<settings$0.Settings> {
     return $Call.ByID(1855413340).then(($result: any) => {
-        return $$createType9($result);
+        return $$createType10($result);
+    });
+}
+
+export function GetTimezones(): $CancellablePromise<string[]> {
+    return $Call.ByID(3432876695).then(($result: any) => {
+        return $$createType11($result);
     });
 }
 
 export function GetTodayHijri(): $CancellablePromise<hijri$0.HijriDate> {
     return $Call.ByID(4192043028).then(($result: any) => {
-        return $$createType5($result);
+        return $$createType6($result);
     });
 }
 
 export function GetTodaySchedule(): $CancellablePromise<prayer$0.DaySchedule> {
     return $Call.ByID(1655258847).then(($result: any) => {
-        return $$createType6($result);
+        return $$createType7($result);
     });
 }
 
@@ -167,7 +182,7 @@ export function PlayAdhan(isFajr: boolean): $CancellablePromise<void> {
 
 export function ResetSettings(): $CancellablePromise<settings$0.Settings> {
     return $Call.ByID(1081576467).then(($result: any) => {
-        return $$createType9($result);
+        return $$createType10($result);
     });
 }
 
@@ -177,6 +192,18 @@ export function SaveBase64File(outputPath: string, base64Data: string): $Cancell
 
 export function SaveSettings(cfg: settings$0.Settings): $CancellablePromise<void> {
     return $Call.ByID(1563075575, cfg);
+}
+
+export function SearchCities(query: string, limit: number): $CancellablePromise<geonames$0.City[]> {
+    return $Call.ByID(2775474700, query, limit).then(($result: any) => {
+        return $$createType13($result);
+    });
+}
+
+export function SearchTimezones(query: string, limit: number): $CancellablePromise<string[]> {
+    return $Call.ByID(3774805361, query, limit).then(($result: any) => {
+        return $$createType11($result);
+    });
 }
 
 export function SetManualLocation(loc: location$0.Location): $CancellablePromise<void> {
@@ -191,14 +218,24 @@ export function StopAdhan(): $CancellablePromise<void> {
     return $Call.ByID(2479816481);
 }
 
+export function UpdateGeonamesData(): $CancellablePromise<geonames$0.DataInfo> {
+    return $Call.ByID(1680012853).then(($result: any) => {
+        return $$createType3($result);
+    });
+}
+
 // Private type creation functions
 const $$createType0 = $models.UpdateInfo.createFrom;
 const $$createType1 = location$0.Location.createFrom;
 const $$createType2 = $models.AppInfo.createFrom;
-const $$createType3 = hijri$0.CalendarDay.createFrom;
-const $$createType4 = $Create.Array($$createType3);
-const $$createType5 = hijri$0.HijriDate.createFrom;
-const $$createType6 = prayer$0.DaySchedule.createFrom;
-const $$createType7 = $Create.Array($$createType6);
-const $$createType8 = prayer$0.NextPrayerInfo.createFrom;
-const $$createType9 = settings$0.Settings.createFrom;
+const $$createType3 = geonames$0.DataInfo.createFrom;
+const $$createType4 = hijri$0.CalendarDay.createFrom;
+const $$createType5 = $Create.Array($$createType4);
+const $$createType6 = hijri$0.HijriDate.createFrom;
+const $$createType7 = prayer$0.DaySchedule.createFrom;
+const $$createType8 = $Create.Array($$createType7);
+const $$createType9 = prayer$0.NextPrayerInfo.createFrom;
+const $$createType10 = settings$0.Settings.createFrom;
+const $$createType11 = $Create.Array($Create.Any);
+const $$createType12 = geonames$0.City.createFrom;
+const $$createType13 = $Create.Array($$createType12);

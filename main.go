@@ -4,10 +4,12 @@ import (
 	"embed"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/appservice"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/audio"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/autostart"
+	"github.com/dadangdut33/simple-prayertime-reminder/internal/geonames"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/location"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/notification"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/prayer"
@@ -44,6 +46,9 @@ func main() {
 	// Initialize core services
 	configPath, _ := appservice.ConfigDirectory()
 	settingsSvc2, _ := settings.NewService(configPath)
+	geonamesDir := filepath.Join(configPath, "geonames")
+	geonames.SetOverridePath(filepath.Join(geonamesDir, "cities500.txt"))
+	geonames.SetMetadataPath(filepath.Join(geonamesDir, "metadata.json"))
 
 	// Load settings
 	cfg := settingsSvc2.Get()

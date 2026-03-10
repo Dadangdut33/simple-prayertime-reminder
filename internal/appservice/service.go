@@ -1,14 +1,19 @@
 package appservice
 
 import (
+	"archive/zip"
 	"encoding/base64"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/audio"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/autostart"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/export"
+	"github.com/dadangdut33/simple-prayertime-reminder/internal/geonames"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/hijri"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/location"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/notification"
@@ -95,6 +100,12 @@ func (s *Service) GetSettings() (settings.Settings, error) {
 
 func (s *Service) SaveSettings(cfg settings.Settings) error {
 	previous := s.settingsSvc.Get()
+	if cfg.Location.Timezone == "" {
+		cfg.Location.Timezone = previous.Location.Timezone
+		if cfg.Location.Timezone == "" {
+			cfg.Location.Timezone = "UTC"
+		}
+	}
 	if previous.AutoStart != cfg.AutoStart {
 		if err := autostart.Sync(cfg.AutoStart); err != nil {
 			return err
@@ -126,6 +137,9 @@ func (s *Service) SaveSettings(cfg settings.Settings) error {
 func (s *Service) ResetSettings() (settings.Settings, error) {
 	previous := s.settingsSvc.Get()
 	defaults := settings.DefaultSettings()
+	if defaults.Location.Timezone == "" {
+		defaults.Location.Timezone = "UTC"
+	}
 	if previous.AutoStart != defaults.AutoStart {
 		if err := autostart.Sync(defaults.AutoStart); err != nil {
 			return settings.Settings{}, err
@@ -157,6 +171,144 @@ func (s *Service) ResetSettings() (settings.Settings, error) {
 
 func (s *Service) GetLocation() (location.Location, error) {
 	return s.locSvc.Get(), nil
+}
+
+func (s *Service) SearchCities(query string, limit int) ([]geonames.City, error) {
+	return geonames.SearchCities(query, limit)
+}
+
+func (s *Service) GetTimezones() ([]string, error) {
+	return geonames.GetTimezones()
+}
+
+func (s *Service) SearchTimezones(query string, limit int) ([]string, error) {
+	return geonames.SearchTimezones(query, limit)
+}
+
+func (s *Service) GetGeonamesInfo() (geonames.DataInfo, error) {
+	return geonames.GetDataInfo()
+}
+
+func (s *Service) UpdateGeonamesData() (geonames.DataInfo, error) {
+	configDir, err := ConfigDirectory()
+	if err != nil {
+		return geonames.DataInfo{}, err
+	}
+
+	targetDir := filepath.Join(configDir, "geonames")
+	if err := os.MkdirAll(targetDir, 0755); err != nil {
+		return geonames.DataInfo{}, fmt.Errorf("create geonames dir: %w", err)
+	}
+
+	targetPath := filepath.Join(targetDir, "cities500.txt")
+	metaPath := filepath.Join(targetDir, "metadata.json")
+
+	if err := downloadGeonamesCities(targetPath); err != nil {
+		return geonames.DataInfo{}, err
+	}
+
+	info := geonames.DataInfo{
+		Source:      "GeoNames cities500",
+		LastUpdated: time.Now().UTC().Format(time.RFC3339),
+	}
+	_ = geonames.WriteMetadata(metaPath, info)
+	geonames.SetOverridePath(targetPath)
+	geonames.SetMetadataPath(metaPath)
+	geonames.Refresh()
+
+	return geonames.GetDataInfo()
+}
+
+func downloadGeonamesCities(targetPath string) error {
+	const sourceURL = "https://download.geonames.org/export/dump/cities500.zip"
+
+	client := &http.Client{Timeout: 60 * time.Second}
+	resp, err := client.Get(sourceURL)
+	if err != nil {
+		return fmt.Errorf("download geonames: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return fmt.Errorf("download geonames: status %s", resp.Status)
+	}
+
+	tmpFile, err := os.CreateTemp("", "geonames-*.zip")
+	if err != nil {
+		return fmt.Errorf("create temp zip: %w", err)
+	}
+	defer func() {
+		_ = os.Remove(tmpFile.Name())
+	}()
+
+	if _, err := io.Copy(tmpFile, resp.Body); err != nil {
+		_ = tmpFile.Close()
+		return fmt.Errorf("write temp zip: %w", err)
+	}
+	if err := tmpFile.Close(); err != nil {
+		return fmt.Errorf("close temp zip: %w", err)
+	}
+
+	reader, err := zipOpen(tmpFile.Name())
+	if err != nil {
+		return err
+	}
+	defer reader.Close()
+
+	for _, file := range reader.File {
+		if file.Name != "cities500.txt" {
+			continue
+		}
+		rc, err := file.Open()
+		if err != nil {
+			return fmt.Errorf("open cities500.txt: %w", err)
+		}
+		defer rc.Close()
+
+		if err := writeFileAtomic(targetPath, rc); err != nil {
+			return err
+		}
+		return nil
+	}
+
+	return fmt.Errorf("cities500.txt not found in archive")
+}
+
+func zipOpen(path string) (*zip.ReadCloser, error) {
+	reader, err := zip.OpenReader(path)
+	if err != nil {
+		return nil, fmt.Errorf("open geonames zip: %w", err)
+	}
+	return reader, nil
+}
+
+func writeFileAtomic(path string, reader io.Reader) error {
+	dir := filepath.Dir(path)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return fmt.Errorf("prepare geonames dir: %w", err)
+	}
+
+	tmpFile, err := os.CreateTemp(dir, "cities500-*.txt")
+	if err != nil {
+		return fmt.Errorf("create temp cities file: %w", err)
+	}
+	defer func() {
+		_ = os.Remove(tmpFile.Name())
+	}()
+
+	if _, err := io.Copy(tmpFile, reader); err != nil {
+		_ = tmpFile.Close()
+		return fmt.Errorf("write cities file: %w", err)
+	}
+	if err := tmpFile.Close(); err != nil {
+		return fmt.Errorf("close cities file: %w", err)
+	}
+
+	if err := os.Rename(tmpFile.Name(), path); err != nil {
+		return fmt.Errorf("replace cities file: %w", err)
+	}
+
+	return nil
 }
 
 func (s *Service) DetectLocation() (location.Location, error) {

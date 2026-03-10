@@ -58,6 +58,11 @@ export class DashboardSettings {
  */
 export class LocationSettings {
     "autoDetect": boolean;
+
+    /**
+     * "list" or "custom"
+     */
+    "inputMode": string;
     "city": string;
     "country": string;
     "latitude": number;
@@ -69,6 +74,9 @@ export class LocationSettings {
     constructor($$source: Partial<LocationSettings> = {}) {
         if (!("autoDetect" in $$source)) {
             this["autoDetect"] = false;
+        }
+        if (!("inputMode" in $$source)) {
+            this["inputMode"] = "";
         }
         if (!("city" in $$source)) {
             this["city"] = "";
