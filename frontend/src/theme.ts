@@ -158,6 +158,30 @@ const getDesignTokens = (mode: 'light' | 'dark', preset: ThemePreset): ThemeOpti
       borderRadius: 12,
     },
     components: {
+      MuiCssBaseline: {
+        styleOverrides: {
+          '*': {
+            scrollbarWidth: 'thin',
+            scrollbarColor:
+              mode === 'light' ? '#b6bccf #eef0f6' : '#3a415e #0f1322',
+          },
+          '*::-webkit-scrollbar': {
+            width: '10px',
+            height: '10px',
+          },
+          '*::-webkit-scrollbar-track': {
+            backgroundColor: mode === 'light' ? '#eef0f6' : '#0f1322',
+          },
+          '*::-webkit-scrollbar-thumb': {
+            backgroundColor: mode === 'light' ? '#b6bccf' : '#3a415e',
+            borderRadius: 999,
+            border: `2px solid ${mode === 'light' ? '#eef0f6' : '#0f1322'}`,
+          },
+          '*::-webkit-scrollbar-thumb:hover': {
+            backgroundColor: mode === 'light' ? '#9ea5bd' : '#4b5374',
+          },
+        },
+      },
       MuiButton: {
         defaultProps: {
           disableElevation: true,

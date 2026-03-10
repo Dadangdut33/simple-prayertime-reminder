@@ -34,18 +34,3 @@ select,
 textarea {
   font: inherit;
 }
-
-/* Custom scrollbar for MUI */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--mui-palette-divider);
-  border-radius: 99px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--mui-palette-text-secondary);
-}
