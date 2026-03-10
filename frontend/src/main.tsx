@@ -10,6 +10,7 @@ import '@fontsource/roboto/700.css';
 import App from './App';
 import Dashboard from './pages/Dashboard';
 import PrayerTimes from './pages/PrayerTimes';
+import WorldPrayerTimes from './pages/WorldPrayerTimes';
 import Quran from './pages/Quran';
 import SettingsPage from './pages/Settings';
 import ReminderPage from './pages/Reminder';
@@ -23,6 +24,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Dashboard /> },
       { path: 'prayer-times', element: <PrayerTimes /> },
+      { path: 'world-cities', element: <WorldPrayerTimes /> },
       { path: 'quran', element: <Quran /> },
       { path: 'settings', element: <SettingsPage /> },
       { path: 'about', element: <AboutPage /> },

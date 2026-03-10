@@ -65,6 +65,26 @@ func SearchCities(query string, limit int) ([]City, error) {
 	return results, nil
 }
 
+func FindCityByName(name, countryCode string) (City, bool) {
+	if err := load(); err != nil {
+		return City{}, false
+	}
+
+	targetName := strings.ToLower(strings.TrimSpace(name))
+	targetCountry := strings.ToLower(strings.TrimSpace(countryCode))
+	for _, record := range cityRecords {
+		if strings.ToLower(record.City.Name) != targetName {
+			continue
+		}
+		if targetCountry != "" && strings.ToLower(record.City.CountryCode) != targetCountry {
+			continue
+		}
+		return record.City, true
+	}
+
+	return City{}, false
+}
+
 func GetTimezones() ([]string, error) {
 	if err := load(); err != nil {
 		return nil, err

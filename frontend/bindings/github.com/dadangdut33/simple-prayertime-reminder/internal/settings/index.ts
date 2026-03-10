@@ -11,5 +11,7 @@ export {
     PrayerOffsets,
     PrayerSettings,
     PrayerTimesSettings,
-    Settings
+    Settings,
+    WorldPrayerCity,
+    WorldPrayerSettings
 } from "./models.js";

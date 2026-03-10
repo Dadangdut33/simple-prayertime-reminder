@@ -9,6 +9,7 @@ import type {
   Location,
   NextPrayerInfo,
   Settings,
+  WorldPrayerCitySummary,
   UpdateInfo,
 } from '../types';
 
@@ -67,6 +68,9 @@ export const getHijriDateRange = (
   AppService.GetHijriDateRange(startDate, endDate) as any;
 export const getNextPrayer = (): Promise<NextPrayerInfo> =>
   AppService.GetNextPrayer() as any;
+export const getWorldPrayerTimes = (
+  cities: Settings['worldPrayer']['cities'],
+): Promise<WorldPrayerCitySummary[]> => AppService.GetWorldPrayerTimes(cities as any) as any;
 
 // ---- Hijri ----
 export const getTodayHijri = (): Promise<HijriDate> =>

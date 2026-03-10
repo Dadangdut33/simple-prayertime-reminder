@@ -13,6 +13,7 @@ import {
 import * as api from '../../../bindings';
 import NumberField from '../../ui/NumberField';
 import type { CitySearchResult, GeonamesInfo, Settings } from '../../../types';
+import { formatCityLabel, getCountryName } from '../../../utils/helpers';
 
 interface LocationSettingsTabProps {
   local: Settings;
@@ -48,7 +49,11 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
       longitude: local.location.longitude,
       elevation: local.location.elevation,
       timezone: local.location.timezone,
-      label: [local.location.city, local.location.country].filter(Boolean).join(', '),
+      label: formatCityLabel({
+        name: local.location.city,
+        admin1: '',
+        country: local.location.country,
+      }),
     };
   }, [
     local.location.city,
@@ -199,6 +204,7 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
             value={selectedCity}
             loading={cityLoading}
             filterOptions={(options) => options}
+            getOptionLabel={(option) => formatCityLabel(option)}
             isOptionEqualToValue={(option, value) =>
               option.id === value.id ||
               (option.name === value.name &&
@@ -210,7 +216,7 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
               if (!value) return;
               setLocation({
                 city: value.name,
-                country: value.countryCode,
+                country: getCountryName(value.countryCode),
                 latitude: value.latitude,
                 longitude: value.longitude,
                 elevation: value.elevation,

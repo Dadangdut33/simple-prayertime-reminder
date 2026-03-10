@@ -168,6 +168,12 @@ export function GetTodaySchedule(): $CancellablePromise<prayer$0.DaySchedule> {
     });
 }
 
+export function GetWorldPrayerTimes(cities: settings$0.WorldPrayerCity[]): $CancellablePromise<$models.WorldPrayerCitySummary[]> {
+    return $Call.ByID(4281561666, cities).then(($result: any) => {
+        return $$createType13($result);
+    });
+}
+
 export function OpenConfigLocation(): $CancellablePromise<void> {
     return $Call.ByID(1230630530);
 }
@@ -196,7 +202,7 @@ export function SaveSettings(cfg: settings$0.Settings): $CancellablePromise<void
 
 export function SearchCities(query: string, limit: number): $CancellablePromise<geonames$0.City[]> {
     return $Call.ByID(2775474700, query, limit).then(($result: any) => {
-        return $$createType13($result);
+        return $$createType15($result);
     });
 }
 
@@ -237,5 +243,7 @@ const $$createType8 = $Create.Array($$createType7);
 const $$createType9 = prayer$0.NextPrayerInfo.createFrom;
 const $$createType10 = settings$0.Settings.createFrom;
 const $$createType11 = $Create.Array($Create.Any);
-const $$createType12 = geonames$0.City.createFrom;
+const $$createType12 = $models.WorldPrayerCitySummary.createFrom;
 const $$createType13 = $Create.Array($$createType12);
+const $$createType14 = geonames$0.City.createFrom;
+const $$createType15 = $Create.Array($$createType14);

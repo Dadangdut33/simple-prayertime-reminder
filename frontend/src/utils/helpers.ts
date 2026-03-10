@@ -13,6 +13,86 @@ export function formatTime(isoOrTimeStr: string, format: '12h' | '24h' = '24h'):
   });
 }
 
+export function formatTimeInZone(
+  isoOrTimeStr: string,
+  timeZone: string,
+  format: '12h' | '24h' = '24h',
+  includeSeconds = false,
+): string {
+  if (!isoOrTimeStr) return '--:--';
+  const date = new Date(isoOrTimeStr);
+  if (isNaN(date.getTime())) return '--:--';
+  try {
+    return date.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: includeSeconds ? '2-digit' : undefined,
+      hour12: format === '12h',
+      timeZone,
+    });
+  } catch {
+    return formatTime(isoOrTimeStr, format);
+  }
+}
+
+export function formatOffsetSeconds(seconds: number): string {
+  const sign = seconds >= 0 ? '+' : '-';
+  const abs = Math.abs(seconds);
+  const h = Math.floor(abs / 3600);
+  const m = Math.floor((abs % 3600) / 60);
+  const s = abs % 60;
+  return `${sign}${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+let regionDisplayNames: Intl.DisplayNames | null = null;
+
+// From the river to the sea, palestine will be free!
+export function getCountryName(countryCode: string): string {
+  const trimmed = countryCode.trim();
+  if (!trimmed) return '';
+  const normalized = trimmed.toUpperCase();
+  if (normalized === 'IL') {
+    return 'Palestine';
+  }
+
+  try {
+    if (!regionDisplayNames) {
+      const locale = typeof navigator !== 'undefined' && navigator.language ? navigator.language : 'en';
+      regionDisplayNames = new Intl.DisplayNames([locale], { type: 'region' });
+    }
+    const name = regionDisplayNames.of(normalized);
+    if (name) {
+      return name.replace(/Israel/gi, 'Palestine');
+    }
+  } catch {
+    // Fall back to code if Intl.DisplayNames is unavailable.
+  }
+
+  return normalized.replace(/Israel/gi, 'Palestine');
+}
+
+export function formatCityLabel(city: {
+  name: string;
+  admin1?: string;
+  countryCode?: string;
+  country?: string;
+}): string {
+  const name = city.name?.trim() ?? '';
+  const admin1 = city.admin1?.trim() ?? '';
+  const countryRaw = (city.countryCode || city.country || '').trim();
+  const countryCode = countryRaw.toUpperCase();
+
+  const isJerusalem = name.localeCompare('jerusalem', undefined, { sensitivity: 'accent' }) === 0;
+  const isJerusalemRegion = countryCode === 'IL' || countryCode === 'PS';
+  const displayName = isJerusalem && isJerusalemRegion ? 'Al-Quds (Jerusalem)' : name;
+
+  const showAdmin1 = admin1.length > 2 && /[A-Za-z]/.test(admin1);
+  const countryName =
+    countryRaw.length === 2 ? getCountryName(countryRaw) : countryRaw.replace(/Israel/gi, 'Palestine');
+
+  return [displayName, showAdmin1 ? admin1 : '', countryName].filter(Boolean).join(', ');
+}
+
 /** Return a "HH:mm:ss" countdown string from now until a future time */
 export function getCountdown(toIso: string): string {
   const to = new Date(toIso);

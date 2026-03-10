@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/dadangdut33/simple-prayertime-reminder/internal/geonames"
 )
 
 // NotificationStyle defines how notifications are shown
@@ -97,6 +99,25 @@ type PrayerTimesSettings struct {
 	UseArabicIndicDigits bool   `json:"useArabicIndicDigits"` // render Hijri numerals using Arabic-Indic digits
 }
 
+// WorldPrayerCity stores a saved city entry for the world prayer times page.
+type WorldPrayerCity struct {
+	ID          int     `json:"id"`
+	Name        string  `json:"name"`
+	CountryCode string  `json:"countryCode"`
+	Admin1      string  `json:"admin1"`
+	Latitude    float64 `json:"latitude"`
+	Longitude   float64 `json:"longitude"`
+	Elevation   int     `json:"elevation"`
+	Timezone    string  `json:"timezone"`
+	Label       string  `json:"label"`
+}
+
+// WorldPrayerSettings controls the world prayer times view.
+type WorldPrayerSettings struct {
+	Cities []WorldPrayerCity `json:"cities"`
+	SortBy string            `json:"sortBy"` // "name", "offset", "current-time", "next-prayer"
+}
+
 // Settings is the root configuration struct
 type Settings struct {
 	Location         LocationSettings     `json:"location"`
@@ -104,6 +125,7 @@ type Settings struct {
 	Notification     NotificationSettings `json:"notification"`
 	Dashboard        DashboardSettings    `json:"dashboard"`
 	PrayerTimes      PrayerTimesSettings  `json:"prayerTimes"`
+	WorldPrayer      WorldPrayerSettings  `json:"worldPrayer"`
 	Theme            string               `json:"theme"` // "light", "dark", "system"
 	ThemePreset      string               `json:"themePreset"`
 	Language         string               `json:"language"` // "en", "id", etc
@@ -112,6 +134,90 @@ type Settings struct {
 	TrayLeftClick    string               `json:"trayLeftClick"`   // "toggle-window", "open-menu", or "none"
 	HijriDateOffset  int                  `json:"hijriDateOffset"` // -2 to +2 days
 	TimeFormat       string               `json:"timeFormat"`      // "12h" or "24h"
+}
+
+func worldPrayerCityFromGeonames(city geonames.City) WorldPrayerCity {
+	return WorldPrayerCity{
+		ID:          city.ID,
+		Name:        city.Name,
+		CountryCode: city.CountryCode,
+		Admin1:      city.Admin1,
+		Latitude:    city.Latitude,
+		Longitude:   city.Longitude,
+		Elevation:   city.Elevation,
+		Timezone:    city.Timezone,
+		Label:       city.Label,
+	}
+}
+
+func fallbackWorldPrayerCities() []WorldPrayerCity {
+	return []WorldPrayerCity{
+		{
+			Name:        "Makkah",
+			CountryCode: "SA",
+			Admin1:      "Makkah",
+			Latitude:    21.4225,
+			Longitude:   39.8262,
+			Elevation:   277,
+			Timezone:    "Asia/Riyadh",
+			Label:       "Makkah, SA",
+		},
+		{
+			Name:        "Madinah",
+			CountryCode: "SA",
+			Admin1:      "Madinah",
+			Latitude:    24.4709,
+			Longitude:   39.6122,
+			Elevation:   610,
+			Timezone:    "Asia/Riyadh",
+			Label:       "Madinah, SA",
+		},
+		{
+			Name:        "Al-Quds (Jerusalem)",
+			CountryCode: "PS",
+			Admin1:      "Jerusalem",
+			Latitude:    31.7683,
+			Longitude:   35.2137,
+			Elevation:   754,
+			Timezone:    "Asia/Jerusalem",
+			Label:       "Al-Quds (Jerusalem)",
+		},
+	}
+}
+
+func defaultWorldPrayerCities() []WorldPrayerCity {
+	cities := []struct {
+		Name            string
+		CountryCode     string
+		LabelOverride   string
+		NameOverride    string
+		CountryOverride string
+	}{
+		{Name: "Makkah", CountryCode: "SA"},
+		{Name: "Madinah", CountryCode: "SA"},
+		{Name: "Jerusalem", CountryCode: "IL", NameOverride: "Al-Quds (Jerusalem)", LabelOverride: "Al-Quds (Jerusalem)", CountryOverride: "PS"},
+	}
+
+	results := make([]WorldPrayerCity, 0, len(cities))
+	for _, entry := range cities {
+		found, ok := geonames.FindCityByName(entry.Name, entry.CountryCode)
+		if !ok {
+			return fallbackWorldPrayerCities()
+		}
+		city := worldPrayerCityFromGeonames(found)
+		if entry.NameOverride != "" {
+			city.Name = entry.NameOverride
+		}
+		if entry.LabelOverride != "" {
+			city.Label = entry.LabelOverride
+		}
+		if entry.CountryOverride != "" {
+			city.CountryCode = entry.CountryOverride
+		}
+		results = append(results, city)
+	}
+
+	return results
 }
 
 // DefaultSettings returns the default application settings.
@@ -171,6 +277,10 @@ func DefaultSettings() Settings {
 			ViewMode:             "table",
 			CalendarSystem:       "gregorian",
 			UseArabicIndicDigits: true,
+		},
+		WorldPrayer: WorldPrayerSettings{
+			Cities: defaultWorldPrayerCities(),
+			SortBy: "name",
 		},
 		Theme:            "system",
 		ThemePreset:      "indigo",

@@ -24,6 +24,7 @@ import {
 
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import PublicIcon from '@mui/icons-material/Public';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import SettingsIcon from '@mui/icons-material/Settings';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
@@ -37,6 +38,7 @@ const DRAWER_COLLAPSED_WIDTH = 78;
 const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', icon: DashboardIcon, end: true },
   { to: '/prayer-times', label: 'Prayer Times', icon: AccessTimeIcon },
+  { to: '/world-cities', label: 'World Cities', icon: PublicIcon },
   { to: '/quran', label: 'Quran', icon: MenuBookIcon },
   { to: '/settings', label: 'Settings', icon: SettingsIcon },
   { to: '/about', label: 'About', icon: InfoOutlinedIcon },
@@ -157,36 +159,36 @@ export default function App() {
               minWidth: 0,
             }}
           >
-          <Box
-            sx={{
-              width: 38,
-              height: 38,
-              borderRadius: 1,
-              display: 'grid',
-              placeItems: 'center',
-              p: 0.5,
-              backgroundColor: (theme) =>
-                theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.92)' : 'rgba(18,20,31,0.06)',
-              border: '1px solid',
-              borderColor: (theme) =>
-                theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.16)' : theme.palette.divider,
-              boxShadow: (theme) =>
-                theme.palette.mode === 'dark' ? '0 10px 24px rgba(0,0,0,0.22)' : '0 8px 18px rgba(18,20,31,0.08)',
-              flexShrink: 0,
-            }}
-          >
             <Box
-              component="img"
-              src={appLogo}
-              alt="Simple Prayertime Reminder logo"
               sx={{
-                width: 28,
-                height: 28,
-                objectFit: 'contain',
-                display: 'block',
+                width: 38,
+                height: 38,
+                borderRadius: 1,
+                display: 'grid',
+                placeItems: 'center',
+                p: 0.5,
+                backgroundColor: (theme) =>
+                  theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.92)' : 'rgba(18,20,31,0.06)',
+                border: '1px solid',
+                borderColor: (theme) =>
+                  theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.16)' : theme.palette.divider,
+                boxShadow: (theme) =>
+                  theme.palette.mode === 'dark' ? '0 10px 24px rgba(0,0,0,0.22)' : '0 8px 18px rgba(18,20,31,0.08)',
+                flexShrink: 0,
               }}
-            />
-          </Box>
+            >
+              <Box
+                component="img"
+                src={appLogo}
+                alt="Simple Prayertime Reminder logo"
+                sx={{
+                  width: 28,
+                  height: 28,
+                  objectFit: 'contain',
+                  display: 'block',
+                }}
+              />
+            </Box>
             {!drawerCollapsed && (
               <Box>
                 <Typography variant="subtitle2" fontWeight="bold" lineHeight={1.2}>
@@ -198,11 +200,7 @@ export default function App() {
 
           {!drawerCollapsed && (
             <Tooltip title="Collapse sidebar">
-              <IconButton
-                size="small"
-                onClick={() => setDrawerCollapsed(true)}
-                sx={{ flexShrink: 0 }}
-              >
+              <IconButton size="small" onClick={() => setDrawerCollapsed(true)} sx={{ flexShrink: 0 }}>
                 <KeyboardDoubleArrowLeftIcon fontSize="small" />
               </IconButton>
             </Tooltip>

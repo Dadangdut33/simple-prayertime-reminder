@@ -108,6 +108,23 @@ export interface CitySearchResult {
   label: string;
 }
 
+export type WorldPrayerCity = CitySearchResult;
+
+export type WorldPrayerSort = 'manual' | 'name' | 'offset' | 'current-time' | 'next-prayer';
+
+export interface WorldPrayerSettings {
+  cities: WorldPrayerCity[];
+  sortBy: WorldPrayerSort;
+}
+
+export interface WorldPrayerCitySummary {
+  city: WorldPrayerCity;
+  offsetSeconds: number;
+  currentTime: string;
+  nextPrayer: NextPrayerInfo;
+  today: DaySchedule;
+}
+
 export interface GeonamesInfo {
   source: string;
   lastUpdated: string;
@@ -164,6 +181,7 @@ export interface Settings {
   notification: NotificationSettings;
   dashboard: DashboardSettings;
   prayerTimes: PrayerTimesSettings;
+  worldPrayer: WorldPrayerSettings;
   theme: string;
   themePreset: ThemePreset;
   language: string;

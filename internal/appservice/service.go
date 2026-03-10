@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/audio"
@@ -25,13 +26,15 @@ import (
 
 // Service is the Wails-facing bridge between the frontend and the Go services.
 type Service struct {
-	prayerSvc    *prayer.Service
-	locSvc       *location.Service
-	settingsSvc  *settings.Service
-	audioSvc     *audio.Service
-	notifSvc     *notification.Service
-	schedulerSvc *scheduler.Service
-	onSettings   func(settings.Settings)
+	prayerSvc           *prayer.Service
+	locSvc              *location.Service
+	settingsSvc         *settings.Service
+	audioSvc            *audio.Service
+	notifSvc            *notification.Service
+	schedulerSvc        *scheduler.Service
+	onSettings          func(settings.Settings)
+	worldPrayerMu       sync.Mutex
+	worldPrayerServices map[string]*prayer.Service
 }
 
 func New(
@@ -41,10 +44,11 @@ func New(
 	audioSvc *audio.Service,
 ) *Service {
 	return &Service{
-		prayerSvc:   prayerSvc,
-		locSvc:      locSvc,
-		settingsSvc: settingsSvc,
-		audioSvc:    audioSvc,
+		prayerSvc:           prayerSvc,
+		locSvc:              locSvc,
+		settingsSvc:         settingsSvc,
+		audioSvc:            audioSvc,
+		worldPrayerServices: make(map[string]*prayer.Service),
 	}
 }
 
@@ -74,14 +78,83 @@ func BuildPrayerConfig(cfg settings.Settings) prayer.PrayerConfig {
 			Maghrib: cfg.Prayer.Offsets.Maghrib,
 			Isha:    cfg.Prayer.Offsets.Isha,
 		},
-		CustomFajrAngle: cfg.Prayer.CustomFajrAngle,
-		CustomIshaAngle: cfg.Prayer.CustomIshaAngle,
+		CustomFajrAngle:       cfg.Prayer.CustomFajrAngle,
+		CustomIshaAngle:       cfg.Prayer.CustomIshaAngle,
 		CustomMaghribDuration: cfg.Prayer.CustomMaghribDuration,
-		Latitude:        cfg.Location.Latitude,
-		Longitude:       cfg.Location.Longitude,
-		Elevation:       cfg.Location.Elevation,
-		Timezone:        cfg.Location.Timezone,
+		Latitude:              cfg.Location.Latitude,
+		Longitude:             cfg.Location.Longitude,
+		Elevation:             cfg.Location.Elevation,
+		Timezone:              cfg.Location.Timezone,
 	}
+}
+
+func buildWorldPrayerConfig(cfg settings.Settings, city settings.WorldPrayerCity) prayer.PrayerConfig {
+	return prayer.PrayerConfig{
+		Method:    prayer.CalculationMethod(cfg.Prayer.Method),
+		AsrMethod: prayer.AsrMethod(cfg.Prayer.AsrMethod),
+		Offsets: prayer.PrayerOffsets{
+			Fajr:    cfg.Prayer.Offsets.Fajr,
+			Sunrise: cfg.Prayer.Offsets.Sunrise,
+			Zuhr:    cfg.Prayer.Offsets.Zuhr,
+			Asr:     cfg.Prayer.Offsets.Asr,
+			Maghrib: cfg.Prayer.Offsets.Maghrib,
+			Isha:    cfg.Prayer.Offsets.Isha,
+		},
+		CustomFajrAngle:       cfg.Prayer.CustomFajrAngle,
+		CustomIshaAngle:       cfg.Prayer.CustomIshaAngle,
+		CustomMaghribDuration: cfg.Prayer.CustomMaghribDuration,
+		Latitude:              city.Latitude,
+		Longitude:             city.Longitude,
+		Elevation:             float64(city.Elevation),
+		Timezone:              city.Timezone,
+	}
+}
+
+func buildWorldPrayerCacheKey(cfg settings.Settings, city settings.WorldPrayerCity) string {
+	return fmt.Sprintf(
+		"%s|%s|%s|%d|%.4f|%.4f|%d|%.2f|%.2f|%.2f|%.2f|%.2f|%.2f|%.2f|%.2f|%.2f",
+		cfg.Prayer.Method,
+		cfg.Prayer.AsrMethod,
+		city.Timezone,
+		city.ID,
+		city.Latitude,
+		city.Longitude,
+		city.Elevation,
+		cfg.Prayer.CustomFajrAngle,
+		cfg.Prayer.CustomIshaAngle,
+		cfg.Prayer.CustomMaghribDuration,
+		cfg.Prayer.Offsets.Fajr,
+		cfg.Prayer.Offsets.Sunrise,
+		cfg.Prayer.Offsets.Zuhr,
+		cfg.Prayer.Offsets.Asr,
+		cfg.Prayer.Offsets.Maghrib,
+		cfg.Prayer.Offsets.Isha,
+	)
+}
+
+func (s *Service) getWorldPrayerService(key string, cfg prayer.PrayerConfig) *prayer.Service {
+	s.worldPrayerMu.Lock()
+	defer s.worldPrayerMu.Unlock()
+
+	if svc, ok := s.worldPrayerServices[key]; ok {
+		return svc
+	}
+
+	svc := prayer.NewService()
+	svc.SetConfig(cfg)
+	s.worldPrayerServices[key] = svc
+	return svc
+}
+
+func loadLocationOrUTC(timezone string) *time.Location {
+	if timezone == "" {
+		return time.UTC
+	}
+	loc, err := time.LoadLocation(timezone)
+	if err != nil {
+		return time.UTC
+	}
+	return loc
 }
 
 func locationFromSettings(cfg settings.Settings) location.Location {
@@ -172,6 +245,55 @@ func (s *Service) ResetSettings() (settings.Settings, error) {
 
 func (s *Service) GetLocation() (location.Location, error) {
 	return s.locSvc.Get(), nil
+}
+
+type WorldPrayerCitySummary struct {
+	City          settings.WorldPrayerCity `json:"city"`
+	OffsetSeconds int                      `json:"offsetSeconds"`
+	CurrentTime   time.Time                `json:"currentTime"`
+	NextPrayer    prayer.NextPrayerInfo    `json:"nextPrayer"`
+	Today         prayer.DaySchedule       `json:"today"`
+}
+
+func (s *Service) GetWorldPrayerTimes(cities []settings.WorldPrayerCity) ([]WorldPrayerCitySummary, error) {
+	cfg := s.settingsSvc.Get()
+	if len(cities) == 0 {
+		cities = cfg.WorldPrayer.Cities
+	}
+
+	homeLoc := loadLocationOrUTC(cfg.Location.Timezone)
+	now := time.Now()
+	_, homeOffset := now.In(homeLoc).Zone()
+
+	results := make([]WorldPrayerCitySummary, 0, len(cities))
+	for _, city := range cities {
+		cityLoc := loadLocationOrUTC(city.Timezone)
+		cityNow := now.In(cityLoc)
+		_, cityOffset := cityNow.Zone()
+
+		worldCfg := buildWorldPrayerConfig(cfg, city)
+		cacheKey := buildWorldPrayerCacheKey(cfg, city)
+		prayerSvc := s.getWorldPrayerService(cacheKey, worldCfg)
+
+		today, err := prayerSvc.GetScheduleForDate(cityNow)
+		if err != nil {
+			return nil, err
+		}
+		nextPrayer, err := prayerSvc.GetNextPrayer(cityNow)
+		if err != nil {
+			return nil, err
+		}
+
+		results = append(results, WorldPrayerCitySummary{
+			City:          city,
+			OffsetSeconds: cityOffset - homeOffset,
+			CurrentTime:   cityNow,
+			NextPrayer:    nextPrayer,
+			Today:         today,
+		})
+	}
+
+	return results, nil
 }
 
 func (s *Service) SearchCities(query string, limit int) ([]geonames.City, error) {

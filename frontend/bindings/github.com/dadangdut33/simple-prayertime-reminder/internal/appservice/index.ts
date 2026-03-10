@@ -8,5 +8,6 @@ export {
 
 export {
     AppInfo,
-    UpdateInfo
+    UpdateInfo,
+    WorldPrayerCitySummary
 } from "./models.js";

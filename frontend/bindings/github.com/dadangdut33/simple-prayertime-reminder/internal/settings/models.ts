@@ -418,6 +418,7 @@ export class Settings {
     "notification": NotificationSettings;
     "dashboard": DashboardSettings;
     "prayerTimes": PrayerTimesSettings;
+    "worldPrayer": WorldPrayerSettings;
 
     /**
      * "light", "dark", "system"
@@ -464,6 +465,9 @@ export class Settings {
         if (!("prayerTimes" in $$source)) {
             this["prayerTimes"] = (new PrayerTimesSettings());
         }
+        if (!("worldPrayer" in $$source)) {
+            this["worldPrayer"] = (new WorldPrayerSettings());
+        }
         if (!("theme" in $$source)) {
             this["theme"] = "";
         }
@@ -501,6 +505,7 @@ export class Settings {
         const $$createField2_0 = $$createType5;
         const $$createField3_0 = $$createType6;
         const $$createField4_0 = $$createType7;
+        const $$createField5_0 = $$createType8;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("location" in $$parsedSource) {
             $$parsedSource["location"] = $$createField0_0($$parsedSource["location"]);
@@ -517,7 +522,102 @@ export class Settings {
         if ("prayerTimes" in $$parsedSource) {
             $$parsedSource["prayerTimes"] = $$createField4_0($$parsedSource["prayerTimes"]);
         }
+        if ("worldPrayer" in $$parsedSource) {
+            $$parsedSource["worldPrayer"] = $$createField5_0($$parsedSource["worldPrayer"]);
+        }
         return new Settings($$parsedSource as Partial<Settings>);
+    }
+}
+
+/**
+ * WorldPrayerCity stores a saved city entry for the world prayer times page.
+ */
+export class WorldPrayerCity {
+    "id": number;
+    "name": string;
+    "countryCode": string;
+    "admin1": string;
+    "latitude": number;
+    "longitude": number;
+    "elevation": number;
+    "timezone": string;
+    "label": string;
+
+    /** Creates a new WorldPrayerCity instance. */
+    constructor($$source: Partial<WorldPrayerCity> = {}) {
+        if (!("id" in $$source)) {
+            this["id"] = 0;
+        }
+        if (!("name" in $$source)) {
+            this["name"] = "";
+        }
+        if (!("countryCode" in $$source)) {
+            this["countryCode"] = "";
+        }
+        if (!("admin1" in $$source)) {
+            this["admin1"] = "";
+        }
+        if (!("latitude" in $$source)) {
+            this["latitude"] = 0;
+        }
+        if (!("longitude" in $$source)) {
+            this["longitude"] = 0;
+        }
+        if (!("elevation" in $$source)) {
+            this["elevation"] = 0;
+        }
+        if (!("timezone" in $$source)) {
+            this["timezone"] = "";
+        }
+        if (!("label" in $$source)) {
+            this["label"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new WorldPrayerCity instance from a string or object.
+     */
+    static createFrom($$source: any = {}): WorldPrayerCity {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new WorldPrayerCity($$parsedSource as Partial<WorldPrayerCity>);
+    }
+}
+
+/**
+ * WorldPrayerSettings controls the world prayer times view.
+ */
+export class WorldPrayerSettings {
+    "cities": WorldPrayerCity[];
+
+    /**
+     * "name", "offset", "current-time", "next-prayer"
+     */
+    "sortBy": string;
+
+    /** Creates a new WorldPrayerSettings instance. */
+    constructor($$source: Partial<WorldPrayerSettings> = {}) {
+        if (!("cities" in $$source)) {
+            this["cities"] = [];
+        }
+        if (!("sortBy" in $$source)) {
+            this["sortBy"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new WorldPrayerSettings instance from a string or object.
+     */
+    static createFrom($$source: any = {}): WorldPrayerSettings {
+        const $$createField0_0 = $$createType10;
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        if ("cities" in $$parsedSource) {
+            $$parsedSource["cities"] = $$createField0_0($$parsedSource["cities"]);
+        }
+        return new WorldPrayerSettings($$parsedSource as Partial<WorldPrayerSettings>);
     }
 }
 
@@ -530,3 +630,6 @@ const $$createType4 = PrayerSettings.createFrom;
 const $$createType5 = NotificationSettings.createFrom;
 const $$createType6 = DashboardSettings.createFrom;
 const $$createType7 = PrayerTimesSettings.createFrom;
+const $$createType8 = WorldPrayerSettings.createFrom;
+const $$createType9 = WorldPrayerCity.createFrom;
+const $$createType10 = $Create.Array($$createType9);

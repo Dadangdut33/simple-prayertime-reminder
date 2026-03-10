@@ -5,6 +5,16 @@
 // @ts-ignore: Unused imports
 import { Create as $Create } from "@wailsio/runtime";
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
+import * as prayer$0 from "../prayer/models.js";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
+import * as settings$0 from "../settings/models.js";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
+import * as time$0 from "../../../../../time/models.js";
+
 export class AppInfo {
     "version": string;
     "repositoryUrl": string;
@@ -102,3 +112,57 @@ export class UpdateInfo {
         return new UpdateInfo($$parsedSource as Partial<UpdateInfo>);
     }
 }
+
+export class WorldPrayerCitySummary {
+    "city": settings$0.WorldPrayerCity;
+    "offsetSeconds": number;
+    "currentTime": time$0.Time;
+    "nextPrayer": prayer$0.NextPrayerInfo;
+    "today": prayer$0.DaySchedule;
+
+    /** Creates a new WorldPrayerCitySummary instance. */
+    constructor($$source: Partial<WorldPrayerCitySummary> = {}) {
+        if (!("city" in $$source)) {
+            this["city"] = (new settings$0.WorldPrayerCity());
+        }
+        if (!("offsetSeconds" in $$source)) {
+            this["offsetSeconds"] = 0;
+        }
+        if (!("currentTime" in $$source)) {
+            this["currentTime"] = null;
+        }
+        if (!("nextPrayer" in $$source)) {
+            this["nextPrayer"] = (new prayer$0.NextPrayerInfo());
+        }
+        if (!("today" in $$source)) {
+            this["today"] = (new prayer$0.DaySchedule());
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new WorldPrayerCitySummary instance from a string or object.
+     */
+    static createFrom($$source: any = {}): WorldPrayerCitySummary {
+        const $$createField0_0 = $$createType0;
+        const $$createField3_0 = $$createType1;
+        const $$createField4_0 = $$createType2;
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        if ("city" in $$parsedSource) {
+            $$parsedSource["city"] = $$createField0_0($$parsedSource["city"]);
+        }
+        if ("nextPrayer" in $$parsedSource) {
+            $$parsedSource["nextPrayer"] = $$createField3_0($$parsedSource["nextPrayer"]);
+        }
+        if ("today" in $$parsedSource) {
+            $$parsedSource["today"] = $$createField4_0($$parsedSource["today"]);
+        }
+        return new WorldPrayerCitySummary($$parsedSource as Partial<WorldPrayerCitySummary>);
+    }
+}
+
+// Private type creation functions
+const $$createType0 = settings$0.WorldPrayerCity.createFrom;
+const $$createType1 = prayer$0.NextPrayerInfo.createFrom;
+const $$createType2 = prayer$0.DaySchedule.createFrom;
