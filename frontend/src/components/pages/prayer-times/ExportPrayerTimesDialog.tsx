@@ -27,6 +27,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import NumberField from '../../ui/NumberField';
 import { formatExportRangeLabel } from './helpers';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../../i18n';
 
 type ExportKind = 'csv' | 'excel' | 'calendar-pdf';
 export type CalendarExportTheme = 'midnight' | 'light' | 'parchment';
@@ -89,14 +91,14 @@ function getDefaultFileName(kind: ExportKind, startDate: Dayjs, endDate: Dayjs) 
 
 function getFilters(kind: ExportKind): Dialogs.FileFilter[] {
   if (kind === 'calendar-pdf') {
-    return [{ DisplayName: 'PDF Document', Pattern: '*.pdf' }];
+    return [{ DisplayName: i18n.t('export.file.pdf'), Pattern: '*.pdf' }];
   }
 
   if (kind === 'excel') {
-    return [{ DisplayName: 'Excel Workbook', Pattern: '*.xlsx' }];
+    return [{ DisplayName: i18n.t('export.file.excel'), Pattern: '*.xlsx' }];
   }
 
-  return [{ DisplayName: 'CSV File', Pattern: '*.csv' }];
+  return [{ DisplayName: i18n.t('export.file.csv'), Pattern: '*.csv' }];
 }
 
 export default function ExportPrayerTimesDialog({
@@ -107,6 +109,7 @@ export default function ExportPrayerTimesDialog({
   onClose,
   onExport,
 }: ExportPrayerTimesDialogProps) {
+  const { t } = useTranslation();
   const monthStart = useMemo(() => activeMonth.startOf('month'), [activeMonth]);
   const monthEnd = useMemo(() => activeMonth.endOf('month'), [activeMonth]);
   const [kind, setKind] = useState<ExportKind>('csv');
@@ -141,9 +144,9 @@ export default function ExportPrayerTimesDialog({
 
   const chooseOutputPath = async () => {
     const path = await Dialogs.SaveFile({
-      Title: 'Export Prayer Times',
-      Message: 'Choose where to save the exported file.',
-      ButtonText: 'Save',
+      Title: t('export.title'),
+      Message: t('export.chooseLocation'),
+      ButtonText: t('common.save'),
       CanCreateDirectories: true,
       ShowHiddenFiles: true,
       Filename: getDefaultFileName(kind, startDate, endDate),
@@ -204,53 +207,53 @@ export default function ExportPrayerTimesDialog({
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Dialog open={open} onClose={exporting ? undefined : onClose} fullWidth maxWidth="sm">
-        <DialogTitle>Export Prayer Times</DialogTitle>
+        <DialogTitle>{t('export.title')}</DialogTitle>
         <DialogContent dividers>
           <Stack spacing={3}>
             <Typography variant="body2" color="text.secondary">
-              Export any date range as table data or Calendar PDF.
+              {t('export.description')}
             </Typography>
 
             <RadioGroup value={kind} onChange={(event) => setKind(event.target.value as ExportKind)}>
-              <FormControlLabel value="csv" control={<Radio />} label="CSV table export" />
-              <FormControlLabel value="excel" control={<Radio />} label="Excel table export" />
-              <FormControlLabel value="calendar-pdf" control={<Radio />} label="Calendar PDF export" />
+              <FormControlLabel value="csv" control={<Radio />} label={t('export.formatCsv')} />
+              <FormControlLabel value="excel" control={<Radio />} label={t('export.formatExcel')} />
+              <FormControlLabel value="calendar-pdf" control={<Radio />} label={t('export.formatCalendarPdf')} />
             </RadioGroup>
 
             <Divider />
 
             <Box>
               <Typography variant="subtitle2" gutterBottom>
-                Date Range
+                {t('export.range')}
               </Typography>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mt: 2 }}>
                 <DatePicker
-                  label="Start day"
+                  label={t('export.startDate')}
                   value={startDate}
                   onChange={handleStartDateChange}
                   slotProps={{ textField: { size: 'small', fullWidth: true } }}
                 />
                 <DatePicker
-                  label="End day"
+                  label={t('export.endDate')}
                   value={endDate}
                   onChange={handleEndDateChange}
                   slotProps={{ textField: { size: 'small', fullWidth: true } }}
                 />
               </Stack>
               <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                Current export range: {rangeLabel}
+                {t('export.currentRange', { range: rangeLabel })}
               </Typography>
             </Box>
 
             <Box>
               <Typography variant="subtitle2" gutterBottom>
-                Export Summary
+                {t('export.summaryTitle')}
               </Typography>
               <Grid container sx={{ mt: 1 }}>
                 <Grid size={6}>
                   <Typography variant="body2">
                     <Box component="span" sx={{ fontWeight: 600 }}>
-                      Calculation:
+                      {t('export.summaryCalculation')}
                     </Box>{' '}
                     {metadata.methodLabel}
                   </Typography>
@@ -258,7 +261,7 @@ export default function ExportPrayerTimesDialog({
                 <Grid size={6}>
                   <Typography variant="body2">
                     <Box component="span" sx={{ fontWeight: 600 }}>
-                      Location:
+                      {t('export.summaryLocation')}
                     </Box>{' '}
                     {metadata.locationLabel}
                   </Typography>
@@ -266,7 +269,7 @@ export default function ExportPrayerTimesDialog({
                 <Grid size={6}>
                   <Typography variant="body2" color="text.secondary">
                     <Box component="span" sx={{ fontWeight: 600 }}>
-                      Coordinates:
+                      {t('export.summaryCoordinates')}
                     </Box>{' '}
                     {metadata.coordinatesLabel}
                   </Typography>
@@ -274,7 +277,7 @@ export default function ExportPrayerTimesDialog({
                 <Grid size={6}>
                   <Typography variant="body2" color="text.secondary">
                     <Box component="span" sx={{ fontWeight: 600 }}>
-                      Timezone:
+                      {t('export.summaryTimezone')}
                     </Box>{' '}
                     {metadata.timezoneLabel}
                   </Typography>
@@ -282,7 +285,7 @@ export default function ExportPrayerTimesDialog({
                 <Grid size={6}>
                   <Typography variant="body2" color="text.secondary">
                     <Box component="span" sx={{ fontWeight: 600 }}>
-                      Elevation:
+                      {t('export.summaryElevation')}
                     </Box>{' '}
                     {metadata.elevationLabel}
                   </Typography>
@@ -290,7 +293,7 @@ export default function ExportPrayerTimesDialog({
                 <Grid size={6}>
                   <Typography variant="body2" color="text.secondary">
                     <Box component="span" sx={{ fontWeight: 600 }}>
-                      Offsets:
+                      {t('export.summaryOffsets')}
                     </Box>{' '}
                     {metadata.offsetSummary}
                   </Typography>
@@ -302,37 +305,37 @@ export default function ExportPrayerTimesDialog({
               <Stack spacing={2}>
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                   <FormControl size="small" fullWidth>
-                    <InputLabel id="calendar-theme-label">Calendar Theme</InputLabel>
+                    <InputLabel id="calendar-theme-label">{t('export.calendarTheme')}</InputLabel>
                     <Select
                       labelId="calendar-theme-label"
                       value={calendarTheme}
-                      label="Calendar Theme"
+                      label={t('export.calendarTheme')}
                       onChange={(event) => setCalendarTheme(event.target.value as CalendarExportTheme)}
                     >
-                      <MenuItem value="midnight">Midnight</MenuItem>
-                      <MenuItem value="light">Light</MenuItem>
-                      <MenuItem value="parchment">Parchment</MenuItem>
+                      <MenuItem value="midnight">{t('export.themeMidnight')}</MenuItem>
+                      <MenuItem value="light">{t('export.themeLight')}</MenuItem>
+                      <MenuItem value="parchment">{t('export.themeParchment')}</MenuItem>
                     </Select>
                   </FormControl>
 
                   <FormControl size="small" fullWidth>
-                    <InputLabel id="export-quality-label">Export Quality</InputLabel>
+                    <InputLabel id="export-quality-label">{t('export.quality')}</InputLabel>
                     <Select
                       labelId="export-quality-label"
                       value={quality}
-                      label="Export Quality"
+                      label={t('export.quality')}
                       onChange={(event) => setQuality(event.target.value as ExportQuality)}
                     >
-                      <MenuItem value="standard">Standard</MenuItem>
-                      <MenuItem value="high">High</MenuItem>
-                      <MenuItem value="custom">Custom</MenuItem>
+                      <MenuItem value="standard">{t('export.qualityStandard')}</MenuItem>
+                      <MenuItem value="high">{t('export.qualityHigh')}</MenuItem>
+                      <MenuItem value="custom">{t('export.qualityCustom')}</MenuItem>
                     </Select>
                   </FormControl>
                 </Stack>
 
                 {quality === 'custom' && (
                   <NumberField
-                    label="Custom Render Scale"
+                    label={t('export.customScale')}
                     size="small"
                     value={qualityScale}
                     min={MIN_CUSTOM_QUALITY_SCALE}
@@ -345,7 +348,7 @@ export default function ExportPrayerTimesDialog({
 
                       setQualityScale(clampQualityScale(value));
                     }}
-                    helperText="Controls the canvas render scale. Use 1.00 to 3.00. Higher values will produce greater quality but also with larger file sizes."
+                    helperText={t('export.customScaleHint')}
                   />
                 )}
               </Stack>
@@ -357,24 +360,24 @@ export default function ExportPrayerTimesDialog({
                   control={
                     <Checkbox checked={includeTable} onChange={(event) => setIncludeTable(event.target.checked)} />
                   }
-                  label="Also export prayer time"
+                  label={t('export.includeTable')}
                 />
                 <Typography variant="caption" color="text.secondary" display="block">
-                  If enabled, the prayer time of each month is also exported after the calendar.
+                  {t('export.includeTableHint')}
                 </Typography>
 
                 {includeTable && (
                   <Box mt={2.25}>
                     <Divider sx={{ mb: 2 }} />
                     <Stack>
-                      <Typography variant="subtitle2">Prayer Time Layout</Typography>
+                      <Typography variant="subtitle2">{t('export.tableLayout')}</Typography>
                       <RadioGroup
                         row
                         value={tableLayout}
                         onChange={(event) => setTableLayout(event.target.value as PrayerTableLayout)}
                       >
-                        <FormControlLabel value="horizontal" control={<Radio />} label="Horizontal" />
-                        <FormControlLabel value="vertical" control={<Radio />} label="Vertical" />
+                        <FormControlLabel value="horizontal" control={<Radio />} label={t('export.layoutHorizontal')} />
+                        <FormControlLabel value="vertical" control={<Radio />} label={t('export.layoutVertical')} />
                       </RadioGroup>
 
                       {tableLayout === 'horizontal' && (
@@ -385,7 +388,7 @@ export default function ExportPrayerTimesDialog({
                               onChange={(event) => setUseTwoColumnPrayerGrid(event.target.checked)}
                             />
                           }
-                          label="Split month rows for better readability"
+                          label={t('export.twoColumnGrid')}
                         />
                       )}
                     </Stack>
@@ -398,18 +401,18 @@ export default function ExportPrayerTimesDialog({
 
             <Box>
               <Typography variant="subtitle2" gutterBottom>
-                Destination
+                {t('export.destination')}
               </Typography>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
                 <TextField
                   value={outputPath}
-                  placeholder="Choose where to save the exported file"
+                  placeholder={t('export.chooseLocation')}
                   size="small"
                   fullWidth
                   InputProps={{ readOnly: true }}
                 />
                 <Button variant="outlined" onClick={() => void chooseOutputPath()}>
-                  Choose File
+                  {t('export.chooseLocation')}
                 </Button>
               </Stack>
             </Box>
@@ -417,10 +420,10 @@ export default function ExportPrayerTimesDialog({
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose} disabled={exporting} color="inherit">
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button onClick={() => void handleExport()} disabled={exporting} variant="contained">
-            {exporting ? 'Exporting…' : 'Export'}
+            {exporting ? t('export.exporting') : t('export.exportNow')}
           </Button>
         </DialogActions>
       </Dialog>

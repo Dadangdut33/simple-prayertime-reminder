@@ -3,6 +3,7 @@ import ExploreIcon from '@mui/icons-material/Explore';
 import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
 import type { Location } from '../../../types';
 import { Compass as CompassIcon, Navigation } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface QiblaCardProps {
   location: Location | null;
@@ -11,6 +12,7 @@ interface QiblaCardProps {
 }
 
 export default function QiblaCard({ location, qiblaDirection, qiblaCompassLabel }: QiblaCardProps) {
+  const { t } = useTranslation();
   return (
     <Card sx={{ p: 3, position: 'relative', overflow: 'hidden' }}>
       <Box
@@ -28,7 +30,7 @@ export default function QiblaCard({ location, qiblaDirection, qiblaCompassLabel 
         <Box display="flex" alignItems="center" gap={1}>
           <ExploreIcon fontSize="small" color="primary" />
           <Typography variant="overline" color="text.secondary">
-            Qibla
+            {t('dashboard.qibla.title')}
           </Typography>
         </Box>
         {location && (
@@ -108,10 +110,10 @@ export default function QiblaCard({ location, qiblaDirection, qiblaCompassLabel 
           </Box>
 
           {[
-            { label: 'N', sx: { top: 10, left: '50%', transform: 'translateX(-50%)' } },
-            { label: 'S', sx: { bottom: 10, left: '50%', transform: 'translateX(-50%)' } },
-            { label: 'E', sx: { right: 12, top: '50%', transform: 'translateY(-50%)' } },
-            { label: 'W', sx: { left: 12, top: '50%', transform: 'translateY(-50%)' } },
+            { label: t('compass.n'), sx: { top: 10, left: '50%', transform: 'translateX(-50%)' } },
+            { label: t('compass.s'), sx: { bottom: 10, left: '50%', transform: 'translateX(-50%)' } },
+            { label: t('compass.e'), sx: { right: 12, top: '50%', transform: 'translateY(-50%)' } },
+            { label: t('compass.w'), sx: { left: 12, top: '50%', transform: 'translateY(-50%)' } },
           ].map((marker) => (
             <Typography
               key={marker.label}
@@ -130,7 +132,7 @@ export default function QiblaCard({ location, qiblaDirection, qiblaCompassLabel 
 
         <Box>
           <Typography variant="body2" color="text.secondary" mb={0.5}>
-            Qibla Direction
+            {t('dashboard.qibla.title')}
           </Typography>
           <Typography variant="h2" sx={{ fontSize: '2.35rem', fontVariantNumeric: 'tabular-nums' }}>
             {Math.round(qiblaDirection ?? 0)}°
@@ -139,8 +141,7 @@ export default function QiblaCard({ location, qiblaDirection, qiblaCompassLabel 
             {qiblaCompassLabel}
           </Typography>
           <Typography variant="body2" color="text.secondary" mt={1}>
-            *This is only showing you approximately which direction is the Qibla. Please check the actual location with
-            using your compass.
+            {t('dashboard.qibla.note')}
           </Typography>
         </Box>
       </Box>

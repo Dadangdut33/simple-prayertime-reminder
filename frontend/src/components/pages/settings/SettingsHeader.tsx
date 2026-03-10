@@ -1,6 +1,7 @@
 import { Box, Button, Typography } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import { useTranslation } from 'react-i18next';
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
@@ -11,6 +12,7 @@ interface SettingsHeaderProps {
 }
 
 export default function SettingsHeader({ saveLabel, saveState, onReset }: SettingsHeaderProps) {
+  const { t } = useTranslation();
   return (
     <Box
       display="flex"
@@ -36,10 +38,10 @@ export default function SettingsHeader({ saveLabel, saveState, onReset }: Settin
           >
             <SettingsIcon fontSize="small" />
           </Box>
-          <Typography variant="h2">Settings</Typography>
+          <Typography variant="h2">{t('settings.title')}</Typography>
         </Box>
         <Typography variant="body2" color="text.secondary">
-          Adjust location, prayer calculations, alarms, and general app preferences.
+          {t('settings.headerDescription')}
         </Typography>
       </Box>
 
@@ -53,7 +55,7 @@ export default function SettingsHeader({ saveLabel, saveState, onReset }: Settin
           {saveLabel}
         </Typography>
         <Button color="inherit" variant="outlined" startIcon={<RestartAltIcon />} onClick={onReset}>
-          Reset to Defaults
+          {t('settings.reset.confirm')}
         </Button>
       </Box>
     </Box>

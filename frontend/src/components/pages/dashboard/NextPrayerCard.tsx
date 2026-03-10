@@ -1,6 +1,7 @@
 import { Box, Card, Chip, LinearProgress, Typography } from '@mui/material';
 import type { NextPrayerInfo } from '../../../types';
 import { formatDuration, formatTime, getPrayerDisplayName } from '../../../utils/helpers';
+import { useTranslation } from 'react-i18next';
 
 interface PrayerMoment {
   name: string;
@@ -24,6 +25,7 @@ export default function NextPrayerCard({
   elapsedSeconds,
   progress,
 }: NextPrayerCardProps) {
+  const { t } = useTranslation();
   const nextPrayerLabel = nextPrayer
     ? getPrayerDisplayName(nextPrayer.name, nextPrayer.time)
     : undefined;
@@ -51,19 +53,21 @@ export default function NextPrayerCard({
       />
 
       <Typography variant="overline" color="text.secondary" fontWeight={600} letterSpacing={1.5}>
-        Next Prayer
+        {t('dashboard.nextPrayer.title')}
       </Typography>
 
       <Box display="flex" justifyContent="space-between" alignItems="flex-start" mt={1}>
         <Typography variant="h2" fontSize="2.5rem" color="primary.main" fontWeight={700} lineHeight={1}>
           {nextPrayerLabel || '...'}
         </Typography>
-        {isAllPassed && <Chip label="Tomorrow" color="secondary" size="small" />}
+        {isAllPassed && <Chip label={t('dashboard.nextPrayer.tomorrow')} color="secondary" size="small" />}
       </Box>
 
       <Box mt={4} pt={3} borderTop="1px solid" borderColor="divider">
         <Typography variant="body2" color="text.secondary" mb={1}>
-          Time Until {nextPrayerLabel === 'Sunrise' ? 'Sunrise' : 'Next Prayer'}
+          {nextPrayerLabel === t('prayerNames.sunrise')
+            ? t('dashboard.nextPrayer.timeUntil', { label: t('prayerNames.sunrise') })
+            : t('dashboard.nextPrayer.timeUntilDefault')}
         </Typography>
         <Typography
           variant="h3"
@@ -80,7 +84,10 @@ export default function NextPrayerCard({
         <Box mt={2.5}>
           <Box display="flex" justifyContent="space-between" alignItems="center" gap={2} mb={1}>
             <Typography variant="body2" color="text.secondary">
-              {formatDuration(elapsedSeconds)} since {previousPrayerInfo?.name}
+              {t('dashboard.nextPrayer.since', {
+                duration: formatDuration(elapsedSeconds),
+                label: previousPrayerInfo?.name ?? '--',
+              })}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               {Math.round(progress)}%

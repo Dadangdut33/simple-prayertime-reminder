@@ -17,6 +17,7 @@ import {
 } from './helpers';
 import PrayerMonthCalendarCard from './PrayerMonthCalendarCard';
 import SelectedDayScheduleCard from './SelectedDayScheduleCard';
+import { useTranslation } from 'react-i18next';
 
 interface PrayerTimesCalendarViewProps {
   activeMonth: Dayjs;
@@ -43,6 +44,7 @@ export default function PrayerTimesCalendarView({
   onSelectedDateChange,
   onMonthChange,
 }: PrayerTimesCalendarViewProps) {
+  const { t } = useTranslation();
   const isSideBySide = calendarSystem === 'side-by-side';
   const schedulesByDate = useMemo(() => buildScheduleMap(schedules), [schedules]);
   const hijriByDate = useMemo(() => buildHijriMap(hijriDays), [hijriDays]);
@@ -61,8 +63,7 @@ export default function PrayerTimesCalendarView({
       <Box display="flex" flexDirection="column" gap={3}>
         {calendarSystem === 'hijri' && (
           <Typography variant="body2" color="text.secondary">
-            Hijri mode emphasizes Hijri day numbers while keeping the month
-            aligned with the selected Gregorian schedule range.
+            {t('prayerTimes.hijriModeHint')}
           </Typography>
         )}
 
@@ -70,7 +71,7 @@ export default function PrayerTimesCalendarView({
           {calendarSystem === 'gregorian' && (
             <Grid size={{ xs: 12, xl: 8 }}>
               <PrayerMonthCalendarCard
-                title="Gregorian Calendar"
+                title={t('prayerTimes.calendar.titleGregorian')}
                 subtitle={`${formatMonthHeading(activeMonth)} • ${hijriRangeLabel}`}
                 mode="gregorian"
                 selectedDate={selectedDate}
@@ -86,7 +87,7 @@ export default function PrayerTimesCalendarView({
           {calendarSystem === 'hijri' && (
             <Grid size={{ xs: 12, xl: 8 }}>
               <PrayerMonthCalendarCard
-                title="Hijri Calendar"
+                title={t('prayerTimes.calendar.titleHijri')}
                 subtitle={`${hijriRangeLabel} • ${formatMonthHeading(activeMonth)}`}
                 mode="hijri"
                 selectedDate={selectedDate}
@@ -103,7 +104,7 @@ export default function PrayerTimesCalendarView({
             <>
               <Grid size={{ xs: 12, lg: 6 }}>
                 <PrayerMonthCalendarCard
-                  title="Gregorian Calendar"
+                  title={t('prayerTimes.calendar.titleGregorian')}
                   subtitle={formatMonthHeading(activeMonth)}
                   mode="gregorian"
                   selectedDate={selectedDate}
@@ -116,7 +117,7 @@ export default function PrayerTimesCalendarView({
               </Grid>
               <Grid size={{ xs: 12, lg: 6 }}>
                 <PrayerMonthCalendarCard
-                  title="Hijri Calendar"
+                  title={t('prayerTimes.calendar.titleHijri')}
                   subtitle={hijriRangeLabel}
                   mode="hijri"
                   selectedDate={selectedDate}
@@ -143,7 +144,7 @@ export default function PrayerTimesCalendarView({
 
         {!loading && selectedHijri && (
           <Typography variant="caption" color="text.secondary">
-            Selected day: {formatHijriDateLabel(selectedHijri)}
+            {t('prayerTimes.calendar.selectedDay', { date: formatHijriDateLabel(selectedHijri) })}
           </Typography>
         )}
       </Box>

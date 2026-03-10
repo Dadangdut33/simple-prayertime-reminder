@@ -4,6 +4,7 @@ import { useAppStore } from './store/appStore';
 import * as api from './bindings';
 import UpdateAvailableDialog from './components/app/UpdateAvailableDialog';
 import type { UpdateInfo } from './types';
+import { useTranslation } from 'react-i18next';
 
 import {
   Box,
@@ -36,15 +37,16 @@ const DRAWER_WIDTH = 240;
 const DRAWER_COLLAPSED_WIDTH = 78;
 
 const NAV_ITEMS = [
-  { to: '/', label: 'Dashboard', icon: DashboardIcon, end: true },
-  { to: '/prayer-times', label: 'Prayer Times Schedule', icon: AccessTimeIcon },
-  { to: '/world-cities', label: 'World Cities', icon: PublicIcon },
-  { to: '/quran', label: 'Quran', icon: MenuBookIcon },
-  { to: '/settings', label: 'Settings', icon: SettingsIcon },
-  { to: '/about', label: 'About', icon: InfoOutlinedIcon },
+  { to: '/', labelKey: 'nav.dashboard', icon: DashboardIcon, end: true },
+  { to: '/prayer-times', labelKey: 'nav.prayerTimes', icon: AccessTimeIcon },
+  { to: '/world-cities', labelKey: 'nav.worldCities', icon: PublicIcon },
+  { to: '/quran', labelKey: 'nav.quran', icon: MenuBookIcon },
+  { to: '/settings', labelKey: 'nav.settings', icon: SettingsIcon },
+  { to: '/about', labelKey: 'nav.about', icon: InfoOutlinedIcon },
 ];
 
 export default function App() {
+  const { t } = useTranslation();
   const { initialize, loading, initialized, settings } = useAppStore();
   const location = useLocation();
   const theme = useTheme();
@@ -101,7 +103,7 @@ export default function App() {
       <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100vh">
         <CircularProgress color="primary" sx={{ mb: 2 }} />
         <Typography variant="body2" color="text.secondary">
-          Loading prayer data…
+          {t('app.loading')}
         </Typography>
       </Box>
     );
@@ -180,7 +182,7 @@ export default function App() {
               <Box
                 component="img"
                 src={appLogo}
-                alt="Simple Prayertime Reminder logo"
+                alt={t('app.name')}
                 sx={{
                   width: 28,
                   height: 28,
@@ -192,14 +194,14 @@ export default function App() {
             {!drawerCollapsed && (
               <Box>
                 <Typography variant="subtitle2" fontWeight="bold" lineHeight={1.2}>
-                  Simple Prayertime Reminder
+                  {t('app.name')}
                 </Typography>
               </Box>
             )}
           </Box>
 
           {!drawerCollapsed && (
-            <Tooltip title="Collapse sidebar">
+            <Tooltip title={t('app.sidebar.collapse')}>
               <IconButton size="small" onClick={() => setDrawerCollapsed(true)} sx={{ flexShrink: 0 }}>
                 <KeyboardDoubleArrowLeftIcon fontSize="small" />
               </IconButton>
@@ -210,8 +212,9 @@ export default function App() {
         <Divider sx={{ mb: 2 }} />
 
         <List sx={{ px: drawerCollapsed ? 1 : 2 }}>
-          {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => {
+          {NAV_ITEMS.map(({ to, labelKey, icon: Icon, end }) => {
             const isActive = end ? location.pathname === to : location.pathname.startsWith(to);
+            const label = t(labelKey);
             return (
               <ListItem key={to} disablePadding sx={{ mb: 0.5 }}>
                 <Tooltip title={drawerCollapsed ? label : ''} placement="right">
@@ -262,7 +265,7 @@ export default function App() {
 
         {drawerCollapsed && (
           <Box sx={{ mt: 'auto', p: 1.5, display: 'flex', justifyContent: 'center' }}>
-            <Tooltip title="Expand sidebar" placement="right">
+            <Tooltip title={t('app.sidebar.expand')} placement="right">
               <IconButton size="small" onClick={() => setDrawerCollapsed(false)}>
                 <KeyboardDoubleArrowRightIcon fontSize="small" />
               </IconButton>

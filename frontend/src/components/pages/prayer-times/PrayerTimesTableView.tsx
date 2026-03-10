@@ -19,6 +19,7 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import type { DaySchedule, HijriCalendarDay } from '../../../types';
 import { formatTime } from '../../../utils/helpers';
 import { buildHijriMap, formatHijriDateShort } from './helpers';
+import { useTranslation } from 'react-i18next';
 
 interface PrayerTimesTableViewProps {
   activeMonth: Dayjs;
@@ -45,6 +46,7 @@ export default function PrayerTimesTableView({
   onNextMonth,
   onToday,
 }: PrayerTimesTableViewProps) {
+  const { t } = useTranslation();
   const todayIso = dayjs().format('YYYY-MM-DD');
   const hijriByDate = buildHijriMap(hijriDays);
 
@@ -66,7 +68,7 @@ export default function PrayerTimesTableView({
             <ChevronLeftIcon />
           </IconButton>
           <Button variant="text" color="inherit" size="small" onClick={onToday}>
-            Today
+            {t('prayerTimes.today')}
           </Button>
           <IconButton onClick={onNextMonth} size="small">
             <ChevronRightIcon />
@@ -78,7 +80,15 @@ export default function PrayerTimesTableView({
         <Table size="small">
           <TableHead>
             <TableRow sx={{ bgcolor: 'action.hover' }}>
-              {['Date', 'Fajr', 'Sunrise', 'Zuhr', 'Asr', 'Maghrib', 'Isha'].map(
+              {[
+                t('prayerTimes.table.date'),
+                t('prayerNames.fajr'),
+                t('prayerNames.sunrise'),
+                t('prayerNames.zuhr'),
+                t('prayerNames.asr'),
+                t('prayerNames.maghrib'),
+                t('prayerNames.isha'),
+              ].map(
                 (label, index) => (
                   <TableCell key={label} align={index === 0 ? 'left' : 'center'}>
                     <Typography variant="overline" fontWeight={600}>

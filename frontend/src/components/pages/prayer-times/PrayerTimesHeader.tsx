@@ -1,12 +1,14 @@
 import { Box, Button, Typography } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import { useTranslation } from 'react-i18next';
 
 interface PrayerTimesHeaderProps {
   onExport: () => void;
 }
 
 export default function PrayerTimesHeader({ onExport }: PrayerTimesHeaderProps) {
+  const { t } = useTranslation();
   return (
     <Box
       display="flex"
@@ -32,10 +34,10 @@ export default function PrayerTimesHeader({ onExport }: PrayerTimesHeaderProps) 
           >
             <CalendarMonthIcon fontSize="small" />
           </Box>
-          <Typography variant="h2">Monthly Schedule</Typography>
+          <Typography variant="h2">{t('prayerTimes.title')}</Typography>
         </Box>
         <Typography variant="body2" color="text.secondary">
-          Browse prayer times as a table or an interactive calendar.
+          {t('prayerTimes.subtitle')}
         </Typography>
       </Box>
 
@@ -46,7 +48,7 @@ export default function PrayerTimesHeader({ onExport }: PrayerTimesHeaderProps) 
           startIcon={<DownloadIcon />}
           onClick={onExport}
         >
-          Export
+          {t('prayerTimes.export')}
         </Button>
       </Box>
     </Box>

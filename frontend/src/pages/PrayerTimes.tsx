@@ -37,6 +37,8 @@ import {
   type PrayerTimesViewMode,
 } from '../types';
 import { Backdrop, Box, LinearProgress, Paper, Stack, Typography } from '@mui/material';
+import i18n from '../i18n';
+import { useTranslation } from 'react-i18next';
 
 function moveToMonth(current: Dayjs, nextMonth: Dayjs): Dayjs {
   const safeDay = Math.min(current.date(), nextMonth.daysInMonth());
@@ -107,23 +109,25 @@ function getImageCompression(quality: ExportQuality, qualityScale: number) {
 }
 
 function formatOffsetValue(value: number) {
-  return `${value > 0 ? '+' : ''}${value}m`;
+  return i18n.t('common.minutesShort', { value: `${value > 0 ? '+' : ''}${value}` });
 }
 
 function buildExportMetadata(settings: ReturnType<typeof useAppStore.getState>['settings']): ExportMetadataSummary {
   const methodLabel =
-    CALCULATION_METHODS.find((method) => method.value === settings?.prayer.method)?.label ??
-    settings?.prayer.method ??
-    'Unknown';
+    (CALCULATION_METHODS.find((method) => method.value === settings?.prayer.method)?.labelKey
+      ? i18n.t(
+          CALCULATION_METHODS.find((method) => method.value === settings?.prayer.method)?.labelKey as string,
+        )
+      : settings?.prayer.method) ?? i18n.t('common.unknown');
 
   if (!settings) {
     return {
       methodLabel,
-      locationLabel: 'Unknown location',
-      coordinatesLabel: 'Unknown coordinates',
-      timezoneLabel: 'Unknown timezone',
-      elevationLabel: 'Unknown elevation',
-      offsetSummary: 'No prayer offsets',
+      locationLabel: i18n.t('prayerTimes.unknownLocation'),
+      coordinatesLabel: i18n.t('prayerTimes.unknownCoordinates'),
+      timezoneLabel: i18n.t('prayerTimes.unknownTimezone'),
+      elevationLabel: i18n.t('prayerTimes.unknownElevation'),
+      offsetSummary: i18n.t('prayerTimes.noOffsets'),
     };
   }
 
@@ -141,9 +145,9 @@ function buildExportMetadata(settings: ReturnType<typeof useAppStore.getState>['
     methodLabel,
     locationLabel,
     coordinatesLabel: `${settings.location.latitude.toFixed(4)}, ${settings.location.longitude.toFixed(4)}`,
-    timezoneLabel: settings.location.timezone || 'Unknown timezone',
-    elevationLabel: `${settings.location.elevation} m`,
-    offsetSummary: offsetEntries.length > 0 ? offsetEntries.join(', ') : 'No prayer offsets',
+    timezoneLabel: settings.location.timezone || i18n.t('prayerTimes.unknownTimezone'),
+    elevationLabel: i18n.t('prayerTimes.elevationValue', { value: settings.location.elevation }),
+    offsetSummary: offsetEntries.length > 0 ? offsetEntries.join(', ') : i18n.t('prayerTimes.noOffsets'),
   };
 }
 
@@ -154,6 +158,7 @@ interface ExportProgressState {
 }
 
 export default function PrayerTimes() {
+  const { t } = useTranslation();
   const { settings, updateSettings } = useAppStore();
   const [selectedDate, setSelectedDate] = useState(() => dayjs());
   const [viewMode, setViewMode] = useState<PrayerTimesViewMode>('table');
@@ -358,12 +363,12 @@ export default function PrayerTimes() {
 
     if (request.kind === 'csv' || request.kind === 'excel') {
       setExporting(true);
-      updateExportProgress(10, 'Preparing export', 'Collecting table data for export.');
+      updateExportProgress(10, t('export.progress.preparingTitle'), t('export.progress.collectingTable'));
       try {
         updateExportProgress(
           45,
-          request.kind === 'csv' ? 'Generating CSV' : 'Generating Excel workbook',
-          `Writing ${request.kind === 'csv' ? 'CSV' : 'XLSX'} data to the selected file.`,
+          request.kind === 'csv' ? t('export.progress.generatingCsv') : t('export.progress.generatingExcel'),
+          t('export.progress.writingFile', { format: request.kind === 'csv' ? 'CSV' : 'XLSX' }),
         );
         if (request.kind === 'csv') {
           await exportRangeToCSV(request.startDate, request.endDate, request.outputPath);
@@ -371,11 +376,11 @@ export default function PrayerTimes() {
           await exportRangeToExcel(request.startDate, request.endDate, request.outputPath);
         }
 
-        updateExportProgress(100, 'Export complete', 'Finalizing the exported file.');
+        updateExportProgress(100, t('export.progress.exportComplete'), t('export.progress.finalizing'));
         setExportDialogOpen(false);
-        alert(`Exported successfully to ${request.outputPath}`);
+        alert(t('export.alert.success', { path: request.outputPath }));
       } catch (error) {
-        alert(`Export failed: ${error}`);
+        alert(t('export.alert.failed', { error: String(error) }));
       } finally {
         setExporting(false);
         setExportProgress(null);
@@ -384,7 +389,7 @@ export default function PrayerTimes() {
     }
 
     setExporting(true);
-    updateExportProgress(8, 'Preparing export', 'Loading prayer schedules and Hijri dates for the selected range.');
+    updateExportProgress(8, t('export.progress.preparingTitle'), t('export.progress.loadingRange'));
     try {
       const [rangeSchedules, rangeHijriDays] = await Promise.all([
         getScheduleRange(request.startDate, request.endDate),
@@ -404,7 +409,7 @@ export default function PrayerTimes() {
         const month = months[index];
         const ref = calendarPdfRefs.current[month.format('YYYY-MM')];
         if (!ref) {
-          throw new Error(`Calendar export page for ${month.format('MMMM YYYY')} is not ready yet.`);
+          throw new Error(t('export.errors.calendarPageNotReady', { month: month.format('MMMM YYYY') }));
         }
 
         const progress =
@@ -412,8 +417,12 @@ export default function PrayerTimes() {
           ((index + 1) / months.length) * (calendarProgressEnd - calendarProgressStart);
         updateExportProgress(
           progress,
-          'Rendering calendar pages',
-          `Capturing calendar ${index + 1} of ${months.length}: ${month.format('MMMM YYYY')}.`,
+          t('export.progress.renderingCalendar'),
+          t('export.progress.capturingCalendar', {
+            index: index + 1,
+            total: months.length,
+            month: month.format('MMMM YYYY'),
+          }),
         );
 
         monthCanvases.push(await captureElement(ref, request.quality, request.qualityScale));
@@ -474,13 +483,17 @@ export default function PrayerTimes() {
         const monthKey = months[index].format('YYYY-MM');
         const tableRef = tablePdfRefs.current[monthKey];
         if (!tableRef) {
-          throw new Error(`Table export page for ${months[index].format('MMMM YYYY')} is not ready yet.`);
+          throw new Error(t('export.errors.tablePageNotReady', { month: months[index].format('MMMM YYYY') }));
         }
 
         updateExportProgress(
           52 + ((index + 1) / months.length) * 24,
-          'Rendering prayer tables',
-          `Capturing prayer table ${index + 1} of ${months.length}: ${months[index].format('MMMM YYYY')}.`,
+          t('export.progress.renderingTables'),
+          t('export.progress.capturingTable', {
+            index: index + 1,
+            total: months.length,
+            month: months[index].format('MMMM YYYY'),
+          }),
         );
 
         const tableCanvas = await captureElement(
@@ -497,16 +510,16 @@ export default function PrayerTimes() {
         isFirstPage = false;
       }
 
-      updateExportProgress(86, 'Composing PDF', 'Creating the final PDF document structure.');
-      updateExportProgress(94, 'Saving PDF', 'Encoding the document and writing it to the selected file.');
+      updateExportProgress(86, t('export.progress.composingTitle'), t('export.progress.composingDetail'));
+      updateExportProgress(94, t('export.progress.savingTitle'), t('export.progress.savingDetail'));
       const pdfBase64 = arrayBufferToBase64(pdf.output('arraybuffer'));
 
       await saveBase64File(request.outputPath, pdfBase64);
-      updateExportProgress(100, 'Export complete', 'The PDF export has finished successfully.');
+      updateExportProgress(100, t('export.progress.exportComplete'), t('export.progress.pdfComplete'));
       setExportDialogOpen(false);
-      alert(`Exported successfully to ${request.outputPath}`);
+      alert(t('export.alert.success', { path: request.outputPath }));
     } catch (error) {
-      alert(`Export failed: ${error}`);
+      alert(t('export.alert.failed', { error: String(error) }));
     } finally {
       setExporting(false);
       setExportProgress(null);
@@ -581,10 +594,10 @@ export default function PrayerTimes() {
           <Stack spacing={2}>
             <Box>
               <Typography variant="h6" fontWeight={700}>
-                Exporting Prayer Times
+                {t('export.backdrop.title')}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {exportProgress?.title ?? 'Preparing export'}
+                {exportProgress?.title ?? t('export.progress.preparingTitle')}
               </Typography>
             </Box>
 
@@ -596,7 +609,7 @@ export default function PrayerTimes() {
 
             <Box display="flex" justifyContent="space-between" gap={2}>
               <Typography variant="body2" color="text.secondary">
-                {exportProgress?.detail ?? 'Please wait while the export is being prepared.'}
+                {exportProgress?.detail ?? t('export.backdrop.detail')}
               </Typography>
               <Typography variant="body2" fontWeight={700}>
                 {Math.round(exportProgress?.progress ?? 0)}%
@@ -604,7 +617,7 @@ export default function PrayerTimes() {
             </Box>
 
             <Typography variant="caption" color="text.secondary">
-              Export is in progress. Navigation and page controls are temporarily locked.
+              {t('export.backdrop.locked')}
             </Typography>
           </Stack>
         </Paper>

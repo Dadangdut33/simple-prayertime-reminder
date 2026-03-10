@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import './i18n';
 import './index.css';
 import 'react-clock/dist/Clock.css';
 import '@fontsource/roboto/300.css';

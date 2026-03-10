@@ -1,6 +1,7 @@
 import { Box, FormControlLabel, Slider, Switch, Typography } from '@mui/material';
 import NumberField from '../../ui/NumberField';
 import { PRAYER_NAMES, type Settings } from '../../../types';
+import { useTranslation } from 'react-i18next';
 
 interface AlarmSettingsTabProps {
   local: Settings;
@@ -8,13 +9,14 @@ interface AlarmSettingsTabProps {
 }
 
 export default function AlarmSettingsTab({ local, setNotification }: AlarmSettingsTabProps) {
+  const { t } = useTranslation();
   return (
     <Box display="flex" flexDirection="column" gap={3}>
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Box>
-          <Typography variant="subtitle1">Play Adhan Audio</Typography>
+          <Typography variant="subtitle1">{t('settings.alarms.playAdhan')}</Typography>
           <Typography variant="body2" color="text.secondary">
-            Play sound when prayer time arrives
+            {t('settings.alarms.playAdhanDesc')}
           </Typography>
         </Box>
         <Switch
@@ -26,10 +28,12 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
       <Box pb={3} borderBottom="1px solid" borderColor="divider">
         <Box display="flex" justifyContent="space-between" mb={1}>
           <Typography variant="body2" color="text.secondary">
-            Adhan Volume
+            {t('settings.alarms.adhanVolume')}
           </Typography>
           <Typography variant="body2" color="primary.main" fontWeight={600}>
-            {Math.round(local.notification.adhanVolume * 100)}%
+            {t('settings.alarms.adhanVolumeValue', {
+              value: Math.round(local.notification.adhanVolume * 100),
+            })}
           </Typography>
         </Box>
         <Slider
@@ -43,7 +47,7 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
 
       <Box>
         <Typography variant="subtitle2" mb={2}>
-          Per-Prayer Alarms
+          {t('settings.alarms.title')}
         </Typography>
         <Box display="grid" gridTemplateColumns={{ xs: '1fr', lg: '1fr 1fr' }} gap={2}>
           {PRAYER_NAMES.map((prayerName) => {
@@ -77,7 +81,7 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
                       }
                     />
                   }
-                  label={<Typography fontWeight={600}>{prayerName}</Typography>}
+                  label={<Typography fontWeight={600}>{t(`prayerNames.${key}`)}</Typography>}
                   sx={{
                     m: 0,
                     justifyContent: 'space-between',
@@ -95,7 +99,7 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
                   }}
                 >
                   <NumberField
-                    label="Remind Before (m)"
+                    label={t('settings.alarms.remindBefore')}
                     size="small"
                     value={alarm.beforeMinutes}
                     min={0}
@@ -112,7 +116,7 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
                     }
                   />
                   <NumberField
-                    label="Auto-dismiss (m)"
+                    label={t('settings.alarms.autoDismiss')}
                     size="small"
                     value={alarm.afterMinutes}
                     min={1}

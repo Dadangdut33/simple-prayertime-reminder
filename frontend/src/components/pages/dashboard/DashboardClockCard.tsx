@@ -1,6 +1,7 @@
 import { Box, Card, Typography } from '@mui/material';
 import Clock from 'react-clock';
 import type { Settings } from '../../../types';
+import { useTranslation } from 'react-i18next';
 
 interface DashboardClockCardProps {
   now: Date;
@@ -15,6 +16,7 @@ export default function DashboardClockCard({
   analogClockSize,
   digitalClockText,
 }: DashboardClockCardProps) {
+  const { t } = useTranslation();
   const analogFormatHour = (_locale: string | undefined, hour: number) => {
     if (settings.dashboard.showAllClockHours) {
       return String(hour);
@@ -39,7 +41,7 @@ export default function DashboardClockCard({
 
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="overline" color="text.secondary" fontWeight={600} letterSpacing={1.5}>
-          Clock
+          {t('dashboard.clock.title')}
         </Typography>
       </Box>
 
@@ -125,7 +127,7 @@ export default function DashboardClockCard({
             {digitalClockText}
           </Typography>
           <Typography variant="body2" color="text.secondary" mt={1}>
-            Local Time.
+            {t('dashboard.clock.localTime')}
           </Typography>
         </Box>
       )}

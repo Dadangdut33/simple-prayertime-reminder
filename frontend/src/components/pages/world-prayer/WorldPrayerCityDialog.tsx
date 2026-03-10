@@ -14,6 +14,7 @@ import {
 import * as api from '../../../bindings';
 import type { CitySearchResult } from '../../../types';
 import { formatCityLabel } from '../../../utils/helpers';
+import { useTranslation } from 'react-i18next';
 
 interface WorldPrayerCityDialogProps {
   open: boolean;
@@ -22,6 +23,7 @@ interface WorldPrayerCityDialogProps {
 }
 
 export default function WorldPrayerCityDialog({ open, onClose, onAdd }: WorldPrayerCityDialogProps) {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [options, setOptions] = useState<CitySearchResult[]>([]);
   const [loading, setLoading] = useState(false);
@@ -73,10 +75,10 @@ export default function WorldPrayerCityDialog({ open, onClose, onAdd }: WorldPra
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Add Cities</DialogTitle>
+      <DialogTitle>{t('worldPrayer.dialogTitle')}</DialogTitle>
       <DialogContent>
         <Typography variant="body2" color="text.secondary" mb={2}>
-          Search cities from the GeoNames database and add them to your list.
+          {t('worldPrayer.dialogHelper')}
         </Typography>
         <Autocomplete
           multiple
@@ -91,9 +93,9 @@ export default function WorldPrayerCityDialog({ open, onClose, onAdd }: WorldPra
           renderInput={(params) => (
             <TextField
               {...params}
-              label="Search city"
+              label={t('settings.location.searchCity')}
               size="small"
-              placeholder="Type at least 2 characters"
+              placeholder={t('worldPrayer.dialogPlaceholder')}
               InputProps={{
                 ...params.InputProps,
                 endAdornment: (
@@ -110,7 +112,7 @@ export default function WorldPrayerCityDialog({ open, onClose, onAdd }: WorldPra
               <Box>
                 <Typography variant="subtitle2">{formatCityLabel(option)}</Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {option.timezone || 'Timezone unknown'}
+                  {option.timezone || t('settings.location.timezoneUnknown')}
                 </Typography>
               </Box>
             </Box>
@@ -118,9 +120,9 @@ export default function WorldPrayerCityDialog({ open, onClose, onAdd }: WorldPra
         />
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>{t('common.cancel')}</Button>
         <Button variant="contained" onClick={handleAdd} disabled={selected.length === 0}>
-          Add Selected
+          {t('worldPrayer.dialogAction')}
         </Button>
       </DialogActions>
     </Dialog>

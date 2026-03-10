@@ -11,6 +11,7 @@ import {
   getPrayerDisplayName,
   getPrayerList,
 } from '../../../utils/helpers';
+import { useTranslation } from 'react-i18next';
 
 interface WorldPrayerCityCardProps {
   summary: WorldPrayerCitySummary;
@@ -41,10 +42,11 @@ export default function WorldPrayerCityCard({
   onDrop,
   onRemove,
 }: WorldPrayerCityCardProps) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const { city } = summary;
   const cityLabel = formatCityLabel(city);
-  const timezoneLabel = city.timezone || 'Unknown timezone';
+  const timezoneLabel = city.timezone || t('settings.location.timezoneUnknown');
   const currentTimeLabel = formatTimeInZone(nowIso, timezoneLabel, timeFormat);
   const nextPrayerLabel = summary.nextPrayer
     ? getPrayerDisplayName(summary.nextPrayer.name, summary.nextPrayer.time)
@@ -110,7 +112,7 @@ export default function WorldPrayerCityCard({
               }}
               onMouseDown={(event) => event.stopPropagation()}
               onClick={(event) => event.stopPropagation()}
-              aria-label={`Reorder ${cityLabel}`}
+              aria-label={t('worldPrayer.reorder', { city: cityLabel })}
               sx={{
                 cursor: draggable ? 'grab' : 'default',
                 '&:active': {
@@ -127,7 +129,11 @@ export default function WorldPrayerCityCard({
               event.stopPropagation();
               toggleExpanded();
             }}
-            aria-label={expanded ? `Collapse ${cityLabel}` : `Expand ${cityLabel}`}
+            aria-label={
+              expanded
+                ? t('worldPrayer.collapseCity', { city: cityLabel })
+                : t('worldPrayer.expandCity', { city: cityLabel })
+            }
           >
             <ExpandMoreIcon
               fontSize="small"
@@ -143,7 +149,7 @@ export default function WorldPrayerCityCard({
               event.stopPropagation();
               onRemove();
             }}
-            aria-label={`Remove ${cityLabel}`}
+            aria-label={t('worldPrayer.removeCity', { city: cityLabel })}
           >
             <CloseIcon fontSize="small" />
           </IconButton>
@@ -159,7 +165,7 @@ export default function WorldPrayerCityCard({
           bgcolor="background.paper"
         >
           <Typography variant="caption" color="text.secondary">
-            Time difference
+            {t('worldPrayer.timeDifference')}
           </Typography>
           <Typography variant="subtitle1" fontWeight={700} sx={{ fontVariantNumeric: 'tabular-nums' }}>
             {formatOffsetSeconds(summary.offsetSeconds)}
@@ -173,7 +179,7 @@ export default function WorldPrayerCityCard({
           bgcolor="background.paper"
         >
           <Typography variant="caption" color="text.secondary">
-            Current time
+            {t('worldPrayer.currentTime')}
           </Typography>
           <Typography variant="subtitle1" fontWeight={700} sx={{ fontVariantNumeric: 'tabular-nums' }}>
             {currentTimeLabel}
@@ -190,7 +196,7 @@ export default function WorldPrayerCityCard({
           gap={0.5}
         >
           <Typography variant="caption" color="text.secondary">
-            Next prayer
+            {t('worldPrayer.nextPrayer')}
           </Typography>
           <Typography variant="subtitle1" fontWeight={700} sx={{ fontVariantNumeric: 'tabular-nums' }}>
             {nextPrayerTime}

@@ -3,13 +3,14 @@ import PublicIcon from '@mui/icons-material/Public';
 import AddIcon from '@mui/icons-material/Add';
 import SortIcon from '@mui/icons-material/Sort';
 import type { WorldPrayerSort } from '../../../types';
+import { useTranslation } from 'react-i18next';
 
-const SORT_OPTIONS: Array<{ value: WorldPrayerSort; label: string }> = [
-  { value: 'manual', label: 'Manual order' },
-  { value: 'name', label: 'Name' },
-  { value: 'offset', label: 'Time difference' },
-  { value: 'current-time', label: 'Current time' },
-  { value: 'next-prayer', label: 'Next prayer' },
+const SORT_OPTIONS: Array<{ value: WorldPrayerSort; labelKey: string }> = [
+  { value: 'manual', labelKey: 'worldPrayer.sortManual' },
+  { value: 'name', labelKey: 'worldPrayer.sortName' },
+  { value: 'offset', labelKey: 'worldPrayer.sortOffset' },
+  { value: 'current-time', labelKey: 'worldPrayer.sortCurrent' },
+  { value: 'next-prayer', labelKey: 'worldPrayer.sortNext' },
 ];
 
 interface WorldPrayerHeaderProps {
@@ -19,6 +20,7 @@ interface WorldPrayerHeaderProps {
 }
 
 export default function WorldPrayerHeader({ sortBy, onSortChange, onAddCity }: WorldPrayerHeaderProps) {
+  const { t } = useTranslation();
   return (
     <Box
       display="flex"
@@ -44,11 +46,10 @@ export default function WorldPrayerHeader({ sortBy, onSortChange, onAddCity }: W
           >
             <PublicIcon fontSize="small" />
           </Box>
-          <Typography variant="h2">World Cities Prayer Times</Typography>
+          <Typography variant="h2">{t('worldPrayer.title')}</Typography>
         </Box>
         <Typography variant="body2" color="text.secondary">
-          View prayer time around the world. <b>Please Note</b> that the prayer time is calculated using your locally
-          set mode!
+          {t('worldPrayer.subtitle')} <b>{t('worldPrayer.noteStrong')}</b> {t('worldPrayer.note')}
         </Typography>
       </Box>
 
@@ -58,13 +59,13 @@ export default function WorldPrayerHeader({ sortBy, onSortChange, onAddCity }: W
           <Select size="small" value={sortBy} onChange={(event) => onSortChange(event.target.value as WorldPrayerSort)}>
             {SORT_OPTIONS.map((option) => (
               <MenuItem key={option.value} value={option.value}>
-                {option.label}
+                {t(option.labelKey)}
               </MenuItem>
             ))}
           </Select>
         </Box>
         <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={onAddCity}>
-          Add City
+          {t('common.addCity')}
         </Button>
       </Box>
     </Box>

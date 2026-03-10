@@ -1,5 +1,6 @@
 import { Box, Button, FormControlLabel, Switch, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import type { PrayerCalendarSystem, PrayerTimesViewMode } from '../../../types';
+import { useTranslation } from 'react-i18next';
 
 interface PrayerTimesControlsProps {
   activeMonthLabel: string;
@@ -22,6 +23,7 @@ export default function PrayerTimesControls({
   onArabicDigitToggle,
   onToday,
 }: PrayerTimesControlsProps) {
+  const { t } = useTranslation();
   return (
     <Box
       display="flex"
@@ -49,8 +51,8 @@ export default function PrayerTimesControls({
             }
           }}
         >
-          <ToggleButton value="table">Table</ToggleButton>
-          <ToggleButton value="calendar">Calendar</ToggleButton>
+          <ToggleButton value="table">{t('prayerTimes.viewTable')}</ToggleButton>
+          <ToggleButton value="calendar">{t('prayerTimes.viewCalendar')}</ToggleButton>
         </ToggleButtonGroup>
 
         {viewMode === 'calendar' && (
@@ -65,15 +67,15 @@ export default function PrayerTimesControls({
                 }
               }}
             >
-              <ToggleButton value="gregorian">Gregorian</ToggleButton>
-              <ToggleButton value="hijri">Hijri</ToggleButton>
-              <ToggleButton value="side-by-side">Side by side</ToggleButton>
+              <ToggleButton value="gregorian">{t('prayerTimes.calendarGregorian')}</ToggleButton>
+              <ToggleButton value="hijri">{t('prayerTimes.calendarHijri')}</ToggleButton>
+              <ToggleButton value="side-by-side">{t('prayerTimes.calendarSideBySide')}</ToggleButton>
             </ToggleButtonGroup>
           </>
         )}
 
         <Button variant="text" size="small" color="inherit" onClick={onToday}>
-          Today
+          {t('prayerTimes.today')}
         </Button>
 
         <Box className="ms-auto">
@@ -86,7 +88,7 @@ export default function PrayerTimesControls({
                   onChange={(event) => onArabicDigitToggle(event.target.checked)}
                 />
               }
-              label="Arabic Hijri digits"
+              label={t('prayerTimes.arabicDigits')}
             />
           )}
         </Box>

@@ -1,6 +1,7 @@
 import { Box, Card, Typography } from '@mui/material';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import { formatTime } from '../../../utils/helpers';
+import { useTranslation } from 'react-i18next';
 
 interface PrayerEntry {
   name: string;
@@ -14,11 +15,12 @@ interface ScheduleCardProps {
 }
 
 export default function ScheduleCard({ prayers, nextPrayerName, isAllPassed }: ScheduleCardProps) {
+  const { t } = useTranslation();
   return (
     <Card sx={{ p: 3 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="overline" color="text.secondary" fontWeight={600} letterSpacing={1.5}>
-          Today's Schedule
+          {t('dashboard.schedule.title')}
         </Typography>
         <NotificationsActiveIcon fontSize="small" color="disabled" />
       </Box>

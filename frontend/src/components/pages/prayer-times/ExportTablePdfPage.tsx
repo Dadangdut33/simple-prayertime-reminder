@@ -3,6 +3,7 @@ import type { DaySchedule, HijriDate } from '../../../types';
 import { formatTime } from '../../../utils/helpers';
 import type { ExportMetadataSummary, PrayerTableLayout } from './ExportPrayerTimesDialog';
 import { formatHijriDateShort } from './helpers';
+import i18n from '../../../i18n';
 
 interface ExportTablePdfPageProps {
   activeMonthLabel: string;
@@ -65,11 +66,11 @@ function PrayerTable({
       <thead>
         <tr>
           {stackedDateColumn ? (
-            <th style={{ width: '34%' }}>Date</th>
+            <th style={{ width: '34%' }}>{i18n.t('prayerTimes.table.date')}</th>
           ) : (
             <>
-              <th style={{ width: compact ? '20%' : '22%' }}>Gregorian Date</th>
-              <th style={{ width: compact ? '28%' : '26%' }}>Hijri Date</th>
+              <th style={{ width: compact ? '20%' : '22%' }}>{i18n.t('export.table.gregorianDate')}</th>
+              <th style={{ width: compact ? '28%' : '26%' }}>{i18n.t('export.table.hijriDate')}</th>
             </>
           )}
           {labels.map((label) => (
@@ -138,32 +139,32 @@ export default function ExportTablePdfPage({
       <Grid container sx={{ mb: 2.25 }}>
         <Grid size={4}>
           <Typography variant="body2" color="text.secondary">
-            Method: {metadata.methodLabel}
+            {i18n.t('export.summaryCalculation')} {metadata.methodLabel}
           </Typography>
         </Grid>
         <Grid size={8}>
           <Typography variant="body2" color="text.secondary">
-            Location: {metadata.locationLabel}
+            {i18n.t('export.summaryLocation')} {metadata.locationLabel}
           </Typography>
         </Grid>
         <Grid size={4}>
           <Typography variant="body2" color="text.secondary">
-            Coordinates: {metadata.coordinatesLabel}
+            {i18n.t('export.summaryCoordinates')} {metadata.coordinatesLabel}
           </Typography>
         </Grid>
         <Grid size={8}>
           <Typography variant="body2" color="text.secondary">
-            Timezone: {metadata.timezoneLabel}
+            {i18n.t('export.summaryTimezone')} {metadata.timezoneLabel}
           </Typography>
         </Grid>
         <Grid size={4}>
           <Typography variant="body2" color="text.secondary">
-            Elevation: {metadata.elevationLabel}
+            {i18n.t('export.summaryElevation')} {metadata.elevationLabel}
           </Typography>
         </Grid>
         <Grid size={8}>
           <Typography variant="body2" color="text.secondary">
-            Offsets: {metadata.offsetSummary}
+            {i18n.t('export.summaryOffsets')} {metadata.offsetSummary}
           </Typography>
         </Grid>
       </Grid>
@@ -175,7 +176,14 @@ export default function ExportTablePdfPage({
             hijriByDate={hijriByDate}
             timeFormat={timeFormat}
             prayerKeys={['fajr', 'sunrise', 'zuhr', 'asr', 'maghrib', 'isha']}
-            labels={['Fajr', 'Sunrise', 'Zuhr', 'Asr', 'Maghrib', 'Isha']}
+            labels={[
+              i18n.t('prayerNames.fajr'),
+              i18n.t('prayerNames.sunrise'),
+              i18n.t('prayerNames.zuhr'),
+              i18n.t('prayerNames.asr'),
+              i18n.t('prayerNames.maghrib'),
+              i18n.t('prayerNames.isha'),
+            ]}
             stackedDateColumn
           />
           <PrayerTable
@@ -183,7 +191,14 @@ export default function ExportTablePdfPage({
             hijriByDate={hijriByDate}
             timeFormat={timeFormat}
             prayerKeys={['fajr', 'sunrise', 'zuhr', 'asr', 'maghrib', 'isha']}
-            labels={['Fajr', 'Sunrise', 'Zuhr', 'Asr', 'Maghrib', 'Isha']}
+            labels={[
+              i18n.t('prayerNames.fajr'),
+              i18n.t('prayerNames.sunrise'),
+              i18n.t('prayerNames.zuhr'),
+              i18n.t('prayerNames.asr'),
+              i18n.t('prayerNames.maghrib'),
+              i18n.t('prayerNames.isha'),
+            ]}
             stackedDateColumn
           />
         </Box>
@@ -193,7 +208,14 @@ export default function ExportTablePdfPage({
           hijriByDate={hijriByDate}
           timeFormat={timeFormat}
           prayerKeys={['fajr', 'sunrise', 'zuhr', 'asr', 'maghrib', 'isha']}
-          labels={['Fajr', 'Sunrise', 'Zuhr', 'Asr', 'Maghrib', 'Isha']}
+          labels={[
+            i18n.t('prayerNames.fajr'),
+            i18n.t('prayerNames.sunrise'),
+            i18n.t('prayerNames.zuhr'),
+            i18n.t('prayerNames.asr'),
+            i18n.t('prayerNames.maghrib'),
+            i18n.t('prayerNames.isha'),
+          ]}
           compact={isPortrait}
         />
       )}

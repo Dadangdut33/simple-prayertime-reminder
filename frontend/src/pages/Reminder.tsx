@@ -13,8 +13,11 @@ import { Box, Button, Card, Typography } from '@mui/material';
 import { BellRing, Bell, CheckCircle2 } from 'lucide-react';
 import { dismissReminder } from '../bindings';
 import type { ReminderInfo } from '../types';
+import { useTranslation } from 'react-i18next';
+import { getPrayerDisplayName } from '../utils/helpers';
 
 export default function ReminderPage() {
+  const { t } = useTranslation();
   const [info, setInfo] = useState<ReminderInfo | null>(null);
 
   useEffect(() => {
@@ -31,22 +34,22 @@ export default function ReminderPage() {
     };
   }, []);
 
-  const prayerName = info?.prayerName ?? 'Prayer';
+  const prayerName = getPrayerDisplayName(info?.prayerName ?? t('reminder.prayerFallback'));
   const state = info?.state ?? 'before';
   const minutesLeft = info?.minutesLeft ?? 0;
 
   let icon = <Bell size={48} color="currentColor" />;
-  let title = `${prayerName} is soon`;
-  let subtitle = `Starts in ${minutesLeft} minutes`;
+  let title = t('reminder.soonTitle', { prayer: prayerName });
+  let subtitle = t('reminder.startsIn', { minutes: minutesLeft });
 
   if (state === 'ontime') {
     icon = <BellRing size={60} color="currentColor" />;
-    title = `It's time for ${prayerName}`;
-    subtitle = 'Prayer time has started';
+    title = t('reminder.timeTitle', { prayer: prayerName });
+    subtitle = t('reminder.started');
   } else if (state === 'after') {
     icon = <CheckCircle2 size={52} color="currentColor" />;
-    title = `${prayerName} is in progress`;
-    subtitle = 'Reminder is still active';
+    title = t('reminder.inProgressTitle', { prayer: prayerName });
+    subtitle = t('reminder.active');
   }
 
   const accentColor = state === 'ontime' ? 'secondary.main' : state === 'after' ? 'success.main' : 'primary.main';
@@ -99,7 +102,7 @@ export default function ReminderPage() {
         </Typography>
 
         <Button fullWidth size="large" variant="contained" onClick={() => dismissReminder()}>
-          Dismiss & Stop Audio
+          {t('reminder.dismiss')}
         </Button>
       </Card>
     </Box>

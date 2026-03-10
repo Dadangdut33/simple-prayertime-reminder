@@ -9,6 +9,7 @@ import Package2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import packageJson from '../../package.json';
 import * as api from '../bindings';
 import type { AppInfo, UpdateInfo } from '../types';
+import { useTranslation } from 'react-i18next';
 
 type LatestReleaseState = {
   status: 'idle' | 'checking' | 'success' | 'error';
@@ -17,6 +18,7 @@ type LatestReleaseState = {
 };
 
 export default function AboutPage() {
+  const { t } = useTranslation();
   const [appInfo, setAppInfo] = useState<AppInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,10 +59,10 @@ export default function AboutPage() {
     }
 
     if (!latestRelease.update.hasUpdate) {
-      return `You are already on the latest version (${latestRelease.update.latestVersion}).`;
+      return t('about.latestAlready', { version: latestRelease.update.latestVersion });
     }
 
-    return `Latest available version: ${latestRelease.update.latestVersion}`;
+    return t('about.latestAvailable', { version: latestRelease.update.latestVersion });
   }, [latestRelease]);
 
   async function handleCheckLatestVersion() {
@@ -112,10 +114,10 @@ export default function AboutPage() {
           >
             <InfoOutlinedIcon fontSize="small" />
           </Box>
-          <Typography variant="h2">About</Typography>
+          <Typography variant="h2">{t('about.title')}</Typography>
         </Box>
         <Typography variant="body2" color="text.secondary">
-          About this app
+          {t('about.subtitle')}
         </Typography>
       </Box>
 
@@ -134,9 +136,9 @@ export default function AboutPage() {
                 `linear-gradient(135deg, ${theme.palette.background.paper}, ${theme.palette.action.hover})`,
             }}
           >
-            <Typography variant="h1">Simple Prayertime Reminder</Typography>
+            <Typography variant="h1">{t('app.name')}</Typography>
             <Typography variant="overline" mt={1} mb={2} color="text.secondary">
-              A simple muslim desktop companion
+              {t('about.tagline')}
             </Typography>
           </Card>
 
@@ -144,11 +146,11 @@ export default function AboutPage() {
             <Card sx={{ p: 3 }}>
               <Box display="flex" alignItems="center" gap={1.25} mb={2}>
                 <UpdateIcon color="primary" fontSize="small" />
-                <Typography variant="subtitle1">Version</Typography>
+                <Typography variant="subtitle1">{t('about.version')}</Typography>
               </Box>
 
               <Typography variant="body2" color="text.secondary" mb={1}>
-                Installed version
+                {t('about.installedVersion')}
               </Typography>
               <Typography variant="h2" color="primary.main" mb={2}>
                 {currentVersion}
@@ -161,12 +163,12 @@ export default function AboutPage() {
                   onClick={handleCheckLatestVersion}
                   disabled={latestRelease.status === 'checking'}
                 >
-                  Check Latest Version
+                  {t('about.checkUpdate')}
                 </Button>
 
                 {latestRelease.update?.releaseUrl && (
                   <Button variant="text" startIcon={<OpenInNewIcon />} onClick={handleOpenLatestRelease}>
-                    {latestRelease.update.actionLabel || 'Open Latest Release'}
+                    {latestRelease.update.actionLabel || t('about.openLatest')}
                   </Button>
                 )}
               </Stack>
@@ -186,27 +188,27 @@ export default function AboutPage() {
             <Card sx={{ p: 3 }}>
               <Box display="flex" alignItems="center" gap={1.25} mb={2}>
                 <ComputerOutlinedIcon color="primary" fontSize="small" />
-                <Typography variant="subtitle1">Environment</Typography>
+                <Typography variant="subtitle1">{t('about.environment')}</Typography>
               </Box>
 
               <Stack spacing={2.5}>
                 <Box>
                   <Typography variant="body2" color="text.secondary">
-                    Detected OS
+                    {t('about.detectedOs')}
                   </Typography>
                   <Typography variant="h3">{appInfo.detectedOs}</Typography>
                 </Box>
                 <Divider />
                 <Box>
                   <Typography variant="body2" color="text.secondary">
-                    Installation method
+                    {t('about.installMethod')}
                   </Typography>
                   <Typography variant="h3">{appInfo.installMethod}</Typography>
                 </Box>
                 <Divider />
                 <Box>
                   <Typography variant="body2" color="text.secondary">
-                    Executable path
+                    {t('about.executablePath')}
                   </Typography>
                   <Typography variant="body2" sx={{ wordBreak: 'break-all', fontFamily: 'monospace' }}>
                     {appInfo.executablePath}
@@ -218,42 +220,42 @@ export default function AboutPage() {
             <Card sx={{ p: 3 }}>
               <Box display="flex" alignItems="center" gap={1.25} mb={2}>
                 <Package2OutlinedIcon color="primary" fontSize="small" />
-                <Typography variant="subtitle1">Repository</Typography>
+                <Typography variant="subtitle1">{t('about.repository')}</Typography>
               </Box>
 
               <Typography variant="body2" color="text.secondary" mb={1}>
-                Source code
+                {t('about.sourceCode')}
               </Typography>
               <Typography variant="body2" sx={{ wordBreak: 'break-all', fontFamily: 'monospace', mb: 2 }}>
                 {appInfo.repositoryUrl}
               </Typography>
               <Button variant="contained" startIcon={<OpenInNewIcon />} onClick={handleOpenRepository}>
-                Open Repository
+                {t('about.openRepository')}
               </Button>
             </Card>
 
             <Card sx={{ p: 3 }}>
               <Box display="flex" alignItems="center" gap={1.25} mb={2}>
                 <FolderOpenOutlinedIcon color="primary" fontSize="small" />
-                <Typography variant="subtitle1">Config Location</Typography>
+                <Typography variant="subtitle1">{t('about.configLocation')}</Typography>
               </Box>
 
               <Typography variant="body2" color="text.secondary" mb={1}>
-                Config directory
+                {t('about.configDirectory')}
               </Typography>
               <Typography variant="body2" sx={{ wordBreak: 'break-all', fontFamily: 'monospace', mb: 2 }}>
                 {appInfo.configDirectory}
               </Typography>
 
               <Typography variant="body2" color="text.secondary" mb={1}>
-                Config file
+                {t('about.configFile')}
               </Typography>
               <Typography variant="body2" sx={{ wordBreak: 'break-all', fontFamily: 'monospace', mb: 2.5 }}>
                 {appInfo.configFile}
               </Typography>
 
               <Button variant="contained" startIcon={<FolderOpenOutlinedIcon />} onClick={handleOpenConfigLocation}>
-                Open Config Location
+                {t('about.openConfig')}
               </Button>
             </Card>
           </Box>

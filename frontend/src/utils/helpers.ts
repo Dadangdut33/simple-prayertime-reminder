@@ -1,5 +1,6 @@
 import type { DigitalClockFormatPreset, HijriDate } from '../types';
 import { DIGITAL_CLOCK_FORMAT_PRESETS } from '../types';
+import i18n from '../i18n';
 
 /** Format a date string from the backend (RFC3339) as a local time string */
 export function formatTime(isoOrTimeStr: string, format: '12h' | '24h' = '24h'): string {
@@ -52,7 +53,7 @@ export function getCountryName(countryCode: string): string {
   if (!trimmed) return '';
   const normalized = trimmed.toUpperCase();
   if (normalized === 'IL') {
-    return 'Palestine';
+    return i18n.t('locations.palestine');
   }
 
   try {
@@ -62,13 +63,13 @@ export function getCountryName(countryCode: string): string {
     }
     const name = regionDisplayNames.of(normalized);
     if (name) {
-      return name.replace(/Israel/gi, 'Palestine');
+      return name.replace(/Israel/gi, i18n.t('locations.palestine'));
     }
   } catch {
     // Fall back to code if Intl.DisplayNames is unavailable.
   }
 
-  return normalized.replace(/Israel/gi, 'Palestine');
+  return normalized.replace(/Israel/gi, i18n.t('locations.palestine'));
 }
 
 export function formatCityLabel(city: {
@@ -84,11 +85,13 @@ export function formatCityLabel(city: {
 
   const isJerusalem = name.localeCompare('jerusalem', undefined, { sensitivity: 'accent' }) === 0;
   const isJerusalemRegion = countryCode === 'IL' || countryCode === 'PS';
-  const displayName = isJerusalem && isJerusalemRegion ? 'Al-Quds (Jerusalem)' : name;
+  const displayName = isJerusalem && isJerusalemRegion ? i18n.t('locations.alQuds') : name;
 
   const showAdmin1 = admin1.length > 2 && /[A-Za-z]/.test(admin1);
   const countryName =
-    countryRaw.length === 2 ? getCountryName(countryRaw) : countryRaw.replace(/Israel/gi, 'Palestine');
+    countryRaw.length === 2
+      ? getCountryName(countryRaw)
+      : countryRaw.replace(/Israel/gi, i18n.t('locations.palestine'));
 
   return [displayName, showAdmin1 ? admin1 : '', countryName].filter(Boolean).join(', ');
 }
@@ -108,8 +111,8 @@ export function getCountdown(toIso: string): string {
 export function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
-  if (h > 0) return `${h}h ${m}m`;
-  return `${m}m`;
+  if (h > 0) return i18n.t('common.durationHoursMinutes', { hours: h, minutes: m });
+  return i18n.t('common.durationMinutes', { minutes: m });
 }
 
 /** Normalize a bearing into the 0-360 range */
@@ -159,42 +162,9 @@ export function bearingToCardinal(bearing: number): string {
 
 /** Convert a bearing to a detailed human-readable compass label */
 export function bearingToCompassLabel(bearing: number): string {
-  const labels: Record<string, string> = {
-    N: 'North',
-    NbE: 'North by East',
-    NNE: 'North-Northeast',
-    NEbN: 'Northeast by North',
-    NE: 'Northeast',
-    NEbE: 'Northeast by East',
-    ENE: 'East-Northeast',
-    EbN: 'East by North',
-    E: 'East',
-    EbS: 'East by South',
-    ESE: 'East-Southeast',
-    SEbE: 'Southeast by East',
-    SE: 'Southeast',
-    SEbS: 'Southeast by South',
-    SSE: 'South-Southeast',
-    SbE: 'South by East',
-    S: 'South',
-    SbW: 'South by West',
-    SSW: 'South-Southwest',
-    SWbS: 'Southwest by South',
-    SW: 'Southwest',
-    SWbW: 'Southwest by West',
-    WSW: 'West-Southwest',
-    WbS: 'West by South',
-    W: 'West',
-    WbN: 'West by North',
-    WNW: 'West-Northwest',
-    NWbW: 'Northwest by West',
-    NW: 'Northwest',
-    NWbN: 'Northwest by North',
-    NNW: 'North-Northwest',
-    NbW: 'North by West',
-  };
   const abbreviation = bearingToCardinal(bearing);
-  return `${labels[abbreviation]} (${abbreviation})`;
+  const label = i18n.t(`compass.labels.${abbreviation}`);
+  return `${label} (${abbreviation})`;
 }
 
 /** Format today's date as 'Monday, 5 March 2026' */
@@ -220,23 +190,8 @@ export function daysInMonth(year: number, month: number): number {
 /** Format hijri date from HijriDate object */
 export function formatHijri(h: HijriDate | null): string {
   if (!h) return '';
-  const months = [
-    '',
-    'Muharram',
-    'Safar',
-    "Rabi' al-Awwal",
-    "Rabi' al-Thani",
-    'Jumada al-Awwal',
-    'Jumada al-Thani',
-    'Rajab',
-    "Sha'ban",
-    'Ramadan',
-    'Shawwal',
-    "Dhu al-Qi'dah",
-    'Dhu al-Hijjah',
-  ];
-  const monthName = months[h.month] ?? h.month;
-  return `${h.day} ${monthName} ${h.year} H`;
+  const monthName = i18n.t(`hijri.months.${h.month}`, { defaultValue: String(h.month) });
+  return i18n.t('hijri.format', { day: h.day, month: monthName, year: h.year });
 }
 
 /** Get prayer times for a DaySchedule as a named list */
@@ -255,8 +210,9 @@ function isFriday(dateStr?: string): boolean {
 }
 
 export function getPrayerDisplayName(name: string, dateStr?: string): string {
-  if (name !== 'Zuhr') return name;
-  return isFriday(dateStr) ? "Jumu'ah" : name;
+  const isJumuah = name === 'Zuhr' && isFriday(dateStr);
+  const key = isJumuah ? 'prayerNames.jumuah' : `prayerNames.${name.toLowerCase()}`;
+  return i18n.t(key);
 }
 
 export function getPrayerList(schedule: {
@@ -270,12 +226,12 @@ export function getPrayerList(schedule: {
 }) {
   const zuhrLabel = getPrayerDisplayName('Zuhr', schedule.date);
   return [
-    { name: 'Fajr', time: schedule.fajr },
-    { name: 'Sunrise', time: schedule.sunrise },
+    { name: getPrayerDisplayName('Fajr'), time: schedule.fajr },
+    { name: getPrayerDisplayName('Sunrise'), time: schedule.sunrise },
     { name: zuhrLabel, time: schedule.zuhr },
-    { name: 'Asr', time: schedule.asr },
-    { name: 'Maghrib', time: schedule.maghrib },
-    { name: 'Isha', time: schedule.isha },
+    { name: getPrayerDisplayName('Asr'), time: schedule.asr },
+    { name: getPrayerDisplayName('Maghrib'), time: schedule.maghrib },
+    { name: getPrayerDisplayName('Isha'), time: schedule.isha },
   ] as const;
 }
 

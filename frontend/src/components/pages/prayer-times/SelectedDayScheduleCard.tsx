@@ -8,6 +8,7 @@ import {
   formatLongGregorianDate,
   toIsoDate,
 } from './helpers';
+import { useTranslation } from 'react-i18next';
 
 interface SelectedDayScheduleCardProps {
   selectedDate: Dayjs;
@@ -24,13 +25,14 @@ export default function SelectedDayScheduleCard({
   loading,
   timeFormat,
 }: SelectedDayScheduleCardProps) {
+  const { t } = useTranslation();
   const isToday = toIsoDate(selectedDate) === dayjs().format('YYYY-MM-DD');
 
   return (
     <Card sx={{ p: 3, borderRadius: 0.5, height: '100%' }}>
       <Box display="flex" justifyContent="space-between" gap={2} mb={2}>
         <Box>
-          <Typography variant="h3">Selected Day</Typography>
+          <Typography variant="h3">{t('prayerTimes.selectedDay')}</Typography>
           <Typography variant="body2" color="text.secondary">
             {formatLongGregorianDate(selectedDate)}
           </Typography>
@@ -38,7 +40,7 @@ export default function SelectedDayScheduleCard({
             {formatHijriDateLabel(hijriDate)}
           </Typography>
         </Box>
-        {isToday && <Chip size="small" color="primary" label="Today" />}
+        {isToday && <Chip size="small" color="primary" label={t('prayerTimes.today')} />}
       </Box>
 
       <Divider sx={{ mb: 2 }} />
@@ -89,7 +91,7 @@ export default function SelectedDayScheduleCard({
         </Box>
       ) : (
         <Typography variant="body2" color="text.secondary">
-          No prayer schedule was found for the selected day.
+          {t('prayerTimes.noSchedule')}
         </Typography>
       )}
     </Card>

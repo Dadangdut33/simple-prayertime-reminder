@@ -14,6 +14,7 @@ import * as api from '../../../bindings';
 import NumberField from '../../ui/NumberField';
 import type { CitySearchResult, GeonamesInfo, Settings } from '../../../types';
 import { formatCityLabel, getCountryName } from '../../../utils/helpers';
+import { useTranslation } from 'react-i18next';
 
 interface LocationSettingsTabProps {
   local: Settings;
@@ -23,6 +24,7 @@ interface LocationSettingsTabProps {
 }
 
 export default function LocationSettingsTab({ local, loading, detectLocation, setLocation }: LocationSettingsTabProps) {
+  const { t } = useTranslation();
   const [cityQuery, setCityQuery] = useState('');
   const [cityOptions, setCityOptions] = useState<CitySearchResult[]>([]);
   const [cityLoading, setCityLoading] = useState(false);
@@ -152,9 +154,9 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
         borderColor="divider"
       >
         <Box>
-          <Typography variant="subtitle1">Auto-Detect Location</Typography>
+          <Typography variant="subtitle1">{t('settings.location.autoDetectTitle')}</Typography>
           <Typography variant="body2" color="text.secondary">
-            Use your IP address to find city and coordinates automatically
+            {t('settings.location.autoDetectDescription')}
           </Typography>
         </Box>
         <Box display="flex" alignItems="center" gap={2}>
@@ -165,7 +167,7 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
             disabled={loading}
             startIcon={loading ? <CircularProgress size={16} /> : null}
           >
-            Detect Now
+            {t('settings.location.detectNow')}
           </Button>
           <Switch
             checked={local.location.autoDetect}
@@ -178,7 +180,7 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
         <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={3}>
           <Box>
             <Typography variant="caption" color="text.secondary" mb={1} display="block">
-              Location Input
+              {t('settings.location.inputMode')}
             </Typography>
             <Select
               size="small"
@@ -190,8 +192,8 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
                 })
               }
             >
-              <MenuItem value="list">Choose from list</MenuItem>
-              <MenuItem value="custom">Custom data</MenuItem>
+              <MenuItem value="list">{t('settings.location.inputList')}</MenuItem>
+              <MenuItem value="custom">{t('settings.location.inputCustom')}</MenuItem>
             </Select>
           </Box>
         </Box>
@@ -227,9 +229,9 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="City (from list)"
+                label={t('settings.location.cityFromList')}
                 size="small"
-                placeholder="Type at least 2 letters"
+                placeholder={t('settings.location.citySearchPlaceholder')}
                 slotProps={{
                   input: {
                     ...params.InputProps,
@@ -244,19 +246,19 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
               />
             )}
           />
-          <TextField label="Country" size="small" fullWidth value={local.location.country} disabled />
+          <TextField label={t('settings.location.country')} size="small" fullWidth value={local.location.country} disabled />
           <TextField
-            label="Timezone"
+            label={t('settings.location.timezone')}
             size="small"
             fullWidth
             value={local.location.timezone}
             error={!local.location.timezone}
-            helperText={!local.location.timezone ? 'Timezone is required to calculate prayer times.' : undefined}
+            helperText={!local.location.timezone ? t('settings.location.timezoneRequired') : undefined}
             disabled
           />
-          <NumberField label="Elevation" size="small" fullWidth value={local.location.elevation} disabled />
-          <NumberField label="Latitude" size="small" fullWidth value={local.location.latitude} disabled />
-          <NumberField label="Longitude" size="small" fullWidth value={local.location.longitude} disabled />
+          <NumberField label={t('settings.location.elevation')} size="small" fullWidth value={local.location.elevation} disabled />
+          <NumberField label={t('settings.location.latitude')} size="small" fullWidth value={local.location.latitude} disabled />
+          <NumberField label={t('settings.location.longitude')} size="small" fullWidth value={local.location.longitude} disabled />
         </Box>
       )}
 
@@ -274,12 +276,14 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
           bgcolor="background.paper"
         >
           <Box>
-            <Typography variant="subtitle2">GeoNames city data</Typography>
+            <Typography variant="subtitle2">{t('settings.location.geonamesTitle')}</Typography>
             <Typography variant="body2" color="text.secondary">
-              Cities are sourced from the GeoNames cities500 dataset.
+              {t('settings.location.geonamesNote')}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Last updated: {geonamesInfo?.lastUpdated ?? (geonamesLoading ? 'Loading…' : 'Unknown')}
+              {t('settings.location.geonamesUpdated', {
+                date: geonamesInfo?.lastUpdated ?? (geonamesLoading ? t('common.loading') : t('common.unknown')),
+              })}
             </Typography>
           </Box>
           <Button
@@ -296,7 +300,7 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
               }
             }}
           >
-            {geonamesUpdating ? 'Updating…' : 'Update GeoNames Data'}
+            {geonamesUpdating ? t('settings.location.updatingCities') : t('settings.location.updateCities')}
           </Button>
         </Box>
       )}
@@ -304,7 +308,7 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
       {(isAuto || isCustomMode) && (
         <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={3}>
           <TextField
-            label="City"
+            label={t('settings.location.city')}
             size="small"
             fullWidth
             value={local.location.city}
@@ -312,7 +316,7 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
             disabled={isAuto}
           />
           <TextField
-            label="Country"
+            label={t('settings.location.country')}
             size="small"
             fullWidth
             value={local.location.country}
@@ -320,7 +324,13 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
             disabled={isAuto}
           />
           {isAuto ? (
-            <TextField label="Timezone" size="small" fullWidth value={local.location.timezone} disabled={true} />
+            <TextField
+              label={t('settings.location.timezone')}
+              size="small"
+              fullWidth
+              value={local.location.timezone}
+              disabled={true}
+            />
           ) : (
             <Autocomplete
               options={timezoneOptions}
@@ -334,12 +344,12 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Timezone"
+                  label={t('settings.location.timezone')}
                   size="small"
                   required={!isAuto}
                   error={!isAuto && !local.location.timezone}
                   helperText={
-                    !isAuto && !local.location.timezone ? 'Timezone is required to calculate prayer times.' : undefined
+                    !isAuto && !local.location.timezone ? t('settings.location.timezoneRequired') : undefined
                   }
                   slotProps={{
                     input: {
@@ -358,7 +368,7 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
             />
           )}
           <NumberField
-            label="Elevation"
+            label={t('settings.location.elevation')}
             size="small"
             fullWidth
             value={local.location.elevation}
@@ -371,7 +381,7 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
             disabled={isAuto}
           />
           <NumberField
-            label="Latitude"
+            label={t('settings.location.latitude')}
             size="small"
             fullWidth
             value={local.location.latitude}
@@ -384,7 +394,7 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
             disabled={isAuto}
           />
           <NumberField
-            label="Longitude"
+            label={t('settings.location.longitude')}
             size="small"
             fullWidth
             value={local.location.longitude}

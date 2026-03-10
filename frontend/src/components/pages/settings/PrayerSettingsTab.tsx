@@ -1,6 +1,7 @@
 import { Alert, Box, MenuItem, Select, Typography } from '@mui/material';
 import NumberField from '../../ui/NumberField';
 import { CALCULATION_METHODS, PRAYER_NAMES, type Settings } from '../../../types';
+import { useTranslation } from 'react-i18next';
 
 interface PrayerSettingsTabProps {
   local: Settings;
@@ -8,16 +9,16 @@ interface PrayerSettingsTabProps {
 }
 
 export default function PrayerSettingsTab({ local, setPrayer }: PrayerSettingsTabProps) {
+  const { t } = useTranslation();
   return (
     <Box display="flex" flexDirection="column" gap={3}>
       <Alert severity="info">
-        Prayer times are calculated with the `go-prayer` library. Please verify the results with your local prayer
-        timetable to ensure they match your community&apos;s conventions.
+        {t('settings.prayer.disclaimer')}
       </Alert>
       <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={3}>
         <Box>
           <Typography variant="caption" color="text.secondary" mb={1} display="block">
-            Calculation Method
+            {t('settings.prayer.method')}
           </Typography>
           <Select
             size="small"
@@ -32,7 +33,7 @@ export default function PrayerSettingsTab({ local, setPrayer }: PrayerSettingsTa
           >
             {CALCULATION_METHODS.map((method) => (
               <MenuItem key={method.value} value={method.value}>
-                {method.label}
+                {t(method.labelKey)}
               </MenuItem>
             ))}
           </Select>
@@ -40,7 +41,7 @@ export default function PrayerSettingsTab({ local, setPrayer }: PrayerSettingsTa
 
         <Box>
           <Typography variant="caption" color="text.secondary" mb={1} display="block">
-            Asr Method
+            {t('settings.prayer.asrMethod')}
           </Typography>
           <Select
             size="small"
@@ -53,8 +54,8 @@ export default function PrayerSettingsTab({ local, setPrayer }: PrayerSettingsTa
             }}
             onChange={(event) => setPrayer({ asrMethod: event.target.value })}
           >
-            <MenuItem value="Shafii">Shafi&apos;i, Maliki, Hanbali (Standard)</MenuItem>
-            <MenuItem value="Hanafi">Hanafi (Later time)</MenuItem>
+            <MenuItem value="Shafii">{t('prayer.asr.shafii')}</MenuItem>
+            <MenuItem value="Hanafi">{t('prayer.asr.hanafi')}</MenuItem>
           </Select>
         </Box>
       </Box>
@@ -69,7 +70,7 @@ export default function PrayerSettingsTab({ local, setPrayer }: PrayerSettingsTa
           borderRadius={2}
         >
           <NumberField
-            label="Custom Fajr Angle (°)"
+            label={t('settings.prayer.customFajr')}
             size="small"
             value={local.prayer.customFajrAngle}
             onValueChange={(value) =>
@@ -79,7 +80,7 @@ export default function PrayerSettingsTab({ local, setPrayer }: PrayerSettingsTa
             }
           />
           <NumberField
-            label="Custom Isha Angle (°)"
+            label={t('settings.prayer.customIsha')}
             size="small"
             value={local.prayer.customIshaAngle}
             onValueChange={(value) =>
@@ -89,10 +90,10 @@ export default function PrayerSettingsTab({ local, setPrayer }: PrayerSettingsTa
             }
           />
           <NumberField
-            label="Maghrib Duration (minutes)"
+            label={t('settings.prayer.customMaghrib')}
             size="small"
             value={local.prayer.customMaghribDuration}
-            helperText="Optional. Set to 0 to use angle-based Maghrib."
+            helperText={t('settings.prayer.customMaghribHint')}
             onValueChange={(value) =>
               setPrayer({
                 customMaghribDuration: value ?? 0,
@@ -104,7 +105,7 @@ export default function PrayerSettingsTab({ local, setPrayer }: PrayerSettingsTa
 
       <Box mt={2}>
         <Typography variant="subtitle2" mb={2}>
-          Manual Time Offsets (Minutes)
+          {t('settings.prayer.offsets')}
         </Typography>
         <Box
           display="grid"
@@ -121,7 +122,7 @@ export default function PrayerSettingsTab({ local, setPrayer }: PrayerSettingsTa
             return (
               <NumberField
                 key={prayerName}
-                label={prayerName}
+                label={t(`prayerNames.${key}`)}
                 size="small"
                 value={local.prayer.offsets[key]}
                 onValueChange={(value) =>

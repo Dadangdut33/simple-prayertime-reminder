@@ -1,4 +1,5 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 interface ResetSettingsDialogProps {
   open: boolean;
@@ -7,20 +8,21 @@ interface ResetSettingsDialogProps {
 }
 
 export default function ResetSettingsDialog({ open, onClose, onConfirm }: ResetSettingsDialogProps) {
+  const { t } = useTranslation();
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-      <DialogTitle>Reset settings to defaults?</DialogTitle>
+      <DialogTitle>{t('settings.reset.title')}</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          This will restore the default location, prayer calculation, alarm, and appearance settings for the app.
+          {t('settings.reset.description')}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="inherit">
-          Cancel
+          {t('common.cancel')}
         </Button>
         <Button variant="contained" color="error" onClick={onConfirm}>
-          Reset Settings
+          {t('settings.reset.confirm')}
         </Button>
       </DialogActions>
     </Dialog>

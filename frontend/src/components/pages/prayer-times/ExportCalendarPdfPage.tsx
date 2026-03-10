@@ -3,6 +3,7 @@ import type { Dayjs } from 'dayjs';
 import type { HijriDate } from '../../../types';
 import type { CalendarExportTheme, ExportMetadataSummary } from './ExportPrayerTimesDialog';
 import { getCalendarDayPresentation, getMonthCalendarDays, getWeekdayHeaders, toIsoDate } from './helpers';
+import i18n from '../../../i18n';
 
 interface ExportCalendarPdfPageProps {
   activeMonth: Dayjs;
@@ -97,32 +98,32 @@ export default function ExportCalendarPdfPage({
         <Grid container sx={{ mb: 2.25 }}>
           <Grid size={4}>
             <Typography variant="body2" sx={{ color: palette.subText }}>
-              Method: {metadata.methodLabel}
+              {i18n.t('export.summaryCalculation')} {metadata.methodLabel}
             </Typography>
           </Grid>
           <Grid size={8}>
             <Typography variant="body2" sx={{ color: palette.subText }}>
-              Location: {metadata.locationLabel}
+              {i18n.t('export.summaryLocation')} {metadata.locationLabel}
             </Typography>
           </Grid>
           <Grid size={4}>
             <Typography variant="body2" sx={{ color: palette.mutedText }}>
-              Coordinates: {metadata.coordinatesLabel}
+              {i18n.t('export.summaryCoordinates')} {metadata.coordinatesLabel}
             </Typography>
           </Grid>
           <Grid size={8}>
             <Typography variant="body2" sx={{ color: palette.mutedText }}>
-              Timezone: {metadata.timezoneLabel}
+              {i18n.t('export.summaryTimezone')} {metadata.timezoneLabel}
             </Typography>
           </Grid>
           <Grid size={4}>
             <Typography variant="body2" sx={{ color: palette.mutedText }}>
-              Elevation: {metadata.elevationLabel}
+              {i18n.t('export.summaryElevation')} {metadata.elevationLabel}
             </Typography>
           </Grid>
           <Grid size={8}>
             <Typography variant="body2" sx={{ color: palette.mutedText }}>
-              Offsets: {metadata.offsetSummary}
+              {i18n.t('export.summaryOffsets')} {metadata.offsetSummary}
             </Typography>
           </Grid>
         </Grid>

@@ -17,6 +17,7 @@ import { formatCityLabel } from '../utils/helpers';
 import WorldPrayerHeader from '../components/pages/world-prayer/WorldPrayerHeader';
 import WorldPrayerCityDialog from '../components/pages/world-prayer/WorldPrayerCityDialog';
 import WorldPrayerCityCard from '../components/pages/world-prayer/WorldPrayerCityCard';
+import { useTranslation } from 'react-i18next';
 
 const DEFAULT_SORT: WorldPrayerSort = 'name';
 
@@ -73,6 +74,7 @@ function sortSummaries(
 }
 
 export default function WorldPrayerTimes() {
+  const { t } = useTranslation();
   const { settings, updateSettings } = useAppStore();
   const [cities, setCities] = useState<WorldPrayerCity[]>([]);
   const [sortBy, setSortBy] = useState<WorldPrayerSort>(DEFAULT_SORT);
@@ -113,8 +115,8 @@ export default function WorldPrayerTimes() {
     }
 
     skipNextPreferenceSave.current = true;
-    setCities(settings.worldPrayer?.cities ?? []);
-    setSortBy(settings.worldPrayer?.sortBy ?? DEFAULT_SORT);
+    setCities(settings?.worldPrayer?.cities ?? []);
+    setSortBy(settings?.worldPrayer?.sortBy ?? DEFAULT_SORT);
   }, [settings]);
 
   useEffect(() => {
@@ -303,10 +305,10 @@ export default function WorldPrayerTimes() {
           }}
         >
           <Typography variant="h6" mb={1}>
-            No cities added yet
+            {t('worldPrayer.emptyTitle')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Add a few cities to compare their prayer times.
+            {t('worldPrayer.emptyBody')}
           </Typography>
         </Paper>
       ) : loading ? (
@@ -350,7 +352,7 @@ export default function WorldPrayerTimes() {
           }}
         >
           <Typography variant="body2" color="text.secondary">
-            Unable to load prayer data for the selected cities. Please try again.
+            {t('worldPrayer.loadError')}
           </Typography>
         </Paper>
       ) : (
@@ -378,16 +380,16 @@ export default function WorldPrayerTimes() {
       <WorldPrayerCityDialog open={dialogOpen} onClose={() => setDialogOpen(false)} onAdd={handleAddCities} />
 
       <Dialog open={Boolean(pendingRemoval)} onClose={() => setPendingRemoval(null)} maxWidth="xs" fullWidth>
-        <DialogTitle>Remove City</DialogTitle>
+        <DialogTitle>{t('worldPrayer.removeTitle')}</DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary">
             {pendingRemoval
-              ? `Remove ${formatCityLabel(pendingRemoval)} from your list?`
-              : 'Remove this city from your list?'}
+              ? t('worldPrayer.removeBody', { city: formatCityLabel(pendingRemoval) })
+              : t('worldPrayer.removeBodyFallback')}
           </Typography>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setPendingRemoval(null)}>Cancel</Button>
+          <Button onClick={() => setPendingRemoval(null)}>{t('common.cancel')}</Button>
           <Button
             variant="contained"
             color="error"
@@ -398,14 +400,14 @@ export default function WorldPrayerTimes() {
               setPendingRemoval(null);
             }}
           >
-            Remove
+            {t('common.remove')}
           </Button>
         </DialogActions>
       </Dialog>
 
       {cities.length > 0 && sortedSummaries.length > 0 && (
         <Typography variant="caption" color="text.secondary" display="block" mt={3}>
-          Time difference is shown relative to your current location.
+          {t('worldPrayer.timeDiffNote')}
         </Typography>
       )}
     </Box>

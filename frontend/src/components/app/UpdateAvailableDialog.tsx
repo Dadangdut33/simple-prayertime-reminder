@@ -1,6 +1,7 @@
 import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import type { UpdateInfo } from '../../types';
+import { useTranslation } from 'react-i18next';
 
 interface UpdateAvailableDialogProps {
   open: boolean;
@@ -15,12 +16,16 @@ export default function UpdateAvailableDialog({
   onClose,
   onOpenAction,
 }: UpdateAvailableDialogProps) {
+  const { t } = useTranslation();
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Update Available</DialogTitle>
+      <DialogTitle>{t('updates.available')}</DialogTitle>
       <DialogContent dividers>
         <Alert severity="info" sx={{ mb: 2 }}>
-          Version {update.latestVersion} is available. You are currently using {update.currentVersion}.
+          {t('updates.versionNotice', {
+            latest: update.latestVersion,
+            current: update.currentVersion,
+          })}
         </Alert>
 
         <Typography variant="subtitle2" gutterBottom>
@@ -33,7 +38,7 @@ export default function UpdateAvailableDialog({
         <Box sx={{ mb: 2 }}>
           <Typography variant="body2">
             <Box component="span" sx={{ fontWeight: 600 }}>
-              Install method:
+              {t('updates.installMethod')}
             </Box>{' '}
             {update.installMethod}
           </Typography>
@@ -50,7 +55,7 @@ export default function UpdateAvailableDialog({
             }}
           >
             <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.75 }}>
-              Recommended command
+              {t('updates.recommendedCommand')}
             </Typography>
             <Typography variant="body2" sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>
               {update.updateCommand}
@@ -60,10 +65,10 @@ export default function UpdateAvailableDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="inherit">
-          Later
+          {t('updates.later')}
         </Button>
         <Button onClick={() => void onOpenAction()} variant="contained" startIcon={<OpenInNewIcon />}>
-          {update.actionLabel || 'Open Latest Release'}
+          {update.actionLabel || t('updates.openLatest')}
         </Button>
       </DialogActions>
     </Dialog>

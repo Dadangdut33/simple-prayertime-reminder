@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { BookmarkPlus, Bookmark, BookOpen } from 'lucide-react';
 import { Box, Button, Card, MenuItem, Select, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 function useBookmarks() {
   const [bookmarks, setBookmarks] = useState<string[]>(() => {
@@ -28,6 +29,7 @@ function useBookmarks() {
 }
 
 export default function Quran() {
+  const { t } = useTranslation();
   const { bookmarks, add, remove } = useBookmarks();
   const [currentURL, setCurrentURL] = useState('https://quran.com');
 
@@ -66,10 +68,10 @@ export default function Quran() {
             >
               <BookOpen size={18} />
             </Box>
-            <Typography variant="h2">Holy Quran</Typography>
+            <Typography variant="h2">{t('quran.title')}</Typography>
           </Box>
           <Typography variant="body2" color="text.secondary">
-            Open Quran.com inside the app and keep quick bookmarks for pages you revisit.
+            {t('quran.subtitle')}
           </Typography>
         </Box>
 
@@ -87,11 +89,11 @@ export default function Quran() {
               }}
             >
               <MenuItem disabled value="">
-                Saved bookmarks
+                {t('quran.savedBookmarks')}
               </MenuItem>
               {bookmarks.map((bookmark, index) => (
                 <MenuItem key={bookmark} value={bookmark}>
-                  Bookmark {index + 1}
+                  {t('quran.bookmarkLabel', { index: index + 1 })}
                 </MenuItem>
               ))}
             </Select>
@@ -103,7 +105,7 @@ export default function Quran() {
             startIcon={isBookmarked ? <Bookmark size={16} fill="currentColor" /> : <BookmarkPlus size={16} />}
             onClick={() => (isBookmarked ? remove(currentURL) : add(currentURL))}
           >
-            {isBookmarked ? 'Bookmarked' : 'Save Bookmark'}
+            {isBookmarked ? t('quran.bookmarked') : t('quran.saveBookmark')}
           </Button>
         </Box>
       </Box>
@@ -134,7 +136,7 @@ export default function Quran() {
               border: 'none',
               background: '#fff',
             }}
-            title="Quran.com WebView"
+            title={t('quran.webviewTitle')}
             sandbox="allow-scripts allow-same-origin allow-popups"
           />
         </Box>

@@ -1,23 +1,8 @@
 import dayjs, { type Dayjs } from 'dayjs';
 import type { DaySchedule, HijriCalendarDay, HijriDate } from '../../../types';
+import i18n from '../../../i18n';
 
 export type CalendarMode = 'gregorian' | 'hijri';
-
-const HIJRI_MONTHS = [
-  '',
-  'Muharram',
-  'Safar',
-  "Rabi' al-Awwal",
-  "Rabi' al-Thani",
-  'Jumada al-Awwal',
-  'Jumada al-Thani',
-  'Rajab',
-  "Sha'ban",
-  'Ramadan',
-  'Shawwal',
-  "Dhu al-Qi'dah",
-  'Dhu al-Hijjah',
-];
 
 export function buildScheduleMap(schedules: DaySchedule[]): Record<string, DaySchedule> {
   return Object.fromEntries(schedules.map((schedule) => [schedule.date.slice(0, 10), schedule]));
@@ -28,7 +13,7 @@ export function buildHijriMap(days: HijriCalendarDay[]): Record<string, HijriDat
 }
 
 export function getHijriMonthName(month: number): string {
-  return HIJRI_MONTHS[month] ?? `Month ${month}`;
+  return i18n.t(`hijri.months.${month}`, { defaultValue: i18n.t('calendar.monthFallback', { month }) });
 }
 
 export function toArabicIndicDigits(value: number | string): string {
@@ -122,7 +107,15 @@ export function formatExportRangeLabel(startDate: Dayjs, endDate: Dayjs): string
 }
 
 export function getWeekdayHeaders(): string[] {
-  return ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  return [
+    i18n.t('calendar.weekdays.short.sunday'),
+    i18n.t('calendar.weekdays.short.monday'),
+    i18n.t('calendar.weekdays.short.tuesday'),
+    i18n.t('calendar.weekdays.short.wednesday'),
+    i18n.t('calendar.weekdays.short.thursday'),
+    i18n.t('calendar.weekdays.short.friday'),
+    i18n.t('calendar.weekdays.short.saturday'),
+  ];
 }
 
 export function getMonthCalendarDays(month: Dayjs): Dayjs[] {

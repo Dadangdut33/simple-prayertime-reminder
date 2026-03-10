@@ -9,10 +9,12 @@ import SettingsHeader from '../components/pages/settings/SettingsHeader';
 import { useAppStore } from '../store/appStore';
 import type { Settings } from '../types';
 import { formatDigitalClock } from '../utils/helpers';
+import { useTranslation } from 'react-i18next';
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
 export default function SettingsPage() {
+  const { t } = useTranslation();
   const { settings, updateSettings, resetSettings, detectLocation, loading } = useAppStore();
   const [activeTab, setActiveTab] = useState(0);
   const [local, setLocal] = useState(settings);
@@ -69,7 +71,13 @@ export default function SettingsPage() {
   );
 
   const saveLabel =
-    saveState === 'saving' ? 'Saving…' : saveState === 'saved' ? 'Saved' : saveState === 'error' ? 'Save failed' : '';
+    saveState === 'saving'
+      ? t('common.saving')
+      : saveState === 'saved'
+        ? t('common.saved')
+        : saveState === 'error'
+          ? t('common.saveFailed')
+          : '';
 
   const replaceLocal = (next: Settings) => setLocal(next);
 
@@ -103,10 +111,10 @@ export default function SettingsPage() {
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs value={activeTab} onChange={(_, value) => setActiveTab(value)}>
-          <Tab label="General" />
-          <Tab label="Location" />
-          <Tab label="Prayer" />
-          <Tab label="Alarms" />
+          <Tab label={t('settings.tabs.general')} />
+          <Tab label={t('settings.tabs.location')} />
+          <Tab label={t('settings.tabs.prayer')} />
+          <Tab label={t('settings.tabs.alarms')} />
         </Tabs>
       </Box>
 

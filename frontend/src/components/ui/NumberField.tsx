@@ -8,6 +8,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { useTranslation } from 'react-i18next';
 
 /**
  * This component is a placeholder for FormControl to correctly set the shrink label state on SSR.
@@ -36,6 +37,7 @@ export default function NumberField({
   onChange?: (value: number | null, details: BaseNumberField.Root.ChangeEventDetails) => void;
   onValueChange?: (value: number | null, details: BaseNumberField.Root.ChangeEventDetails) => void;
 }) {
+  const { t } = useTranslation();
   let id = React.useId();
   if (idProp) {
     id = idProp;
@@ -102,11 +104,11 @@ export default function NumberField({
                   },
                 }}
               >
-                <BaseNumberField.Increment render={<IconButton size={size} aria-label="Increase" />}>
+                <BaseNumberField.Increment render={<IconButton size={size} aria-label={t('common.increase')} />}>
                   <KeyboardArrowUpIcon fontSize={size} sx={{ transform: 'translateY(2px)' }} />
                 </BaseNumberField.Increment>
 
-                <BaseNumberField.Decrement render={<IconButton size={size} aria-label="Decrease" />}>
+                <BaseNumberField.Decrement render={<IconButton size={size} aria-label={t('common.decrease')} />}>
                   <KeyboardArrowDownIcon fontSize={size} sx={{ transform: 'translateY(-2px)' }} />
                 </BaseNumberField.Decrement>
               </InputAdornment>

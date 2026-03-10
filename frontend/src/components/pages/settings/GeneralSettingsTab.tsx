@@ -4,6 +4,7 @@ import AppsIcon from '@mui/icons-material/Apps';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined';
 import { DIGITAL_CLOCK_FORMAT_PRESETS, THEME_PRESETS, type Settings } from '../../../types';
+import { useTranslation } from 'react-i18next';
 
 interface GeneralSettingsTabProps {
   local: Settings;
@@ -26,12 +27,16 @@ export default function GeneralSettingsTab({
   setDashboard,
   clockFormatPreview,
 }: GeneralSettingsTabProps) {
+  const { t } = useTranslation();
   const hijriAdjustmentLabel =
     local.hijriDateOffset === 0
-      ? 'No adjustment'
-      : `${local.hijriDateOffset > 0 ? '+' : ''}${local.hijriDateOffset} day${
-          Math.abs(local.hijriDateOffset) === 1 ? '' : 's'
-        }`;
+      ? t('settings.general.hijri.noAdjustment')
+      : t('settings.general.hijri.adjustmentLabel', {
+          value: `${local.hijriDateOffset > 0 ? '+' : ''}${local.hijriDateOffset}`,
+          suffix: Math.abs(local.hijriDateOffset) === 1 ? '' : 's',
+        });
+  const formatHijriMarkLabel = (value: number) =>
+    t('settings.general.hijri.adjustmentMark', { value: value > 0 ? `+${value}` : String(value) });
 
   return (
     <Box display="flex" flexDirection="column" gap={3}>
@@ -69,10 +74,9 @@ export default function GeneralSettingsTab({
               <AccessTimeIcon fontSize="small" />
             </Box>
             <Box>
-              <Typography variant="subtitle1">Dashboard Clock</Typography>
+              <Typography variant="subtitle1">{t('settings.general.clock.title')}</Typography>
               <Typography variant="body2" color="text.secondary">
-                Control whether the dashboard shows a clock, and only reveal the options that apply to the selected
-                clock style.
+                {t('settings.general.clock.description')}
               </Typography>
             </Box>
           </Box>
@@ -84,7 +88,7 @@ export default function GeneralSettingsTab({
                 onChange={(event) => setDashboard({ showClock: event.target.checked })}
               />
             }
-            label="Show on dashboard"
+            label={t('settings.general.clock.toggle')}
             sx={{ m: 0 }}
           />
         </Box>
@@ -94,7 +98,7 @@ export default function GeneralSettingsTab({
             <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={3}>
               <Box>
                 <Typography variant="caption" color="text.secondary" mb={1} display="block">
-                  Clock Style
+                  {t('settings.general.clock.styleLabel')}
                 </Typography>
                 <Select
                   size="small"
@@ -106,8 +110,8 @@ export default function GeneralSettingsTab({
                     })
                   }
                 >
-                  <MenuItem value="digital">Digital Clock</MenuItem>
-                  <MenuItem value="analog">Analog Clock</MenuItem>
+                  <MenuItem value="digital">{t('settings.general.clock.digital')}</MenuItem>
+                  <MenuItem value="analog">{t('settings.general.clock.analog')}</MenuItem>
                 </Select>
               </Box>
             </Box>
@@ -115,12 +119,12 @@ export default function GeneralSettingsTab({
             {local.dashboard.clockType === 'digital' && (
               <Box p={2.5} border="1px solid" borderColor="divider" borderRadius={0.5} bgcolor="background.paper">
                 <Typography variant="subtitle2" mb={2}>
-                  Digital Clock Settings
+                  {t('settings.general.clock.digitalSettings')}
                 </Typography>
                 <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={3}>
                   <Box>
                     <Typography variant="caption" color="text.secondary" mb={1} display="block">
-                      Display Format
+                      {t('settings.general.clock.displayFormat')}
                     </Typography>
                     <Select
                       size="small"
@@ -134,7 +138,7 @@ export default function GeneralSettingsTab({
                     >
                       {DIGITAL_CLOCK_FORMAT_PRESETS.map((preset) => (
                         <MenuItem key={preset.value} value={preset.value}>
-                          {preset.label}
+                          {t(preset.labelKey)}
                           {preset.format ? ` (${preset.format})` : ''}
                         </MenuItem>
                       ))}
@@ -144,7 +148,7 @@ export default function GeneralSettingsTab({
                   {local.dashboard.digitalClockFormat === 'custom' && (
                     <Box>
                       <Typography variant="caption" color="text.secondary" mb={1} display="block">
-                        Custom Format
+                        {t('settings.general.clock.customFormat')}
                       </Typography>
                       <TextField
                         size="small"
@@ -155,7 +159,7 @@ export default function GeneralSettingsTab({
                             digitalClockCustom: event.target.value,
                           })
                         }
-                        helperText="Examples: HH:mm:ss, hh:mm A, ddd D MMM, dddd, D MMMM YYYY."
+                        helperText={t('settings.general.clock.customFormatHint')}
                       />
                     </Box>
                   )}
@@ -163,13 +167,13 @@ export default function GeneralSettingsTab({
 
                 <Box mt={2} p={2} borderRadius={0.5} bgcolor="action.hover" color="text.secondary">
                   <Typography variant="caption" display="block">
-                    Custom tokens: HH/H 24-hour, hh/h 12-hour, mm minutes, ss seconds, A or a am/pm.
+                    {t('settings.general.clock.tokensHint')}
                   </Typography>
                   <Typography variant="caption" display="block">
-                    Date tokens: ddd/dddd weekday, D/DD day, MMM/MMMM month, YY/YYYY year.
+                    {t('settings.general.clock.dateTokensHint')}
                   </Typography>
                   <Typography variant="subtitle2" color="text.primary" mt={1.5}>
-                    Preview: {clockFormatPreview}
+                    {t('settings.general.clock.preview', { value: clockFormatPreview })}
                   </Typography>
                 </Box>
               </Box>
@@ -178,17 +182,19 @@ export default function GeneralSettingsTab({
             {local.dashboard.clockType === 'analog' && (
               <Box p={2.5} border="1px solid" borderColor="divider" borderRadius={0.5} bgcolor="background.paper">
                 <Typography variant="subtitle2" mb={2}>
-                  Analog Clock Settings
+                  {t('settings.general.clock.analogSettings')}
                 </Typography>
 
                 <Stack spacing={2}>
                   <Box>
                     <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
                       <Typography variant="caption" color="text.secondary">
-                        Clock Size
+                        {t('settings.general.clock.clockSize')}
                       </Typography>
                       <Typography variant="body2" color="primary.main" fontWeight={700}>
-                        {Math.round(local.dashboard.analogClockSize)} px
+                        {t('settings.general.clock.sizeValue', {
+                          value: Math.round(local.dashboard.analogClockSize),
+                        })}
                       </Typography>
                     </Box>
                     <Slider
@@ -196,9 +202,9 @@ export default function GeneralSettingsTab({
                       max={280}
                       step={10}
                       marks={[
-                        { value: 160, label: 'S' },
-                        { value: 220, label: 'M' },
-                        { value: 280, label: 'L' },
+                        { value: 160, label: t('settings.general.clock.sizeMarkSmall') },
+                        { value: 220, label: t('settings.general.clock.sizeMarkMedium') },
+                        { value: 280, label: t('settings.general.clock.sizeMarkLarge') },
                       ]}
                       value={local.dashboard.analogClockSize}
                       onChange={(_, value) => setDashboard({ analogClockSize: value as number })}
@@ -215,9 +221,9 @@ export default function GeneralSettingsTab({
                     gap={1.5}
                   >
                     <Box>
-                      <Typography variant="subtitle2">Hour Numbers</Typography>
+                      <Typography variant="subtitle2">{t('settings.general.clock.hourNumbers')}</Typography>
                       <Typography variant="body2" color="text.secondary">
-                        Choose whether the analog face shows only 12, 3, 6, and 9, or all twelve hour numbers.
+                        {t('settings.general.clock.hourNumbersDesc')}
                       </Typography>
                     </Box>
                     <FormControlLabel
@@ -231,7 +237,7 @@ export default function GeneralSettingsTab({
                           }
                         />
                       }
-                      label="Show all hour numbers"
+                      label={t('settings.general.clock.showAllHours')}
                       sx={{ m: 0 }}
                     />
                   </Box>
@@ -241,7 +247,7 @@ export default function GeneralSettingsTab({
           </Box>
         ) : (
           <Typography variant="body2" color="text.secondary" mt={2.5}>
-            The dashboard clock is currently hidden. Enable it to adjust digital or analog options.
+            {t('settings.general.clock.hidden')}
           </Typography>
         )}
       </Box>
@@ -265,9 +271,9 @@ export default function GeneralSettingsTab({
               <PaletteOutlinedIcon fontSize="small" />
             </Box>
             <Box>
-              <Typography variant="subtitle1">Appearance</Typography>
+              <Typography variant="subtitle1">{t('settings.general.appearance.title')}</Typography>
               <Typography variant="body2" color="text.secondary">
-                Control the appearance of the app
+                {t('settings.general.appearance.description')}
               </Typography>
             </Box>
           </Box>
@@ -275,7 +281,7 @@ export default function GeneralSettingsTab({
           <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={3}>
             <Box>
               <Typography variant="caption" color="text.secondary" mb={1} display="block">
-                Prayer Time Display
+                {t('settings.general.appearance.timeFormat')}
               </Typography>
               <Select
                 size="small"
@@ -288,14 +294,14 @@ export default function GeneralSettingsTab({
                   })
                 }
               >
-                <MenuItem value="24h">24-Hour (14:30)</MenuItem>
-                <MenuItem value="12h">12-Hour (02:30 PM)</MenuItem>
+                <MenuItem value="24h">{t('settings.general.appearance.timeFormat24')}</MenuItem>
+                <MenuItem value="12h">{t('settings.general.appearance.timeFormat12')}</MenuItem>
               </Select>
             </Box>
 
             <Box>
               <Typography variant="caption" color="text.secondary" mb={1} display="block">
-                Theme Mode
+                {t('settings.general.appearance.themeMode')}
               </Typography>
               <Select
                 size="small"
@@ -303,16 +309,16 @@ export default function GeneralSettingsTab({
                 value={local.theme}
                 onChange={(event) => setLocal({ ...local, theme: event.target.value })}
               >
-                <MenuItem value="system">System Default</MenuItem>
-                <MenuItem value="dark">Dark Mode</MenuItem>
-                <MenuItem value="light">Light Mode</MenuItem>
+                <MenuItem value="system">{t('settings.general.appearance.themeSystem')}</MenuItem>
+                <MenuItem value="dark">{t('settings.general.appearance.themeDark')}</MenuItem>
+                <MenuItem value="light">{t('settings.general.appearance.themeLight')}</MenuItem>
               </Select>
             </Box>
           </Box>
 
           <Box mt={3}>
             <Typography variant="caption" color="text.secondary" mb={1} display="block">
-              Theme Preset
+              {t('settings.general.appearance.themePreset')}
             </Typography>
             <Box
               display="grid"
@@ -357,7 +363,7 @@ export default function GeneralSettingsTab({
                         />
                       ))}
                     </Box>
-                    <Typography variant="subtitle2">{preset.label}</Typography>
+                    <Typography variant="subtitle2">{t(preset.labelKey)}</Typography>
                   </Box>
                 );
               })}
@@ -392,17 +398,16 @@ export default function GeneralSettingsTab({
               <CalendarMonthOutlinedIcon fontSize="small" />
             </Box>
             <Box>
-              <Typography variant="subtitle1">Hijri Date Adjustment</Typography>
+              <Typography variant="subtitle1">{t('settings.general.hijri.title')}</Typography>
               <Typography variant="body2" color="text.secondary">
-                Shift the calculated Hijri day when to match your local time if it starts the month slightly earlier or
-                later.
+                {t('settings.general.hijri.description')}
               </Typography>
             </Box>
           </Box>
 
           <Box p={2.5} borderRadius={0.5} bgcolor="background.paper" border="1px solid" borderColor="divider">
             <Typography variant="overline" color="text.secondary" display="block">
-              Current Adjustment
+              {t('settings.general.hijri.currentAdjustment')}
             </Typography>
             <Typography variant="h2" color="primary.main" mt={0.5} mb={2}>
               {hijriAdjustmentLabel}
@@ -412,11 +417,11 @@ export default function GeneralSettingsTab({
               max={2}
               step={1}
               marks={[
-                { value: -2, label: '-2' },
-                { value: -1, label: '-1' },
-                { value: 0, label: '0' },
-                { value: 1, label: '+1' },
-                { value: 2, label: '+2' },
+                { value: -2, label: formatHijriMarkLabel(-2) },
+                { value: -1, label: formatHijriMarkLabel(-1) },
+                { value: 0, label: formatHijriMarkLabel(0) },
+                { value: 1, label: formatHijriMarkLabel(1) },
+                { value: 2, label: formatHijriMarkLabel(2) },
               ]}
               value={local.hijriDateOffset}
               onChange={(_, value) =>
@@ -427,7 +432,7 @@ export default function GeneralSettingsTab({
               }
             />
             <Typography variant="body2" color="text.secondary" mt={2}>
-              Leave this at zero unless you intentionally need the Hijri date shown by the app to be shifted.
+              {t('settings.general.hijri.hint')}
             </Typography>
           </Box>
         </Box>
@@ -450,9 +455,9 @@ export default function GeneralSettingsTab({
             <AppsIcon fontSize="small" />
           </Box>
           <Box>
-            <Typography variant="subtitle1">Application Settings</Typography>
+            <Typography variant="subtitle1">{t('settings.general.app.title')}</Typography>
             <Typography variant="body2" color="text.secondary">
-              Control how the app behave
+              {t('settings.general.app.description')}
             </Typography>
           </Box>
         </Box>
@@ -460,11 +465,10 @@ export default function GeneralSettingsTab({
         <Box display={'grid'} gridTemplateColumns={{ xs: '1fr', xl: '1fr 1fr' }} gap={3}>
           <Box mt={3} p={2.5} borderRadius={0.5} border="1px solid" borderColor="divider" bgcolor="background.paper">
             <Typography variant="subtitle2" mb={0.75}>
-              Startup
+              {t('settings.general.app.startup')}
             </Typography>
             <Typography variant="body2" color="text.secondary" mb={2}>
-              Launch the app automatically when you sign in. Autostart launches the app in background mode so it stays
-              in the tray instead of opening the main window immediately.
+              {t('settings.general.app.startupDesc')}
             </Typography>
 
             <FormControlLabel
@@ -479,22 +483,22 @@ export default function GeneralSettingsTab({
                   }
                 />
               }
-              label="Launch in background on startup"
+              label={t('settings.general.app.startupToggle')}
               sx={{ m: 0 }}
             />
           </Box>
 
           <Box mt={3} p={2.5} borderRadius={0.5} border="1px solid" borderColor="divider" bgcolor="background.paper">
             <Typography variant="subtitle2" mb={0.75}>
-              Tray
+              {t('settings.general.app.tray')}
             </Typography>
             <Typography variant="body2" color="text.secondary" mb={2}>
-              Choose what left click does when you click the tray icon.
+              {t('settings.general.app.trayDesc')}
             </Typography>
 
             <Box maxWidth={320}>
               <Typography variant="caption" color="text.secondary" mb={1} display="block">
-                Left Click Action
+                {t('settings.general.app.trayAction')}
               </Typography>
               <Select
                 size="small"
@@ -507,20 +511,19 @@ export default function GeneralSettingsTab({
                   })
                 }
               >
-                <MenuItem value="toggle-window">Toggle window</MenuItem>
-                <MenuItem value="open-menu">Open menu</MenuItem>
-                <MenuItem value="none">Do nothing</MenuItem>
+                <MenuItem value="toggle-window">{t('settings.general.app.trayToggle')}</MenuItem>
+                <MenuItem value="open-menu">{t('settings.general.app.trayMenu')}</MenuItem>
+                <MenuItem value="none">{t('settings.general.app.trayNone')}</MenuItem>
               </Select>
             </Box>
           </Box>
 
           <Box mt={3} p={2.5} borderRadius={0.5} border="1px solid" borderColor="divider" bgcolor="background.paper">
             <Typography variant="subtitle2" mb={0.75}>
-              Updates
+              {t('settings.general.app.updates')}
             </Typography>
             <Typography variant="body2" color="text.secondary" mb={2}>
-              Automatically check for a newer version whenever the app starts. If one is available, the app will show a
-              notice with update instructions based on how this copy was installed.
+              {t('settings.general.app.updatesDesc')}
             </Typography>
 
             <FormControlLabel
@@ -535,7 +538,7 @@ export default function GeneralSettingsTab({
                   }
                 />
               }
-              label="Check for updates on startup"
+              label={t('settings.general.app.updatesToggle')}
               sx={{ m: 0 }}
             />
           </Box>
