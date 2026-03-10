@@ -240,7 +240,27 @@ export function formatHijri(h: HijriDate | null): string {
 }
 
 /** Get prayer times for a DaySchedule as a named list */
+function parseLocalDateValue(dateStr?: string): Date | null {
+  if (!dateStr) return null;
+  const datePart = dateStr.split('T')[0];
+  const [year, month, day] = datePart.split('-').map((value) => Number(value));
+  if (!year || !month || !day) return null;
+  return new Date(year, month - 1, day);
+}
+
+function isFriday(dateStr?: string): boolean {
+  const date = parseLocalDateValue(dateStr);
+  if (!date) return false;
+  return date.getDay() === 5;
+}
+
+export function getPrayerDisplayName(name: string, dateStr?: string): string {
+  if (name !== 'Zuhr') return name;
+  return isFriday(dateStr) ? "Jumu'ah" : name;
+}
+
 export function getPrayerList(schedule: {
+  date?: string;
   fajr: string;
   sunrise: string;
   zuhr: string;
@@ -248,10 +268,11 @@ export function getPrayerList(schedule: {
   maghrib: string;
   isha: string;
 }) {
+  const zuhrLabel = getPrayerDisplayName('Zuhr', schedule.date);
   return [
     { name: 'Fajr', time: schedule.fajr },
     { name: 'Sunrise', time: schedule.sunrise },
-    { name: 'Zuhr', time: schedule.zuhr },
+    { name: zuhrLabel, time: schedule.zuhr },
     { name: 'Asr', time: schedule.asr },
     { name: 'Maghrib', time: schedule.maghrib },
     { name: 'Isha', time: schedule.isha },

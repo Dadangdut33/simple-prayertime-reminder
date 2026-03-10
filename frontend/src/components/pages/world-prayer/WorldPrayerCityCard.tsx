@@ -4,7 +4,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import type { WorldPrayerCitySummary } from '../../../types';
-import { formatCityLabel, formatOffsetSeconds, formatTimeInZone, getPrayerList } from '../../../utils/helpers';
+import {
+  formatCityLabel,
+  formatOffsetSeconds,
+  formatTimeInZone,
+  getPrayerDisplayName,
+  getPrayerList,
+} from '../../../utils/helpers';
 
 interface WorldPrayerCityCardProps {
   summary: WorldPrayerCitySummary;
@@ -40,7 +46,9 @@ export default function WorldPrayerCityCard({
   const cityLabel = formatCityLabel(city);
   const timezoneLabel = city.timezone || 'Unknown timezone';
   const currentTimeLabel = formatTimeInZone(nowIso, timezoneLabel, timeFormat);
-  const nextPrayerLabel = summary.nextPrayer?.name || '--';
+  const nextPrayerLabel = summary.nextPrayer
+    ? getPrayerDisplayName(summary.nextPrayer.name, summary.nextPrayer.time)
+    : '--';
   const nextPrayerTime = summary.nextPrayer?.time
     ? formatTimeInZone(summary.nextPrayer.time, timezoneLabel, timeFormat)
     : '--:--';

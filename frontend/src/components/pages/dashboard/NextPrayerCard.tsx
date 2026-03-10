@@ -1,6 +1,6 @@
 import { Box, Card, Chip, LinearProgress, Typography } from '@mui/material';
 import type { NextPrayerInfo } from '../../../types';
-import { formatDuration, formatTime } from '../../../utils/helpers';
+import { formatDuration, formatTime, getPrayerDisplayName } from '../../../utils/helpers';
 
 interface PrayerMoment {
   name: string;
@@ -24,6 +24,10 @@ export default function NextPrayerCard({
   elapsedSeconds,
   progress,
 }: NextPrayerCardProps) {
+  const nextPrayerLabel = nextPrayer
+    ? getPrayerDisplayName(nextPrayer.name, nextPrayer.time)
+    : undefined;
+
   return (
     <Card
       sx={{
@@ -52,14 +56,14 @@ export default function NextPrayerCard({
 
       <Box display="flex" justifyContent="space-between" alignItems="flex-start" mt={1}>
         <Typography variant="h2" fontSize="2.5rem" color="primary.main" fontWeight={700} lineHeight={1}>
-          {nextPrayer?.name || '...'}
+          {nextPrayerLabel || '...'}
         </Typography>
         {isAllPassed && <Chip label="Tomorrow" color="secondary" size="small" />}
       </Box>
 
       <Box mt={4} pt={3} borderTop="1px solid" borderColor="divider">
         <Typography variant="body2" color="text.secondary" mb={1}>
-          Time Until {nextPrayer?.name === 'Sunrise' ? 'Sunrise' : 'Next Prayer'}
+          Time Until {nextPrayerLabel === 'Sunrise' ? 'Sunrise' : 'Next Prayer'}
         </Typography>
         <Typography
           variant="h3"
@@ -104,7 +108,7 @@ export default function NextPrayerCard({
               {previousPrayerInfo ? formatTime(previousPrayerInfo.time.toISOString()) : '--:--'}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {nextPrayer?.name} • {nextPrayer ? formatTime(nextPrayer.time) : '--:--'}
+              {nextPrayerLabel} • {nextPrayer ? formatTime(nextPrayer.time) : '--:--'}
             </Typography>
           </Box>
         </Box>

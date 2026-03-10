@@ -6,7 +6,13 @@ import QiblaCard from '../components/pages/dashboard/QiblaCard';
 import ScheduleCard from '../components/pages/dashboard/ScheduleCard';
 import { useCountdown, useClock } from '../hooks';
 import { useAppStore } from '../store/appStore';
-import { bearingToCompassLabel, clamp, formatDigitalClock, getPrayerList } from '../utils/helpers';
+import {
+  bearingToCompassLabel,
+  clamp,
+  formatDigitalClock,
+  getPrayerDisplayName,
+  getPrayerList,
+} from '../utils/helpers';
 
 export default function Dashboard() {
   const { todaySchedule, nextPrayer, hijriDate, location, qiblaDirection, settings, loading } = useAppStore();
@@ -20,6 +26,9 @@ export default function Dashboard() {
   const prayers = getPrayerList(todaySchedule);
   const isAllPassed = nextPrayer?.name === 'Fajr' && new Date(nextPrayer.time) > now;
   const nextPrayerDate = nextPrayer ? new Date(nextPrayer.time) : null;
+  const nextPrayerLabel = nextPrayer
+    ? getPrayerDisplayName(nextPrayer.name, nextPrayer.time || todaySchedule.date)
+    : undefined;
 
   let previousPrayerInfo: { name: string; time: Date } | null = null;
   for (const prayer of prayers) {
@@ -82,7 +91,7 @@ export default function Dashboard() {
         </Box>
 
         <Box display="grid" gap={3}>
-          <ScheduleCard prayers={prayers} nextPrayerName={nextPrayer?.name} isAllPassed={isAllPassed} />
+          <ScheduleCard prayers={prayers} nextPrayerName={nextPrayerLabel} isAllPassed={isAllPassed} />
 
           <QiblaCard location={location} qiblaDirection={qiblaDirection} qiblaCompassLabel={qiblaCompassLabel} />
         </Box>
