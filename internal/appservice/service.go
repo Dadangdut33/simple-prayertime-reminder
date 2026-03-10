@@ -76,6 +76,7 @@ func BuildPrayerConfig(cfg settings.Settings) prayer.PrayerConfig {
 		},
 		CustomFajrAngle: cfg.Prayer.CustomFajrAngle,
 		CustomIshaAngle: cfg.Prayer.CustomIshaAngle,
+		CustomMaghribDuration: cfg.Prayer.CustomMaghribDuration,
 		Latitude:        cfg.Location.Latitude,
 		Longitude:       cfg.Location.Longitude,
 		Elevation:       cfg.Location.Elevation,

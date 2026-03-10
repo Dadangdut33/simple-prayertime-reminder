@@ -128,6 +128,7 @@ export interface PrayerSettings {
   offsets: PrayerOffsets;
   customFajrAngle: number;
   customIshaAngle: number;
+  customMaghribDuration: number;
 }
 
 export type ClockType = 'digital' | 'analog';
@@ -187,18 +188,26 @@ export const PRAYER_NAMES = ['Fajr', 'Sunrise', 'Zuhr', 'Asr', 'Maghrib', 'Isha'
 export type PrayerName = (typeof PRAYER_NAMES)[number];
 
 export const CALCULATION_METHODS = [
-  { value: 'MWL', label: 'Muslim World League' },
-  { value: 'ISNA', label: 'ISNA (North America)' },
-  { value: 'Egypt', label: 'Egyptian General Authority' },
-  { value: 'UmmAlQura', label: 'Umm al-Qura (Makkah)' },
-  { value: 'Karachi', label: 'University of Karachi' },
-  { value: 'Kemenag', label: 'Kemenag (Indonesia)' },
-  { value: 'JAKIM', label: 'JAKIM (Malaysia)' },
-  { value: 'MUIS', label: 'MUIS (Singapore)' },
-  { value: 'Diyanet', label: 'Diyanet (Turkey)' },
-  { value: 'Tehran', label: 'Tehran University' },
-  { value: 'Jafari', label: 'Jafari (Shia)' },
-  { value: 'Custom', label: 'Custom' },
+  { value: 'AstronomicalTwilight', label: 'Astronomical Twilight (Fajr 18° / Isha 18°)' },
+  { value: 'MWL', label: 'Muslim World League (Fajr 18° / Isha 17°)' },
+  { value: 'ISNA', label: 'ISNA (North America) (Fajr 15° / Isha 15°)' },
+  { value: 'Egypt', label: 'Egyptian General Authority (Fajr 19.5° / Isha 17.5°)' },
+  { value: 'EgyptBis', label: 'Egyptian General Authority Bis (Fajr 20° / Isha 18°)' },
+  { value: 'UmmAlQura', label: 'Umm al-Qura (Fajr 18.5° / Isha +90 min)' },
+  { value: 'Gulf', label: 'Gulf Region (Fajr 19.5° / Isha +90 min)' },
+  { value: 'Algerian', label: 'Algerian Ministry (Fajr 18° / Isha 17°)' },
+  { value: 'Karachi', label: 'University of Karachi (Fajr 18° / Isha 18°)' },
+  { value: 'Kemenag', label: 'Kemenag (Fajr 20° / Isha 18°)' },
+  { value: 'JAKIM', label: 'JAKIM (Fajr 20° / Isha 18°)' },
+  { value: 'MUIS', label: 'MUIS (Fajr 20° / Isha 18°)' },
+  { value: 'Diyanet', label: 'Diyanet (Fajr 18° / Isha 17°)' },
+  { value: 'UOIF', label: 'UOIF (France) (Fajr 12° / Isha 12°)' },
+  { value: 'France15', label: 'France (Fajr 15° / Isha 15°)' },
+  { value: 'France18', label: 'France (Fajr 18° / Isha 18°)' },
+  { value: 'Tunisia', label: 'Tunisia (Fajr 18° / Isha 18°)' },
+  { value: 'Tehran', label: 'Tehran (Fajr 17.7° / Isha 14°)' },
+  { value: 'Jafari', label: 'Jafari (Fajr 16° / Isha 14°)' },
+  { value: 'Custom', label: 'Custom (angles + optional Maghrib duration)' },
 ] as const;
 
 export const THEME_PRESETS = [

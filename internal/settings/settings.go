@@ -72,11 +72,12 @@ type PrayerOffsets struct {
 
 // PrayerSettings holds prayer calculation configuration
 type PrayerSettings struct {
-	Method          string        `json:"method"`
-	AsrMethod       string        `json:"asrMethod"`
-	Offsets         PrayerOffsets `json:"offsets"`
-	CustomFajrAngle float64       `json:"customFajrAngle"`
-	CustomIshaAngle float64       `json:"customIshaAngle"`
+	Method                string        `json:"method"`
+	AsrMethod             string        `json:"asrMethod"`
+	Offsets               PrayerOffsets `json:"offsets"`
+	CustomFajrAngle       float64       `json:"customFajrAngle"`
+	CustomIshaAngle       float64       `json:"customIshaAngle"`
+	CustomMaghribDuration float64       `json:"customMaghribDuration"`
 }
 
 // DashboardSettings controls dashboard widgets and presentation.
@@ -138,11 +139,12 @@ func DefaultSettings() Settings {
 			Timezone:   "Asia/Jakarta",
 		},
 		Prayer: PrayerSettings{
-			Method:          "Kemenag",
-			AsrMethod:       "Shafii",
-			Offsets:         PrayerOffsets{},
-			CustomFajrAngle: 20,
-			CustomIshaAngle: 18,
+			Method:                "Kemenag",
+			AsrMethod:             "Shafii",
+			Offsets:               PrayerOffsets{},
+			CustomFajrAngle:       20,
+			CustomIshaAngle:       18,
+			CustomMaghribDuration: 0,
 		},
 		Notification: NotificationSettings{
 			Style:       NotificationWindow,

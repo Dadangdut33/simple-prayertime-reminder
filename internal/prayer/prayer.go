@@ -11,15 +11,23 @@ import (
 type CalculationMethod string
 
 const (
+	MethodAstronomical CalculationMethod = "AstronomicalTwilight"
 	MethodMWL     CalculationMethod = "MWL"
 	MethodISNA    CalculationMethod = "ISNA"
 	MethodEgypt   CalculationMethod = "Egypt"
+	MethodEgyptBis CalculationMethod = "EgyptBis"
 	MethodMakkah  CalculationMethod = "UmmAlQura"
+	MethodGulf    CalculationMethod = "Gulf"
+	MethodAlgerian CalculationMethod = "Algerian"
 	MethodKarachi CalculationMethod = "Karachi"
 	MethodKemenag CalculationMethod = "Kemenag"
 	MethodJAKIM   CalculationMethod = "JAKIM"
 	MethodMUIS    CalculationMethod = "MUIS"
 	MethodTurkey  CalculationMethod = "Diyanet"
+	MethodUOIF    CalculationMethod = "UOIF"
+	MethodFrance15 CalculationMethod = "France15"
+	MethodFrance18 CalculationMethod = "France18"
+	MethodTunisia CalculationMethod = "Tunisia"
 	MethodTehran  CalculationMethod = "Tehran"
 	MethodJafari  CalculationMethod = "Jafari"
 	MethodCustom  CalculationMethod = "Custom"
@@ -63,15 +71,16 @@ type NextPrayerInfo struct {
 
 // PrayerConfig holds all prayer configuration
 type PrayerConfig struct {
-	Latitude        float64           `json:"latitude"`
-	Longitude       float64           `json:"longitude"`
-	Elevation       float64           `json:"elevation"`
-	Timezone        string            `json:"timezone"`
-	Method          CalculationMethod `json:"method"`
-	AsrMethod       AsrMethod         `json:"asrMethod"`
-	Offsets         PrayerOffsets     `json:"offsets"`
-	CustomFajrAngle float64           `json:"customFajrAngle"`
-	CustomIshaAngle float64           `json:"customIshaAngle"`
+	Latitude              float64           `json:"latitude"`
+	Longitude             float64           `json:"longitude"`
+	Elevation             float64           `json:"elevation"`
+	Timezone              string            `json:"timezone"`
+	Method                CalculationMethod `json:"method"`
+	AsrMethod             AsrMethod         `json:"asrMethod"`
+	Offsets               PrayerOffsets     `json:"offsets"`
+	CustomFajrAngle       float64           `json:"customFajrAngle"`
+	CustomIshaAngle       float64           `json:"customIshaAngle"`
+	CustomMaghribDuration float64           `json:"customMaghribDuration"`
 }
 
 // Service handles prayer time calculations
@@ -96,14 +105,22 @@ func (svc *Service) SetConfig(cfg PrayerConfig) {
 // getConvention returns the TwilightConvention for the method
 func (svc *Service) getConvention() *prayer.TwilightConvention {
 	switch svc.cfg.Method {
+	case MethodAstronomical:
+		return prayer.AstronomicalTwilight()
 	case MethodMWL:
 		return prayer.MWL()
 	case MethodISNA:
 		return prayer.ISNA()
 	case MethodEgypt:
 		return prayer.Egypt()
+	case MethodEgyptBis:
+		return prayer.EgyptBis()
 	case MethodMakkah:
 		return prayer.UmmAlQura()
+	case MethodGulf:
+		return prayer.Gulf()
+	case MethodAlgerian:
+		return prayer.Algerian()
 	case MethodKarachi:
 		return prayer.Karachi()
 	case MethodKemenag:
@@ -114,15 +131,27 @@ func (svc *Service) getConvention() *prayer.TwilightConvention {
 		return prayer.MUIS()
 	case MethodTurkey:
 		return prayer.Diyanet()
+	case MethodUOIF:
+		return prayer.UOIF()
+	case MethodFrance15:
+		return prayer.France15()
+	case MethodFrance18:
+		return prayer.France18()
+	case MethodTunisia:
+		return prayer.Tunisia()
 	case MethodTehran:
 		return prayer.Tehran()
 	case MethodJafari:
 		return prayer.Jafari()
 	case MethodCustom:
-		return &prayer.TwilightConvention{
+		convention := &prayer.TwilightConvention{
 			FajrAngle: svc.cfg.CustomFajrAngle,
 			IshaAngle: svc.cfg.CustomIshaAngle,
 		}
+		if svc.cfg.CustomMaghribDuration > 0 {
+			convention.MaghribDuration = time.Duration(svc.cfg.CustomMaghribDuration * float64(time.Minute))
+		}
+		return convention
 	default:
 		return prayer.MWL()
 	}

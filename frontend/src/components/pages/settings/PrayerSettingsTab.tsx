@@ -1,4 +1,4 @@
-import { Box, MenuItem, Select, TextField, Typography } from '@mui/material';
+import { Alert, Box, MenuItem, Select, Typography } from '@mui/material';
 import NumberField from '../../ui/NumberField';
 import { CALCULATION_METHODS, PRAYER_NAMES, type Settings } from '../../../types';
 
@@ -10,6 +10,10 @@ interface PrayerSettingsTabProps {
 export default function PrayerSettingsTab({ local, setPrayer }: PrayerSettingsTabProps) {
   return (
     <Box display="flex" flexDirection="column" gap={3}>
+      <Alert severity="info">
+        Prayer times are calculated with the `go-prayer` library. Please verify the results with your local prayer
+        timetable to ensure they match your community&apos;s conventions.
+      </Alert>
       <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={3}>
         <Box>
           <Typography variant="caption" color="text.secondary" mb={1} display="block">
@@ -19,6 +23,11 @@ export default function PrayerSettingsTab({ local, setPrayer }: PrayerSettingsTa
             size="small"
             fullWidth
             value={local.prayer.method}
+            MenuProps={{
+              PaperProps: {
+                sx: { maxHeight: 320 },
+              },
+            }}
             onChange={(event) => setPrayer({ method: event.target.value })}
           >
             {CALCULATION_METHODS.map((method) => (
@@ -37,6 +46,11 @@ export default function PrayerSettingsTab({ local, setPrayer }: PrayerSettingsTa
             size="small"
             fullWidth
             value={local.prayer.asrMethod}
+            MenuProps={{
+              PaperProps: {
+                sx: { maxHeight: 320 },
+              },
+            }}
             onChange={(event) => setPrayer({ asrMethod: event.target.value })}
           >
             <MenuItem value="Shafii">Shafi&apos;i, Maliki, Hanbali (Standard)</MenuItem>
@@ -54,25 +68,34 @@ export default function PrayerSettingsTab({ local, setPrayer }: PrayerSettingsTa
           bgcolor="action.hover"
           borderRadius={2}
         >
-          <TextField
+          <NumberField
             label="Custom Fajr Angle (°)"
-            type="number"
             size="small"
             value={local.prayer.customFajrAngle}
-            onChange={(event) =>
+            onValueChange={(value) =>
               setPrayer({
-                customFajrAngle: Number.parseFloat(event.target.value) || 0,
+                customFajrAngle: value ?? 0,
               })
             }
           />
-          <TextField
+          <NumberField
             label="Custom Isha Angle (°)"
-            type="number"
             size="small"
             value={local.prayer.customIshaAngle}
-            onChange={(event) =>
+            onValueChange={(value) =>
               setPrayer({
-                customIshaAngle: Number.parseFloat(event.target.value) || 0,
+                customIshaAngle: value ?? 0,
+              })
+            }
+          />
+          <NumberField
+            label="Maghrib Duration (minutes)"
+            size="small"
+            value={local.prayer.customMaghribDuration}
+            helperText="Optional. Set to 0 to use angle-based Maghrib."
+            onValueChange={(value) =>
+              setPrayer({
+                customMaghribDuration: value ?? 0,
               })
             }
           />

@@ -327,6 +327,7 @@ export class PrayerSettings {
     "offsets": PrayerOffsets;
     "customFajrAngle": number;
     "customIshaAngle": number;
+    "customMaghribDuration": number;
 
     /** Creates a new PrayerSettings instance. */
     constructor($$source: Partial<PrayerSettings> = {}) {
@@ -344,6 +345,9 @@ export class PrayerSettings {
         }
         if (!("customIshaAngle" in $$source)) {
             this["customIshaAngle"] = 0;
+        }
+        if (!("customMaghribDuration" in $$source)) {
+            this["customMaghribDuration"] = 0;
         }
 
         Object.assign(this, $$source);
