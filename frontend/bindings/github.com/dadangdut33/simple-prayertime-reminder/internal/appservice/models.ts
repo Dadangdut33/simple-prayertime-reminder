@@ -60,6 +60,42 @@ export class AppInfo {
     }
 }
 
+/**
+ * DebugTimeInfo exposes the backend's current time data.
+ */
+export class DebugTimeInfo {
+    "nowRFC3339": string;
+    "clock": string;
+    "timezone": string;
+    "offset": string;
+
+    /** Creates a new DebugTimeInfo instance. */
+    constructor($$source: Partial<DebugTimeInfo> = {}) {
+        if (!("nowRFC3339" in $$source)) {
+            this["nowRFC3339"] = "";
+        }
+        if (!("clock" in $$source)) {
+            this["clock"] = "";
+        }
+        if (!("timezone" in $$source)) {
+            this["timezone"] = "";
+        }
+        if (!("offset" in $$source)) {
+            this["offset"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new DebugTimeInfo instance from a string or object.
+     */
+    static createFrom($$source: any = {}): DebugTimeInfo {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new DebugTimeInfo($$parsedSource as Partial<DebugTimeInfo>);
+    }
+}
+
 export class QuranBookmark {
     "id": string;
     "url": string;
@@ -164,6 +200,54 @@ export class QuranNote {
     static createFrom($$source: any = {}): QuranNote {
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         return new QuranNote($$parsedSource as Partial<QuranNote>);
+    }
+}
+
+/**
+ * ReminderDebugEntry describes a scheduled reminder time for debugging.
+ */
+export class ReminderDebugEntry {
+    "prayerName": string;
+    "state": string;
+    "scheduledTime": string;
+    "offsetMinutes": number;
+    "enabled": boolean;
+    "deltaSeconds": number;
+    "isFuture": boolean;
+
+    /** Creates a new ReminderDebugEntry instance. */
+    constructor($$source: Partial<ReminderDebugEntry> = {}) {
+        if (!("prayerName" in $$source)) {
+            this["prayerName"] = "";
+        }
+        if (!("state" in $$source)) {
+            this["state"] = "";
+        }
+        if (!("scheduledTime" in $$source)) {
+            this["scheduledTime"] = "";
+        }
+        if (!("offsetMinutes" in $$source)) {
+            this["offsetMinutes"] = 0;
+        }
+        if (!("enabled" in $$source)) {
+            this["enabled"] = false;
+        }
+        if (!("deltaSeconds" in $$source)) {
+            this["deltaSeconds"] = 0;
+        }
+        if (!("isFuture" in $$source)) {
+            this["isFuture"] = false;
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new ReminderDebugEntry instance from a string or object.
+     */
+    static createFrom($$source: any = {}): ReminderDebugEntry {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new ReminderDebugEntry($$parsedSource as Partial<ReminderDebugEntry>);
     }
 }
 

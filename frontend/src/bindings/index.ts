@@ -3,11 +3,13 @@ import type {
   AppInfo,
   CitySearchResult,
   DaySchedule,
+  DebugTimeInfo,
   GeonamesInfo,
   HijriCalendarDay,
   HijriDate,
   Location,
   NextPrayerInfo,
+  ReminderDebugEntry,
   ReminderInfo,
   ReminderTestSnapshot,
   Settings,
@@ -145,6 +147,10 @@ export const stopAdhan = (): Promise<void> => AppService.StopAdhan() as any;
 // ---- Time ----
 export const getCurrentTime = (): Promise<string> =>
   AppService.GetCurrentTime() as any;
+export const getDebugTimeInfo = (): Promise<DebugTimeInfo> =>
+  AppService.GetDebugTimeInfo() as any;
+export const getReminderDebugSchedule = (): Promise<ReminderDebugEntry[]> =>
+  AppService.GetReminderDebugSchedule() as any;
 
 // ---- App Info ----
 export const getAppInfo = (): Promise<AppInfo> =>

@@ -1,6 +1,5 @@
 import { Box, Card, Chip, LinearProgress, Typography } from '@mui/material';
-import type { NextPrayerInfo } from '../../../types';
-import { formatDuration, formatTime, getPrayerDisplayName } from '../../../utils/helpers';
+import { formatDuration, formatTime } from '../../../utils/helpers';
 import { useTranslation } from 'react-i18next';
 
 interface PrayerMoment {
@@ -9,8 +8,11 @@ interface PrayerMoment {
 }
 
 interface NextPrayerCardProps {
-  nextPrayer: NextPrayerInfo | null;
+  displayPrayerLabel: string;
+  nextPrayerLabel: string;
+  nextPrayerTime: string | null;
   countdown: string;
+  timeLabel: string;
   isAllPassed: boolean;
   previousPrayerInfo: PrayerMoment | null;
   elapsedSeconds: number;
@@ -18,17 +20,18 @@ interface NextPrayerCardProps {
 }
 
 export default function NextPrayerCard({
-  nextPrayer,
+  displayPrayerLabel,
+  nextPrayerLabel,
+  nextPrayerTime,
   countdown,
+  timeLabel,
   isAllPassed,
   previousPrayerInfo,
   elapsedSeconds,
   progress,
 }: NextPrayerCardProps) {
   const { t } = useTranslation();
-  const nextPrayerLabel = nextPrayer
-    ? getPrayerDisplayName(nextPrayer.name, nextPrayer.time)
-    : undefined;
+  const progressLabel = progress >= 100 ? 100 : Math.floor(progress);
 
   return (
     <Card
@@ -58,16 +61,14 @@ export default function NextPrayerCard({
 
       <Box display="flex" justifyContent="space-between" alignItems="flex-start" mt={1}>
         <Typography variant="h2" fontSize="2.5rem" color="primary.main" fontWeight={700} lineHeight={1}>
-          {nextPrayerLabel || '...'}
+          {displayPrayerLabel || '...'}
         </Typography>
         {isAllPassed && <Chip label={t('dashboard.nextPrayer.tomorrow')} color="secondary" size="small" />}
       </Box>
 
       <Box mt={4} pt={3} borderTop="1px solid" borderColor="divider">
         <Typography variant="body2" color="text.secondary" mb={1}>
-          {nextPrayerLabel === t('prayerNames.sunrise')
-            ? t('dashboard.nextPrayer.timeUntil', { label: t('prayerNames.sunrise') })
-            : t('dashboard.nextPrayer.timeUntilDefault')}
+          {timeLabel}
         </Typography>
         <Typography
           variant="h3"
@@ -90,7 +91,7 @@ export default function NextPrayerCard({
               })}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {Math.round(progress)}%
+              {progressLabel}%
             </Typography>
           </Box>
 
@@ -115,7 +116,7 @@ export default function NextPrayerCard({
               {previousPrayerInfo ? formatTime(previousPrayerInfo.time.toISOString()) : '--:--'}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {nextPrayerLabel} • {nextPrayer ? formatTime(nextPrayer.time) : '--:--'}
+              {nextPrayerLabel} • {nextPrayerTime ? formatTime(nextPrayerTime) : '--:--'}
             </Typography>
           </Box>
         </Box>

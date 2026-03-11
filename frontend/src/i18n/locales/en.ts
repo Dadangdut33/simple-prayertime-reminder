@@ -56,6 +56,8 @@ const en = {
       tomorrow: 'Tomorrow',
       timeUntil: 'Time Until {{label}}',
       timeUntilDefault: 'Time Until Next Prayer',
+      timeForPrayerLabel: 'Time for prayer',
+      timeForPrayer: 'Time for prayer',
       since: '{{duration}} since {{label}}',
     },
     schedule: {
@@ -634,6 +636,9 @@ const en = {
     timezoneLoading: 'Loading timezones…',
     refresh: 'Refresh snapshot',
     trigger: 'Trigger reminder',
+    backendTimeTitle: 'Backend time',
+    backendTimeRefresh: 'Load backend time',
+    backendTimeOutput: 'Backend time data',
     snapshot: 'Snapshot',
     currentTime: 'Current time',
     simulatedTime: 'Simulated time',

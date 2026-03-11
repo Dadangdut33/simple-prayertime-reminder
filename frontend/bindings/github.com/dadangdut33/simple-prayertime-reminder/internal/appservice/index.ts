@@ -8,9 +8,11 @@ export {
 
 export {
     AppInfo,
+    DebugTimeInfo,
     QuranBookmark,
     QuranData,
     QuranNote,
+    ReminderDebugEntry,
     ReminderTestSnapshot,
     UpdateInfo,
     WorldPrayerCitySummary

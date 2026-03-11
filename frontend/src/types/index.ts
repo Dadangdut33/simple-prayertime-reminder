@@ -15,6 +15,23 @@ export interface NextPrayerInfo {
   time: string;
 }
 
+export interface ReminderDebugEntry {
+  prayerName: string;
+  state: string;
+  scheduledTime: string;
+  offsetMinutes: number;
+  enabled: boolean;
+  deltaSeconds: number;
+  isFuture: boolean;
+}
+
+export interface DebugTimeInfo {
+  nowRFC3339: string;
+  clock: string;
+  timezone: string;
+  offset: string;
+}
+
 // ---- Hijri ----
 export interface HijriDate {
   day: number;

@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
 	"sync"
 	"time"
 
@@ -39,6 +40,25 @@ type Service struct {
 	quranMu               sync.Mutex
 	reminderStatePath     string
 	testReminderStatePath string
+}
+
+// ReminderDebugEntry describes a scheduled reminder time for debugging.
+type ReminderDebugEntry struct {
+	PrayerName    string `json:"prayerName"`
+	State         string `json:"state"`
+	ScheduledTime string `json:"scheduledTime"`
+	OffsetMinutes int    `json:"offsetMinutes"`
+	Enabled       bool   `json:"enabled"`
+	DeltaSeconds  int    `json:"deltaSeconds"`
+	IsFuture      bool   `json:"isFuture"`
+}
+
+// DebugTimeInfo exposes the backend's current time data.
+type DebugTimeInfo struct {
+	NowRFC3339 string `json:"nowRFC3339"`
+	Clock      string `json:"clock"`
+	Timezone   string `json:"timezone"`
+	Offset     string `json:"offset"`
 }
 
 func New(
@@ -688,6 +708,101 @@ func loadReminderState(path string) *notification.ReminderInfo {
 
 func (s *Service) GetCurrentTime() string {
 	return time.Now().Format("15:04:05")
+}
+
+// GetDebugTimeInfo returns the backend's current time and timezone info.
+func (s *Service) GetDebugTimeInfo() DebugTimeInfo {
+	now := time.Now()
+	zoneName, offsetSeconds := now.Zone()
+	sign := "+"
+	if offsetSeconds < 0 {
+		sign = "-"
+		offsetSeconds = -offsetSeconds
+	}
+	offsetHours := offsetSeconds / 3600
+	offsetMinutes := (offsetSeconds % 3600) / 60
+	offset := fmt.Sprintf("%s%02d:%02d", sign, offsetHours, offsetMinutes)
+	return DebugTimeInfo{
+		NowRFC3339: now.Format(time.RFC3339),
+		Clock:      now.Format("15:04:05"),
+		Timezone:   zoneName,
+		Offset:     offset,
+	}
+}
+
+// GetReminderDebugSchedule returns today's reminder schedule with relative timing info.
+func (s *Service) GetReminderDebugSchedule() ([]ReminderDebugEntry, error) {
+	cfg := s.settingsSvc.Get()
+	sched, err := s.prayerSvc.GetTodaySchedule()
+	if err != nil {
+		return nil, err
+	}
+
+	now := time.Now()
+	type entryWithTime struct {
+		ReminderDebugEntry
+		at time.Time
+	}
+	entries := make([]entryWithTime, 0, 18)
+
+	addEntry := func(prayerName string, state notification.WindowState, at time.Time, offsetMinutes int, enabled bool) {
+		delta := int(at.Sub(now).Seconds())
+		entries = append(entries, entryWithTime{
+			ReminderDebugEntry: ReminderDebugEntry{
+				PrayerName:    prayerName,
+				State:         string(state),
+				ScheduledTime: at.Format(time.RFC3339),
+				OffsetMinutes: offsetMinutes,
+				Enabled:       enabled,
+				DeltaSeconds:  delta,
+				IsFuture:      delta > 0,
+			},
+			at: at,
+		})
+	}
+
+	type prayerEntry struct {
+		name    string
+		t       time.Time
+		setting settings.PrayerNotificationSetting
+	}
+
+	prayers := []prayerEntry{
+		{name: "Fajr", t: sched.Fajr, setting: cfg.Notification.Prayers.Fajr},
+		{name: "Sunrise", t: sched.Sunrise, setting: cfg.Notification.Prayers.Sunrise},
+		{name: "Zuhr", t: sched.Zuhr, setting: cfg.Notification.Prayers.Zuhr},
+		{name: "Asr", t: sched.Asr, setting: cfg.Notification.Prayers.Asr},
+		{name: "Maghrib", t: sched.Maghrib, setting: cfg.Notification.Prayers.Maghrib},
+		{name: "Isha", t: sched.Isha, setting: cfg.Notification.Prayers.Isha},
+	}
+
+	for _, prayerEntry := range prayers {
+		if prayerEntry.t.IsZero() {
+			continue
+		}
+		enabled := prayerEntry.setting.Enabled
+		beforeMinutes := prayerEntry.setting.BeforeMinutes
+		afterMinutes := prayerEntry.setting.AfterMinutes
+
+		if beforeMinutes > 0 {
+			beforeTime := prayerEntry.t.Add(-time.Duration(beforeMinutes) * time.Minute)
+			addEntry(prayerEntry.name, notification.StateBefore, beforeTime, -beforeMinutes, enabled)
+		}
+
+		addEntry(prayerEntry.name, notification.StateOnTime, prayerEntry.t, 0, enabled)
+
+		if afterMinutes > 0 {
+			afterTime := prayerEntry.t.Add(time.Duration(afterMinutes) * time.Minute)
+			addEntry(prayerEntry.name, notification.StateAfter, afterTime, afterMinutes, enabled)
+		}
+	}
+
+	sort.Slice(entries, func(i, j int) bool { return entries[i].at.Before(entries[j].at) })
+	result := make([]ReminderDebugEntry, 0, len(entries))
+	for _, entry := range entries {
+		result = append(result, entry.ReminderDebugEntry)
+	}
+	return result, nil
 }
 
 func (s *Service) ExportRangeToCSV(startDate, endDate, outputPath string) error {

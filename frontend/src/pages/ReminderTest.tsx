@@ -16,8 +16,14 @@ import {
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../store/appStore';
-import { getReminderTestSnapshot, searchTimezones, syncReminderTestWindow, triggerReminderTest } from '../bindings';
-import type { ReminderTestSnapshot } from '../types';
+import {
+  getDebugTimeInfo,
+  getReminderTestSnapshot,
+  searchTimezones,
+  syncReminderTestWindow,
+  triggerReminderTest,
+} from '../bindings';
+import type { DebugTimeInfo, ReminderTestSnapshot } from '../types';
 import NumberField from '../components/ui/NumberField';
 
 const PRAYER_OPTIONS = ['Fajr', 'Sunrise', 'Zuhr', 'Asr', 'Maghrib', 'Isha'] as const;
@@ -36,6 +42,7 @@ export default function ReminderTestPage() {
   const [liveTick, setLiveTick] = useState(0);
   const [liveStart, setLiveStart] = useState<number | null>(null);
   const [snapshot, setSnapshot] = useState<ReminderTestSnapshot | null>(null);
+  const [debugTimeInfo, setDebugTimeInfo] = useState<DebugTimeInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const requestIdRef = useRef(0);
@@ -155,6 +162,20 @@ export default function ReminderTestPage() {
     }
     inflightRef.current = true;
     void runSnapshotRequest(trigger, offsetOverride, silent);
+  };
+
+  const loadDebugTimeInfo = async () => {
+    try {
+      const info = await getDebugTimeInfo();
+      setDebugTimeInfo(info);
+    } catch (err) {
+      setDebugTimeInfo({
+        nowRFC3339: '',
+        clock: '',
+        timezone: '',
+        offset: `Failed to load backend time: ${String(err)}`,
+      });
+    }
   };
 
   useEffect(() => {
@@ -352,6 +373,22 @@ export default function ReminderTestPage() {
             style: settings?.notification.style ?? 'window',
           })}
         </Typography>
+
+        <Divider />
+        <Typography variant="subtitle2">{t('reminderTest.backendTimeTitle')}</Typography>
+        <Button variant="outlined" onClick={loadDebugTimeInfo}>
+          {t('reminderTest.backendTimeRefresh')}
+        </Button>
+        {debugTimeInfo && (
+          <TextField
+            label={t('reminderTest.backendTimeOutput')}
+            value={JSON.stringify(debugTimeInfo, null, 2)}
+            fullWidth
+            multiline
+            minRows={4}
+            InputProps={{ readOnly: true }}
+          />
+        )}
       </Box>
     </Box>
   );
