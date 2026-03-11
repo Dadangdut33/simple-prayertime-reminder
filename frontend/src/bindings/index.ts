@@ -8,6 +8,8 @@ import type {
   HijriDate,
   Location,
   NextPrayerInfo,
+  ReminderInfo,
+  ReminderTestSnapshot,
   Settings,
   QuranData,
   WorldPrayerCitySummary,
@@ -89,11 +91,6 @@ export const getQiblaDirectionFor = (
 export const getCardinalDirection = (bearing: number): Promise<string> =>
   AppService.GetCardinalDirection(bearing) as any;
 
-// ---- Audio ----
-export const playAdhan = (isFajr: boolean): Promise<void> =>
-  AppService.PlayAdhan(isFajr) as any;
-export const stopAdhan = (): Promise<void> => AppService.StopAdhan() as any;
-
 // ---- Export ----
 export const exportToCSV = (
   year: number,
@@ -129,6 +126,21 @@ export const saveBase64File = (
 // ---- Notification ----
 export const dismissReminder = (): Promise<void> =>
   AppService.DismissReminder() as any;
+export const dismissTestReminder = (): Promise<void> =>
+  AppService.DismissTestReminder() as any;
+export const emitReminderInfo = (): Promise<void> =>
+  AppService.EmitReminderInfo() as any;
+export const emitTestReminderInfo = (): Promise<void> =>
+  AppService.EmitTestReminderInfo() as any;
+export const getReminderInfo = (): Promise<ReminderInfo | null> =>
+  AppService.GetReminderInfo() as any;
+export const getReminderState = (): Promise<ReminderInfo | null> =>
+  AppService.GetReminderState() as any;
+export const getTestReminderState = (): Promise<ReminderInfo | null> =>
+  AppService.GetTestReminderState() as any;
+export const playAdhan = (isFajr: boolean): Promise<void> =>
+  AppService.PlayAdhan(isFajr) as any;
+export const stopAdhan = (): Promise<void> => AppService.StopAdhan() as any;
 
 // ---- Time ----
 export const getCurrentTime = (): Promise<string> =>
@@ -149,3 +161,23 @@ export const saveQuranData = (data: QuranData): Promise<void> =>
   AppService.SaveQuranData(data as any) as any;
 export const readTextFile = (path: string): Promise<string> =>
   AppService.ReadTextFile(path) as any;
+export const getReminderTestSnapshot = (
+  prayerName: string,
+  offsetSeconds: number,
+  timezone: string,
+): Promise<ReminderTestSnapshot> =>
+  AppService.GetReminderTestSnapshot(prayerName, offsetSeconds, timezone) as any;
+export const syncReminderTestWindow = (
+  prayerName: string,
+  offsetSeconds: number,
+  timezone: string,
+  live: boolean,
+): Promise<ReminderTestSnapshot> =>
+  AppService.SyncReminderTestWindow(prayerName, offsetSeconds, timezone, live) as any;
+export const triggerReminderTest = (
+  prayerName: string,
+  offsetSeconds: number,
+  timezone: string,
+  live: boolean,
+): Promise<ReminderTestSnapshot> =>
+  AppService.TriggerReminderTest(prayerName, offsetSeconds, timezone, live) as any;

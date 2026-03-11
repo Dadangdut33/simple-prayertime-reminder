@@ -6,6 +6,50 @@
 import { Create as $Create } from "@wailsio/runtime";
 
 /**
+ * ReminderInfo contains data passed to the reminder window
+ */
+export class ReminderInfo {
+    "prayerName": string;
+    "state": WindowState;
+    "minutesLeft": number;
+    "offsetMinutes": number;
+    "triggerId": number;
+    "live": boolean;
+
+    /** Creates a new ReminderInfo instance. */
+    constructor($$source: Partial<ReminderInfo> = {}) {
+        if (!("prayerName" in $$source)) {
+            this["prayerName"] = "";
+        }
+        if (!("state" in $$source)) {
+            this["state"] = WindowState.$zero;
+        }
+        if (!("minutesLeft" in $$source)) {
+            this["minutesLeft"] = 0;
+        }
+        if (!("offsetMinutes" in $$source)) {
+            this["offsetMinutes"] = 0;
+        }
+        if (!("triggerId" in $$source)) {
+            this["triggerId"] = 0;
+        }
+        if (!("live" in $$source)) {
+            this["live"] = false;
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new ReminderInfo instance from a string or object.
+     */
+    static createFrom($$source: any = {}): ReminderInfo {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new ReminderInfo($$parsedSource as Partial<ReminderInfo>);
+    }
+}
+
+/**
  * Service manages the prayer reminder window
  */
 export class Service {
@@ -24,3 +68,17 @@ export class Service {
         return new Service($$parsedSource as Partial<Service>);
     }
 }
+
+/**
+ * WindowState represents the state of the reminder window
+ */
+export enum WindowState {
+    /**
+     * The Go zero value for the underlying type of the enum.
+     */
+    $zero = "",
+
+    StateBefore = "before",
+    StateOnTime = "ontime",
+    StateAfter = "after",
+};

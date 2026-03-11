@@ -104,6 +104,8 @@ export interface NotificationSettings {
   style: NotificationStyle;
   playAdhan: boolean;
   adhanVolume: number;
+  persistentReminder: boolean;
+  autoDismissSeconds: number;
   prayers: PerPrayerNotification;
 }
 
@@ -212,6 +214,7 @@ export interface Settings {
   trayLeftClick: 'toggle-window' | 'open-menu' | 'none';
   hijriDateOffset: number;
   timeFormat: '12h' | '24h';
+  enableTestTools: boolean;
 }
 
 // ---- Reminder event ----
@@ -221,6 +224,23 @@ export interface ReminderInfo {
   prayerName: string;
   state: WindowState;
   minutesLeft: number;
+  offsetMinutes?: number;
+  triggerId?: number;
+  live?: boolean;
+}
+
+export interface ReminderTestSnapshot {
+  timezone: string;
+  currentTime: string;
+  simulatedTime: string;
+  prayerName: string;
+  prayerTime: string;
+  offsetSeconds: number;
+  state: WindowState;
+  minutesLeft: number;
+  nextPrayerName: string;
+  nextPrayerTime: string;
+  schedule: Record<string, string>;
 }
 
 // ---- Named prayer list ----

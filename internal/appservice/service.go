@@ -3,6 +3,7 @@ package appservice
 import (
 	"archive/zip"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -26,16 +27,18 @@ import (
 
 // Service is the Wails-facing bridge between the frontend and the Go services.
 type Service struct {
-	prayerSvc           *prayer.Service
-	locSvc              *location.Service
-	settingsSvc         *settings.Service
-	audioSvc            *audio.Service
-	notifSvc            *notification.Service
-	schedulerSvc        *scheduler.Service
-	onSettings          func(settings.Settings)
-	worldPrayerMu       sync.Mutex
-	worldPrayerServices map[string]*prayer.Service
-	quranMu             sync.Mutex
+	prayerSvc             *prayer.Service
+	locSvc                *location.Service
+	settingsSvc           *settings.Service
+	audioSvc              *audio.Service
+	notifSvc              *notification.Service
+	schedulerSvc          *scheduler.Service
+	onSettings            func(settings.Settings)
+	worldPrayerMu         sync.Mutex
+	worldPrayerServices   map[string]*prayer.Service
+	quranMu               sync.Mutex
+	reminderStatePath     string
+	testReminderStatePath string
 }
 
 func New(
@@ -44,12 +47,15 @@ func New(
 	settingsSvc *settings.Service,
 	audioSvc *audio.Service,
 ) *Service {
+	configDir, _ := ConfigDirectory()
 	return &Service{
-		prayerSvc:           prayerSvc,
-		locSvc:              locSvc,
-		settingsSvc:         settingsSvc,
-		audioSvc:            audioSvc,
-		worldPrayerServices: make(map[string]*prayer.Service),
+		prayerSvc:             prayerSvc,
+		locSvc:                locSvc,
+		settingsSvc:           settingsSvc,
+		audioSvc:              audioSvc,
+		worldPrayerServices:   make(map[string]*prayer.Service),
+		reminderStatePath:     filepath.Join(configDir, "reminder_state.json"),
+		testReminderStatePath: filepath.Join(configDir, "reminder_test_state.json"),
 	}
 }
 
@@ -573,15 +579,6 @@ func (s *Service) GetCardinalDirection(bearing float64) string {
 	return qibla.CardinalDirection(bearing)
 }
 
-func (s *Service) PlayAdhan(isFajr bool) error {
-	cfg := s.settingsSvc.Get()
-	return s.audioSvc.Play(isFajr, cfg.Notification.AdhanVolume)
-}
-
-func (s *Service) StopAdhan() {
-	s.audioSvc.Stop()
-}
-
 func (s *Service) ExportToCSV(_, _ int, startDate, endDate, outputPath string) error {
 	rows, err := s.buildRangeExportRows(startDate, endDate)
 	if err != nil {
@@ -610,11 +607,83 @@ func (s *Service) SaveBase64File(outputPath, base64Data string) error {
 }
 
 func (s *Service) DismissReminder() {
+	if s.notifSvc != nil {
+		s.notifSvc.CloseReminder()
+	}
+	if s.audioSvc != nil {
+		s.audioSvc.Stop()
+	}
 	if s.schedulerSvc != nil {
 		s.schedulerSvc.Stop()
 		cfg := s.settingsSvc.Get()
 		s.schedulerSvc.Start(cfg)
 	}
+}
+
+func (s *Service) DismissTestReminder() {
+	if s.notifSvc != nil {
+		s.notifSvc.CloseTestReminder()
+	}
+	if s.audioSvc != nil {
+		s.audioSvc.Stop()
+	}
+}
+
+func (s *Service) PlayAdhan(isFajr bool) error {
+	if s.audioSvc == nil {
+		return nil
+	}
+	cfg := s.settingsSvc.Get()
+	return s.audioSvc.Play(isFajr, cfg.Notification.AdhanVolume)
+}
+
+func (s *Service) StopAdhan() {
+	if s.audioSvc != nil {
+		s.audioSvc.Stop()
+	}
+}
+
+func (s *Service) EmitReminderInfo() {
+	if s.notifSvc != nil {
+		s.notifSvc.EmitLastReminder()
+	}
+}
+
+func (s *Service) EmitTestReminderInfo() {
+	if s.notifSvc != nil {
+		s.notifSvc.EmitLastTestReminder()
+	}
+}
+
+func (s *Service) GetReminderInfo() *notification.ReminderInfo {
+	return loadReminderState(s.reminderStatePath)
+}
+
+func (s *Service) GetTestReminderInfo() *notification.ReminderInfo {
+	return loadReminderState(s.testReminderStatePath)
+}
+
+func (s *Service) GetReminderState() *notification.ReminderInfo {
+	return loadReminderState(s.reminderStatePath)
+}
+
+func (s *Service) GetTestReminderState() *notification.ReminderInfo {
+	return loadReminderState(s.testReminderStatePath)
+}
+
+func loadReminderState(path string) *notification.ReminderInfo {
+	if path == "" {
+		return nil
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil
+	}
+	var info notification.ReminderInfo
+	if err := json.Unmarshal(data, &info); err != nil {
+		return nil
+	}
+	return &info
 }
 
 func (s *Service) GetCurrentTime() string {

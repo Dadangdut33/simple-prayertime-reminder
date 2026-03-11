@@ -29,7 +29,7 @@ const (
 type PrayerNotificationSetting struct {
 	Enabled       bool `json:"enabled"`
 	BeforeMinutes int  `json:"beforeMinutes"` // minutes before prayer to remind
-	AfterMinutes  int  `json:"afterMinutes"`  // minutes after prayer to auto-dismiss
+	AfterMinutes  int  `json:"afterMinutes"`  // minutes after prayer to remind again
 }
 
 // PerPrayerNotification holds notification settings per prayer
@@ -44,10 +44,12 @@ type PerPrayerNotification struct {
 
 // NotificationSettings stores all notification preferences
 type NotificationSettings struct {
-	Style       NotificationStyle     `json:"style"`
-	PlayAdhan   bool                  `json:"playAdhan"`
-	AdhanVolume float64               `json:"adhanVolume"` // 0.0 to 1.0
-	Prayers     PerPrayerNotification `json:"prayers"`
+	Style              NotificationStyle     `json:"style"`
+	PlayAdhan          bool                  `json:"playAdhan"`
+	AdhanVolume        float64               `json:"adhanVolume"` // 0.0 to 1.0
+	PersistentReminder bool                  `json:"persistentReminder"`
+	AutoDismissSeconds int                   `json:"autoDismissSeconds"`
+	Prayers            PerPrayerNotification `json:"prayers"`
 }
 
 // LocationSettings stores location configuration
@@ -134,6 +136,7 @@ type Settings struct {
 	TrayLeftClick    string               `json:"trayLeftClick"`   // "toggle-window", "open-menu", or "none"
 	HijriDateOffset  int                  `json:"hijriDateOffset"` // -2 to +2 days
 	TimeFormat       string               `json:"timeFormat"`      // "12h" or "24h"
+	EnableTestTools  bool                 `json:"enableTestTools"`
 }
 
 func worldPrayerCityFromGeonames(city geonames.City) WorldPrayerCity {
@@ -253,9 +256,11 @@ func DefaultSettings() Settings {
 			CustomMaghribDuration: 0,
 		},
 		Notification: NotificationSettings{
-			Style:       NotificationWindow,
-			PlayAdhan:   true,
-			AdhanVolume: 0.8,
+			Style:              NotificationWindow,
+			PlayAdhan:          true,
+			AdhanVolume:        0.8,
+			PersistentReminder: false,
+			AutoDismissSeconds: 30,
 			Prayers: PerPrayerNotification{
 				Fajr:    defaultPrayerNotif,
 				Sunrise: sunriseNotif,
@@ -290,6 +295,7 @@ func DefaultSettings() Settings {
 		TrayLeftClick:    "toggle-window",
 		HijriDateOffset:  0,
 		TimeFormat:       "24h",
+		EnableTestTools:  false,
 	}
 }
 

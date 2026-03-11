@@ -3,6 +3,9 @@ package audio
 import (
 	"bytes"
 	_ "embed"
+	"fmt"
+	"io"
+	"log"
 	"sync"
 
 	"github.com/ebitengine/oto/v3"
@@ -17,10 +20,11 @@ var adhanFajrData []byte
 
 // Service manages adhan audio playback
 type Service struct {
-	ctx    *oto.Context
-	player *oto.Player
-	mu     sync.Mutex
-	ready  chan struct{}
+	ctx     *oto.Context
+	player  *oto.Player
+	mu      sync.Mutex
+	ready   chan struct{}
+	initErr error
 }
 
 // NewService creates a new Audio service and initializes the audio context
@@ -37,6 +41,8 @@ func (svc *Service) init() {
 		Format:       oto.FormatSignedInt16LE,
 	})
 	if err != nil {
+		svc.initErr = err
+		log.Printf("audio: failed to initialize audio context: %v", err)
 		close(svc.ready)
 		return
 	}
@@ -55,7 +61,10 @@ func (svc *Service) waitReady() bool {
 // volume is in range 0.0 to 1.0.
 func (svc *Service) Play(isFajr bool, volume float64) error {
 	if !svc.waitReady() {
-		return nil // silently skip if audio context failed
+		if svc.initErr != nil {
+			return fmt.Errorf("audio context failed: %w", svc.initErr)
+		}
+		return fmt.Errorf("audio context not ready")
 	}
 
 	svc.mu.Lock()
@@ -90,7 +99,8 @@ func (svc *Service) Stop() {
 
 func (svc *Service) stopLocked() {
 	if svc.player != nil {
-		svc.player.Close()
+		svc.player.Pause()
+		_, _ = svc.player.Seek(0, io.SeekStart)
 		svc.player = nil
 	}
 }

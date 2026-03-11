@@ -520,6 +520,25 @@ export default function GeneralSettingsTab({
 
           <Box mt={3} p={2.5} borderRadius={0.5} border="1px solid" borderColor="divider" bgcolor="background.paper">
             <Typography variant="subtitle2" mb={0.75}>
+              {t('settings.general.app.testTools')}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" mb={2}>
+              {t('settings.general.app.testToolsDesc')}
+            </Typography>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={local.enableTestTools}
+                  onChange={(event) => setLocal({ ...local, enableTestTools: event.target.checked })}
+                />
+              }
+              label={t('settings.general.app.testToolsToggle')}
+              sx={{ m: 0 }}
+            />
+          </Box>
+
+          <Box mt={3} p={2.5} borderRadius={0.5} border="1px solid" borderColor="divider" bgcolor="background.paper">
+            <Typography variant="subtitle2" mb={0.75}>
               {t('settings.general.app.updates')}
             </Typography>
             <Typography variant="body2" color="text.secondary" mb={2}>

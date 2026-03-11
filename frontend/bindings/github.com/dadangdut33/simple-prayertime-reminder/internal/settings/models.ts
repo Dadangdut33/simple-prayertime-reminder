@@ -120,6 +120,8 @@ export class NotificationSettings {
      * 0.0 to 1.0
      */
     "adhanVolume": number;
+    "persistentReminder": boolean;
+    "autoDismissSeconds": number;
     "prayers": PerPrayerNotification;
 
     /** Creates a new NotificationSettings instance. */
@@ -133,6 +135,12 @@ export class NotificationSettings {
         if (!("adhanVolume" in $$source)) {
             this["adhanVolume"] = 0;
         }
+        if (!("persistentReminder" in $$source)) {
+            this["persistentReminder"] = false;
+        }
+        if (!("autoDismissSeconds" in $$source)) {
+            this["autoDismissSeconds"] = 0;
+        }
         if (!("prayers" in $$source)) {
             this["prayers"] = (new PerPrayerNotification());
         }
@@ -144,10 +152,10 @@ export class NotificationSettings {
      * Creates a new NotificationSettings instance from a string or object.
      */
     static createFrom($$source: any = {}): NotificationSettings {
-        const $$createField3_0 = $$createType0;
+        const $$createField5_0 = $$createType0;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("prayers" in $$parsedSource) {
-            $$parsedSource["prayers"] = $$createField3_0($$parsedSource["prayers"]);
+            $$parsedSource["prayers"] = $$createField5_0($$parsedSource["prayers"]);
         }
         return new NotificationSettings($$parsedSource as Partial<NotificationSettings>);
     }
@@ -246,7 +254,7 @@ export class PrayerNotificationSetting {
     "beforeMinutes": number;
 
     /**
-     * minutes after prayer to auto-dismiss
+     * minutes after prayer to remind again
      */
     "afterMinutes": number;
 
@@ -447,6 +455,7 @@ export class Settings {
      * "12h" or "24h"
      */
     "timeFormat": string;
+    "enableTestTools": boolean;
 
     /** Creates a new Settings instance. */
     constructor($$source: Partial<Settings> = {}) {
@@ -491,6 +500,9 @@ export class Settings {
         }
         if (!("timeFormat" in $$source)) {
             this["timeFormat"] = "";
+        }
+        if (!("enableTestTools" in $$source)) {
+            this["enableTestTools"] = false;
         }
 
         Object.assign(this, $$source);

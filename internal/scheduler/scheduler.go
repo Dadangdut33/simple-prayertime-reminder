@@ -113,10 +113,12 @@ func (svc *Service) scheduleDayReminders(cfg settings.Settings) {
 		}
 
 		// Schedule "after" reminder
-		afterTime := e.t.Add(time.Duration(e.notifSettings.AfterMinutes) * time.Minute)
-		if afterTime.After(now) {
-			delay := time.Until(afterTime)
-			go svc.closeAfterDelay(delay)
+		if e.notifSettings.AfterMinutes > 0 {
+			afterTime := e.t.Add(time.Duration(e.notifSettings.AfterMinutes) * time.Minute)
+			if afterTime.After(now) {
+				delay := time.Until(afterTime)
+				go svc.fireAfterDelay(e, notification.StateAfter, delay, notifCfg)
+			}
 		}
 	}
 }
@@ -134,20 +136,23 @@ func (svc *Service) fireAfterDelay(
 	}
 
 	minutesLeft := 0
+	offsetMinutes := 0
 	if state == notification.StateBefore {
 		minutesLeft = entry.notifSettings.BeforeMinutes
+		offsetMinutes = -entry.notifSettings.BeforeMinutes
+	} else if state == notification.StateAfter {
+		offsetMinutes = entry.notifSettings.AfterMinutes
 	}
 
 	svc.notifSvc.ShowReminder(notification.ReminderInfo{
-		PrayerName:  entry.name,
-		State:       state,
-		MinutesLeft: minutesLeft,
+		PrayerName:    entry.name,
+		State:         state,
+		MinutesLeft:   minutesLeft,
+		OffsetMinutes: offsetMinutes,
 	})
 
-	if state == notification.StateOnTime && notifCfg.PlayAdhan {
-		if err := svc.audioSvc.Play(entry.isFajr, notifCfg.AdhanVolume); err != nil {
-			log.Printf("scheduler: failed to play adhan: %v", err)
-		}
+	if !notifCfg.PersistentReminder && notifCfg.AutoDismissSeconds > 0 {
+		go svc.closeAfterDelay(time.Duration(notifCfg.AutoDismissSeconds) * time.Second)
 	}
 }
 
@@ -157,6 +162,5 @@ func (svc *Service) closeAfterDelay(delay time.Duration) {
 		return
 	case <-time.After(delay):
 	}
-	svc.audioSvc.Stop()
 	svc.notifSvc.CloseReminder()
 }

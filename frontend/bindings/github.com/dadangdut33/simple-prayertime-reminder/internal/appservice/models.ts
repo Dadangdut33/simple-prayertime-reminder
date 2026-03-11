@@ -167,6 +167,71 @@ export class QuranNote {
     }
 }
 
+export class ReminderTestSnapshot {
+    "timezone": string;
+    "currentTime": string;
+    "simulatedTime": string;
+    "prayerName": string;
+    "prayerTime": string;
+    "offsetSeconds": number;
+    "state": string;
+    "minutesLeft": number;
+    "nextPrayerName": string;
+    "nextPrayerTime": string;
+    "schedule": { [_ in string]?: string };
+
+    /** Creates a new ReminderTestSnapshot instance. */
+    constructor($$source: Partial<ReminderTestSnapshot> = {}) {
+        if (!("timezone" in $$source)) {
+            this["timezone"] = "";
+        }
+        if (!("currentTime" in $$source)) {
+            this["currentTime"] = "";
+        }
+        if (!("simulatedTime" in $$source)) {
+            this["simulatedTime"] = "";
+        }
+        if (!("prayerName" in $$source)) {
+            this["prayerName"] = "";
+        }
+        if (!("prayerTime" in $$source)) {
+            this["prayerTime"] = "";
+        }
+        if (!("offsetSeconds" in $$source)) {
+            this["offsetSeconds"] = 0;
+        }
+        if (!("state" in $$source)) {
+            this["state"] = "";
+        }
+        if (!("minutesLeft" in $$source)) {
+            this["minutesLeft"] = 0;
+        }
+        if (!("nextPrayerName" in $$source)) {
+            this["nextPrayerName"] = "";
+        }
+        if (!("nextPrayerTime" in $$source)) {
+            this["nextPrayerTime"] = "";
+        }
+        if (!("schedule" in $$source)) {
+            this["schedule"] = {};
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new ReminderTestSnapshot instance from a string or object.
+     */
+    static createFrom($$source: any = {}): ReminderTestSnapshot {
+        const $$createField10_0 = $$createType4;
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        if ("schedule" in $$parsedSource) {
+            $$parsedSource["schedule"] = $$createField10_0($$parsedSource["schedule"]);
+        }
+        return new ReminderTestSnapshot($$parsedSource as Partial<ReminderTestSnapshot>);
+    }
+}
+
 export class UpdateInfo {
     "currentVersion": string;
     "latestVersion": string;
@@ -252,9 +317,9 @@ export class WorldPrayerCitySummary {
      * Creates a new WorldPrayerCitySummary instance from a string or object.
      */
     static createFrom($$source: any = {}): WorldPrayerCitySummary {
-        const $$createField0_0 = $$createType4;
-        const $$createField3_0 = $$createType5;
-        const $$createField4_0 = $$createType6;
+        const $$createField0_0 = $$createType5;
+        const $$createField3_0 = $$createType6;
+        const $$createField4_0 = $$createType7;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("city" in $$parsedSource) {
             $$parsedSource["city"] = $$createField0_0($$parsedSource["city"]);
@@ -274,6 +339,7 @@ const $$createType0 = QuranBookmark.createFrom;
 const $$createType1 = $Create.Array($$createType0);
 const $$createType2 = QuranNote.createFrom;
 const $$createType3 = $Create.Array($$createType2);
-const $$createType4 = settings$0.WorldPrayerCity.createFrom;
-const $$createType5 = prayer$0.NextPrayerInfo.createFrom;
-const $$createType6 = prayer$0.DaySchedule.createFrom;
+const $$createType4 = $Create.Map($Create.Any, $Create.Any);
+const $$createType5 = settings$0.WorldPrayerCity.createFrom;
+const $$createType6 = prayer$0.NextPrayerInfo.createFrom;
+const $$createType7 = prayer$0.DaySchedule.createFrom;

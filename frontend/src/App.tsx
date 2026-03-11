@@ -29,6 +29,7 @@ import PublicIcon from '@mui/icons-material/Public';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import SettingsIcon from '@mui/icons-material/Settings';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import appLogo from '../../assets/icons/icon.png';
@@ -41,6 +42,7 @@ const NAV_ITEMS = [
   { to: '/prayer-times', labelKey: 'nav.prayerTimes', icon: AccessTimeIcon },
   { to: '/world-cities', labelKey: 'nav.worldCities', icon: PublicIcon },
   { to: '/quran', labelKey: 'nav.quran', icon: MenuBookIcon },
+  { to: '/reminder-test', labelKey: 'nav.testTools', icon: BugReportOutlinedIcon },
   { to: '/settings', labelKey: 'nav.settings', icon: SettingsIcon },
   { to: '/about', labelKey: 'nav.about', icon: InfoOutlinedIcon },
 ];
@@ -111,9 +113,13 @@ export default function App() {
 
   const drawerWidth = drawerCollapsed ? DRAWER_COLLAPSED_WIDTH : DRAWER_WIDTH;
 
+  const visibleNavItems = settings?.enableTestTools
+    ? NAV_ITEMS
+    : NAV_ITEMS.filter((item) => item.to !== '/reminder-test');
+
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-      {startupUpdateInfo ? (
+      {startupUpdateInfo && (
         <UpdateAvailableDialog
           open
           update={startupUpdateInfo}
@@ -122,7 +128,7 @@ export default function App() {
             await api.openURL(startupUpdateInfo.releaseUrl);
           }}
         />
-      ) : null}
+      )}
 
       <Drawer
         variant="permanent"
@@ -212,7 +218,7 @@ export default function App() {
         <Divider sx={{ mb: 2 }} />
 
         <List sx={{ px: drawerCollapsed ? 1 : 2 }}>
-          {NAV_ITEMS.map(({ to, labelKey, icon: Icon, end }) => {
+          {visibleNavItems.map(({ to, labelKey, icon: Icon, end }) => {
             const isActive = end ? location.pathname === to : location.pathname.startsWith(to);
             const label = t(labelKey);
             return (

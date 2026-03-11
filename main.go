@@ -61,14 +61,13 @@ func main() {
 		Timezone:  cfg.Location.Timezone,
 	})
 
-	audioSvc2 := audio.NewService()
-
 	// Dependency injection for dependent services
 	prayerSvc2 := prayer.NewService()
 	prayerSvc2.SetConfig(appservice.BuildPrayerConfig(cfg))
+	audioSvc := audio.NewService()
 
 	// The primary AppService which binds methods to JS
-	appSvc := appservice.New(prayerSvc2, locSvc2, settingsSvc2, audioSvc2)
+	appSvc := appservice.New(prayerSvc2, locSvc2, settingsSvc2, audioSvc)
 
 	app := application.New(application.Options{
 		Name:        appName,
@@ -86,10 +85,14 @@ func main() {
 	})
 
 	// Notification and Scheduler need app to emit events/manage windows
-	notifSvc2 := notification.NewService(app)
-	schedulerSvc2 := scheduler.NewService(prayerSvc2, audioSvc2, notifSvc2)
+	notifSvc := notification.NewService(app, audioSvc)
+	notifSvc.SetStatePaths(
+		filepath.Join(configPath, "reminder_state.json"),
+		filepath.Join(configPath, "reminder_test_state.json"),
+	)
+	schedulerSvc := scheduler.NewService(prayerSvc2, audioSvc, notifSvc)
 
-	appSvc.SetRuntimeServices(notifSvc2, schedulerSvc2)
+	appSvc.SetRuntimeServices(notifSvc, schedulerSvc)
 
 	// Main window
 	mainWindow := app.Window.NewWithOptions(application.WebviewWindowOptions{
@@ -118,7 +121,7 @@ func main() {
 	})
 
 	// Start scheduler
-	schedulerSvc2.Start(cfg)
+	schedulerSvc.Start(cfg)
 
 	// If AutoDetectLocation is true and location is empty, trigger detection async
 	if cfg.Location.AutoDetect && cfg.Location.City == "" {
