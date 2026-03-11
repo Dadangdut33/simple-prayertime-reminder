@@ -246,6 +246,12 @@ export interface ReminderTestSnapshot {
 // ---- Named prayer list ----
 export const PRAYER_NAMES = ['Fajr', 'Sunrise', 'Zuhr', 'Asr', 'Maghrib', 'Isha'] as const;
 export type PrayerName = (typeof PRAYER_NAMES)[number];
+export const PRAYER_NAME_FAJR: PrayerName = 'Fajr';
+export const PRAYER_NAME_SUNRISE: PrayerName = 'Sunrise';
+export const PRAYER_NAME_ZUHR: PrayerName = 'Zuhr';
+export const PRAYER_NAME_ASR: PrayerName = 'Asr';
+export const PRAYER_NAME_MAGHRIB: PrayerName = 'Maghrib';
+export const PRAYER_NAME_ISHA: PrayerName = 'Isha';
 
 export const CALCULATION_METHODS = [
   { value: 'AstronomicalTwilight', labelKey: 'prayer.methods.astronomical' },

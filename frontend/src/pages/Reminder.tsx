@@ -20,6 +20,7 @@ import {
   playAdhan,
 } from '../bindings';
 import type { ReminderInfo } from '../types';
+import { PRAYER_NAME_FAJR, PRAYER_NAME_SUNRISE } from '../types';
 import { useTranslation } from 'react-i18next';
 import { getPrayerDisplayName } from '../utils/helpers';
 import { useAppStore } from '../store/appStore';
@@ -149,8 +150,7 @@ export default function ReminderPage() {
 
   const prayerTimeMs = prayerTimeMsRef.current;
   const useLiveClock = !isTest || Boolean(info?.live);
-  const diffSeconds =
-    useLiveClock && prayerTimeMs ? Math.floor((clock.getTime() - prayerTimeMs) / 1000) : null;
+  const diffSeconds = useLiveClock && prayerTimeMs ? Math.floor((clock.getTime() - prayerTimeMs) / 1000) : null;
   let displayState = state;
   let beforeMinutes = minutesLeft > 0 ? minutesLeft : Math.abs(offsetMinutes);
   let afterMinutes = Math.max(0, offsetMinutes);
@@ -207,11 +207,12 @@ export default function ReminderPage() {
   useEffect(() => {
     if (!hasState || !info || !notificationSettings?.playAdhan) return;
     if (!info.triggerId) return;
+    if (info.prayerName === PRAYER_NAME_SUNRISE) return;
     if (displayState !== 'ontime') return;
     const key = `${info.prayerName}|${prayerTimeMs ?? 0}|${isTest ? 'test' : 'real'}`;
     if (lastPlayKeyRef.current === key) return;
     lastPlayKeyRef.current = key;
-    void playAdhan(info.prayerName === 'Fajr').catch((e) => {
+    void playAdhan(info.prayerName === PRAYER_NAME_FAJR).catch((e) => {
       console.error('Fail to play audio');
       console.error(e);
     });

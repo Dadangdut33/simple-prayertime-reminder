@@ -187,6 +187,7 @@ The file is created automatically on first run.
 ## Attribution
 
 - <a href="https://youtu.be/iaWZ_3D6vOQ">Adhan uploaded by Ayat via YouTube</a>
+- <a href="https://quran.com">Default link for Quran embed webview</a>
 - <a href="https://www.flaticon.com/free-icons/mosque" title="mosque icons">Mosque icons created by Freepik - Flaticon</a>
 
 ## License
