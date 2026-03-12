@@ -200,6 +200,7 @@ export type DigitalClockFormatPreset =
 export type ThemePreset = 'indigo' | 'emerald' | 'sunset' | 'rose' | 'ocean';
 export type PrayerTimesViewMode = 'table' | 'calendar';
 export type PrayerCalendarSystem = 'gregorian' | 'hijri' | 'side-by-side';
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 export interface DashboardSettings {
   showClock: boolean;
@@ -226,6 +227,7 @@ export interface Settings {
   theme: string;
   themePreset: ThemePreset;
   language: string;
+  logLevel: LogLevel;
   autoStart: boolean;
   autoCheckUpdates: boolean;
   trayLeftClick: 'toggle-window' | 'open-menu' | 'none';

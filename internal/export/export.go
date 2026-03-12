@@ -26,6 +26,7 @@ type MonthRow struct {
 func ToCSV(rows []MonthRow, filepath string) error {
 	f, err := os.Create(filepath)
 	if err != nil {
+		log.Error("export csv create failed", "error", err, "path", filepath)
 		return fmt.Errorf("failed to create CSV file: %w", err)
 	}
 	defer f.Close()
@@ -44,6 +45,7 @@ func ToCSV(rows []MonthRow, filepath string) error {
 		"Isha",
 	}
 	if err := w.Write(header); err != nil {
+		log.Error("export csv header write failed", "error", err)
 		return err
 	}
 
@@ -59,9 +61,11 @@ func ToCSV(rows []MonthRow, filepath string) error {
 			formatTime(row.Isha),
 		}
 		if err := w.Write(row); err != nil {
+			log.Error("export csv row write failed", "error", err)
 			return err
 		}
 	}
+	log.Info("export csv saved", "path", filepath, "rows", len(rows))
 	return nil
 }
 
@@ -144,7 +148,12 @@ func ToExcel(rows []MonthRow, filepath string) error {
 		ActivePane:  "bottomLeft",
 	})
 
-	return f.SaveAs(filepath)
+	if err := f.SaveAs(filepath); err != nil {
+		log.Error("export excel save failed", "error", err, "path", filepath)
+		return err
+	}
+	log.Info("export excel saved", "path", filepath, "rows", len(rows))
+	return nil
 }
 
 func formatTime(t time.Time) string {

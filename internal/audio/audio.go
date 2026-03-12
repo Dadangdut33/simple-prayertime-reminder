@@ -5,11 +5,12 @@ import (
 	_ "embed"
 	"fmt"
 	"io"
-	"log"
 	"sync"
 
 	"github.com/ebitengine/oto/v3"
 	"github.com/hajimehoshi/go-mp3"
+
+	"github.com/dadangdut33/simple-prayertime-reminder/internal/logging"
 )
 
 //go:embed adhan.mp3
@@ -27,6 +28,8 @@ type Service struct {
 	initErr error
 }
 
+var log = logging.With("audio")
+
 // NewService creates a new Audio service and initializes the audio context
 func NewService() *Service {
 	svc := &Service{ready: make(chan struct{})}
@@ -42,7 +45,7 @@ func (svc *Service) init() {
 	})
 	if err != nil {
 		svc.initErr = err
-		log.Printf("audio: failed to initialize audio context: %v", err)
+		log.Error("audio context init failed", "error", err)
 		close(svc.ready)
 		return
 	}
@@ -87,6 +90,7 @@ func (svc *Service) Play(isFajr bool, volume float64) error {
 	player.SetVolume(clamp(volume, 0, 1))
 	player.Play()
 	svc.player = player
+	log.Info("adhan play", "fajr", isFajr, "volume", volume)
 	return nil
 }
 
@@ -99,6 +103,7 @@ func (svc *Service) Stop() {
 
 func (svc *Service) stopLocked() {
 	if svc.player != nil {
+		log.Info("adhan stop")
 		svc.player.Pause()
 		_, _ = svc.player.Seek(0, io.SeekStart)
 		svc.player = nil

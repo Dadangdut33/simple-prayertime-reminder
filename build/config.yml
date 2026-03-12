@@ -1,16 +1,16 @@
 # This file contains the configuration for this project.
 # When you update `info` or `fileAssociations`, run `wails3 task common:update:build-assets` to update the assets.
 # Note that this will overwrite any changes you have made to the assets.
-version: '3'
+version: "3"
 
 # This information is used to generate the build assets.
 info:
   companyName: "Daadangdut33" # The name of the company
   productName: "Simple Prayertime Reminder" # The name of the application
   productIdentifier: "com.dadangdut33.SimplePrayertimeReminder" # The unique product identifier
-  description: "A program that does X" # The application description
-  copyright: "(c) 2025, My Company" # Copyright text
-  comments: "Some Product Comments" # Comments
+  description: "A simple prayertime reminder application for desktop" # The application description
+  copyright: "(c) 2026, Dadangdut33" # Copyright text
+  comments: "" # Comments
   version: "2.0.0" # The application version
   # cfBundleIconName: "appicon" # The macOS icon name in Assets.car icon bundles (optional)
   #                               # Should match the name of your .icon file without the extension

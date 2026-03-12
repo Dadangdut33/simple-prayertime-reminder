@@ -28,6 +28,7 @@ type AppInfo struct {
 func ConfigDirectory() (string, error) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
+		log.Error("config directory: user home not found", "error", err)
 		return "", err
 	}
 	return filepath.Join(homeDir, ".config", "simple-prayertime-reminder"), nil
@@ -95,11 +96,13 @@ func detectInstallMethod(executablePath string) string {
 func (s *Service) GetAppInfo() (AppInfo, error) {
 	configDir, err := ConfigDirectory()
 	if err != nil {
+		log.Error("get app info: config dir failed", "error", err)
 		return AppInfo{}, err
 	}
 
 	executablePath, err := os.Executable()
 	if err != nil {
+		log.Error("get app info: executable path failed", "error", err)
 		return AppInfo{}, err
 	}
 
@@ -117,12 +120,23 @@ func (s *Service) GetAppInfo() (AppInfo, error) {
 func (s *Service) OpenConfigLocation() error {
 	configDir, err := ConfigDirectory()
 	if err != nil {
+		log.Error("open config location failed", "error", err)
 		return err
 	}
 
-	return browser.OpenFile(configDir)
+	if err := browser.OpenFile(configDir); err != nil {
+		log.Error("open config location: browser open failed", "error", err)
+		return err
+	}
+	log.Info("open config location")
+	return nil
 }
 
 func (s *Service) OpenURL(url string) error {
-	return browser.OpenURL(url)
+	if err := browser.OpenURL(url); err != nil {
+		log.Error("open url failed", "error", err, "url", url)
+		return err
+	}
+	log.Info("open url", "url", url)
+	return nil
 }

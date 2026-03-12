@@ -15,10 +15,12 @@ import (
 
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/audio"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/autostart"
+	"github.com/dadangdut33/simple-prayertime-reminder/internal/clock"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/export"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/geonames"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/hijri"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/location"
+	"github.com/dadangdut33/simple-prayertime-reminder/internal/logging"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/notification"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/prayer"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/qibla"
@@ -68,6 +70,7 @@ func New(
 	audioSvc *audio.Service,
 ) *Service {
 	configDir, _ := ConfigDirectory()
+	log.Info("appservice init", "configDir", configDir)
 	return &Service{
 		prayerSvc:             prayerSvc,
 		locSvc:                locSvc,
@@ -82,6 +85,7 @@ func New(
 func (s *Service) SetRuntimeServices(notifSvc *notification.Service, schedulerSvc *scheduler.Service) {
 	s.notifSvc = notifSvc
 	s.schedulerSvc = schedulerSvc
+	log.Info("runtime services set")
 }
 
 // SetSettingsChangedHandler registers a callback for settings updates.
@@ -91,6 +95,7 @@ func SetSettingsChangedHandler(s *Service, handler func(settings.Settings)) {
 		return
 	}
 	s.onSettings = handler
+	log.Info("settings changed handler set")
 }
 
 func BuildPrayerConfig(cfg settings.Settings) prayer.PrayerConfig {
@@ -184,6 +189,15 @@ func loadLocationOrUTC(timezone string) *time.Location {
 	return loc
 }
 
+func updateLogLevel(cfg settings.Settings) {
+	configDir, err := ConfigDirectory()
+	if err != nil {
+		logging.SetLevel(cfg.LogLevel)
+		return
+	}
+	logging.Configure(logging.Options{Dir: configDir, Level: cfg.LogLevel})
+}
+
 func locationFromSettings(cfg settings.Settings) location.Location {
 	return location.Location{
 		City:      cfg.Location.City,
@@ -209,6 +223,7 @@ func (s *Service) SaveSettings(cfg settings.Settings) error {
 	}
 	if previous.AutoStart != cfg.AutoStart {
 		if err := autostart.Sync(cfg.AutoStart); err != nil {
+			log.Error("autostart sync failed", "error", err, "enabled", cfg.AutoStart)
 			return err
 		}
 	}
@@ -217,6 +232,7 @@ func (s *Service) SaveSettings(cfg settings.Settings) error {
 		if previous.AutoStart != cfg.AutoStart {
 			_ = autostart.Sync(previous.AutoStart)
 		}
+		log.Error("settings update failed", "error", err)
 		return err
 	}
 
@@ -232,6 +248,8 @@ func (s *Service) SaveSettings(cfg settings.Settings) error {
 		s.onSettings(cfg)
 	}
 
+	updateLogLevel(cfg)
+	log.Info("settings saved")
 	return nil
 }
 
@@ -243,6 +261,7 @@ func (s *Service) ResetSettings() (settings.Settings, error) {
 	}
 	if previous.AutoStart != defaults.AutoStart {
 		if err := autostart.Sync(defaults.AutoStart); err != nil {
+			log.Error("autostart sync failed", "error", err, "enabled", defaults.AutoStart)
 			return settings.Settings{}, err
 		}
 	}
@@ -251,6 +270,7 @@ func (s *Service) ResetSettings() (settings.Settings, error) {
 		if previous.AutoStart != defaults.AutoStart {
 			_ = autostart.Sync(previous.AutoStart)
 		}
+		log.Error("settings reset failed", "error", err)
 		return settings.Settings{}, err
 	}
 
@@ -267,6 +287,8 @@ func (s *Service) ResetSettings() (settings.Settings, error) {
 		s.onSettings(cfg)
 	}
 
+	updateLogLevel(cfg)
+	log.Info("settings reset")
 	return cfg, nil
 }
 
@@ -289,7 +311,7 @@ func (s *Service) GetWorldPrayerTimes(cities []settings.WorldPrayerCity) ([]Worl
 	}
 
 	homeLoc := loadLocationOrUTC(cfg.Location.Timezone)
-	now := time.Now()
+	now := clock.Now()
 	_, homeOffset := now.In(homeLoc).Zone()
 
 	results := make([]WorldPrayerCitySummary, 0, len(cities))
@@ -304,10 +326,12 @@ func (s *Service) GetWorldPrayerTimes(cities []settings.WorldPrayerCity) ([]Worl
 
 		today, err := prayerSvc.GetScheduleForDate(cityNow)
 		if err != nil {
+			log.Error("world prayer schedule failed", "error", err, "city", city.Label, "timezone", city.Timezone)
 			return nil, err
 		}
 		nextPrayer, err := prayerSvc.GetNextPrayer(cityNow)
 		if err != nil {
+			log.Error("world prayer next prayer failed", "error", err, "city", city.Label, "timezone", city.Timezone)
 			return nil, err
 		}
 
@@ -320,6 +344,7 @@ func (s *Service) GetWorldPrayerTimes(cities []settings.WorldPrayerCity) ([]Worl
 		})
 	}
 
+	log.Info("world prayer times computed", "cities", len(results))
 	return results, nil
 }
 
@@ -464,6 +489,7 @@ func writeFileAtomic(path string, reader io.Reader) error {
 func (s *Service) DetectLocation() (location.Location, error) {
 	loc, err := s.locSvc.DetectFromIP()
 	if err != nil {
+		log.Error("detect location failed", "error", err)
 		return location.Location{}, err
 	}
 
@@ -477,6 +503,7 @@ func (s *Service) DetectLocation() (location.Location, error) {
 	cfg.Location.Timezone = loc.Timezone
 	_ = s.SaveSettings(cfg)
 
+	log.Info("location detected", "city", loc.City, "country", loc.Country, "timezone", loc.Timezone)
 	return loc, nil
 }
 
@@ -492,32 +519,59 @@ func (s *Service) SetManualLocation(loc location.Location) error {
 	cfg.Location.Elevation = loc.Elevation
 	cfg.Location.Timezone = loc.Timezone
 
-	return s.SaveSettings(cfg)
+	if err := s.SaveSettings(cfg); err != nil {
+		log.Error("set manual location failed", "error", err)
+		return err
+	}
+	log.Info("manual location set", "city", loc.City, "country", loc.Country, "timezone", loc.Timezone)
+	return nil
 }
 
 func (s *Service) GetTodaySchedule() (prayer.DaySchedule, error) {
-	return s.prayerSvc.GetTodaySchedule()
+	schedule, err := s.prayerSvc.GetTodaySchedule()
+	if err != nil {
+		log.Error("today schedule failed", "error", err)
+		return prayer.DaySchedule{}, err
+	}
+	return schedule, nil
 }
 
 func (s *Service) GetScheduleForDate(dateStr string) (prayer.DaySchedule, error) {
 	t, err := time.Parse("2006-01-02", dateStr)
 	if err != nil {
+		log.Error("parse schedule date failed", "error", err, "date", dateStr)
 		return prayer.DaySchedule{}, err
 	}
-	return s.prayerSvc.GetScheduleForDate(t)
+	schedule, err := s.prayerSvc.GetScheduleForDate(t)
+	if err != nil {
+		log.Error("schedule for date failed", "error", err, "date", dateStr)
+		return prayer.DaySchedule{}, err
+	}
+	return schedule, nil
 }
 
 func (s *Service) GetMonthSchedule(year, month int) ([]prayer.DaySchedule, error) {
-	return s.prayerSvc.GetMonthSchedule(year, month)
+	schedule, err := s.prayerSvc.GetMonthSchedule(year, month)
+	if err != nil {
+		log.Error("month schedule failed", "error", err, "year", year, "month", month)
+		return nil, err
+	}
+	return schedule, nil
 }
 
 func (s *Service) GetScheduleRange(startDate, endDate string) ([]prayer.DaySchedule, error) {
 	start, end, err := parseDateRange(startDate, endDate)
 	if err != nil {
+		log.Error("parse date range failed", "error", err, "start", startDate, "end", endDate)
 		return nil, err
 	}
 
-	return s.prayerSvc.GetScheduleRange(start, end)
+	schedule, err := s.prayerSvc.GetScheduleRange(start, end)
+	if err != nil {
+		log.Error("schedule range failed", "error", err, "start", startDate, "end", endDate)
+		return nil, err
+	}
+	return schedule, nil
 }
 
 func (s *Service) GetMonthHijriDates(year, month int) ([]hijri.CalendarDay, error) {
@@ -568,7 +622,7 @@ func (s *Service) GetHijriDateRange(startDate, endDate string) ([]hijri.Calendar
 }
 
 func (s *Service) GetNextPrayer() (prayer.NextPrayerInfo, error) {
-	return s.prayerSvc.GetNextPrayer(time.Now())
+	return s.prayerSvc.GetNextPrayer(clock.Now())
 }
 
 func (s *Service) GetTodayHijri() (hijri.HijriDate, error) {
@@ -602,28 +656,44 @@ func (s *Service) GetCardinalDirection(bearing float64) string {
 func (s *Service) ExportToCSV(_, _ int, startDate, endDate, outputPath string) error {
 	rows, err := s.buildRangeExportRows(startDate, endDate)
 	if err != nil {
+		log.Error("export csv build rows failed", "error", err)
 		return err
 	}
 
-	return export.ToCSV(rows, outputPath)
+	if err := export.ToCSV(rows, outputPath); err != nil {
+		log.Error("export csv failed", "error", err)
+		return err
+	}
+	return nil
 }
 
 func (s *Service) ExportToExcel(_, _ int, startDate, endDate, outputPath string) error {
 	rows, err := s.buildRangeExportRows(startDate, endDate)
 	if err != nil {
+		log.Error("export excel build rows failed", "error", err)
 		return err
 	}
 
-	return export.ToExcel(rows, outputPath)
+	if err := export.ToExcel(rows, outputPath); err != nil {
+		log.Error("export excel failed", "error", err)
+		return err
+	}
+	return nil
 }
 
 func (s *Service) SaveBase64File(outputPath, base64Data string) error {
 	data, err := base64.StdEncoding.DecodeString(base64Data)
 	if err != nil {
+		log.Error("decode base64 file failed", "error", err)
 		return fmt.Errorf("failed to decode base64 file: %w", err)
 	}
 
-	return os.WriteFile(outputPath, data, 0644)
+	if err := os.WriteFile(outputPath, data, 0644); err != nil {
+		log.Error("write base64 file failed", "error", err, "path", outputPath)
+		return err
+	}
+	log.Info("base64 file saved", "path", outputPath)
+	return nil
 }
 
 func (s *Service) DismissReminder() {
@@ -638,6 +708,7 @@ func (s *Service) DismissReminder() {
 		cfg := s.settingsSvc.Get()
 		s.schedulerSvc.Start(cfg)
 	}
+	log.Info("reminder dismissed")
 }
 
 func (s *Service) DismissTestReminder() {
@@ -647,6 +718,7 @@ func (s *Service) DismissTestReminder() {
 	if s.audioSvc != nil {
 		s.audioSvc.Stop()
 	}
+	log.Info("test reminder dismissed")
 }
 
 func (s *Service) PlayAdhan(isFajr bool) error {
@@ -654,13 +726,18 @@ func (s *Service) PlayAdhan(isFajr bool) error {
 		return nil
 	}
 	cfg := s.settingsSvc.Get()
-	return s.audioSvc.Play(isFajr, cfg.Notification.AdhanVolume)
+	if err := s.audioSvc.Play(isFajr, cfg.Notification.AdhanVolume); err != nil {
+		log.Error("play adhan failed", "error", err, "fajr", isFajr)
+		return err
+	}
+	return nil
 }
 
 func (s *Service) StopAdhan() {
 	if s.audioSvc != nil {
 		s.audioSvc.Stop()
 	}
+	log.Info("stop adhan requested")
 }
 
 func (s *Service) EmitReminderInfo() {
@@ -697,22 +774,28 @@ func loadReminderState(path string) *notification.ReminderInfo {
 	}
 	data, err := os.ReadFile(path)
 	if err != nil {
+		if !os.IsNotExist(err) {
+			log.Error("load reminder state failed", "error", err, "path", path)
+		}
 		return nil
 	}
 	var info notification.ReminderInfo
 	if err := json.Unmarshal(data, &info); err != nil {
+		log.Error("decode reminder state failed", "error", err, "path", path)
 		return nil
 	}
 	return &info
 }
 
 func (s *Service) GetCurrentTime() string {
-	return time.Now().Format("15:04:05")
+	now := clock.Now().Format("15:04:05")
+	log.Info("current time requested", "time", now)
+	return now
 }
 
 // GetDebugTimeInfo returns the backend's current time and timezone info.
 func (s *Service) GetDebugTimeInfo() DebugTimeInfo {
-	now := time.Now()
+	now := clock.Now()
 	zoneName, offsetSeconds := now.Zone()
 	sign := "+"
 	if offsetSeconds < 0 {
@@ -735,10 +818,11 @@ func (s *Service) GetReminderDebugSchedule() ([]ReminderDebugEntry, error) {
 	cfg := s.settingsSvc.Get()
 	sched, err := s.prayerSvc.GetTodaySchedule()
 	if err != nil {
+		log.Error("debug schedule failed", "error", err)
 		return nil, err
 	}
 
-	now := time.Now()
+	now := clock.Now()
 	type entryWithTime struct {
 		ReminderDebugEntry
 		at time.Time
@@ -802,35 +886,48 @@ func (s *Service) GetReminderDebugSchedule() ([]ReminderDebugEntry, error) {
 	for _, entry := range entries {
 		result = append(result, entry.ReminderDebugEntry)
 	}
+	log.Info("debug schedule built", "entries", len(result))
 	return result, nil
 }
 
 func (s *Service) ExportRangeToCSV(startDate, endDate, outputPath string) error {
 	rows, err := s.buildRangeExportRows(startDate, endDate)
 	if err != nil {
+		log.Error("export range csv build rows failed", "error", err)
 		return err
 	}
 
-	return export.ToCSV(rows, outputPath)
+	if err := export.ToCSV(rows, outputPath); err != nil {
+		log.Error("export range csv failed", "error", err)
+		return err
+	}
+	return nil
 }
 
 func (s *Service) ExportRangeToExcel(startDate, endDate, outputPath string) error {
 	rows, err := s.buildRangeExportRows(startDate, endDate)
 	if err != nil {
+		log.Error("export range excel build rows failed", "error", err)
 		return err
 	}
 
-	return export.ToExcel(rows, outputPath)
+	if err := export.ToExcel(rows, outputPath); err != nil {
+		log.Error("export range excel failed", "error", err)
+		return err
+	}
+	return nil
 }
 
 func (s *Service) buildRangeExportRows(startDate, endDate string) ([]export.MonthRow, error) {
 	schedules, err := s.GetScheduleRange(startDate, endDate)
 	if err != nil {
+		log.Error("export range schedule failed", "error", err)
 		return nil, err
 	}
 
 	hijriDays, err := s.GetHijriDateRange(startDate, endDate)
 	if err != nil {
+		log.Error("export range hijri failed", "error", err)
 		return nil, err
 	}
 

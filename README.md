@@ -76,6 +76,8 @@ This project was previously Electron-based. It now uses a Go backend with a Reac
 
 This repo includes a `Taskfile.yml`, and the Wails CLI can run those tasks directly, so you do not need a separate `task` binary if you use `wails3 task ...`.
 
+It is very recommended to install [taskfile](https://taskfile.dev/docs/installation) when developing.
+
 ### First-time setup
 
 1. Install Go dependencies:
@@ -105,6 +107,36 @@ wails3 task dev
 ```
 
 This starts the Go backend, the Vite dev server for `frontend/`, and the desktop app together.
+
+#### Using Fake Time
+
+When developing, you might want to mock your time and for this I provided a page to test the reminder option and I also make a simple wrapper for the time library in order for it to be compatible with libfaketime.
+
+To use **libfaketime** you need to add faketime to the tags.
+
+Use it like this:
+
+```bash
+faketime '2026-03-12 04:29:30' wails3 dev
+# you need to pass faketime with its parameter or it will just use real time instead.
+```
+
+In order to do this, I created a simple wrapper for the [clock](./internal/clock/clock.go) which shouldn't cause any overhead when its not in use.
+
+#### Stopping Rogue Process
+
+You can use the script
+
+```bash
+task dev:kill:linux
+task dev:kill:darwin
+task dev:kill:windows
+
+# or
+go-task dev:kill:linux
+go-task dev:kill:darwin
+go-task dev:kill:windows
+```
 
 ### Build the app
 

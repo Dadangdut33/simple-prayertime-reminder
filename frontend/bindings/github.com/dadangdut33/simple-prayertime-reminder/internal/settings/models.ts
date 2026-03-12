@@ -438,6 +438,11 @@ export class Settings {
      * "en", "id", etc
      */
     "language": string;
+
+    /**
+     * "debug", "info", "warn", "error"
+     */
+    "logLevel": string;
     "autoStart": boolean;
     "autoCheckUpdates": boolean;
 
@@ -485,6 +490,9 @@ export class Settings {
         }
         if (!("language" in $$source)) {
             this["language"] = "";
+        }
+        if (!("logLevel" in $$source)) {
+            this["logLevel"] = "";
         }
         if (!("autoStart" in $$source)) {
             this["autoStart"] = false;

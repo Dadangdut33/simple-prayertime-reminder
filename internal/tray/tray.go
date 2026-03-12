@@ -1,4 +1,4 @@
-package main
+package tray
 
 import (
 	"fmt"
@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/appservice"
+	"github.com/dadangdut33/simple-prayertime-reminder/internal/logging"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/prayer"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
@@ -22,7 +23,9 @@ const (
 	trayLeftClickNone         = "none"
 )
 
-type trayMenuState struct {
+var log = logging.With("tray")
+
+type MenuState struct {
 	identityItem *application.MenuItem
 	titleItem    *application.MenuItem
 	dateItem     *application.MenuItem
@@ -35,9 +38,9 @@ type trayMenuState struct {
 	forceMenuOnce   atomic.Bool
 }
 
-func setupTray(app *application.App, appSvc *appservice.Service, mainWindow application.Window) *trayMenuState {
+func Setup(app *application.App, appSvc *appservice.Service, mainWindow application.Window, appName string, appIcon []byte) *MenuState {
 	tray := app.SystemTray.New()
-	trayLabel := buildTrayIdentityLabel(appSvc)
+	trayLabel := buildTrayIdentityLabel(appSvc, appName)
 
 	if runtime.GOOS == "darwin" {
 		tray.SetLabel(" " + trayLabel)
@@ -47,7 +50,7 @@ func setupTray(app *application.App, appSvc *appservice.Service, mainWindow appl
 
 	tray.SetTooltip(trayLabel)
 	tray.SetIcon(appIcon)
-	state, menu := buildTrayMenu(app, appSvc, mainWindow, trayLabel)
+	state, menu := buildTrayMenu(app, appSvc, mainWindow, trayLabel, appIcon, appName)
 	tray.SetMenu(menu)
 	state.forceMenuOnce.Store(true)
 	tray.OnRightClick(func() {
@@ -80,7 +83,7 @@ func setupTray(app *application.App, appSvc *appservice.Service, mainWindow appl
 		mainWindow.Focus()
 	})
 
-	state.updateLeftClickAction(getTrayLeftClickAction(appSvc))
+	state.UpdateLeftClickAction(getTrayLeftClickAction(appSvc))
 	return state
 }
 
@@ -89,9 +92,11 @@ func buildTrayMenu(
 	appSvc *appservice.Service,
 	mainWindow application.Window,
 	trayLabel string,
-) (*trayMenuState, *application.Menu) {
+	appIcon []byte,
+	appName string,
+) (*MenuState, *application.Menu) {
 	menu := app.Menu.New()
-	state := &trayMenuState{
+	state := &MenuState{
 		identityItem: menu.Add(trayLabel).SetEnabled(false).SetBitmap(appIcon),
 		titleItem:    menu.Add("Today's Prayer Times").SetEnabled(false),
 		dateItem:     menu.Add("Loading today's schedule...").SetEnabled(false),
@@ -108,20 +113,20 @@ func buildTrayMenu(
 		mainWindow.Focus()
 	})
 	menu.Add("Refresh Prayer Times").OnClick(func(_ *application.Context) {
-		state.refresh(appSvc)
+		state.refresh(appSvc, appName)
 	})
 	menu.AddSeparator()
 	menu.Add("Quit").OnClick(func(_ *application.Context) {
 		app.Quit()
 	})
 
-	state.refresh(appSvc)
-	startTrayRefreshLoop(app, appSvc, state)
+	state.refresh(appSvc, appName)
+	startTrayRefreshLoop(app, appSvc, state, appName)
 
 	return state, menu
 }
 
-func startTrayRefreshLoop(app *application.App, appSvc *appservice.Service, state *trayMenuState) {
+func startTrayRefreshLoop(app *application.App, appSvc *appservice.Service, state *MenuState, appName string) {
 	ticker := time.NewTicker(trayRefreshInterval)
 	done := make(chan struct{})
 
@@ -137,18 +142,19 @@ func startTrayRefreshLoop(app *application.App, appSvc *appservice.Service, stat
 			case <-done:
 				return
 			case <-ticker.C:
-				state.refresh(appSvc)
+				state.refresh(appSvc, appName)
 			}
 		}
 	}()
 }
 
-func (s *trayMenuState) refresh(appSvc *appservice.Service) {
-	s.identityItem.SetLabel(buildTrayIdentityLabel(appSvc))
-	s.updateLeftClickAction(getTrayLeftClickAction(appSvc))
+func (s *MenuState) refresh(appSvc *appservice.Service, appName string) {
+	s.identityItem.SetLabel(buildTrayIdentityLabel(appSvc, appName))
+	s.UpdateLeftClickAction(getTrayLeftClickAction(appSvc))
 
 	schedule, err := appSvc.GetTodaySchedule()
 	if err != nil {
+		log.Warn("tray schedule load failed", "error", err)
 		s.titleItem.SetHidden(false)
 		s.titleItem.SetLabel("Today's Prayer Times")
 		s.dateItem.SetLabel("Unable to load today's prayer times")
@@ -184,7 +190,7 @@ func (s *trayMenuState) refresh(appSvc *appservice.Service) {
 	}
 }
 
-func buildTrayIdentityLabel(appSvc *appservice.Service) string {
+func buildTrayIdentityLabel(appSvc *appservice.Service, appName string) string {
 	info, err := appSvc.GetAppInfo()
 	if err != nil || info.Version == "" {
 		return appName
@@ -196,6 +202,7 @@ func buildTrayIdentityLabel(appSvc *appservice.Service) string {
 func getTrayLeftClickAction(appSvc *appservice.Service) string {
 	cfg, err := appSvc.GetSettings()
 	if err != nil {
+		log.Warn("tray settings load failed", "error", err)
 		return trayLeftClickToggleWindow
 	}
 
@@ -213,14 +220,14 @@ func normalizeTrayLeftClick(value string) string {
 	}
 }
 
-func (s *trayMenuState) updateLeftClickAction(value string) {
+func (s *MenuState) UpdateLeftClickAction(value string) {
 	action := normalizeTrayLeftClick(value)
 	s.leftClickMu.Lock()
 	s.leftClickAction = action
 	s.leftClickMu.Unlock()
 }
 
-func (s *trayMenuState) leftClickMode() string {
+func (s *MenuState) leftClickMode() string {
 	s.leftClickMu.RLock()
 	defer s.leftClickMu.RUnlock()
 	if s.leftClickAction == "" {
@@ -229,7 +236,7 @@ func (s *trayMenuState) leftClickMode() string {
 	return s.leftClickAction
 }
 
-func (s *trayMenuState) tryOpenMenu(tray *application.SystemTray) {
+func (s *MenuState) tryOpenMenu(tray *application.SystemTray) {
 	if runtime.GOOS == "linux" {
 		return
 	}

@@ -41,6 +41,7 @@ var (
 
 func SearchCities(query string, limit int) ([]City, error) {
 	if err := load(); err != nil {
+		log.Error("search cities load failed", "error", err)
 		return nil, err
 	}
 
@@ -67,6 +68,7 @@ func SearchCities(query string, limit int) ([]City, error) {
 
 func FindCityByName(name, countryCode string) (City, bool) {
 	if err := load(); err != nil {
+		log.Error("find city load failed", "error", err)
 		return City{}, false
 	}
 
@@ -87,6 +89,7 @@ func FindCityByName(name, countryCode string) (City, bool) {
 
 func GetTimezones() ([]string, error) {
 	if err := load(); err != nil {
+		log.Error("get timezones load failed", "error", err)
 		return nil, err
 	}
 
@@ -95,6 +98,7 @@ func GetTimezones() ([]string, error) {
 
 func SearchTimezones(query string, limit int) ([]string, error) {
 	if err := load(); err != nil {
+		log.Error("search timezones load failed", "error", err)
 		return nil, err
 	}
 
@@ -150,6 +154,7 @@ func load() error {
 
 	file, err := openCitiesFile()
 	if err != nil {
+		log.Error("open cities file failed", "error", err)
 		loadErr = err
 		loaded = true
 		return loadErr
@@ -158,6 +163,7 @@ func load() error {
 
 	records, timezones, err := parseCities(file)
 	if err != nil {
+		log.Error("parse cities failed", "error", err)
 		loadErr = err
 		loaded = true
 		return loadErr
@@ -166,6 +172,7 @@ func load() error {
 	cityRecords = records
 	timezoneCache = timezones
 	loaded = true
+	log.Info("geonames loaded", "cities", len(cityRecords), "timezones", len(timezoneCache))
 	return loadErr
 }
 
@@ -226,6 +233,7 @@ func parseCities(reader io.Reader) ([]cityRecord, []string, error) {
 	}
 
 	if err := scanner.Err(); err != nil {
+		log.Error("scan cities failed", "error", err)
 		return nil, nil, fmt.Errorf("parse cities500.txt: %w", err)
 	}
 
@@ -271,13 +279,16 @@ func openCitiesFile() (io.ReadCloser, error) {
 		if info, err := os.Stat(overridePath); err == nil && !info.IsDir() {
 			file, err := os.Open(overridePath)
 			if err == nil {
+				log.Info("using override cities file", "path", overridePath)
 				return file, nil
 			}
+			log.Error("open override cities file failed", "error", err, "path", overridePath)
 		}
 	}
 
 	file, err := data.Open("cities500.txt")
 	if err != nil {
+		log.Error("open embedded cities file failed", "error", err)
 		return nil, fmt.Errorf("open cities500.txt: %w", err)
 	}
 	return file, nil

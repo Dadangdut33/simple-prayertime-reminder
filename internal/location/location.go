@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/dadangdut33/simple-prayertime-reminder/internal/logging"
 )
 
 // Location holds geographic location data
@@ -33,8 +35,11 @@ type Service struct {
 	current Location
 }
 
+var log = logging.With("location")
+
 // NewService creates a new Location service with a default location
 func NewService(initial Location) *Service {
+	log.Info("location service init", "city", initial.City, "country", initial.Country)
 	return &Service{current: initial}
 }
 
@@ -43,16 +48,19 @@ func (svc *Service) DetectFromIP() (Location, error) {
 	client := &http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Get("http://ip-api.com/json/?fields=status,message,country,city,lat,lon,timezone")
 	if err != nil {
+		log.Error("ip geolocation request failed", "error", err)
 		return Location{}, fmt.Errorf("geolocation request failed: %w", err)
 	}
 	defer resp.Body.Close()
 
 	var apiResp ipAPIResponse
 	if err := json.NewDecoder(resp.Body).Decode(&apiResp); err != nil {
+		log.Error("ip geolocation decode failed", "error", err)
 		return Location{}, fmt.Errorf("failed to parse geolocation response: %w", err)
 	}
 
 	if apiResp.Status != "success" {
+		log.Error("ip geolocation failed", "message", apiResp.Message)
 		return Location{}, fmt.Errorf("geolocation failed: %s", apiResp.Message)
 	}
 
@@ -65,12 +73,14 @@ func (svc *Service) DetectFromIP() (Location, error) {
 	}
 
 	svc.current = loc
+	log.Info("ip geolocation success", "city", loc.City, "country", loc.Country, "timezone", loc.Timezone)
 	return loc, nil
 }
 
 // SetManual sets a manually specified location
 func (svc *Service) SetManual(loc Location) {
 	svc.current = loc
+	log.Info("manual location set", "city", loc.City, "country", loc.Country, "timezone", loc.Timezone)
 }
 
 // Get returns the current location

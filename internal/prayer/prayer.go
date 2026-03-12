@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/dadangdut33/simple-prayertime-reminder/internal/clock"
+	"github.com/dadangdut33/simple-prayertime-reminder/internal/logging"
 	prayer "github.com/hablullah/go-prayer"
 )
 
@@ -89,6 +91,8 @@ type Service struct {
 	yearCache map[int][]prayer.Schedule
 }
 
+var log = logging.With("prayer")
+
 // NewService creates a new Prayer service
 func NewService() *Service {
 	return &Service{
@@ -100,6 +104,7 @@ func NewService() *Service {
 func (svc *Service) SetConfig(cfg PrayerConfig) {
 	svc.cfg = cfg
 	svc.yearCache = make(map[int][]prayer.Schedule)
+	log.Info("prayer config set", "method", cfg.Method, "timezone", cfg.Timezone)
 }
 
 // getConvention returns the TwilightConvention for the method
@@ -173,6 +178,7 @@ func (svc *Service) computeYear(year int) ([]prayer.Schedule, error) {
 
 	tz, err := time.LoadLocation(svc.cfg.Timezone)
 	if err != nil {
+		log.Warn("timezone load failed, using UTC", "timezone", svc.cfg.Timezone, "error", err)
 		tz = time.UTC
 	}
 
@@ -196,10 +202,12 @@ func (svc *Service) computeYear(year int) ([]prayer.Schedule, error) {
 
 	schedules, err := prayer.Calculate(cfg, year)
 	if err != nil {
+		log.Error("prayer calculation failed", "error", err, "year", year)
 		return nil, fmt.Errorf("prayer calculation failed: %w", err)
 	}
 
 	svc.yearCache[year] = schedules
+	log.Info("prayer schedule cached", "year", year)
 	return schedules, nil
 }
 
@@ -221,11 +229,13 @@ func toDay(sc prayer.Schedule) DaySchedule {
 func (svc *Service) GetScheduleForDate(date time.Time) (DaySchedule, error) {
 	schedules, err := svc.computeYear(date.Year())
 	if err != nil {
+		log.Error("schedule compute failed", "error", err)
 		return DaySchedule{}, err
 	}
 
 	idx := date.YearDay() - 1
 	if idx < 0 || idx >= len(schedules) {
+		log.Error("schedule date out of range", "date", date.String())
 		return DaySchedule{}, fmt.Errorf("date out of range: %v", date)
 	}
 
@@ -234,13 +244,14 @@ func (svc *Service) GetScheduleForDate(date time.Time) (DaySchedule, error) {
 
 // GetTodaySchedule returns today's prayer schedule
 func (svc *Service) GetTodaySchedule() (DaySchedule, error) {
-	return svc.GetScheduleForDate(time.Now())
+	return svc.GetScheduleForDate(clock.Now())
 }
 
 // GetNextPrayer returns info about the next upcoming prayer
 func (svc *Service) GetNextPrayer(now time.Time) (NextPrayerInfo, error) {
 	sched, err := svc.GetScheduleForDate(now)
 	if err != nil {
+		log.Error("next prayer schedule failed", "error", err)
 		return NextPrayerInfo{}, err
 	}
 
@@ -265,6 +276,7 @@ func (svc *Service) GetNextPrayer(now time.Time) (NextPrayerInfo, error) {
 	// All prayers passed — return next day's Fajr
 	tomorrowSched, err := svc.GetScheduleForDate(now.AddDate(0, 0, 1))
 	if err != nil {
+		log.Error("next prayer tomorrow schedule failed", "error", err)
 		return NextPrayerInfo{}, err
 	}
 	return NextPrayerInfo{Name: "Fajr", Time: tomorrowSched.Fajr}, nil
@@ -274,6 +286,7 @@ func (svc *Service) GetNextPrayer(now time.Time) (NextPrayerInfo, error) {
 func (svc *Service) GetMonthSchedule(year, month int) ([]DaySchedule, error) {
 	schedules, err := svc.computeYear(year)
 	if err != nil {
+		log.Error("month schedule compute failed", "error", err, "year", year)
 		return nil, err
 	}
 
@@ -299,6 +312,7 @@ func (svc *Service) GetMonthSchedule(year, month int) ([]DaySchedule, error) {
 // GetScheduleRange returns prayer schedules for an inclusive date range.
 func (svc *Service) GetScheduleRange(startDate, endDate time.Time) ([]DaySchedule, error) {
 	if endDate.Before(startDate) {
+		log.Error("schedule range invalid", "start", startDate, "end", endDate)
 		return nil, fmt.Errorf("end date must be on or after start date")
 	}
 
@@ -309,6 +323,7 @@ func (svc *Service) GetScheduleRange(startDate, endDate time.Time) ([]DaySchedul
 	for current := start; !current.After(end); current = current.AddDate(0, 0, 1) {
 		schedule, err := svc.GetScheduleForDate(current)
 		if err != nil {
+			log.Error("schedule range item failed", "error", err, "date", current)
 			return nil, err
 		}
 

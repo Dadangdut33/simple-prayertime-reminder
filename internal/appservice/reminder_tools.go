@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dadangdut33/simple-prayertime-reminder/internal/clock"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/notification"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/prayer"
 )
@@ -90,11 +91,13 @@ func (s *Service) buildReminderTestSnapshot(prayerName string, offsetSeconds int
 
 	loc, err := time.LoadLocation(cfg.Timezone)
 	if err != nil {
+		log.Warn("test reminder timezone load failed", "error", err, "timezone", cfg.Timezone)
 		loc = time.UTC
 	}
-	now := time.Now().In(loc)
+	now := clock.Now().In(loc)
 	schedule, err := prayerSvc.GetScheduleForDate(now)
 	if err != nil {
+		log.Error("test reminder schedule failed", "error", err)
 		return ReminderTestSnapshot{}, err
 	}
 
@@ -103,6 +106,7 @@ func (s *Service) buildReminderTestSnapshot(prayerName string, offsetSeconds int
 	if err != nil || targetTime.IsZero() {
 		next, nextErr := prayerSvc.GetNextPrayer(now)
 		if nextErr != nil {
+			log.Error("test reminder next prayer failed", "error", nextErr)
 			return ReminderTestSnapshot{}, nextErr
 		}
 		targetName = next.Name
@@ -114,12 +118,14 @@ func (s *Service) buildReminderTestSnapshot(prayerName string, offsetSeconds int
 	if !sameDay(simulatedNow.In(loc), now) {
 		schedule, err = prayerSvc.GetScheduleForDate(simulatedNow)
 		if err != nil {
+			log.Error("test reminder schedule day shift failed", "error", err)
 			return ReminderTestSnapshot{}, err
 		}
 		targetTime, err = getPrayerTimeFromSchedule(schedule, targetName)
 		if err != nil || targetTime.IsZero() {
 			next, nextErr := prayerSvc.GetNextPrayer(simulatedNow)
 			if nextErr != nil {
+				log.Error("test reminder next prayer (day shift) failed", "error", nextErr)
 				return ReminderTestSnapshot{}, nextErr
 			}
 			targetName = next.Name
@@ -144,6 +150,7 @@ func (s *Service) buildReminderTestSnapshot(prayerName string, offsetSeconds int
 
 	nextPrayer, err := prayerSvc.GetNextPrayer(simulatedNow)
 	if err != nil {
+		log.Error("test reminder next prayer failed", "error", err)
 		return ReminderTestSnapshot{}, err
 	}
 
@@ -163,12 +170,18 @@ func (s *Service) buildReminderTestSnapshot(prayerName string, offsetSeconds int
 }
 
 func (s *Service) GetReminderTestSnapshot(prayerName string, offsetSeconds int, timezone string) (ReminderTestSnapshot, error) {
-	return s.buildReminderTestSnapshot(prayerName, offsetSeconds, timezone)
+	snapshot, err := s.buildReminderTestSnapshot(prayerName, offsetSeconds, timezone)
+	if err != nil {
+		return ReminderTestSnapshot{}, err
+	}
+	log.Info("test snapshot built", "prayer", snapshot.PrayerName, "offsetSeconds", snapshot.OffsetSeconds)
+	return snapshot, nil
 }
 
 func (s *Service) SyncReminderTestWindow(prayerName string, offsetSeconds int, timezone string, live bool) (ReminderTestSnapshot, error) {
 	snapshot, err := s.buildReminderTestSnapshot(prayerName, offsetSeconds, timezone)
 	if err != nil {
+		log.Error("sync test reminder failed", "error", err)
 		return ReminderTestSnapshot{}, err
 	}
 
@@ -182,6 +195,7 @@ func (s *Service) SyncReminderTestWindow(prayerName string, offsetSeconds int, t
 			live,
 		)
 	}
+	log.Info("test reminder synced", "prayer", snapshot.PrayerName, "offsetSeconds", snapshot.OffsetSeconds, "live", live)
 
 	return snapshot, nil
 }
@@ -189,6 +203,7 @@ func (s *Service) SyncReminderTestWindow(prayerName string, offsetSeconds int, t
 func (s *Service) TriggerReminderTest(prayerName string, offsetSeconds int, timezone string, live bool) (ReminderTestSnapshot, error) {
 	snapshot, err := s.buildReminderTestSnapshot(prayerName, offsetSeconds, timezone)
 	if err != nil {
+		log.Error("trigger test reminder failed", "error", err)
 		return ReminderTestSnapshot{}, err
 	}
 
@@ -202,6 +217,7 @@ func (s *Service) TriggerReminderTest(prayerName string, offsetSeconds int, time
 			Live:          live,
 		})
 	}
+	log.Info("test reminder triggered", "prayer", snapshot.PrayerName, "offsetSeconds", snapshot.OffsetSeconds, "live", live)
 
 	cfg := s.settingsSvc.Get()
 	if !cfg.Notification.PersistentReminder && cfg.Notification.AutoDismissSeconds > 0 {

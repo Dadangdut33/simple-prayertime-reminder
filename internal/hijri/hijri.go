@@ -3,6 +3,8 @@ package hijri
 import (
 	"fmt"
 	"time"
+
+	"github.com/dadangdut33/simple-prayertime-reminder/internal/clock"
 )
 
 // HijriDate represents a date in the Islamic (Hijri) calendar
@@ -89,5 +91,5 @@ func (h HijriDate) FormatShort() string {
 
 // TodayHijri returns today's Hijri date with the given day offset
 func TodayHijri(offsetDays int) HijriDate {
-	return ToHijri(time.Now(), offsetDays)
+	return ToHijri(clock.Now(), offsetDays)
 }

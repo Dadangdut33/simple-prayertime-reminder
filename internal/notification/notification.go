@@ -2,13 +2,13 @@ package notification
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
 	"sync"
 	"time"
 
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/audio"
+	"github.com/dadangdut33/simple-prayertime-reminder/internal/logging"
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/events"
 )
@@ -45,8 +45,11 @@ type Service struct {
 	testReminderStatePath string
 }
 
+var log = logging.With("notification")
+
 // NewService creates a new Notification service
 func NewService(app *application.App, audioSvc *audio.Service) *Service {
+	log.Info("notification service init")
 	return &Service{app: app, audioSvc: audioSvc}
 }
 
@@ -56,6 +59,7 @@ func (svc *Service) SetStatePaths(reminderPath, testReminderPath string) {
 	defer svc.mu.Unlock()
 	svc.reminderStatePath = reminderPath
 	svc.testReminderStatePath = testReminderPath
+	log.Info("state paths set", "reminder", reminderPath, "test", testReminderPath)
 }
 
 // ShowReminder creates or updates the reminder window with prayer info
@@ -73,6 +77,7 @@ func (svc *Service) ShowReminder(info ReminderInfo) {
 
 	// Emit event so the reminder page can update
 	svc.app.Event.Emit("reminder:update", info)
+	log.Info("reminder shown", "prayer", info.PrayerName, "state", info.State, "offsetMinutes", info.OffsetMinutes, "triggerId", info.TriggerID)
 }
 
 // UpdateState updates the reminder window's state
@@ -99,6 +104,7 @@ func (svc *Service) UpdateState(state WindowState, minutesLeft int, prayerName s
 	svc.mu.Unlock()
 
 	svc.app.Event.Emit("reminder:update", info)
+	log.Info("reminder updated", "prayer", info.PrayerName, "state", info.State, "minutesLeft", info.MinutesLeft)
 }
 
 // ShowTestReminder creates or updates the simulated reminder window with prayer info.
@@ -112,6 +118,7 @@ func (svc *Service) ShowTestReminder(info ReminderInfo) {
 	svc.mu.Unlock()
 
 	svc.app.Event.Emit("reminder:test-update", info)
+	log.Info("test reminder shown", "prayer", info.PrayerName, "state", info.State, "offsetMinutes", info.OffsetMinutes, "triggerId", info.TriggerID, "live", info.Live)
 }
 
 // UpdateTestState updates the simulated reminder window's state without forcing it to show.
@@ -136,6 +143,7 @@ func (svc *Service) UpdateTestState(state WindowState, minutesLeft int, prayerNa
 	svc.mu.Unlock()
 
 	svc.app.Event.Emit("reminder:test-update", info)
+	log.Info("test reminder updated", "prayer", info.PrayerName, "state", info.State, "minutesLeft", info.MinutesLeft, "offsetMinutes", info.OffsetMinutes, "live", info.Live)
 }
 
 // CloseReminder hides the reminder window
@@ -146,6 +154,7 @@ func (svc *Service) CloseReminder() {
 	if svc.reminderWindow != nil {
 		svc.reminderWindow.Hide()
 	}
+	log.Info("reminder closed")
 	svc.stopAudio()
 }
 
@@ -158,6 +167,7 @@ func (svc *Service) CloseTestReminder() {
 		svc.testReminderWindow.Hide()
 	}
 	svc.lastTestInfo = nil
+	log.Info("test reminder closed")
 	svc.stopAudio()
 }
 
@@ -170,9 +180,11 @@ func (svc *Service) EmitLastReminder() {
 
 	if info != nil {
 		svc.app.Event.Emit("reminder:update", *info)
+		log.Info("re-emit reminder", "prayer", info.PrayerName, "state", info.State)
 	}
 	if testInfo != nil {
 		svc.app.Event.Emit("reminder:test-update", *testInfo)
+		log.Info("re-emit test reminder", "prayer", testInfo.PrayerName, "state", testInfo.State)
 	}
 }
 
@@ -184,6 +196,7 @@ func (svc *Service) EmitLastTestReminder() {
 
 	if info != nil {
 		svc.app.Event.Emit("reminder:test-update", *info)
+		log.Info("re-emit test reminder", "prayer", info.PrayerName, "state", info.State)
 	}
 }
 
@@ -213,6 +226,7 @@ func (svc *Service) LastTestReminder() *ReminderInfo {
 
 func (svc *Service) ensureReminderWindowLocked(show bool) {
 	if svc.reminderWindow == nil {
+		log.Info("creating reminder window")
 		svc.reminderWindow = svc.app.Window.NewWithOptions(application.WebviewWindowOptions{
 			Title:            "Prayer Reminder",
 			Width:            480,
@@ -229,18 +243,21 @@ func (svc *Service) ensureReminderWindowLocked(show bool) {
 			BackgroundColour: application.NewRGB(20, 20, 30),
 		})
 		svc.reminderWindow.RegisterHook(events.Common.WindowClosing, func(event *application.WindowEvent) {
+			log.Info("reminder window closing")
 			svc.mu.Lock()
 			svc.reminderWindow = nil
 			svc.mu.Unlock()
 			svc.stopAudio()
 		})
 	} else if show {
+		log.Info("show reminder window")
 		svc.reminderWindow.Show()
 	}
 }
 
 func (svc *Service) ensureTestReminderWindowLocked(show bool) {
 	if svc.testReminderWindow == nil {
+		log.Info("creating test reminder window")
 		svc.testReminderWindow = svc.app.Window.NewWithOptions(application.WebviewWindowOptions{
 			Title:            "Prayer Reminder (Simulated)",
 			Width:            480,
@@ -257,18 +274,21 @@ func (svc *Service) ensureTestReminderWindowLocked(show bool) {
 			BackgroundColour: application.NewRGB(20, 20, 30),
 		})
 		svc.testReminderWindow.RegisterHook(events.Common.WindowClosing, func(event *application.WindowEvent) {
+			log.Info("test reminder window closing")
 			svc.mu.Lock()
 			svc.testReminderWindow = nil
 			svc.mu.Unlock()
 			svc.stopAudio()
 		})
 	} else if show {
+		log.Info("show test reminder window")
 		svc.testReminderWindow.Show()
 	}
 }
 
 func (svc *Service) stopAudio() {
 	if svc.audioSvc != nil {
+		log.Info("stop adhan requested")
 		svc.audioSvc.Stop()
 	}
 }
@@ -278,23 +298,23 @@ func (svc *Service) writeStateLocked(path string, info ReminderInfo) {
 		return
 	}
 	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
-		fmt.Printf("reminder: failed to create state dir: %v\n", err)
+		log.Error("state dir create failed", "error", err, "path", path)
 		return
 	}
 	data, err := json.Marshal(info)
 	if err != nil {
-		fmt.Printf("reminder: failed to marshal state: %v\n", err)
+		log.Error("state marshal failed", "error", err)
 		return
 	}
 	tmpPath := path + ".tmp"
 	if err := os.WriteFile(tmpPath, data, 0644); err != nil {
-		fmt.Printf("reminder: failed to write state: %v\n", err)
+		log.Error("state write failed", "error", err, "path", tmpPath)
 		return
 	}
 	if err := os.Rename(tmpPath, path); err != nil {
 		_ = os.Remove(path)
 		if err := os.Rename(tmpPath, path); err != nil {
-			fmt.Printf("reminder: failed to commit state: %v\n", err)
+			log.Error("state commit failed", "error", err, "path", path)
 		}
 	}
 }

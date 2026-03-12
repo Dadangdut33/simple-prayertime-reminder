@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/geonames"
+	"github.com/dadangdut33/simple-prayertime-reminder/internal/logging"
 )
 
 // NotificationStyle defines how notifications are shown
@@ -131,6 +132,7 @@ type Settings struct {
 	Theme            string               `json:"theme"` // "light", "dark", "system"
 	ThemePreset      string               `json:"themePreset"`
 	Language         string               `json:"language"` // "en", "id", etc
+	LogLevel         string               `json:"logLevel"` // "debug", "info", "warn", "error"
 	AutoStart        bool                 `json:"autoStart"`
 	AutoCheckUpdates bool                 `json:"autoCheckUpdates"`
 	TrayLeftClick    string               `json:"trayLeftClick"`   // "toggle-window", "open-menu", or "none"
@@ -290,6 +292,7 @@ func DefaultSettings() Settings {
 		Theme:            "system",
 		ThemePreset:      "indigo",
 		Language:         "en",
+		LogLevel:         "info",
 		AutoStart:        false,
 		AutoCheckUpdates: true,
 		TrayLeftClick:    "toggle-window",
@@ -304,6 +307,8 @@ type Service struct {
 	configPath string
 	settings   Settings
 }
+
+var log = logging.With("settings")
 
 // NewService creates a new Settings service
 func NewService(configDir string) (*Service, error) {
@@ -320,6 +325,7 @@ func NewService(configDir string) (*Service, error) {
 		return nil, fmt.Errorf("failed to load settings: %w", err)
 	}
 
+	log.Info("settings loaded", "path", svc.configPath)
 	return svc, nil
 }
 
@@ -336,6 +342,7 @@ func (s *Service) Load() error {
 	}
 
 	s.settings = loaded
+	log.Info("settings read from disk", "path", s.configPath)
 	return nil
 }
 
@@ -345,7 +352,11 @@ func (s *Service) Save() error {
 	if err != nil {
 		return fmt.Errorf("failed to marshal settings: %w", err)
 	}
-	return os.WriteFile(s.configPath, data, 0644)
+	if err := os.WriteFile(s.configPath, data, 0644); err != nil {
+		return err
+	}
+	log.Info("settings saved", "path", s.configPath)
+	return nil
 }
 
 // Get returns the current settings
@@ -356,18 +367,21 @@ func (s *Service) Get() Settings {
 // Update replaces the current settings and saves them
 func (s *Service) Update(updated Settings) error {
 	s.settings = updated
+	log.Info("settings updated")
 	return s.Save()
 }
 
 // UpdatePartial allows updating specific fields while preserving others
 func (s *Service) UpdatePartial(updater func(*Settings)) error {
 	updater(&s.settings)
+	log.Info("settings updated (partial)")
 	return s.Save()
 }
 
 // Reset restores default settings and saves them
 func (s *Service) Reset() error {
 	s.settings = defaultSettings()
+	log.Info("settings reset to default")
 	return s.Save()
 }
 

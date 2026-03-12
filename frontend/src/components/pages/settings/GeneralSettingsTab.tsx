@@ -561,6 +561,37 @@ export default function GeneralSettingsTab({
               sx={{ m: 0 }}
             />
           </Box>
+
+          <Box mt={3} p={2.5} borderRadius={0.5} border="1px solid" borderColor="divider" bgcolor="background.paper">
+            <Typography variant="subtitle2" mb={0.75}>
+              {t('settings.general.app.logLevel')}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" mb={2}>
+              {t('settings.general.app.logLevelDesc')}
+            </Typography>
+
+            <Box maxWidth={320}>
+              <Typography variant="caption" color="text.secondary" mb={1} display="block">
+                {t('settings.general.app.logLevelLabel')}
+              </Typography>
+              <Select
+                size="small"
+                fullWidth
+                value={local.logLevel ?? 'info'}
+                onChange={(event) =>
+                  setLocal({
+                    ...local,
+                    logLevel: event.target.value as Settings['logLevel'],
+                  })
+                }
+              >
+                <MenuItem value="debug">{t('settings.general.app.logLevelDebug')}</MenuItem>
+                <MenuItem value="info">{t('settings.general.app.logLevelInfo')}</MenuItem>
+                <MenuItem value="warn">{t('settings.general.app.logLevelWarn')}</MenuItem>
+                <MenuItem value="error">{t('settings.general.app.logLevelError')}</MenuItem>
+              </Select>
+            </Box>
+          </Box>
         </Box>
       </Box>
     </Box>

@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 includes:
   common: ./build/Taskfile.yml
@@ -11,7 +11,8 @@ includes:
 vars:
   APP_NAME: "simple-prayertime-reminder"
   BIN_DIR: "bin"
-  VITE_PORT: '{{.WAILS_VITE_PORT | default 9245}}'
+  VITE_PORT: "{{.WAILS_VITE_PORT | default 9245}}"
+  TIME: "{{.TIME}}"
 
 tasks:
   build:
@@ -33,6 +34,24 @@ tasks:
     summary: Runs the application in development mode
     cmds:
       - wails3 dev -config ./build/config.yml -port {{.VITE_PORT}}
+
+  dev:kill:linux:
+    cmds:
+      - pkill -f "{{.APP_NAME}}" || true
+      - pkill -f "wails3 dev" || true
+      - pkill -f "vite" || true
+
+  dev:kill:darwin:
+    cmds:
+      - pkill -f "{{.APP_NAME}}" || true
+      - pkill -f "wails3 dev" || true
+      - pkill -f "vite" || true
+
+  dev:kill:windows:
+    cmds:
+      - taskkill /F /IM "{{.APP_NAME}}.exe" /T 2>nul || true
+      - taskkill /F /IM "wails3.exe" /T 2>nul || true
+      - taskkill /F /IM "vite.exe" /T 2>nul || true
 
   setup:docker:
     summary: Builds Docker image for cross-compilation (~800MB download)

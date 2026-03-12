@@ -284,6 +284,13 @@ const en = {
         testTools: 'Reminder Test Tools',
         testToolsDesc: 'Enable the internal reminder test page for debugging notifications.',
         testToolsToggle: 'Enable reminder test tools',
+        logLevel: 'Logging',
+        logLevelDesc: 'Control how much detail is written to the log file for debugging.',
+        logLevelLabel: 'Log level',
+        logLevelDebug: 'Debug',
+        logLevelInfo: 'Info',
+        logLevelWarn: 'Warn',
+        logLevelError: 'Error',
       },
     },
     location: {

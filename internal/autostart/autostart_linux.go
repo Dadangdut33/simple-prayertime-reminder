@@ -25,23 +25,27 @@ func quoteExecArg(value string) string {
 func Sync(enabled bool) error {
 	entryPath, err := desktopEntryPath()
 	if err != nil {
+		log.Error("autostart path failed", "error", err)
 		return err
 	}
 
 	if !enabled {
 		if err := os.Remove(entryPath); err != nil && !os.IsNotExist(err) {
+			log.Error("autostart remove failed", "error", err)
 			return fmt.Errorf("failed to remove autostart entry: %w", err)
 		}
-
+		log.Info("autostart disabled")
 		return nil
 	}
 
 	executablePath, err := os.Executable()
 	if err != nil {
+		log.Error("autostart exec path failed", "error", err)
 		return fmt.Errorf("failed to resolve executable path: %w", err)
 	}
 
 	if err := os.MkdirAll(filepath.Dir(entryPath), 0o755); err != nil {
+		log.Error("autostart mkdir failed", "error", err)
 		return fmt.Errorf("failed to create autostart directory: %w", err)
 	}
 
@@ -57,8 +61,10 @@ X-GNOME-Autostart-enabled=true
 `, quoteExecArg(executablePath), BackgroundArg)
 
 	if err := os.WriteFile(entryPath, []byte(entry), 0o644); err != nil {
+		log.Error("autostart write failed", "error", err)
 		return fmt.Errorf("failed to write autostart entry: %w", err)
 	}
 
+	log.Info("autostart enabled", "path", entryPath)
 	return nil
 }

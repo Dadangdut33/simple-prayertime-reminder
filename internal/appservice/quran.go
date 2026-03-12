@@ -61,6 +61,7 @@ func ensureDefaultBookmark(data QuranData) QuranData {
 func (s *Service) quranDataPath() (string, error) {
 	configDir, err := ConfigDirectory()
 	if err != nil {
+		log.Error("quran data path failed", "error", err)
 		return "", err
 	}
 	return filepath.Join(configDir, "quran.json"), nil
@@ -72,6 +73,7 @@ func (s *Service) GetQuranData() (QuranData, error) {
 
 	path, err := s.quranDataPath()
 	if err != nil {
+		log.Error("get quran data failed", "error", err)
 		return defaultQuranData(), err
 	}
 
@@ -80,11 +82,13 @@ func (s *Service) GetQuranData() (QuranData, error) {
 		if errors.Is(err, os.ErrNotExist) {
 			return defaultQuranData(), nil
 		}
+		log.Error("read quran data failed", "error", err)
 		return defaultQuranData(), err
 	}
 
 	var payload QuranData
 	if err := json.Unmarshal(data, &payload); err != nil {
+		log.Error("decode quran data failed", "error", err)
 		return defaultQuranData(), err
 	}
 
@@ -97,16 +101,24 @@ func (s *Service) SaveQuranData(payload QuranData) error {
 
 	path, err := s.quranDataPath()
 	if err != nil {
+		log.Error("save quran data failed", "error", err)
 		return err
 	}
 	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+		log.Error("save quran data: mkdir failed", "error", err)
 		return err
 	}
 
 	payload = ensureDefaultBookmark(payload)
 	data, err := json.MarshalIndent(payload, "", "  ")
 	if err != nil {
+		log.Error("save quran data: marshal failed", "error", err)
 		return err
 	}
-	return os.WriteFile(path, data, 0644)
+	if err := os.WriteFile(path, data, 0644); err != nil {
+		log.Error("save quran data: write failed", "error", err)
+		return err
+	}
+	log.Info("quran data saved", "path", path)
+	return nil
 }
