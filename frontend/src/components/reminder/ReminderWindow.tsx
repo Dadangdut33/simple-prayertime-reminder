@@ -12,6 +12,7 @@ interface ReminderWindowProps {
   afterMinutes: number;
   hoverDetail?: string | null;
   autoDismissSecondsLeft?: number | null;
+  autoDismissAfterAdhan?: boolean;
   extra?: ReactNode;
   debug?: ReactNode;
   onDismiss?: () => void | Promise<void>;
@@ -26,6 +27,7 @@ export default function ReminderWindow({
   afterMinutes,
   hoverDetail,
   autoDismissSecondsLeft,
+  autoDismissAfterAdhan,
   extra,
   debug,
   onDismiss,
@@ -105,6 +107,11 @@ export default function ReminderWindow({
         {autoDismissSecondsLeft !== null && autoDismissSecondsLeft !== undefined && (
           <Typography variant="caption" color="text.secondary" display="block" mb={2}>
             {t('reminder.autoDismissIn', { seconds: autoDismissSecondsLeft })}
+          </Typography>
+        )}
+        {(autoDismissSecondsLeft === null || autoDismissSecondsLeft === undefined) && autoDismissAfterAdhan && (
+          <Typography variant="caption" color="text.secondary" display="block" mb={2}>
+            {t('reminder.autoDismissAfterAdhan')}
           </Typography>
         )}
         {extra}

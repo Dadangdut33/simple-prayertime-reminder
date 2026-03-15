@@ -45,12 +45,13 @@ type PerPrayerNotification struct {
 
 // NotificationSettings stores all notification preferences
 type NotificationSettings struct {
-	Style              NotificationStyle     `json:"style"`
-	PlayAdhan          bool                  `json:"playAdhan"`
-	AdhanVolume        float64               `json:"adhanVolume"` // 0.0 to 1.0
-	PersistentReminder bool                  `json:"persistentReminder"`
-	AutoDismissSeconds int                   `json:"autoDismissSeconds"`
-	Prayers            PerPrayerNotification `json:"prayers"`
+	Style                 NotificationStyle     `json:"style"`
+	PlayAdhan             bool                  `json:"playAdhan"`
+	AdhanVolume           float64               `json:"adhanVolume"` // 0.0 to 1.0
+	PersistentReminder    bool                  `json:"persistentReminder"`
+	AutoDismissSeconds    int                   `json:"autoDismissSeconds"`
+	AutoDismissAfterAdhan bool                  `json:"autoDismissAfterAdhan"`
+	Prayers               PerPrayerNotification `json:"prayers"`
 }
 
 // LocationSettings stores location configuration
@@ -258,11 +259,12 @@ func DefaultSettings() Settings {
 			CustomMaghribDuration: 0,
 		},
 		Notification: NotificationSettings{
-			Style:              NotificationWindow,
-			PlayAdhan:          true,
-			AdhanVolume:        0.8,
-			PersistentReminder: false,
-			AutoDismissSeconds: 30,
+			Style:                 NotificationWindow,
+			PlayAdhan:             true,
+			AdhanVolume:           0.8,
+			PersistentReminder:    false,
+			AutoDismissSeconds:    30,
+			AutoDismissAfterAdhan: false,
 			Prayers: PerPrayerNotification{
 				Fajr:    defaultPrayerNotif,
 				Sunrise: sunriseNotif,

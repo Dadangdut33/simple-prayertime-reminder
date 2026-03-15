@@ -15,6 +15,7 @@ export class ReminderInfo {
     "offsetMinutes": number;
     "triggerId": number;
     "live": boolean;
+    "notification"?: ReminderNotificationSettings | null;
 
     /** Creates a new ReminderInfo instance. */
     constructor($$source: Partial<ReminderInfo> = {}) {
@@ -44,8 +45,48 @@ export class ReminderInfo {
      * Creates a new ReminderInfo instance from a string or object.
      */
     static createFrom($$source: any = {}): ReminderInfo {
+        const $$createField6_0 = $$createType1;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        if ("notification" in $$parsedSource) {
+            $$parsedSource["notification"] = $$createField6_0($$parsedSource["notification"]);
+        }
         return new ReminderInfo($$parsedSource as Partial<ReminderInfo>);
+    }
+}
+
+/**
+ * ReminderNotificationSettings is a snapshot of reminder-related settings.
+ */
+export class ReminderNotificationSettings {
+    "persistentReminder": boolean;
+    "autoDismissSeconds": number;
+    "autoDismissAfterAdhan": boolean;
+    "playAdhan": boolean;
+
+    /** Creates a new ReminderNotificationSettings instance. */
+    constructor($$source: Partial<ReminderNotificationSettings> = {}) {
+        if (!("persistentReminder" in $$source)) {
+            this["persistentReminder"] = false;
+        }
+        if (!("autoDismissSeconds" in $$source)) {
+            this["autoDismissSeconds"] = 0;
+        }
+        if (!("autoDismissAfterAdhan" in $$source)) {
+            this["autoDismissAfterAdhan"] = false;
+        }
+        if (!("playAdhan" in $$source)) {
+            this["playAdhan"] = false;
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new ReminderNotificationSettings instance from a string or object.
+     */
+    static createFrom($$source: any = {}): ReminderNotificationSettings {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new ReminderNotificationSettings($$parsedSource as Partial<ReminderNotificationSettings>);
     }
 }
 
@@ -82,3 +123,7 @@ export enum WindowState {
     StateOnTime = "ontime",
     StateAfter = "after",
 };
+
+// Private type creation functions
+const $$createType0 = ReminderNotificationSettings.createFrom;
+const $$createType1 = $Create.Nullable($$createType0);

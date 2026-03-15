@@ -29,6 +29,21 @@ type Service struct {
 
 var log = logging.With("scheduler")
 
+const (
+	audioStartTimeout = 5 * time.Second
+	audioStopTimeout  = 15 * time.Minute
+	audioPollInterval = 250 * time.Millisecond
+)
+
+func toReminderNotificationSettings(cfg settings.NotificationSettings) *notification.ReminderNotificationSettings {
+	return &notification.ReminderNotificationSettings{
+		PersistentReminder:   cfg.PersistentReminder,
+		AutoDismissSeconds:   cfg.AutoDismissSeconds,
+		AutoDismissAfterAdhan: cfg.AutoDismissAfterAdhan,
+		PlayAdhan:            cfg.PlayAdhan,
+	}
+}
+
 // NewService creates a new Scheduler service
 func NewService(p *prayer.Service, a *audio.Service, n *notification.Service) *Service {
 	return &Service{
@@ -164,11 +179,17 @@ func (svc *Service) fireAfterDelay(
 		State:         state,
 		MinutesLeft:   minutesLeft,
 		OffsetMinutes: offsetMinutes,
+		Notification:  toReminderNotificationSettings(notifCfg),
 	})
 	log.Info("reminder fired", "prayer", entry.name, "state", state, "offsetMinutes", offsetMinutes)
 
 	if !notifCfg.PersistentReminder && notifCfg.AutoDismissSeconds > 0 {
-		go svc.closeAfterDelay(time.Duration(notifCfg.AutoDismissSeconds) * time.Second)
+		delay := time.Duration(notifCfg.AutoDismissSeconds) * time.Second
+		if svc.shouldWaitForAdhan(state, notifCfg) {
+			go svc.closeAfterAdhan(delay)
+		} else {
+			go svc.closeAfterDelay(delay)
+		}
 	}
 }
 
@@ -180,4 +201,44 @@ func (svc *Service) closeAfterDelay(delay time.Duration) {
 	}
 	log.Info("auto dismiss reminder", "delay", delay)
 	svc.notifSvc.CloseReminder()
+}
+
+func (svc *Service) shouldWaitForAdhan(state notification.WindowState, cfg settings.NotificationSettings) bool {
+	return state == notification.StateOnTime && cfg.PlayAdhan && cfg.AutoDismissAfterAdhan
+}
+
+func (svc *Service) closeAfterAdhan(delay time.Duration) {
+	if svc.audioSvc == nil {
+		svc.closeAfterDelay(delay)
+		return
+	}
+
+	started := svc.waitForAudioState(true, audioStartTimeout)
+	if !started {
+		svc.closeAfterDelay(delay)
+		return
+	}
+
+	_ = svc.waitForAudioState(false, audioStopTimeout)
+	svc.closeAfterDelay(delay)
+}
+
+func (svc *Service) waitForAudioState(target bool, timeout time.Duration) bool {
+	deadline := time.Now().Add(timeout)
+	ticker := time.NewTicker(audioPollInterval)
+	defer ticker.Stop()
+
+	for {
+		if svc.audioSvc != nil && svc.audioSvc.IsPlaying() == target {
+			return true
+		}
+		if time.Now().After(deadline) {
+			return false
+		}
+		select {
+		case <-svc.stopCh:
+			return false
+		case <-ticker.C:
+		}
+	}
 }

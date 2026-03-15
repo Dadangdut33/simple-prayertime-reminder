@@ -123,6 +123,7 @@ export interface NotificationSettings {
   adhanVolume: number;
   persistentReminder: boolean;
   autoDismissSeconds: number;
+  autoDismissAfterAdhan: boolean;
   prayers: PerPrayerNotification;
 }
 
@@ -239,6 +240,13 @@ export interface Settings {
 // ---- Reminder event ----
 export type WindowState = 'before' | 'ontime' | 'after';
 
+export interface ReminderNotificationSettings {
+  persistentReminder: boolean;
+  autoDismissSeconds: number;
+  autoDismissAfterAdhan: boolean;
+  playAdhan: boolean;
+}
+
 export interface ReminderInfo {
   prayerName: string;
   state: WindowState;
@@ -246,6 +254,7 @@ export interface ReminderInfo {
   offsetMinutes?: number;
   triggerId?: number;
   live?: boolean;
+  notification?: ReminderNotificationSettings;
 }
 
 export interface ReminderTestSnapshot {

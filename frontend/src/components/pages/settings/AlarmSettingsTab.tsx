@@ -105,6 +105,20 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
         />
       </Box>
 
+      <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={2} alignItems="flex-start">
+        <Box flex={1}>
+          <Typography variant="subtitle1">{t('settings.alarms.autoDismissAfterAdhan')}</Typography>
+          <Typography variant="body2" color="text.secondary">
+            {t('settings.alarms.autoDismissAfterAdhanDesc')}
+          </Typography>
+        </Box>
+        <Switch
+          checked={local.notification.autoDismissAfterAdhan}
+          disabled={!local.notification.playAdhan}
+          onChange={(event) => setNotification({ autoDismissAfterAdhan: event.target.checked })}
+        />
+      </Box>
+
       <Box>
         <Typography variant="subtitle2" mb={2}>
           {t('settings.alarms.title')}

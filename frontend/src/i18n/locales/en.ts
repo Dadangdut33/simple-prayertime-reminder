@@ -354,6 +354,9 @@ const en = {
       persistentDesc: 'Keep the reminder window open until you dismiss it manually.',
       autoDismissSeconds: 'Auto-dismiss after (seconds)',
       autoDismissDisabled: 'Disabled when persistent reminders are enabled.',
+      autoDismissAfterAdhan: 'Wait for adhan before auto-dismiss',
+      autoDismissAfterAdhanDesc:
+        'When enabled, auto-dismiss starts after the adhan finishes (only applies when adhan audio is on).',
     },
   },
   prayerTimes: {
@@ -626,6 +629,7 @@ const en = {
     started: 'It is now prayer time',
     active: 'Have you prayed yet?',
     autoDismissIn: 'Auto-dismiss in {{seconds}}s',
+    autoDismissAfterAdhan: 'Auto-dismiss after adhan finishes',
     dismiss: 'Dismiss',
   },
   reminderTest: {

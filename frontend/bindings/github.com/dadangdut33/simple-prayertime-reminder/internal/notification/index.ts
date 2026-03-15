@@ -3,6 +3,7 @@
 
 export {
     ReminderInfo,
+    ReminderNotificationSettings,
     Service,
     WindowState
 } from "./models.js";

@@ -122,6 +122,7 @@ export class NotificationSettings {
     "adhanVolume": number;
     "persistentReminder": boolean;
     "autoDismissSeconds": number;
+    "autoDismissAfterAdhan": boolean;
     "prayers": PerPrayerNotification;
 
     /** Creates a new NotificationSettings instance. */
@@ -141,6 +142,9 @@ export class NotificationSettings {
         if (!("autoDismissSeconds" in $$source)) {
             this["autoDismissSeconds"] = 0;
         }
+        if (!("autoDismissAfterAdhan" in $$source)) {
+            this["autoDismissAfterAdhan"] = false;
+        }
         if (!("prayers" in $$source)) {
             this["prayers"] = (new PerPrayerNotification());
         }
@@ -152,10 +156,10 @@ export class NotificationSettings {
      * Creates a new NotificationSettings instance from a string or object.
      */
     static createFrom($$source: any = {}): NotificationSettings {
-        const $$createField5_0 = $$createType0;
+        const $$createField6_0 = $$createType0;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("prayers" in $$parsedSource) {
-            $$parsedSource["prayers"] = $$createField5_0($$parsedSource["prayers"]);
+            $$parsedSource["prayers"] = $$createField6_0($$parsedSource["prayers"]);
         }
         return new NotificationSettings($$parsedSource as Partial<NotificationSettings>);
     }

@@ -22,14 +22,23 @@ const (
 	StateAfter  WindowState = "after"
 )
 
+// ReminderNotificationSettings is a snapshot of reminder-related settings.
+type ReminderNotificationSettings struct {
+	PersistentReminder   bool `json:"persistentReminder"`
+	AutoDismissSeconds   int  `json:"autoDismissSeconds"`
+	AutoDismissAfterAdhan bool `json:"autoDismissAfterAdhan"`
+	PlayAdhan            bool `json:"playAdhan"`
+}
+
 // ReminderInfo contains data passed to the reminder window
 type ReminderInfo struct {
-	PrayerName    string      `json:"prayerName"`
-	State         WindowState `json:"state"`
-	MinutesLeft   int         `json:"minutesLeft"`
-	OffsetMinutes int         `json:"offsetMinutes"`
-	TriggerID     int64       `json:"triggerId"`
-	Live          bool        `json:"live"`
+	PrayerName    string                       `json:"prayerName"`
+	State         WindowState                  `json:"state"`
+	MinutesLeft   int                          `json:"minutesLeft"`
+	OffsetMinutes int                          `json:"offsetMinutes"`
+	TriggerID     int64                        `json:"triggerId"`
+	Live          bool                         `json:"live"`
+	Notification  *ReminderNotificationSettings `json:"notification,omitempty"`
 }
 
 // Service manages the prayer reminder window
@@ -122,10 +131,22 @@ func (svc *Service) ShowTestReminder(info ReminderInfo) {
 }
 
 // UpdateTestState updates the simulated reminder window's state without forcing it to show.
-func (svc *Service) UpdateTestState(state WindowState, minutesLeft int, prayerName string, offsetMinutes int, live bool) {
+func (svc *Service) UpdateTestState(
+	state WindowState,
+	minutesLeft int,
+	prayerName string,
+	offsetMinutes int,
+	live bool,
+	notif *ReminderNotificationSettings,
+) {
 	triggerID := int64(0)
+	var previousNotif *ReminderNotificationSettings
 	if svc.lastTestInfo != nil {
 		triggerID = svc.lastTestInfo.TriggerID
+		previousNotif = svc.lastTestInfo.Notification
+	}
+	if notif == nil {
+		notif = previousNotif
 	}
 	info := ReminderInfo{
 		PrayerName:    prayerName,
@@ -134,6 +155,7 @@ func (svc *Service) UpdateTestState(state WindowState, minutesLeft int, prayerNa
 		OffsetMinutes: offsetMinutes,
 		TriggerID:     triggerID,
 		Live:          live,
+		Notification:  notif,
 	}
 
 	svc.mu.Lock()

@@ -47,7 +47,7 @@ export default function ReminderPage() {
     }
   }, [initialize, initialized]);
 
-  const notificationSettings = settings?.notification ?? null;
+  const notificationSettings = info?.notification ?? settings?.notification ?? null;
 
   const normalizeInfo = (next: ReminderInfo | null): ReminderInfo | null => {
     if (!next) return null;
@@ -62,8 +62,15 @@ export default function ReminderPage() {
     return { ...next, offsetMinutes };
   };
 
-  const buildInfoKey = (next: ReminderInfo) =>
-    `${next.prayerName}|${next.state}|${next.minutesLeft}|${next.offsetMinutes ?? 0}|${next.triggerId ?? 0}`;
+  const buildInfoKey = (next: ReminderInfo) => {
+    const notif = next.notification;
+    const notifKey = notif
+      ? `${notif.persistentReminder ? 1 : 0}|${notif.autoDismissSeconds}|${notif.autoDismissAfterAdhan ? 1 : 0}|${
+          notif.playAdhan ? 1 : 0
+        }`
+      : 'none';
+    return `${next.prayerName}|${next.state}|${next.minutesLeft}|${next.offsetMinutes ?? 0}|${next.triggerId ?? 0}|${notifKey}`;
+  };
 
   const applyInfo = (next: ReminderInfo | null, force = false) => {
     if (!next) {
@@ -85,24 +92,12 @@ export default function ReminderPage() {
     prayerTimeMsRef.current = now - (normalized.offsetMinutes ?? 0) * 60 * 1000;
   };
 
-  const resolveInfo = (state: ReminderInfo | null, eventData?: ReminderInfo | null) => {
-    if (state && eventData) {
-      const same =
-        state.prayerName === eventData.prayerName &&
-        state.state === eventData.state &&
-        state.minutesLeft === eventData.minutesLeft &&
-        (state.offsetMinutes ?? 0) === (eventData.offsetMinutes ?? 0);
-      return same ? state : eventData;
-    }
-    return state ?? eventData ?? null;
-  };
-
   useEffect(() => {
     if (window.wails?.Events?.On) {
       const eventName = isTest ? 'reminder:test-update' : 'reminder:update';
-      window.wails.Events.On(eventName, (data: ReminderInfo) => {
+      window.wails.Events.On(eventName, () => {
         void (isTest ? getTestReminderState() : getReminderState()).then((state) => {
-          applyInfo(resolveInfo(state, data), isTest);
+          applyInfo(state, true);
         });
       });
     }
@@ -131,17 +126,6 @@ export default function ReminderPage() {
       applyInfo(state);
     });
   }, 2000);
-
-  useEffect(() => {
-    if (!notificationSettings) return;
-    if (!info) return;
-    if (!notificationSettings.persistentReminder && notificationSettings.autoDismissSeconds > 0) {
-      const baseTime = infoReceivedAtRef.current ?? Date.now();
-      autoDismissAtRef.current = baseTime + notificationSettings.autoDismissSeconds * 1000;
-    } else {
-      autoDismissAtRef.current = null;
-    }
-  }, [info, notificationSettings]);
 
   const prayerName = info?.prayerName ? getPrayerDisplayName(info.prayerName) : t('reminder.prayerFallback');
   const state = info?.state ?? 'before';
@@ -175,6 +159,24 @@ export default function ReminderPage() {
       beforeMinutes = 0;
     }
   }
+
+  useEffect(() => {
+    if (!notificationSettings) return;
+    if (!info) return;
+    const shouldWaitForAdhan =
+      !notificationSettings.persistentReminder &&
+      notificationSettings.autoDismissSeconds > 0 &&
+      notificationSettings.autoDismissAfterAdhan &&
+      notificationSettings.playAdhan &&
+      displayState === 'ontime';
+
+    if (!notificationSettings.persistentReminder && notificationSettings.autoDismissSeconds > 0 && !shouldWaitForAdhan) {
+      const baseTime = infoReceivedAtRef.current ?? Date.now();
+      autoDismissAtRef.current = baseTime + notificationSettings.autoDismissSeconds * 1000;
+    } else {
+      autoDismissAtRef.current = null;
+    }
+  }, [displayState, info, notificationSettings]);
 
   const offsetLabel = useMemo(() => {
     if (!offsetMinutes || Number.isNaN(offsetMinutes)) return null;
@@ -230,6 +232,13 @@ export default function ReminderPage() {
     return Math.max(0, Math.ceil((autoDismissAtRef.current - clock.getTime()) / 1000));
   })();
 
+  const autoDismissAfterAdhanActive =
+    Boolean(notificationSettings?.autoDismissAfterAdhan) &&
+    Boolean(notificationSettings?.playAdhan) &&
+    !notificationSettings?.persistentReminder &&
+    (notificationSettings?.autoDismissSeconds ?? 0) > 0 &&
+    displayState === 'ontime';
+
   const debugNode =
     isTest && info ? (
       <Box
@@ -266,6 +275,7 @@ export default function ReminderPage() {
       afterMinutes={afterMinutes}
       hoverDetail={hoverDetail}
       autoDismissSecondsLeft={autoDismissSecondsLeft}
+      autoDismissAfterAdhan={autoDismissAfterAdhanActive}
       extra={extraNode}
       onDismiss={async () => {
         if (isTest) {

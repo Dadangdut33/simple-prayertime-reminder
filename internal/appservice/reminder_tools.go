@@ -6,9 +6,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dadangdut33/simple-prayertime-reminder/internal/audio"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/clock"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/notification"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/prayer"
+	"github.com/dadangdut33/simple-prayertime-reminder/internal/settings"
 )
 
 type ReminderTestSnapshot struct {
@@ -72,6 +74,15 @@ func scheduleToMap(s prayer.DaySchedule) map[string]string {
 		"Asr":     s.Asr.Format(time.RFC3339),
 		"Maghrib": s.Maghrib.Format(time.RFC3339),
 		"Isha":    s.Isha.Format(time.RFC3339),
+	}
+}
+
+func toReminderNotificationSettings(cfg settings.NotificationSettings) *notification.ReminderNotificationSettings {
+	return &notification.ReminderNotificationSettings{
+		PersistentReminder:   cfg.PersistentReminder,
+		AutoDismissSeconds:   cfg.AutoDismissSeconds,
+		AutoDismissAfterAdhan: cfg.AutoDismissAfterAdhan,
+		PlayAdhan:            cfg.PlayAdhan,
 	}
 }
 
@@ -187,12 +198,14 @@ func (s *Service) SyncReminderTestWindow(prayerName string, offsetSeconds int, t
 
 	offsetMinutes := int(math.Round(float64(snapshot.OffsetSeconds) / 60.0))
 	if s.notifSvc != nil {
+		cfg := s.settingsSvc.Get()
 		s.notifSvc.UpdateTestState(
 			notification.WindowState(snapshot.State),
 			snapshot.MinutesLeft,
 			snapshot.PrayerName,
 			offsetMinutes,
 			live,
+			toReminderNotificationSettings(cfg.Notification),
 		)
 	}
 	log.Info("test reminder synced", "prayer", snapshot.PrayerName, "offsetSeconds", snapshot.OffsetSeconds, "live", live)
@@ -208,6 +221,7 @@ func (s *Service) TriggerReminderTest(prayerName string, offsetSeconds int, time
 	}
 
 	offsetMinutes := int(math.Round(float64(snapshot.OffsetSeconds) / 60.0))
+	cfg := s.settingsSvc.Get()
 	if s.notifSvc != nil {
 		s.notifSvc.ShowTestReminder(notification.ReminderInfo{
 			PrayerName:    snapshot.PrayerName,
@@ -215,19 +229,60 @@ func (s *Service) TriggerReminderTest(prayerName string, offsetSeconds int, time
 			MinutesLeft:   snapshot.MinutesLeft,
 			OffsetMinutes: offsetMinutes,
 			Live:          live,
+			Notification:  toReminderNotificationSettings(cfg.Notification),
 		})
 	}
 	log.Info("test reminder triggered", "prayer", snapshot.PrayerName, "offsetSeconds", snapshot.OffsetSeconds, "live", live)
 
-	cfg := s.settingsSvc.Get()
 	if !cfg.Notification.PersistentReminder && cfg.Notification.AutoDismissSeconds > 0 {
-		go func() {
-			time.Sleep(time.Duration(cfg.Notification.AutoDismissSeconds) * time.Second)
-			if s.notifSvc != nil {
-				s.notifSvc.CloseTestReminder()
-			}
-		}()
+		delay := time.Duration(cfg.Notification.AutoDismissSeconds) * time.Second
+		if snapshot.State == string(notification.StateOnTime) &&
+			cfg.Notification.PlayAdhan &&
+			cfg.Notification.AutoDismissAfterAdhan {
+			go s.closeTestAfterAdhan(delay)
+		} else {
+			go s.closeTestAfterDelay(delay)
+		}
 	}
 
 	return snapshot, nil
+}
+
+func (s *Service) closeTestAfterDelay(delay time.Duration) {
+	time.Sleep(delay)
+	if s.notifSvc != nil {
+		s.notifSvc.CloseTestReminder()
+	}
+}
+
+func (s *Service) closeTestAfterAdhan(delay time.Duration) {
+	if s.audioSvc == nil {
+		s.closeTestAfterDelay(delay)
+		return
+	}
+
+	started := waitForAudioState(s.audioSvc, true, 5*time.Second)
+	if !started {
+		s.closeTestAfterDelay(delay)
+		return
+	}
+
+	_ = waitForAudioState(s.audioSvc, false, 15*time.Minute)
+	s.closeTestAfterDelay(delay)
+}
+
+func waitForAudioState(audioSvc *audio.Service, target bool, timeout time.Duration) bool {
+	deadline := time.Now().Add(timeout)
+	ticker := time.NewTicker(250 * time.Millisecond)
+	defer ticker.Stop()
+
+	for {
+		if audioSvc != nil && audioSvc.IsPlaying() == target {
+			return true
+		}
+		if time.Now().After(deadline) {
+			return false
+		}
+		<-ticker.C
+	}
 }
