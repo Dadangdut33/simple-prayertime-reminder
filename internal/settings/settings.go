@@ -98,27 +98,27 @@ func DefaultSettings() Settings {
 	defaultPrayerNotif := PrayerNotificationSetting{
 		Enabled:       true,
 		BeforeMinutes: 10,
-		AfterMinutes:  30,
+		AfterMinutes:  20,
 	}
 	sunriseNotif := PrayerNotificationSetting{
 		Enabled:       false,
 		BeforeMinutes: 10,
-		AfterMinutes:  30,
+		AfterMinutes:  20,
 	}
 
 	return Settings{
 		Location: LocationSettings{
 			AutoDetect: true,
 			InputMode:  "custom",
-			City:       "",
-			Country:    "",
+			City:       "Jakarta",
+			Country:    "Indonesia",
 			Latitude:   -6.2,
 			Longitude:  106.816666,
 			Elevation:  0,
 			Timezone:   "Asia/Jakarta",
 		},
 		Prayer: PrayerSettings{
-			Method:                "Kemenag",
+			Method:                "MWL",
 			AsrMethod:             "Shafii",
 			Offsets:               PrayerOffsets{},
 			CustomFajrAngle:       20,
