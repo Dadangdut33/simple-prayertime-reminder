@@ -13,13 +13,6 @@ import (
 	"time"
 )
 
-type Options struct {
-	Dir      string
-	Level    string
-	KeepDays int
-	BaseName string
-}
-
 var (
 	mu         sync.Mutex
 	baseLog    *slog.Logger

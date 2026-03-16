@@ -110,9 +110,6 @@ export class ReminderNotificationSettings {
     }
 }
 
-/**
- * Service manages the prayer reminder window
- */
 export class Service {
 
     /** Creates a new Service instance. */

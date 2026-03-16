@@ -5,12 +5,9 @@ import (
 	_ "embed"
 	"fmt"
 	"io"
-	"sync"
 
 	"github.com/ebitengine/oto/v3"
 	"github.com/hajimehoshi/go-mp3"
-
-	"github.com/dadangdut33/simple-prayertime-reminder/internal/logging"
 )
 
 //go:embed adhan.mp3
@@ -18,17 +15,6 @@ var adhanNormalData []byte
 
 //go:embed adhan_fajr.mp3
 var adhanFajrData []byte
-
-// Service manages adhan audio playback
-type Service struct {
-	ctx     *oto.Context
-	player  *oto.Player
-	mu      sync.Mutex
-	ready   chan struct{}
-	initErr error
-}
-
-var log = logging.With("audio")
 
 // NewService creates a new Audio service and initializes the audio context
 func NewService() *Service {

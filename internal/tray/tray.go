@@ -4,12 +4,9 @@ import (
 	"fmt"
 	"runtime"
 	"strings"
-	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/appservice"
-	"github.com/dadangdut33/simple-prayertime-reminder/internal/logging"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/prayer"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
@@ -22,21 +19,6 @@ const (
 	trayLeftClickOpenMenu     = "open-menu"
 	trayLeftClickNone         = "none"
 )
-
-var log = logging.With("tray")
-
-type MenuState struct {
-	identityItem *application.MenuItem
-	titleItem    *application.MenuItem
-	dateItem     *application.MenuItem
-	prayerNames  []string
-	prayerItems  []*application.MenuItem
-
-	leftClickMu     sync.RWMutex
-	leftClickAction string
-	skipNextClick   atomic.Bool
-	forceMenuOnce   atomic.Bool
-}
 
 func Setup(app *application.App, appSvc *appservice.Service, mainWindow application.Window, appName string, appIcon []byte) *MenuState {
 	tray := app.SystemTray.New()

@@ -10,18 +10,6 @@ import (
 
 const timeFormat = "15:04"
 
-// MonthRow represents one exported prayer-time row.
-type MonthRow struct {
-	GregorianDate string
-	HijriDate     string
-	Fajr          time.Time
-	Sunrise       time.Time
-	Zuhr          time.Time
-	Asr           time.Time
-	Maghrib       time.Time
-	Isha          time.Time
-}
-
 // ToCSV exports prayer times to a CSV file.
 func ToCSV(rows []MonthRow, filepath string) error {
 	f, err := os.Create(filepath)

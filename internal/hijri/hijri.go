@@ -7,19 +7,6 @@ import (
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/clock"
 )
 
-// HijriDate represents a date in the Islamic (Hijri) calendar
-type HijriDate struct {
-	Day   int `json:"day"`
-	Month int `json:"month"`
-	Year  int `json:"year"`
-}
-
-// CalendarDay associates a Gregorian ISO date with its Hijri equivalent.
-type CalendarDay struct {
-	Date  string    `json:"date"`
-	Hijri HijriDate `json:"hijri"`
-}
-
 // HijriMonths contains English names for Hijri months
 var HijriMonths = [13]string{
 	"", // 1-indexed

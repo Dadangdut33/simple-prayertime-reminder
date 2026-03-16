@@ -438,7 +438,7 @@ export class PrayerTimesSettings {
 }
 
 /**
- * Settings is the root configuration struct
+ * Settings holds the full app configuration.
  */
 export class Settings {
     "location": LocationSettings;
@@ -447,38 +447,14 @@ export class Settings {
     "dashboard": DashboardSettings;
     "prayerTimes": PrayerTimesSettings;
     "worldPrayer": WorldPrayerSettings;
-
-    /**
-     * "light", "dark", "system"
-     */
     "theme": string;
     "themePreset": string;
-
-    /**
-     * "en", "id", etc
-     */
     "language": string;
-
-    /**
-     * "debug", "info", "warn", "error"
-     */
     "logLevel": string;
     "autoStart": boolean;
     "autoCheckUpdates": boolean;
-
-    /**
-     * "toggle-window", "open-menu", or "none"
-     */
     "trayLeftClick": string;
-
-    /**
-     * -2 to +2 days
-     */
     "hijriDateOffset": number;
-
-    /**
-     * "12h" or "24h"
-     */
     "timeFormat": string;
     "enableTestTools": boolean;
 
@@ -630,10 +606,6 @@ export class WorldPrayerCity {
  */
 export class WorldPrayerSettings {
     "cities": WorldPrayerCity[];
-
-    /**
-     * "name", "offset", "current-time", "next-prayer"
-     */
     "sortBy": string;
 
     /** Creates a new WorldPrayerSettings instance. */
