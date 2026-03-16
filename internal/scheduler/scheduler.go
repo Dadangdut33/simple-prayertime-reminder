@@ -41,6 +41,11 @@ func toReminderNotificationSettings(cfg settings.NotificationSettings) *notifica
 		AutoDismissSeconds:   cfg.AutoDismissSeconds,
 		AutoDismissAfterAdhan: cfg.AutoDismissAfterAdhan,
 		PlayAdhan:            cfg.PlayAdhan,
+		AdhanVolume:          cfg.AdhanVolume,
+		AlwaysOnTop:          cfg.AlwaysOnTop,
+		UseNativeNotification: cfg.UseNativeNotification,
+		NativeNotificationSticky: cfg.NativeNotificationSticky,
+		UseNativeDialog:      cfg.UseNativeDialog,
 	}
 }
 

@@ -42,6 +42,10 @@ export function CheckForUpdates(): $CancellablePromise<$models.UpdateInfo> {
     });
 }
 
+export function CheckNativeNotificationPermission(): $CancellablePromise<boolean> {
+    return $Call.ByID(2633779010);
+}
+
 export function DetectLocation(): $CancellablePromise<location$0.Location> {
     return $Call.ByID(3572912391).then(($result: any) => {
         return $$createType1($result);
@@ -254,6 +258,10 @@ export function PlayAdhan(isFajr: boolean): $CancellablePromise<void> {
 
 export function ReadTextFile(path: string): $CancellablePromise<string> {
     return $Call.ByID(1179436650, path);
+}
+
+export function RequestNativeNotificationPermission(): $CancellablePromise<boolean> {
+    return $Call.ByID(853643315);
 }
 
 export function ResetSettings(): $CancellablePromise<settings$0.Settings> {

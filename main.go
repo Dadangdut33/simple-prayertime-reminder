@@ -18,6 +18,7 @@ import (
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/tray"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
+	"github.com/wailsapp/wails/v3/pkg/services/notifications"
 )
 
 const (
@@ -85,12 +86,14 @@ func main() {
 	appSvc := appservice.New(prayerSvc2, locSvc2, settingsSvc2, audioSvc)
 
 	logger.Info("creating application")
+	nativeNotifSvc := notifications.New()
 	app := application.New(application.Options{
 		Name:        appName,
 		Description: appDescription,
 		Icon:        appIcon,
 		Services: []application.Service{
 			application.NewService(appSvc),
+			application.NewService(nativeNotifSvc),
 		},
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),
@@ -100,12 +103,8 @@ func main() {
 		},
 	})
 
-	app.OnShutdown(func() {
-		logging.Close()
-	})
-
 	// Notification and Scheduler need app to emit events/manage windows
-	notifSvc := notification.NewService(app, audioSvc)
+	notifSvc := notification.NewService(app, audioSvc, nativeNotifSvc)
 	notifSvc.SetStatePaths(
 		filepath.Join(configPath, "reminder_state.json"),
 		filepath.Join(configPath, "reminder_test_state.json"),
@@ -113,6 +112,11 @@ func main() {
 	schedulerSvc := scheduler.NewService(prayerSvc2, audioSvc, notifSvc)
 
 	appSvc.SetRuntimeServices(notifSvc, schedulerSvc)
+
+	app.OnShutdown(func() {
+		notifSvc.Shutdown()
+		logging.Close()
+	})
 
 	// Main window
 	logger.Info("creating main window")

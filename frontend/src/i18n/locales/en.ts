@@ -357,6 +357,16 @@ const en = {
       autoDismissAfterAdhan: 'Wait for adhan before auto-dismiss',
       autoDismissAfterAdhanDesc:
         'When enabled, auto-dismiss starts after the adhan finishes (only applies when adhan audio is on).',
+      alwaysOnTop: 'Always keep reminder on top',
+      alwaysOnTopDesc: 'Keep the reminder window above other windows.',
+      useNativeNotification: 'Send native notification',
+      useNativeNotificationDesc: 'Send an OS notification.',
+      nativeSticky: 'Sticky native notification',
+      nativeStickyDesc: 'Keep the OS notification visible until dismissed (if supported).',
+      nativePermissionDenied: 'Notification permission is not granted.',
+      useNativeDialog: 'Use native message box dialog instead of window',
+      useNativeDialogDesc: 'Show a simple message dialog instead of the custom reminder window.',
+      useNativeDialogNote: 'Dialog reminders disable auto-dismiss and always-on-top settings.',
     },
   },
   prayerTimes: {

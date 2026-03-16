@@ -2,6 +2,7 @@ package prayer
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/clock"
@@ -89,6 +90,7 @@ type PrayerConfig struct {
 type Service struct {
 	cfg       PrayerConfig
 	yearCache map[int][]prayer.Schedule
+	mu        sync.RWMutex
 }
 
 var log = logging.With("prayer")
@@ -102,14 +104,16 @@ func NewService() *Service {
 
 // SetConfig updates the prayer configuration and clears cache
 func (svc *Service) SetConfig(cfg PrayerConfig) {
+	svc.mu.Lock()
 	svc.cfg = cfg
 	svc.yearCache = make(map[int][]prayer.Schedule)
+	svc.mu.Unlock()
 	log.Info("prayer config set", "method", cfg.Method, "timezone", cfg.Timezone)
 }
 
 // getConvention returns the TwilightConvention for the method
-func (svc *Service) getConvention() *prayer.TwilightConvention {
-	switch svc.cfg.Method {
+func getConvention(cfg PrayerConfig) *prayer.TwilightConvention {
+	switch cfg.Method {
 	case MethodAstronomical:
 		return prayer.AstronomicalTwilight()
 	case MethodMWL:
@@ -150,11 +154,11 @@ func (svc *Service) getConvention() *prayer.TwilightConvention {
 		return prayer.Jafari()
 	case MethodCustom:
 		convention := &prayer.TwilightConvention{
-			FajrAngle: svc.cfg.CustomFajrAngle,
-			IshaAngle: svc.cfg.CustomIshaAngle,
+			FajrAngle: cfg.CustomFajrAngle,
+			IshaAngle: cfg.CustomIshaAngle,
 		}
-		if svc.cfg.CustomMaghribDuration > 0 {
-			convention.MaghribDuration = time.Duration(svc.cfg.CustomMaghribDuration * float64(time.Minute))
+		if cfg.CustomMaghribDuration > 0 {
+			convention.MaghribDuration = time.Duration(cfg.CustomMaghribDuration * float64(time.Minute))
 		}
 		return convention
 	default:
@@ -163,8 +167,8 @@ func (svc *Service) getConvention() *prayer.TwilightConvention {
 }
 
 // getAsrConvention returns the Asr convention
-func (svc *Service) getAsrConvention() prayer.AsrConvention {
-	if svc.cfg.AsrMethod == AsrHanafi {
+func getAsrConvention(cfg PrayerConfig) prayer.AsrConvention {
+	if cfg.AsrMethod == AsrHanafi {
 		return prayer.Hanafi
 	}
 	return prayer.Shafii
@@ -172,41 +176,47 @@ func (svc *Service) getAsrConvention() prayer.AsrConvention {
 
 // computeYear fetches (or reads from cache) the full year's schedule
 func (svc *Service) computeYear(year int) ([]prayer.Schedule, error) {
-	if cached, ok := svc.yearCache[year]; ok {
+	svc.mu.RLock()
+	cached, ok := svc.yearCache[year]
+	cfgSnapshot := svc.cfg
+	svc.mu.RUnlock()
+	if ok {
 		return cached, nil
 	}
 
-	tz, err := time.LoadLocation(svc.cfg.Timezone)
+	tz, err := time.LoadLocation(cfgSnapshot.Timezone)
 	if err != nil {
-		log.Warn("timezone load failed, using UTC", "timezone", svc.cfg.Timezone, "error", err)
+		log.Warn("timezone load failed, using UTC", "timezone", cfgSnapshot.Timezone, "error", err)
 		tz = time.UTC
 	}
 
-	cfg := prayer.Config{
-		Latitude:            svc.cfg.Latitude,
-		Longitude:           svc.cfg.Longitude,
-		Elevation:           svc.cfg.Elevation,
+	prayerCfg := prayer.Config{
+		Latitude:            cfgSnapshot.Latitude,
+		Longitude:           cfgSnapshot.Longitude,
+		Elevation:           cfgSnapshot.Elevation,
 		Timezone:            tz,
-		TwilightConvention:  svc.getConvention(),
-		AsrConvention:       svc.getAsrConvention(),
+		TwilightConvention:  getConvention(cfgSnapshot),
+		AsrConvention:       getAsrConvention(cfgSnapshot),
 		HighLatitudeAdapter: prayer.NearestLatitude(),
 		Corrections: prayer.ScheduleCorrections{
-			Fajr:    time.Duration(svc.cfg.Offsets.Fajr * float64(time.Minute)),
-			Sunrise: time.Duration(svc.cfg.Offsets.Sunrise * float64(time.Minute)),
-			Zuhr:    time.Duration(svc.cfg.Offsets.Zuhr * float64(time.Minute)),
-			Asr:     time.Duration(svc.cfg.Offsets.Asr * float64(time.Minute)),
-			Maghrib: time.Duration(svc.cfg.Offsets.Maghrib * float64(time.Minute)),
-			Isha:    time.Duration(svc.cfg.Offsets.Isha * float64(time.Minute)),
+			Fajr:    time.Duration(cfgSnapshot.Offsets.Fajr * float64(time.Minute)),
+			Sunrise: time.Duration(cfgSnapshot.Offsets.Sunrise * float64(time.Minute)),
+			Zuhr:    time.Duration(cfgSnapshot.Offsets.Zuhr * float64(time.Minute)),
+			Asr:     time.Duration(cfgSnapshot.Offsets.Asr * float64(time.Minute)),
+			Maghrib: time.Duration(cfgSnapshot.Offsets.Maghrib * float64(time.Minute)),
+			Isha:    time.Duration(cfgSnapshot.Offsets.Isha * float64(time.Minute)),
 		},
 	}
 
-	schedules, err := prayer.Calculate(cfg, year)
+	schedules, err := prayer.Calculate(prayerCfg, year)
 	if err != nil {
 		log.Error("prayer calculation failed", "error", err, "year", year)
 		return nil, fmt.Errorf("prayer calculation failed: %w", err)
 	}
 
+	svc.mu.Lock()
 	svc.yearCache[year] = schedules
+	svc.mu.Unlock()
 	log.Info("prayer schedule cached", "year", year)
 	return schedules, nil
 }

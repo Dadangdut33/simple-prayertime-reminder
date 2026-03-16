@@ -740,6 +740,20 @@ func (s *Service) StopAdhan() {
 	log.Info("stop adhan requested")
 }
 
+func (s *Service) CheckNativeNotificationPermission() (bool, error) {
+	if s.notifSvc == nil {
+		return false, fmt.Errorf("notification service not available")
+	}
+	return s.notifSvc.CheckNativeNotificationPermission()
+}
+
+func (s *Service) RequestNativeNotificationPermission() (bool, error) {
+	if s.notifSvc == nil {
+		return false, fmt.Errorf("notification service not available")
+	}
+	return s.notifSvc.RequestNativeNotificationPermission()
+}
+
 func (s *Service) EmitReminderInfo() {
 	if s.notifSvc != nil {
 		s.notifSvc.EmitLastReminder()

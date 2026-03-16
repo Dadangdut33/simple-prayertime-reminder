@@ -2,8 +2,10 @@ package notification
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -11,6 +13,7 @@ import (
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/logging"
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/events"
+	"github.com/wailsapp/wails/v3/pkg/services/notifications"
 )
 
 // WindowState represents the state of the reminder window
@@ -24,20 +27,25 @@ const (
 
 // ReminderNotificationSettings is a snapshot of reminder-related settings.
 type ReminderNotificationSettings struct {
-	PersistentReminder   bool `json:"persistentReminder"`
-	AutoDismissSeconds   int  `json:"autoDismissSeconds"`
-	AutoDismissAfterAdhan bool `json:"autoDismissAfterAdhan"`
-	PlayAdhan            bool `json:"playAdhan"`
+	PersistentReminder       bool    `json:"persistentReminder"`
+	AutoDismissSeconds       int     `json:"autoDismissSeconds"`
+	AutoDismissAfterAdhan    bool    `json:"autoDismissAfterAdhan"`
+	PlayAdhan                bool    `json:"playAdhan"`
+	AdhanVolume              float64 `json:"adhanVolume"`
+	AlwaysOnTop              bool    `json:"alwaysOnTop"`
+	UseNativeNotification    bool    `json:"useNativeNotification"`
+	NativeNotificationSticky bool    `json:"nativeNotificationSticky"`
+	UseNativeDialog          bool    `json:"useNativeDialog"`
 }
 
 // ReminderInfo contains data passed to the reminder window
 type ReminderInfo struct {
-	PrayerName    string                       `json:"prayerName"`
-	State         WindowState                  `json:"state"`
-	MinutesLeft   int                          `json:"minutesLeft"`
-	OffsetMinutes int                          `json:"offsetMinutes"`
-	TriggerID     int64                        `json:"triggerId"`
-	Live          bool                         `json:"live"`
+	PrayerName    string                        `json:"prayerName"`
+	State         WindowState                   `json:"state"`
+	MinutesLeft   int                           `json:"minutesLeft"`
+	OffsetMinutes int                           `json:"offsetMinutes"`
+	TriggerID     int64                         `json:"triggerId"`
+	Live          bool                          `json:"live"`
 	Notification  *ReminderNotificationSettings `json:"notification,omitempty"`
 }
 
@@ -48,6 +56,10 @@ type Service struct {
 	testReminderWindow    *application.WebviewWindow
 	app                   *application.App
 	audioSvc              *audio.Service
+	nativeNotifSvc        *notifications.NotificationService
+	dialogCh              chan ReminderInfo
+	dialogClosed          bool
+	dialogCloseOnce       sync.Once
 	lastInfo              *ReminderInfo
 	lastTestInfo          *ReminderInfo
 	reminderStatePath     string
@@ -57,9 +69,16 @@ type Service struct {
 var log = logging.With("notification")
 
 // NewService creates a new Notification service
-func NewService(app *application.App, audioSvc *audio.Service) *Service {
+func NewService(app *application.App, audioSvc *audio.Service, nativeNotifSvc *notifications.NotificationService) *Service {
 	log.Info("notification service init")
-	return &Service{app: app, audioSvc: audioSvc}
+	svc := &Service{
+		app:            app,
+		audioSvc:       audioSvc,
+		nativeNotifSvc: nativeNotifSvc,
+		dialogCh:       make(chan ReminderInfo, 1),
+	}
+	go svc.dialogWorker()
+	return svc
 }
 
 // SetStatePaths configures where reminder state JSON files are written.
@@ -81,8 +100,33 @@ func (svc *Service) ShowReminder(info ReminderInfo) {
 	latest := info
 	svc.lastInfo = &latest
 
-	svc.ensureReminderWindowLocked(true)
+	notif := info.Notification
+	showDialog := false
+	if notif != nil && notif.UseNativeNotification {
+		svc.sendNativeNotificationLocked(info, notif.NativeNotificationSticky)
+	}
+
+	shouldShowWindow := true
+	alwaysOnTop := true
+	if notif != nil {
+		alwaysOnTop = notif.AlwaysOnTop
+		if notif.UseNativeDialog {
+			shouldShowWindow = false
+			showDialog = true
+		}
+	}
+	if shouldShowWindow {
+		svc.ensureReminderWindowLocked(true, alwaysOnTop)
+	} else if svc.reminderWindow != nil {
+		svc.reminderWindow.Hide()
+	}
 	svc.writeStateLocked(svc.reminderStatePath, info)
+	if notif != nil && notif.UseNativeDialog {
+		svc.playAdhanForDialog(info, notif)
+	}
+	if showDialog {
+		svc.enqueueNativeDialog(info)
+	}
 
 	// Emit event so the reminder page can update
 	svc.app.Event.Emit("reminder:update", info)
@@ -93,9 +137,11 @@ func (svc *Service) ShowReminder(info ReminderInfo) {
 func (svc *Service) UpdateState(state WindowState, minutesLeft int, prayerName string) {
 	triggerID := int64(0)
 	live := true
+	var notif *ReminderNotificationSettings
 	if svc.lastInfo != nil {
 		triggerID = svc.lastInfo.TriggerID
 		live = svc.lastInfo.Live
+		notif = svc.lastInfo.Notification
 	}
 	info := ReminderInfo{
 		PrayerName:    prayerName,
@@ -104,6 +150,7 @@ func (svc *Service) UpdateState(state WindowState, minutesLeft int, prayerName s
 		OffsetMinutes: 0,
 		TriggerID:     triggerID,
 		Live:          live,
+		Notification:  notif,
 	}
 
 	svc.mu.Lock()
@@ -122,9 +169,33 @@ func (svc *Service) ShowTestReminder(info ReminderInfo) {
 	info.TriggerID = time.Now().UnixMilli()
 	latest := info
 	svc.lastTestInfo = &latest
-	svc.ensureTestReminderWindowLocked(true)
+	notif := info.Notification
+	showDialog := false
+	if notif != nil && notif.UseNativeNotification {
+		svc.sendNativeNotificationLocked(info, notif.NativeNotificationSticky)
+	}
+	shouldShowWindow := true
+	alwaysOnTop := true
+	if notif != nil {
+		alwaysOnTop = notif.AlwaysOnTop
+		if notif.UseNativeDialog {
+			shouldShowWindow = false
+			showDialog = true
+		}
+	}
+	if shouldShowWindow {
+		svc.ensureTestReminderWindowLocked(true, alwaysOnTop)
+	} else if svc.testReminderWindow != nil {
+		svc.testReminderWindow.Hide()
+	}
 	svc.writeStateLocked(svc.testReminderStatePath, info)
 	svc.mu.Unlock()
+	if notif != nil && notif.UseNativeDialog {
+		svc.playAdhanForDialog(info, notif)
+	}
+	if showDialog {
+		svc.enqueueNativeDialog(info)
+	}
 
 	svc.app.Event.Emit("reminder:test-update", info)
 	log.Info("test reminder shown", "prayer", info.PrayerName, "state", info.State, "offsetMinutes", info.OffsetMinutes, "triggerId", info.TriggerID, "live", info.Live)
@@ -246,7 +317,7 @@ func (svc *Service) LastTestReminder() *ReminderInfo {
 	return &copy
 }
 
-func (svc *Service) ensureReminderWindowLocked(show bool) {
+func (svc *Service) ensureReminderWindowLocked(show bool, alwaysOnTop bool) {
 	if svc.reminderWindow == nil {
 		log.Info("creating reminder window")
 		svc.reminderWindow = svc.app.Window.NewWithOptions(application.WebviewWindowOptions{
@@ -258,7 +329,7 @@ func (svc *Service) ensureReminderWindowLocked(show bool) {
 			MaxHeight:        500,
 			MaxWidth:         500,
 			Frameless:        false,
-			AlwaysOnTop:      true,
+			AlwaysOnTop:      alwaysOnTop,
 			DisableResize:    false,
 			Hidden:           false,
 			URL:              "/reminder",
@@ -271,13 +342,16 @@ func (svc *Service) ensureReminderWindowLocked(show bool) {
 			svc.mu.Unlock()
 			svc.stopAudio()
 		})
-	} else if show {
+	} else {
+		svc.reminderWindow.SetAlwaysOnTop(alwaysOnTop)
+	}
+	if show {
 		log.Info("show reminder window")
 		svc.reminderWindow.Show()
 	}
 }
 
-func (svc *Service) ensureTestReminderWindowLocked(show bool) {
+func (svc *Service) ensureTestReminderWindowLocked(show bool, alwaysOnTop bool) {
 	if svc.testReminderWindow == nil {
 		log.Info("creating test reminder window")
 		svc.testReminderWindow = svc.app.Window.NewWithOptions(application.WebviewWindowOptions{
@@ -289,7 +363,7 @@ func (svc *Service) ensureTestReminderWindowLocked(show bool) {
 			MaxWidth:         500,
 			MaxHeight:        500,
 			Frameless:        false,
-			AlwaysOnTop:      true,
+			AlwaysOnTop:      alwaysOnTop,
 			DisableResize:    false,
 			Hidden:           false,
 			URL:              "/reminder?mode=test",
@@ -302,7 +376,10 @@ func (svc *Service) ensureTestReminderWindowLocked(show bool) {
 			svc.mu.Unlock()
 			svc.stopAudio()
 		})
-	} else if show {
+	} else {
+		svc.testReminderWindow.SetAlwaysOnTop(alwaysOnTop)
+	}
+	if show {
 		log.Info("show test reminder window")
 		svc.testReminderWindow.Show()
 	}
@@ -313,6 +390,136 @@ func (svc *Service) stopAudio() {
 		log.Info("stop adhan requested")
 		svc.audioSvc.Stop()
 	}
+}
+
+func (svc *Service) buildReminderText(info ReminderInfo) (string, string) {
+	prayer := info.PrayerName
+	switch info.State {
+	case StateOnTime:
+		return "Time for prayer", fmt.Sprintf("It's time for %s prayer.", prayer)
+	case StateAfter:
+		offset := info.OffsetMinutes
+		if offset <= 0 {
+			offset = info.MinutesLeft
+		}
+		if offset < 0 {
+			offset = -offset
+		}
+		return "Prayer reminder", fmt.Sprintf("%d minutes have passed since %s prayer.", offset, prayer)
+	default:
+		minutes := info.MinutesLeft
+		if minutes <= 0 {
+			minutes = -info.OffsetMinutes
+		}
+		if minutes < 0 {
+			minutes = -minutes
+		}
+		return "Prayer reminder", fmt.Sprintf("%s starts in %d minutes.", prayer, minutes)
+	}
+}
+
+func (svc *Service) showNativeDialog(info ReminderInfo) {
+	title, body := svc.buildReminderText(info)
+	dialog := svc.app.Dialog.Question().SetTitle(title).SetMessage(body)
+
+	dismiss := dialog.AddButton("Dismiss")
+	dismiss.OnClick(func() {
+		svc.stopAudio()
+	})
+
+	dialog.Show()
+}
+
+func (svc *Service) enqueueNativeDialog(info ReminderInfo) {
+	svc.mu.Lock()
+	closed := svc.dialogClosed
+	svc.mu.Unlock()
+	if closed {
+		log.Info("native dialog queue closed, skipping")
+		return
+	}
+	select {
+	case svc.dialogCh <- info:
+		log.Info("native dialog queued")
+	default:
+		log.Info("native dialog already in progress, skipping")
+	}
+}
+
+func (svc *Service) dialogWorker() {
+	for info := range svc.dialogCh {
+		svc.showNativeDialog(info)
+	}
+}
+
+// Shutdown stops the dialog worker and prevents new dialogs.
+func (svc *Service) Shutdown() {
+	svc.dialogCloseOnce.Do(func() {
+		svc.mu.Lock()
+		svc.dialogClosed = true
+		svc.mu.Unlock()
+		close(svc.dialogCh)
+	})
+}
+
+func (svc *Service) sendNativeNotificationLocked(info ReminderInfo, sticky bool) {
+	if svc.nativeNotifSvc == nil {
+		log.Warn("native notifications unavailable")
+		return
+	}
+	allowed, err := svc.nativeNotifSvc.CheckNotificationAuthorization()
+	if err != nil {
+		log.Warn("native notification permission check failed", "error", err)
+		return
+	}
+	if !allowed {
+		log.Warn("native notification permission not granted")
+		return
+	}
+	title, body := svc.buildReminderText(info)
+	id := fmt.Sprintf("reminder-%d", info.TriggerID)
+	if err := svc.nativeNotifSvc.SendNotification(notifications.NotificationOptions{
+		ID:    id,
+		Title: title,
+		Body:  body,
+	}); err != nil {
+		log.Error("native notification send failed", "error", err)
+	}
+	if sticky {
+		log.Info("native notification sticky requested (platform support may vary)")
+	}
+}
+
+func (svc *Service) playAdhanForDialog(info ReminderInfo, notif *ReminderNotificationSettings) {
+	if svc.audioSvc == nil || notif == nil {
+		return
+	}
+	if !notif.PlayAdhan || info.State != StateOnTime {
+		return
+	}
+	if strings.EqualFold(info.PrayerName, "Sunrise") {
+		return
+	}
+	isFajr := strings.EqualFold(info.PrayerName, "Fajr")
+	if err := svc.audioSvc.Play(isFajr, notif.AdhanVolume); err != nil {
+		log.Error("dialog adhan play failed", "error", err, "fajr", isFajr)
+	}
+}
+
+// CheckNativeNotificationPermission reports whether the OS allows notifications.
+func (svc *Service) CheckNativeNotificationPermission() (bool, error) {
+	if svc.nativeNotifSvc == nil {
+		return false, fmt.Errorf("native notification service not available")
+	}
+	return svc.nativeNotifSvc.CheckNotificationAuthorization()
+}
+
+// RequestNativeNotificationPermission prompts for notification permission.
+func (svc *Service) RequestNativeNotificationPermission() (bool, error) {
+	if svc.nativeNotifSvc == nil {
+		return false, fmt.Errorf("native notification service not available")
+	}
+	return svc.nativeNotifSvc.RequestNotificationAuthorization()
 }
 
 func (svc *Service) writeStateLocked(path string, info ReminderInfo) {

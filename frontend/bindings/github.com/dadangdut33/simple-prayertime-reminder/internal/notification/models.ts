@@ -62,6 +62,11 @@ export class ReminderNotificationSettings {
     "autoDismissSeconds": number;
     "autoDismissAfterAdhan": boolean;
     "playAdhan": boolean;
+    "adhanVolume": number;
+    "alwaysOnTop": boolean;
+    "useNativeNotification": boolean;
+    "nativeNotificationSticky": boolean;
+    "useNativeDialog": boolean;
 
     /** Creates a new ReminderNotificationSettings instance. */
     constructor($$source: Partial<ReminderNotificationSettings> = {}) {
@@ -76,6 +81,21 @@ export class ReminderNotificationSettings {
         }
         if (!("playAdhan" in $$source)) {
             this["playAdhan"] = false;
+        }
+        if (!("adhanVolume" in $$source)) {
+            this["adhanVolume"] = 0;
+        }
+        if (!("alwaysOnTop" in $$source)) {
+            this["alwaysOnTop"] = false;
+        }
+        if (!("useNativeNotification" in $$source)) {
+            this["useNativeNotification"] = false;
+        }
+        if (!("nativeNotificationSticky" in $$source)) {
+            this["nativeNotificationSticky"] = false;
+        }
+        if (!("useNativeDialog" in $$source)) {
+            this["useNativeDialog"] = false;
         }
 
         Object.assign(this, $$source);

@@ -124,6 +124,10 @@ export interface NotificationSettings {
   persistentReminder: boolean;
   autoDismissSeconds: number;
   autoDismissAfterAdhan: boolean;
+  alwaysOnTop: boolean;
+  useNativeNotification: boolean;
+  nativeNotificationSticky: boolean;
+  useNativeDialog: boolean;
   prayers: PerPrayerNotification;
 }
 
@@ -245,6 +249,11 @@ export interface ReminderNotificationSettings {
   autoDismissSeconds: number;
   autoDismissAfterAdhan: boolean;
   playAdhan: boolean;
+  adhanVolume: number;
+  alwaysOnTop: boolean;
+  useNativeNotification: boolean;
+  nativeNotificationSticky: boolean;
+  useNativeDialog: boolean;
 }
 
 export interface ReminderInfo {

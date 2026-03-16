@@ -123,6 +123,10 @@ export class NotificationSettings {
     "persistentReminder": boolean;
     "autoDismissSeconds": number;
     "autoDismissAfterAdhan": boolean;
+    "alwaysOnTop": boolean;
+    "useNativeNotification": boolean;
+    "nativeNotificationSticky": boolean;
+    "useNativeDialog": boolean;
     "prayers": PerPrayerNotification;
 
     /** Creates a new NotificationSettings instance. */
@@ -145,6 +149,18 @@ export class NotificationSettings {
         if (!("autoDismissAfterAdhan" in $$source)) {
             this["autoDismissAfterAdhan"] = false;
         }
+        if (!("alwaysOnTop" in $$source)) {
+            this["alwaysOnTop"] = false;
+        }
+        if (!("useNativeNotification" in $$source)) {
+            this["useNativeNotification"] = false;
+        }
+        if (!("nativeNotificationSticky" in $$source)) {
+            this["nativeNotificationSticky"] = false;
+        }
+        if (!("useNativeDialog" in $$source)) {
+            this["useNativeDialog"] = false;
+        }
         if (!("prayers" in $$source)) {
             this["prayers"] = (new PerPrayerNotification());
         }
@@ -156,10 +172,10 @@ export class NotificationSettings {
      * Creates a new NotificationSettings instance from a string or object.
      */
     static createFrom($$source: any = {}): NotificationSettings {
-        const $$createField6_0 = $$createType0;
+        const $$createField10_0 = $$createType0;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("prayers" in $$parsedSource) {
-            $$parsedSource["prayers"] = $$createField6_0($$parsedSource["prayers"]);
+            $$parsedSource["prayers"] = $$createField10_0($$parsedSource["prayers"]);
         }
         return new NotificationSettings($$parsedSource as Partial<NotificationSettings>);
     }

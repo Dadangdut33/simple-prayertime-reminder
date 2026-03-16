@@ -25,6 +25,10 @@ export const saveSettings = (s: Settings): Promise<void> =>
   AppService.SaveSettings(s as any) as any;
 export const resetSettings = (): Promise<Settings> =>
   AppService.ResetSettings() as any;
+export const checkNativeNotificationPermission = (): Promise<boolean> =>
+  AppService.CheckNativeNotificationPermission() as any;
+export const requestNativeNotificationPermission = (): Promise<boolean> =>
+  AppService.RequestNativeNotificationPermission() as any;
 
 // ---- Location ----
 export const getLocation = (): Promise<Location> =>
