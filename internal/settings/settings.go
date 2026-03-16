@@ -101,7 +101,7 @@ func DefaultSettings() Settings {
 		AfterMinutes:  20,
 	}
 	sunriseNotif := PrayerNotificationSetting{
-		Enabled:       false,
+		Enabled:       true,
 		BeforeMinutes: 10,
 		AfterMinutes:  20,
 	}
@@ -162,16 +162,16 @@ func DefaultSettings() Settings {
 			Cities: defaultWorldPrayerCities(),
 			SortBy: "name",
 		},
-		Theme:            "system",
-		ThemePreset:      "indigo",
-		Language:         "en",
-		LogLevel:         "info",
-		AutoStart:        false,
-		AutoCheckUpdates: true,
-		TrayLeftClick:    "toggle-window",
-		HijriDateOffset:  0,
-		TimeFormat:       "24h",
-		EnableTestTools:  false,
+		Theme:               "system",
+		ThemePreset:         "indigo",
+		Language:            "en",
+		LogLevel:            "info",
+		AutoStart:           false,
+		AutoCheckUpdates:    true,
+		TrayLeftClick:       "toggle-window",
+		HijriDateOffset:     0,
+		TimeFormat:          "24h",
+		EnableTestTools:     false,
 		OnboardingCompleted: false,
 	}
 }

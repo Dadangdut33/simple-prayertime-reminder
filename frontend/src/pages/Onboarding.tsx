@@ -9,6 +9,7 @@ import {
   Divider,
   FormControl,
   FormControlLabel,
+  Link,
   MenuItem,
   Select,
   Stack,
@@ -30,7 +31,8 @@ import { formatCityLabel, formatDigitalClock, getCountryName } from '../utils/he
 import { useAppStore } from '../store/appStore';
 import NumberField from '../components/ui/NumberField';
 import DashboardClockCard from '../components/pages/dashboard/DashboardClockCard';
-import { checkNativeNotificationPermission, requestNativeNotificationPermission } from '../bindings';
+import { checkNativeNotificationPermission, openURL, requestNativeNotificationPermission } from '../bindings';
+import { AVAILABLE_LANGUAGES, getLanguageLabel } from '../i18n';
 
 const THEME_PRESETS: { value: ThemePreset; labelKey: string }[] = [
   { value: 'indigo', labelKey: 'onboarding.appearance.presets.indigo' },
@@ -57,6 +59,7 @@ export default function Onboarding() {
   const [saving, setSaving] = useState(false);
   const [nativePermission, setNativePermission] = useState<boolean | null>(null);
   const [nativePermissionError, setNativePermissionError] = useState<string | null>(null);
+  const repoUrl = 'https://github.com/Dadangdut33/simple-prayertime-reminder';
 
   const [cityQuery, setCityQuery] = useState('');
   const [cityOptions, setCityOptions] = useState<CitySearchResult[]>([]);
@@ -317,6 +320,28 @@ export default function Onboarding() {
               </Box>
 
               <Box>
+                <Typography variant="subtitle1">{t('settings.general.appearance.language')}</Typography>
+                <FormControl size="small" sx={{ mt: 1, minWidth: 220 }}>
+                  <Select
+                    value={local.language}
+                    onChange={(event) => setTheme({ language: event.target.value as Settings['language'] })}
+                  >
+                    {AVAILABLE_LANGUAGES.map((lang) => (
+                      <MenuItem key={lang} value={lang}>
+                        {getLanguageLabel(lang)}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <Typography variant="caption" color="text.secondary" mt={1} display="block">
+                  {t('settings.general.appearance.languageNotePrefix')}{' '}
+                  <Link component="button" onClick={() => openURL(repoUrl)} sx={{ cursor: 'pointer' }}>
+                    {t('settings.general.appearance.languageNoteLink')}
+                  </Link>
+                </Typography>
+              </Box>
+
+              <Box>
                 <Typography variant="subtitle1">{t('onboarding.appearance.clockStyle')}</Typography>
                 <ToggleButtonGroup
                   exclusive
@@ -368,6 +393,8 @@ export default function Onboarding() {
                   />
                 </Stack>
               </Box>
+
+              <Alert severity="info">{t('settings.location.autoDetectDisclaimer')}</Alert>
 
               {!local.location.autoDetect && (
                 <Autocomplete

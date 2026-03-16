@@ -30,5 +30,6 @@ type ReminderInfo struct {
 	OffsetMinutes int                           `json:"offsetMinutes"`
 	TriggerID     int64                         `json:"triggerId"`
 	Live          bool                          `json:"live"`
+	Language      string                        `json:"language"`
 	Notification  *ReminderNotificationSettings `json:"notification,omitempty"`
 }

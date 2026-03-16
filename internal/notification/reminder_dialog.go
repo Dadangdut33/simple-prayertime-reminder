@@ -5,7 +5,7 @@ import (
 )
 
 func (svc *Service) showNativeDialog(info ReminderInfo) {
-	title, body := svc.buildReminderText(info)
+	title, body := svc.buildReminderText(info, true)
 	dialog := svc.app.Dialog.Question().SetTitle(title).SetMessage(body)
 
 	dismiss := dialog.AddButton("Dismiss")

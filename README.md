@@ -108,6 +108,16 @@ wails3 task dev
 
 This starts the Go backend, the Vite dev server for `frontend/`, and the desktop app together.
 
+### Contributing Translations
+
+We welcome translation contributions via pull request.
+
+1. Copy `frontend/src/i18n/locales/en.ts` to a new locale file (e.g. `frontend/src/i18n/locales/id.ts`).
+2. Add the new locale to `frontend/src/i18n/index.ts` resources.
+3. Use a standard language code (ISO 639-1 or BCP 47, e.g. `id`, `en-GB`).
+4. The language selector automatically lists available locales.
+5. Open a pull request with your changes.
+
 #### Using Fake Time
 
 When developing, you might want to mock your time and for this I provided a page to test the reminder option and I also make a simple wrapper for the time library in order for it to be compatible with libfaketime.

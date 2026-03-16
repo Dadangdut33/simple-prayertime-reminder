@@ -1,9 +1,13 @@
-import { Box, FormControlLabel, MenuItem, Select, Slider, Stack, Switch, TextField, Typography } from '@mui/material';
+import { Box, FormControlLabel, Link, MenuItem, Select, Slider, Stack, Switch, TextField, Typography } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AppsIcon from '@mui/icons-material/Apps';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined';
 import { DIGITAL_CLOCK_FORMAT_PRESETS, THEME_PRESETS, type Settings } from '../../../types';
+import { AVAILABLE_LANGUAGES, getLanguageLabel } from '../../../i18n';
+import { openURL } from '../../../bindings';
+
+const REPO_URL = 'https://github.com/Dadangdut33/simple-prayertime-reminder';
 import { useTranslation } from 'react-i18next';
 
 interface GeneralSettingsTabProps {
@@ -313,6 +317,39 @@ export default function GeneralSettingsTab({
                 <MenuItem value="dark">{t('settings.general.appearance.themeDark')}</MenuItem>
                 <MenuItem value="light">{t('settings.general.appearance.themeLight')}</MenuItem>
               </Select>
+            </Box>
+
+            <Box>
+              <Typography variant="caption" color="text.secondary" mb={1} display="block">
+                {t('settings.general.appearance.language')}
+              </Typography>
+              <Select
+                size="small"
+                fullWidth
+                value={local.language}
+                onChange={(event) =>
+                  setLocal({
+                    ...local,
+                    language: event.target.value as Settings['language'],
+                  })
+                }
+              >
+                {AVAILABLE_LANGUAGES.map((lang) => (
+                  <MenuItem key={lang} value={lang}>
+                    {getLanguageLabel(lang)}
+                  </MenuItem>
+                ))}
+              </Select>
+              <Typography variant="caption" color="text.secondary" mt={1} display="block">
+                {t('settings.general.appearance.languageNotePrefix')}{' '}
+                <Link
+                  component="button"
+                  onClick={() => openURL(REPO_URL)}
+                  sx={{ cursor: 'pointer' }}
+                >
+                  {t('settings.general.appearance.languageNoteLink')}
+                </Link>
+              </Typography>
             </Box>
           </Box>
 

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
+  Alert,
   Autocomplete,
   Box,
   Button,
@@ -175,6 +176,8 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
           />
         </Box>
       </Box>
+
+      <Alert severity="info">{t('settings.location.autoDetectDisclaimer')}</Alert>
 
       {!isAuto && (
         <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={3}>

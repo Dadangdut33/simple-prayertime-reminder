@@ -210,6 +210,7 @@ func (s *Service) SyncReminderTestWindow(prayerName string, offsetSeconds int, t
 			snapshot.PrayerName,
 			offsetMinutes,
 			live,
+			cfg.Language,
 			toReminderNotificationSettings(cfg.Notification),
 		)
 	}
@@ -234,6 +235,7 @@ func (s *Service) TriggerReminderTest(prayerName string, offsetSeconds int, time
 			MinutesLeft:   snapshot.MinutesLeft,
 			OffsetMinutes: offsetMinutes,
 			Live:          live,
+			Language:      cfg.Language,
 			Notification:  toReminderNotificationSettings(cfg.Notification),
 		})
 	}

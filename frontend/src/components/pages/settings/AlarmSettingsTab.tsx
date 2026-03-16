@@ -180,7 +180,11 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
             </Box>
             <Switch
               checked={local.notification.autoDismissAfterAdhan}
-              disabled={!local.notification.playAdhan || local.notification.useNativeDialog}
+              disabled={
+                !local.notification.playAdhan ||
+                local.notification.useNativeDialog ||
+                local.notification.persistentReminder
+              }
               onChange={(event) => setNotification({ autoDismissAfterAdhan: event.target.checked })}
             />
           </Box>

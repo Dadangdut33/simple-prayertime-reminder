@@ -104,6 +104,34 @@ export default function ReminderWindow({
         <Typography variant="body1" color="text.secondary" mb={3}>
           {subtitle}
         </Typography>
+        {state === 'after' && (
+          <Box
+            sx={{
+              mb: 3,
+              px: 2,
+              py: 1.5,
+              borderLeft: '3px solid',
+              borderColor: 'success.main',
+              bgcolor: 'action.hover',
+              textAlign: 'left',
+            }}
+          >
+            <Typography
+              variant="body2"
+              className="flex flex-col"
+              sx={{ mb: 1, whiteSpace: 'pre-line', fontStyle: 'italic' }}
+            >
+              {t('reminder.afterQuoteBefore')}
+              <Typography sx={{ fontWeight: 700, my: 1, fontStyle: 'normal', mx: 'auto' }}>
+                {t('reminder.afterQuoteEmphasis')}
+              </Typography>
+              {t('reminder.afterQuoteAfter')}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {t('reminder.afterReference')}
+            </Typography>
+          </Box>
+        )}
         {autoDismissSecondsLeft !== null && autoDismissSecondsLeft !== undefined && (
           <Typography variant="caption" color="text.secondary" display="block" mb={2}>
             {t('reminder.autoDismissIn', { seconds: autoDismissSecondsLeft })}
@@ -114,8 +142,8 @@ export default function ReminderWindow({
             {t('reminder.autoDismissAfterAdhan')}
           </Typography>
         )}
-        {extra}
-        {debug}
+        {/* {extra} */}
+        {/* {debug} */}
         {onDismiss && (
           <Button fullWidth size="large" variant="contained" onClick={onDismiss}>
             {dismissLabel ?? t('reminder.dismiss')}

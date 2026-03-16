@@ -20,7 +20,7 @@ func (svc *Service) sendNativeNotificationLocked(info ReminderInfo, sticky bool)
 		log.Warn("native notification permission not granted")
 		return
 	}
-	title, body := svc.buildReminderText(info)
+	title, body := svc.buildReminderText(info, false)
 	id := fmt.Sprintf("reminder-%d", info.TriggerID)
 	if err := svc.nativeNotifSvc.SendNotification(notifications.NotificationOptions{
 		ID:    id,

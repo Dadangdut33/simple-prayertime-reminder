@@ -7,6 +7,21 @@ import (
 	"github.com/wailsapp/wails/v3/pkg/events"
 )
 
+const (
+	// W
+	reminderW    = 440
+	reminderMinW = 380
+	reminderMaxW = 500
+	// H
+	reminderBaseH    = 280
+	reminderBaseMinH = 280
+	reminderBaseMaxH = 300
+	// After reminder have different height because of its size
+	reminderAfterH    = 580
+	reminderAfterMinH = 580
+	reminderAfterMaxH = 640
+)
+
 // ShowReminder creates or updates the reminder window with prayer info
 func (svc *Service) ShowReminder(info ReminderInfo) {
 	svc.mu.Lock()
@@ -32,8 +47,12 @@ func (svc *Service) ShowReminder(info ReminderInfo) {
 			showDialog = true
 		}
 	}
+	height, minHeight, maxHeight := reminderBaseH, reminderBaseMinH, reminderBaseMaxH
+	if info.State == StateAfter {
+		height, minHeight, maxHeight = reminderAfterH, reminderAfterMinH, reminderAfterMaxH
+	}
 	if shouldShowWindow {
-		svc.ensureReminderWindowLocked(true, alwaysOnTop)
+		svc.ensureReminderWindowLocked(true, alwaysOnTop, height, minHeight, maxHeight)
 	} else if svc.reminderWindow != nil {
 		svc.reminderWindow.Hide()
 	}
@@ -70,8 +89,12 @@ func (svc *Service) ShowTestReminder(info ReminderInfo) {
 			showDialog = true
 		}
 	}
+	height, minHeight, maxHeight := reminderBaseH, reminderBaseMinH, reminderBaseMaxH
+	if info.State == StateAfter {
+		height, minHeight, maxHeight = reminderAfterH, reminderAfterMinH, reminderAfterMaxH
+	}
 	if shouldShowWindow {
-		svc.ensureTestReminderWindowLocked(true, alwaysOnTop)
+		svc.ensureTestReminderWindowLocked(true, alwaysOnTop, height, minHeight, maxHeight)
 	} else if svc.testReminderWindow != nil {
 		svc.testReminderWindow.Hide()
 	}
@@ -95,16 +118,22 @@ func (svc *Service) UpdateTestState(
 	prayerName string,
 	offsetMinutes int,
 	live bool,
+	language string,
 	notif *ReminderNotificationSettings,
 ) {
 	triggerID := int64(0)
 	var previousNotif *ReminderNotificationSettings
+	previousLanguage := ""
 	if svc.lastTestInfo != nil {
 		triggerID = svc.lastTestInfo.TriggerID
 		previousNotif = svc.lastTestInfo.Notification
+		previousLanguage = svc.lastTestInfo.Language
 	}
 	if notif == nil {
 		notif = previousNotif
+	}
+	if language == "" {
+		language = previousLanguage
 	}
 	info := ReminderInfo{
 		PrayerName:    prayerName,
@@ -113,6 +142,7 @@ func (svc *Service) UpdateTestState(
 		OffsetMinutes: offsetMinutes,
 		TriggerID:     triggerID,
 		Live:          live,
+		Language:      language,
 		Notification:  notif,
 	}
 
@@ -204,17 +234,23 @@ func (svc *Service) LastTestReminder() *ReminderInfo {
 	return &copy
 }
 
-func (svc *Service) ensureReminderWindowLocked(show bool, alwaysOnTop bool) {
+func (svc *Service) ensureReminderWindowLocked(show bool, alwaysOnTop bool, height int, minHeight int, maxHeight int) {
+	log.Info(
+		"Reminder Window Params",
+		"height", height,
+		"minHeight", minHeight,
+		"alwaysOnTop", alwaysOnTop,
+	)
 	if svc.reminderWindow == nil {
 		log.Info("creating reminder window")
 		svc.reminderWindow = svc.app.Window.NewWithOptions(application.WebviewWindowOptions{
 			Title:            "Prayer Reminder",
-			Width:            480,
-			Height:           330,
-			MinWidth:         400,
-			MinHeight:        300,
-			MaxHeight:        500,
-			MaxWidth:         500,
+			Width:            reminderW,
+			Height:           height,
+			MinWidth:         reminderMinW,
+			MinHeight:        minHeight,
+			MaxHeight:        maxHeight,
+			MaxWidth:         reminderMaxW,
 			Frameless:        false,
 			AlwaysOnTop:      alwaysOnTop,
 			DisableResize:    false,
@@ -230,7 +266,11 @@ func (svc *Service) ensureReminderWindowLocked(show bool, alwaysOnTop bool) {
 			svc.stopAudio()
 		})
 	} else {
+		log.Info("reminder window still exist")
 		svc.reminderWindow.SetAlwaysOnTop(alwaysOnTop)
+		svc.reminderWindow.SetSize(reminderW, height)
+		svc.reminderWindow.SetMinSize(reminderMinW, minHeight)
+		svc.reminderWindow.SetMaxSize(reminderMaxW, maxHeight)
 	}
 	if show {
 		log.Info("show reminder window")
@@ -238,17 +278,24 @@ func (svc *Service) ensureReminderWindowLocked(show bool, alwaysOnTop bool) {
 	}
 }
 
-func (svc *Service) ensureTestReminderWindowLocked(show bool, alwaysOnTop bool) {
+func (svc *Service) ensureTestReminderWindowLocked(show bool, alwaysOnTop bool, height int, minHeight int, maxHeight int) {
+	log.Info(
+		"Test Reminder Window Params",
+		"height", height,
+		"minHeight", minHeight,
+		"alwaysOnTop", alwaysOnTop,
+	)
+	heightOffset := 0 // add h offset because debug window have some debug component
 	if svc.testReminderWindow == nil {
 		log.Info("creating test reminder window")
 		svc.testReminderWindow = svc.app.Window.NewWithOptions(application.WebviewWindowOptions{
 			Title:            "Prayer Reminder (Simulated)",
-			Width:            480,
-			Height:           370,
-			MinWidth:         400,
-			MinHeight:        300,
-			MaxWidth:         500,
-			MaxHeight:        500,
+			Width:            reminderW,
+			Height:           height + heightOffset,
+			MinWidth:         reminderMinW,
+			MinHeight:        minHeight,
+			MaxWidth:         reminderMaxW,
+			MaxHeight:        maxHeight,
 			Frameless:        false,
 			AlwaysOnTop:      alwaysOnTop,
 			DisableResize:    false,
@@ -264,7 +311,11 @@ func (svc *Service) ensureTestReminderWindowLocked(show bool, alwaysOnTop bool) 
 			svc.stopAudio()
 		})
 	} else {
+		log.Info("test reminder window still exist")
 		svc.testReminderWindow.SetAlwaysOnTop(alwaysOnTop)
+		svc.testReminderWindow.SetSize(reminderW, height+heightOffset)
+		svc.testReminderWindow.SetMinSize(reminderMinW, minHeight)
+		svc.testReminderWindow.SetMaxSize(reminderMaxW, maxHeight)
 	}
 	if show {
 		log.Info("show test reminder window")

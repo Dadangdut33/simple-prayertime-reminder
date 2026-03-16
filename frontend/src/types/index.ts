@@ -264,6 +264,7 @@ export interface ReminderInfo {
   offsetMinutes?: number;
   triggerId?: number;
   live?: boolean;
+  language?: string;
   notification?: ReminderNotificationSettings;
 }
 

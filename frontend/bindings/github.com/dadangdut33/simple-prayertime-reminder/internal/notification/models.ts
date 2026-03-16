@@ -15,6 +15,7 @@ export class ReminderInfo {
     "offsetMinutes": number;
     "triggerId": number;
     "live": boolean;
+    "language": string;
     "notification"?: ReminderNotificationSettings | null;
 
     /** Creates a new ReminderInfo instance. */
@@ -37,6 +38,9 @@ export class ReminderInfo {
         if (!("live" in $$source)) {
             this["live"] = false;
         }
+        if (!("language" in $$source)) {
+            this["language"] = "";
+        }
 
         Object.assign(this, $$source);
     }
@@ -45,10 +49,10 @@ export class ReminderInfo {
      * Creates a new ReminderInfo instance from a string or object.
      */
     static createFrom($$source: any = {}): ReminderInfo {
-        const $$createField6_0 = $$createType1;
+        const $$createField7_0 = $$createType1;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("notification" in $$parsedSource) {
-            $$parsedSource["notification"] = $$createField6_0($$parsedSource["notification"]);
+            $$parsedSource["notification"] = $$createField7_0($$parsedSource["notification"]);
         }
         return new ReminderInfo($$parsedSource as Partial<ReminderInfo>);
     }

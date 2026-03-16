@@ -18,15 +18,15 @@ const (
 
 func toReminderNotificationSettings(cfg settings.NotificationSettings) *notification.ReminderNotificationSettings {
 	return &notification.ReminderNotificationSettings{
-		PersistentReminder:   cfg.PersistentReminder,
-		AutoDismissSeconds:   cfg.AutoDismissSeconds,
-		AutoDismissAfterAdhan: cfg.AutoDismissAfterAdhan,
-		PlayAdhan:            cfg.PlayAdhan,
-		AdhanVolume:          cfg.AdhanVolume,
-		AlwaysOnTop:          cfg.AlwaysOnTop,
-		UseNativeNotification: cfg.UseNativeNotification,
+		PersistentReminder:       cfg.PersistentReminder,
+		AutoDismissSeconds:       cfg.AutoDismissSeconds,
+		AutoDismissAfterAdhan:    cfg.AutoDismissAfterAdhan,
+		PlayAdhan:                cfg.PlayAdhan,
+		AdhanVolume:              cfg.AdhanVolume,
+		AlwaysOnTop:              cfg.AlwaysOnTop,
+		UseNativeNotification:    cfg.UseNativeNotification,
 		NativeNotificationSticky: cfg.NativeNotificationSticky,
-		UseNativeDialog:      cfg.UseNativeDialog,
+		UseNativeDialog:          cfg.UseNativeDialog,
 	}
 }
 
@@ -117,14 +117,14 @@ func (svc *Service) scheduleDayReminders(cfg settings.Settings) {
 		if beforeTime.After(now) {
 			delay := beforeTime.Sub(now)
 			log.Info("schedule before reminder", "prayer", e.name, "delay", delay)
-			go svc.fireAfterDelay(e, notification.StateBefore, delay, notifCfg)
+			go svc.fireAfterDelay(e, notification.StateBefore, delay, notifCfg, cfg.Language)
 		}
 
 		// Schedule "on time" event
 		if e.t.After(now) {
 			delay := e.t.Sub(now)
 			log.Info("schedule on-time reminder", "prayer", e.name, "delay", delay)
-			go svc.fireAfterDelay(e, notification.StateOnTime, delay, notifCfg)
+			go svc.fireAfterDelay(e, notification.StateOnTime, delay, notifCfg, cfg.Language)
 		}
 
 		// Schedule "after" reminder
@@ -133,7 +133,7 @@ func (svc *Service) scheduleDayReminders(cfg settings.Settings) {
 			if afterTime.After(now) {
 				delay := afterTime.Sub(now)
 				log.Info("schedule after reminder", "prayer", e.name, "delay", delay)
-				go svc.fireAfterDelay(e, notification.StateAfter, delay, notifCfg)
+				go svc.fireAfterDelay(e, notification.StateAfter, delay, notifCfg, cfg.Language)
 			}
 		}
 	}
@@ -144,6 +144,7 @@ func (svc *Service) fireAfterDelay(
 	state notification.WindowState,
 	delay time.Duration,
 	notifCfg settings.NotificationSettings,
+	language string,
 ) {
 	select {
 	case <-svc.stopCh:
@@ -153,10 +154,11 @@ func (svc *Service) fireAfterDelay(
 
 	minutesLeft := 0
 	offsetMinutes := 0
-	if state == notification.StateBefore {
+	switch state {
+	case notification.StateBefore:
 		minutesLeft = entry.notifSettings.BeforeMinutes
 		offsetMinutes = -entry.notifSettings.BeforeMinutes
-	} else if state == notification.StateAfter {
+	case notification.StateAfter:
 		offsetMinutes = entry.notifSettings.AfterMinutes
 	}
 
@@ -165,6 +167,7 @@ func (svc *Service) fireAfterDelay(
 		State:         state,
 		MinutesLeft:   minutesLeft,
 		OffsetMinutes: offsetMinutes,
+		Language:      language,
 		Notification:  toReminderNotificationSettings(notifCfg),
 	})
 	log.Info("reminder fired", "prayer", entry.name, "state", state, "offsetMinutes", offsetMinutes)

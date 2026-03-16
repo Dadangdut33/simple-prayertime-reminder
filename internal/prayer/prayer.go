@@ -2,6 +2,7 @@ package prayer
 
 import (
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/clock"
@@ -119,6 +120,17 @@ func (svc *Service) computeYear(year int) ([]prayer.Schedule, error) {
 			Maghrib: time.Duration(cfgSnapshot.Offsets.Maghrib * float64(time.Minute)),
 			Isha:    time.Duration(cfgSnapshot.Offsets.Isha * float64(time.Minute)),
 		},
+	}
+
+	if math.IsNaN(prayerCfg.Latitude) || math.IsNaN(prayerCfg.Longitude) ||
+		math.IsInf(prayerCfg.Latitude, 0) || math.IsInf(prayerCfg.Longitude, 0) ||
+		prayerCfg.Latitude < -90 || prayerCfg.Latitude > 90 ||
+		prayerCfg.Longitude < -180 || prayerCfg.Longitude > 180 {
+		log.Error("invalid coordinates for prayer calculation",
+			"latitude", prayerCfg.Latitude,
+			"longitude", prayerCfg.Longitude,
+		)
+		return nil, fmt.Errorf("invalid coordinates: lat=%v lon=%v", prayerCfg.Latitude, prayerCfg.Longitude)
 	}
 
 	schedules, err := prayer.Calculate(prayerCfg, year)

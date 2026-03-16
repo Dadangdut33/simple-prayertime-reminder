@@ -277,6 +277,7 @@ export default function ReminderPage() {
       autoDismissSecondsLeft={autoDismissSecondsLeft}
       autoDismissAfterAdhan={autoDismissAfterAdhanActive}
       extra={extraNode}
+      cardSx={displayState === 'after' ? { minHeight: 520 } : undefined}
       onDismiss={async () => {
         if (isTest) {
           await dismissTestReminder();

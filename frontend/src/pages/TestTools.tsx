@@ -19,12 +19,14 @@ import { useAppStore } from '../store/appStore';
 import {
   getDebugTimeInfo,
   getReminderTestSnapshot,
+  openURL,
   searchTimezones,
   syncReminderTestWindow,
   triggerReminderTest,
 } from '../bindings';
-import type { DebugTimeInfo, ReminderTestSnapshot } from '../types';
+import type { DebugTimeInfo, ReminderTestSnapshot, UpdateInfo } from '../types';
 import NumberField from '../components/ui/NumberField';
+import UpdateAvailableDialog from '../components/app/UpdateAvailableDialog';
 
 const PRAYER_OPTIONS = ['Fajr', 'Sunrise', 'Zuhr', 'Asr', 'Maghrib', 'Isha'] as const;
 
@@ -43,6 +45,7 @@ export default function TestToolsPage() {
   const [liveStart, setLiveStart] = useState<number | null>(null);
   const [snapshot, setSnapshot] = useState<ReminderTestSnapshot | null>(null);
   const [debugTimeInfo, setDebugTimeInfo] = useState<DebugTimeInfo | null>(null);
+  const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const requestIdRef = useRef(0);
@@ -197,6 +200,18 @@ export default function TestToolsPage() {
     );
   }
 
+  const mockUpdate: UpdateInfo = {
+    hasUpdate: true,
+    latestVersion: '2.1.0',
+    currentVersion: '2.0.0',
+    updateTitle: t('updates.available'),
+    updateDetail: t('updates.versionNotice', { latest: '2.1.0', current: '2.0.0' }),
+    installMethod: 'GitHub',
+    actionLabel: t('updates.openLatest'),
+    releaseUrl: 'https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest',
+    updateCommand: '',
+  };
+
   return (
     <Box p={4} display="flex" flexDirection="column" gap={3}>
       <Box display="flex" alignItems="center" gap={1.5}>
@@ -223,17 +238,29 @@ export default function TestToolsPage() {
       </Box>
 
       <Box display="flex" justifyContent="flex-end">
-        <Button
-          variant="outlined"
-          size="small"
-          onClick={async () => {
-            if (!settings) return;
-            await updateSettings({ ...settings, onboardingCompleted: false });
-          }}
-        >
-          {t('reminderTest.redoOnboarding')}
-        </Button>
+        <Box display="flex" gap={1}>
+          <Button variant="outlined" size="small" onClick={() => setShowUpdateDialog(true)}>
+            {t('reminderTest.showUpdateDialog')}
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={async () => {
+              if (!settings) return;
+              await updateSettings({ ...settings, onboardingCompleted: false });
+            }}
+          >
+            {t('reminderTest.redoOnboarding')}
+          </Button>
+        </Box>
       </Box>
+
+      <UpdateAvailableDialog
+        open={showUpdateDialog}
+        update={mockUpdate}
+        onClose={() => setShowUpdateDialog(false)}
+        onOpenAction={async () => openURL(mockUpdate.releaseUrl)}
+      />
 
       <Box display="grid" gridTemplateColumns={{ xs: '1fr', lg: '1fr 1fr' }} gap={3}>
         <Box
