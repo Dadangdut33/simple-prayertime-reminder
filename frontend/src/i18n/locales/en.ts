@@ -383,7 +383,7 @@ const en = {
     today: 'Today',
     arabicDigits: 'Arabic Hijri digits',
     hijriModeHint:
-      'Hijri mode emphasizes Hijri day numbers while keeping the month aligned with the selected Gregorian schedule range.',
+      'Hijri mode aligns the schedule range to the selected Hijri month instead of the Gregorian month.',
     selectedDay: 'Selected Day',
     noSchedule: 'No prayer schedule was found for the selected day.',
     range: 'Export range: {{start}} - {{end}}',

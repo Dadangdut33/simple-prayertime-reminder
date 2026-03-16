@@ -38,6 +38,9 @@ importers:
       dayjs:
         specifier: ^1.11.19
         version: 1.11.19
+      dayjs-hijri:
+        specifier: ^1.0.1
+        version: 1.0.1
       html2canvas:
         specifier: ^1.4.1
         version: 1.4.1
@@ -1028,6 +1031,9 @@ packages:
 
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
+
+  dayjs-hijri@1.0.1:
+    resolution: {integrity: sha512-xq1sQVEcxxuEVBVHYGjgurORQtv9iRaZTCIiyZ3Cmo+PvuLjTWGHVB6xlAQKeyw+ZkZHgnsAh1PolbwA3DFwqg==}
 
   dayjs@1.11.19:
     resolution: {integrity: sha512-t5EcLVS6QPBNqM2z8fakk/NKel+Xzshgt8FFKAn+qwlD1pzZWxh0nVCrvFK7ZDb6XucZeF9z8C7CBWTRIVApAw==}
@@ -2680,6 +2686,8 @@ snapshots:
   css-selector-parser@3.3.0: {}
 
   csstype@3.2.3: {}
+
+  dayjs-hijri@1.0.1: {}
 
   dayjs@1.11.19: {}
 

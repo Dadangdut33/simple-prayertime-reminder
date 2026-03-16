@@ -30,6 +30,11 @@ interface PrayerTimesCalendarViewProps {
   useArabicIndicDigits: boolean;
   onSelectedDateChange: (date: Dayjs) => void;
   onMonthChange: (month: Dayjs) => void;
+  onPrevMonth: () => void;
+  onNextMonth: () => void;
+  hijriMonth: number | null;
+  hijriYear: number | null;
+  onHijriMonthYearChange: (year: number, month: number) => void;
 }
 
 export default function PrayerTimesCalendarView({
@@ -43,6 +48,11 @@ export default function PrayerTimesCalendarView({
   useArabicIndicDigits,
   onSelectedDateChange,
   onMonthChange,
+  onPrevMonth,
+  onNextMonth,
+  hijriMonth,
+  hijriYear,
+  onHijriMonthYearChange,
 }: PrayerTimesCalendarViewProps) {
   const { t } = useTranslation();
   const isSideBySide = calendarSystem === 'side-by-side';
@@ -93,6 +103,11 @@ export default function PrayerTimesCalendarView({
                 selectedDate={selectedDate}
                 onSelectedDateChange={onSelectedDateChange}
                 onMonthChange={onMonthChange}
+                onPrevMonth={onPrevMonth}
+                onNextMonth={onNextMonth}
+                hijriMonth={hijriMonth}
+                hijriYear={hijriYear}
+                onHijriMonthYearChange={onHijriMonthYearChange}
                 loading={loading}
                 hijriByDate={hijriByDate}
                 useArabicIndicDigits={useArabicIndicDigits}
@@ -123,6 +138,11 @@ export default function PrayerTimesCalendarView({
                   selectedDate={selectedDate}
                   onSelectedDateChange={onSelectedDateChange}
                   onMonthChange={onMonthChange}
+                  onPrevMonth={onPrevMonth}
+                  onNextMonth={onNextMonth}
+                  hijriMonth={hijriMonth}
+                  hijriYear={hijriYear}
+                  onHijriMonthYearChange={onHijriMonthYearChange}
                   loading={loading}
                   hijriByDate={hijriByDate}
                   useArabicIndicDigits={useArabicIndicDigits}

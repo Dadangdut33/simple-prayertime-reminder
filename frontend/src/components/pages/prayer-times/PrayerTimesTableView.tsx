@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 
 interface PrayerTimesTableViewProps {
   activeMonth: Dayjs;
+  activeMonthLabel: string;
   loading: boolean;
   schedules: DaySchedule[];
   hijriDays: HijriCalendarDay[];
@@ -38,6 +39,7 @@ function formatDateShort(dateStr: string): string {
 
 export default function PrayerTimesTableView({
   activeMonth,
+  activeMonthLabel,
   loading,
   schedules,
   hijriDays,
@@ -60,7 +62,7 @@ export default function PrayerTimesTableView({
       >
         <Box display="flex" alignItems="center" gap={1.5}>
           <CalendarMonthIcon color="primary" />
-          <Typography variant="h3">{activeMonth.format('MMMM YYYY')}</Typography>
+          <Typography variant="h3">{activeMonthLabel || activeMonth.format('MMMM YYYY')}</Typography>
         </Box>
 
         <Box display="flex" gap={1} alignItems="center">

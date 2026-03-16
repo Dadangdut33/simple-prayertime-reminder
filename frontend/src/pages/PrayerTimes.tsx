@@ -4,6 +4,7 @@ import {
   exportRangeToCSV,
   exportRangeToExcel,
   getHijriDateRange,
+  getHijriForDate,
   getMonthHijriDates,
   getMonthSchedule,
   getScheduleRange,
@@ -157,6 +158,40 @@ interface ExportProgressState {
   detail: string;
 }
 
+interface HijriMonthRange {
+  start: Dayjs;
+  end: Dayjs;
+  label: string;
+}
+
+async function getHijriMonthRangeForDate(date: Dayjs): Promise<HijriMonthRange | null> {
+  const isoDate = date.format('YYYY-MM-DD');
+  const hijriDate = await getHijriForDate(isoDate);
+  const searchStart = date.subtract(40, 'day');
+  const searchEnd = date.add(40, 'day');
+  const rangeDays = await getHijriDateRange(
+    searchStart.format('YYYY-MM-DD'),
+    searchEnd.format('YYYY-MM-DD'),
+  );
+  const monthDays = rangeDays.filter(
+    (day) => day.hijri.year === hijriDate.year && day.hijri.month === hijriDate.month,
+  );
+
+  if (monthDays.length === 0) {
+    return null;
+  }
+
+  const sorted = [...monthDays].sort((a, b) => a.date.localeCompare(b.date));
+  const start = dayjs(sorted[0].date);
+  const end = dayjs(sorted[sorted.length - 1].date);
+
+  return {
+    start,
+    end,
+    label: getHijriMonthRangeLabel(monthDays),
+  };
+}
+
 export default function PrayerTimes() {
   const { t } = useTranslation();
   const { settings, updateSettings } = useAppStore();
@@ -179,12 +214,21 @@ export default function PrayerTimes() {
   const [useTwoColumnPrayerGrid, setUseTwoColumnPrayerGrid] = useState(true);
   const [exportSchedulesData, setExportSchedulesData] = useState<DaySchedule[]>([]);
   const [exportHijriDaysData, setExportHijriDaysData] = useState<HijriCalendarDay[]>([]);
+  const [hijriRange, setHijriRange] = useState<HijriMonthRange | null>(null);
   const calendarPdfRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const tablePdfRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const skipNextPreferenceSave = useRef(false);
+  const hijriAnchorPending = useRef(false);
+  const selectedDateKey = useMemo(() => selectedDate.format('YYYY-MM-DD'), [selectedDate]);
 
   const activeMonthKey = useMemo(() => selectedDate.format('YYYY-MM'), [selectedDate]);
   const activeMonth = useMemo(() => selectedDate.startOf('month'), [activeMonthKey]);
+  const activeMonthLabel = useMemo(() => {
+    if (calendarSystem === 'hijri') {
+      return hijriRange?.label ?? formatMonthHeading(activeMonth);
+    }
+    return formatMonthHeading(activeMonth);
+  }, [activeMonth, calendarSystem, hijriRange]);
   const exportRangeLabel = useMemo(
     () => formatExportRangeLabel(exportStartDate, exportEndDate),
     [exportEndDate, exportStartDate],
@@ -196,6 +240,11 @@ export default function PrayerTimes() {
   const exportHijriByDate = useMemo(
     () => buildHijriMap(exportHijriDaysData),
     [exportHijriDaysData],
+  );
+  const hijriByDate = useMemo(() => buildHijriMap(hijriDays), [hijriDays]);
+  const selectedHijri = useMemo(
+    () => hijriByDate[selectedDate.format('YYYY-MM-DD')] ?? null,
+    [hijriByDate, selectedDate],
   );
   const exportSchedulesByMonth = useMemo(
     () =>
@@ -251,6 +300,21 @@ export default function PrayerTimes() {
   }, [settings]);
 
   useEffect(() => {
+    if (calendarSystem === 'hijri') {
+      hijriAnchorPending.current = true;
+    }
+  }, [calendarSystem]);
+
+  useEffect(() => {
+    if (calendarSystem !== 'hijri' || !hijriRange || !hijriAnchorPending.current) {
+      return;
+    }
+
+    hijriAnchorPending.current = false;
+    setSelectedDate(hijriRange.start);
+  }, [calendarSystem, hijriRange]);
+
+  useEffect(() => {
     if (!settings) {
       return;
     }
@@ -297,6 +361,10 @@ export default function PrayerTimes() {
   }, [activeMonth]);
 
   useEffect(() => {
+    if (calendarSystem === 'hijri') {
+      return;
+    }
+
     let active = true;
     setLoading(true);
 
@@ -309,6 +377,7 @@ export default function PrayerTimes() {
           return;
         }
 
+        setHijriRange(null);
         setSchedules(scheduleRows);
         setHijriDays(hijriRows);
         setLoading(false);
@@ -323,10 +392,126 @@ export default function PrayerTimes() {
     return () => {
       active = false;
     };
-  }, [activeMonth]);
+  }, [activeMonth, calendarSystem]);
+
+  useEffect(() => {
+    if (calendarSystem !== 'hijri') {
+      return;
+    }
+
+    let active = true;
+    if (
+      hijriRange &&
+      !selectedDate.isBefore(hijriRange.start, 'day') &&
+      !selectedDate.isAfter(hijriRange.end, 'day')
+    ) {
+      return () => {
+        active = false;
+      };
+    }
+
+    setLoading(true);
+
+    (async () => {
+      try {
+        const range = await getHijriMonthRangeForDate(selectedDate);
+        if (!active) {
+          return;
+        }
+
+        if (!range) {
+          setLoading(false);
+          return;
+        }
+
+        const startIso = range.start.format('YYYY-MM-DD');
+        const endIso = range.end.format('YYYY-MM-DD');
+        const [scheduleRows, hijriRows] = await Promise.all([
+          getScheduleRange(startIso, endIso),
+          getHijriDateRange(startIso, endIso),
+        ]);
+
+        if (!active) {
+          return;
+        }
+
+        setHijriRange(range);
+        setSchedules(scheduleRows);
+        setHijriDays(hijriRows);
+        setLoading(false);
+      } catch (error) {
+        console.error(error);
+        if (active) {
+          setLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [calendarSystem, hijriRange, selectedDate, selectedDateKey]);
 
   const setMonth = (month: Dayjs) => {
     setSelectedDate((current) => moveToMonth(current, month.startOf('month')));
+  };
+
+  const handlePrevMonth = () => {
+    if (calendarSystem === 'hijri' && hijriRange) {
+      hijriAnchorPending.current = true;
+      setSelectedDate(hijriRange.start.subtract(1, 'day'));
+      return;
+    }
+    setMonth(activeMonth.subtract(1, 'month'));
+  };
+
+  const handleNextMonth = () => {
+    if (calendarSystem === 'hijri' && hijriRange) {
+      hijriAnchorPending.current = true;
+      setSelectedDate(hijriRange.end.add(1, 'day'));
+      return;
+    }
+    setMonth(activeMonth.add(1, 'month'));
+  };
+
+  const handleHijriMonthYearChange = async (year: number, month: number) => {
+    if (!selectedHijri) {
+      return;
+    }
+
+    if (selectedHijri.year === year && selectedHijri.month === month) {
+      if (hijriRange) {
+        setSelectedDate(hijriRange.start);
+      }
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const yearDiff = year - selectedHijri.year;
+      const seed = selectedDate.add(yearDiff * 354, 'day');
+      const rangeStart = seed.subtract(430, 'day');
+      const rangeEnd = seed.add(430, 'day');
+      const days = await getHijriDateRange(
+        rangeStart.format('YYYY-MM-DD'),
+        rangeEnd.format('YYYY-MM-DD'),
+      );
+      const matches = days
+        .filter((day) => day.hijri.year === year && day.hijri.month === month)
+        .sort((a, b) => a.date.localeCompare(b.date));
+
+      if (matches.length > 0) {
+        hijriAnchorPending.current = true;
+        setSelectedDate(dayjs(matches[0].date));
+        return;
+      }
+
+      setSelectedDate(seed);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const captureElement = async (
@@ -531,7 +716,7 @@ export default function PrayerTimes() {
       <PrayerTimesHeader onExport={() => setExportDialogOpen(true)} />
 
       <PrayerTimesControls
-        activeMonthLabel={formatMonthHeading(activeMonth)}
+        activeMonthLabel={activeMonthLabel}
         viewMode={viewMode}
         calendarSystem={calendarSystem}
         useArabicIndicDigits={useArabicIndicDigits}
@@ -544,12 +729,13 @@ export default function PrayerTimes() {
       {viewMode === 'table' ? (
         <PrayerTimesTableView
           activeMonth={activeMonth}
+          activeMonthLabel={activeMonthLabel}
           loading={loading}
           schedules={schedules}
           hijriDays={hijriDays}
           timeFormat={settings?.timeFormat ?? '24h'}
-          onPrevMonth={() => setMonth(activeMonth.subtract(1, 'month'))}
-          onNextMonth={() => setMonth(activeMonth.add(1, 'month'))}
+          onPrevMonth={handlePrevMonth}
+          onNextMonth={handleNextMonth}
           onToday={() => setSelectedDate(dayjs())}
         />
       ) : (
@@ -564,6 +750,11 @@ export default function PrayerTimes() {
           useArabicIndicDigits={useArabicIndicDigits}
           onSelectedDateChange={setSelectedDate}
           onMonthChange={setMonth}
+          onPrevMonth={handlePrevMonth}
+          onNextMonth={handleNextMonth}
+          hijriMonth={selectedHijri?.month ?? null}
+          hijriYear={selectedHijri?.year ?? null}
+          onHijriMonthYearChange={handleHijriMonthYearChange}
         />
       )}
 
