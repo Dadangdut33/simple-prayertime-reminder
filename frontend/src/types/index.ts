@@ -239,6 +239,7 @@ export interface Settings {
   hijriDateOffset: number;
   timeFormat: '12h' | '24h';
   enableTestTools: boolean;
+  onboardingCompleted: boolean;
 }
 
 // ---- Reminder event ----

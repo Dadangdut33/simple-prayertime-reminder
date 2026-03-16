@@ -15,7 +15,7 @@ import WorldPrayerTimes from './pages/WorldPrayerTimes';
 import Quran from './pages/Quran';
 import SettingsPage from './pages/Settings';
 import ReminderPage from './pages/Reminder';
-import ReminderTestPage from './pages/ReminderTest';
+import TestToolsPage from './pages/TestTools';
 import AboutPage from './pages/About';
 import ThemeProvider from './ThemeProvider';
 
@@ -31,7 +31,7 @@ const router = createBrowserRouter([
       { path: 'settings', element: <SettingsPage /> },
       { path: 'about', element: <AboutPage /> },
       { path: 'reminder', element: <ReminderPage /> },
-      { path: 'reminder-test', element: <ReminderTestPage /> },
+      { path: 'test-tools', element: <TestToolsPage /> },
     ],
   },
 ]);

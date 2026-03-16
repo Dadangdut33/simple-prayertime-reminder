@@ -457,6 +457,7 @@ export class Settings {
     "hijriDateOffset": number;
     "timeFormat": string;
     "enableTestTools": boolean;
+    "onboardingCompleted": boolean;
 
     /** Creates a new Settings instance. */
     constructor($$source: Partial<Settings> = {}) {
@@ -507,6 +508,9 @@ export class Settings {
         }
         if (!("enableTestTools" in $$source)) {
             this["enableTestTools"] = false;
+        }
+        if (!("onboardingCompleted" in $$source)) {
+            this["onboardingCompleted"] = false;
         }
 
         Object.assign(this, $$source);

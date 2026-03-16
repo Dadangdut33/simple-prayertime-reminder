@@ -28,9 +28,9 @@ import NumberField from '../components/ui/NumberField';
 
 const PRAYER_OPTIONS = ['Fajr', 'Sunrise', 'Zuhr', 'Asr', 'Maghrib', 'Isha'] as const;
 
-export default function ReminderTestPage() {
+export default function TestToolsPage() {
   const { t } = useTranslation();
-  const { settings } = useAppStore();
+  const { settings, updateSettings } = useAppStore();
   const [prayerName, setPrayerName] = useState<(typeof PRAYER_OPTIONS)[number]>('Fajr');
   const [offsetMinutes, setOffsetMinutes] = useState(0);
   const [timezone, setTimezone] = useState('');
@@ -220,6 +220,19 @@ export default function ReminderTestPage() {
             {t('reminderTest.subtitle')}
           </Typography>
         </Box>
+      </Box>
+
+      <Box display="flex" justifyContent="flex-end">
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={async () => {
+            if (!settings) return;
+            await updateSettings({ ...settings, onboardingCompleted: false });
+          }}
+        >
+          {t('reminderTest.redoOnboarding')}
+        </Button>
       </Box>
 
       <Box display="grid" gridTemplateColumns={{ xs: '1fr', lg: '1fr 1fr' }} gap={3}>

@@ -5,6 +5,7 @@ import * as api from './bindings';
 import UpdateAvailableDialog from './components/app/UpdateAvailableDialog';
 import type { UpdateInfo } from './types';
 import { useTranslation } from 'react-i18next';
+import Onboarding from './pages/Onboarding';
 
 import {
   Box,
@@ -42,7 +43,7 @@ const NAV_ITEMS = [
   { to: '/prayer-times', labelKey: 'nav.prayerTimes', icon: AccessTimeIcon },
   { to: '/world-cities', labelKey: 'nav.worldCities', icon: PublicIcon },
   { to: '/quran', labelKey: 'nav.quran', icon: MenuBookIcon },
-  { to: '/reminder-test', labelKey: 'nav.testTools', icon: BugReportOutlinedIcon },
+  { to: '/test-tools', labelKey: 'nav.testTools', icon: BugReportOutlinedIcon },
   { to: '/settings', labelKey: 'nav.settings', icon: SettingsIcon },
   { to: '/about', labelKey: 'nav.about', icon: InfoOutlinedIcon },
 ];
@@ -111,11 +112,15 @@ export default function App() {
     );
   }
 
+  if (settings && !settings.onboardingCompleted) {
+    return <Onboarding />;
+  }
+
   const drawerWidth = drawerCollapsed ? DRAWER_COLLAPSED_WIDTH : DRAWER_WIDTH;
 
   const visibleNavItems = settings?.enableTestTools
     ? NAV_ITEMS
-    : NAV_ITEMS.filter((item) => item.to !== '/reminder-test');
+    : NAV_ITEMS.filter((item) => item.to !== '/test-tools');
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>

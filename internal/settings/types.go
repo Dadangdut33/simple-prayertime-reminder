@@ -134,6 +134,7 @@ type Settings struct {
 	HijriDateOffset  int                  `json:"hijriDateOffset"`
 	TimeFormat       string               `json:"timeFormat"`
 	EnableTestTools  bool                 `json:"enableTestTools"`
+	OnboardingCompleted bool              `json:"onboardingCompleted"`
 }
 
 // Service handles settings loading and saving

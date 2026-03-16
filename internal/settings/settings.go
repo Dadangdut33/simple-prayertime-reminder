@@ -172,6 +172,7 @@ func DefaultSettings() Settings {
 		HijriDateOffset:  0,
 		TimeFormat:       "24h",
 		EnableTestTools:  false,
+		OnboardingCompleted: false,
 	}
 }
 
@@ -201,9 +202,16 @@ func (s *Service) Load() error {
 		return err
 	}
 
+	var raw map[string]json.RawMessage
+	_ = json.Unmarshal(data, &raw)
+	_, hasOnboarding := raw["onboardingCompleted"]
+
 	loaded := DefaultSettings()
 	if err := json.Unmarshal(data, &loaded); err != nil {
 		return fmt.Errorf("invalid settings JSON: %w", err)
+	}
+	if !hasOnboarding {
+		loaded.OnboardingCompleted = true
 	}
 
 	s.settings = loaded
