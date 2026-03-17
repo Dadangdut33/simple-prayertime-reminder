@@ -43,3 +43,11 @@ export function useClock(): Date {
   }, []);
   return now;
 }
+
+export function useIsRendering(): boolean {
+  const [isRendering, setIsRendering] = useState(true);
+  useEffect(() => {
+    setIsRendering(false);
+  }, []);
+  return isRendering;
+}

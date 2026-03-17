@@ -134,6 +134,8 @@ export const dismissReminder = (): Promise<void> =>
   AppService.DismissReminder() as any;
 export const dismissTestReminder = (): Promise<void> =>
   AppService.DismissTestReminder() as any;
+export const closeTestReminderWindow = (): Promise<void> =>
+  AppService.CloseTestReminderWindow() as any;
 export const emitReminderInfo = (): Promise<void> =>
   AppService.EmitReminderInfo() as any;
 export const emitTestReminderInfo = (): Promise<void> =>
@@ -147,6 +149,8 @@ export const getTestReminderState = (): Promise<ReminderInfo | null> =>
 export const playAdhan = (isFajr: boolean): Promise<void> =>
   AppService.PlayAdhan(isFajr) as any;
 export const stopAdhan = (): Promise<void> => AppService.StopAdhan() as any;
+export const resizeReminderWindow = (state: string, isTest: boolean): Promise<void> =>
+  AppService.ResizeReminderWindow(state, isTest) as any;
 
 // ---- Time ----
 export const getCurrentTime = (): Promise<string> =>

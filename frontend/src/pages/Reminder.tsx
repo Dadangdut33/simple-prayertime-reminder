@@ -1,13 +1,3 @@
-declare global {
-  interface Window {
-    wails?: {
-      Events?: {
-        On: (eventName: string, callback: (...args: any[]) => void) => void;
-      };
-    };
-  }
-}
-
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import {
@@ -18,14 +8,16 @@ import {
   getReminderState,
   getTestReminderState,
   playAdhan,
+  resizeReminderWindow,
 } from '../bindings';
 import type { ReminderInfo } from '../types';
 import { PRAYER_NAME_FAJR, PRAYER_NAME_SUNRISE } from '../types';
 import { useTranslation } from 'react-i18next';
 import { getPrayerDisplayName } from '../utils/helpers';
 import { useAppStore } from '../store/appStore';
-import { useClock, useInterval } from '../hooks';
+import { useClock } from '../hooks';
 import ReminderWindow from '../components/reminder/ReminderWindow';
+import { Events } from '@wailsio/runtime';
 
 export default function ReminderPage() {
   const { t } = useTranslation();
@@ -40,6 +32,7 @@ export default function ReminderPage() {
   const infoReceivedAtRef = useRef<number | null>(null);
   const prayerTimeMsRef = useRef<number | null>(null);
   const clock = useClock();
+  const lastResizeStateRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!initialized) {
@@ -93,16 +86,13 @@ export default function ReminderPage() {
   };
 
   useEffect(() => {
-    if (window.wails?.Events?.On) {
-      const eventName = isTest ? 'reminder:test-update' : 'reminder:update';
-      window.wails.Events.On(eventName, () => {
-        void (isTest ? getTestReminderState() : getReminderState()).then((state) => {
-          applyInfo(state, true);
-        });
+    const eventName = isTest ? 'reminder:test-update' : 'reminder:update';
+    Events.On(eventName, () => {
+      void (isTest ? getTestReminderState() : getReminderState()).then((state) => {
+        applyInfo(state, true);
       });
-    }
+    });
 
-    document.body.style.background = 'transparent';
     if (isTest) {
       void emitTestReminderInfo();
       void getTestReminderState().then((data) => {
@@ -116,16 +106,9 @@ export default function ReminderPage() {
     }
 
     return () => {
-      document.body.style.background = '';
+      Events.Off(eventName);
     };
   }, [isTest]);
-
-  useInterval(() => {
-    void (isTest ? getTestReminderState() : getReminderState()).then((state) => {
-      if (!state) return;
-      applyInfo(state);
-    });
-  }, 2000);
 
   const prayerName = info?.prayerName ? getPrayerDisplayName(info.prayerName) : t('reminder.prayerFallback');
   const state = info?.state ?? 'before';
@@ -160,6 +143,14 @@ export default function ReminderPage() {
     }
   }
 
+  // check for resize if display state change when the window is still up
+  useEffect(() => {
+    if (!hasState || !info) return;
+    if (lastResizeStateRef.current === displayState) return;
+    lastResizeStateRef.current = displayState;
+    void resizeReminderWindow(displayState, isTest);
+  }, [displayState, hasState, info, isTest]);
+
   useEffect(() => {
     if (!notificationSettings) return;
     if (!info) return;
@@ -170,7 +161,11 @@ export default function ReminderPage() {
       notificationSettings.playAdhan &&
       displayState === 'ontime';
 
-    if (!notificationSettings.persistentReminder && notificationSettings.autoDismissSeconds > 0 && !shouldWaitForAdhan) {
+    if (
+      !notificationSettings.persistentReminder &&
+      notificationSettings.autoDismissSeconds > 0 &&
+      !shouldWaitForAdhan
+    ) {
       const baseTime = infoReceivedAtRef.current ?? Date.now();
       autoDismissAtRef.current = baseTime + notificationSettings.autoDismissSeconds * 1000;
     } else {

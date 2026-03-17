@@ -23,6 +23,7 @@ import {
   searchTimezones,
   syncReminderTestWindow,
   triggerReminderTest,
+  closeTestReminderWindow,
 } from '../bindings';
 import type { DebugTimeInfo, ReminderTestSnapshot, UpdateInfo } from '../types';
 import NumberField from '../components/ui/NumberField';
@@ -134,7 +135,7 @@ export default function TestToolsPage() {
       const offsetSeconds = offsetOverride ?? effectiveOffsetSeconds;
       const result = trigger
         ? await triggerReminderTest(prayerName, offsetSeconds, timezone, liveMode)
-        : syncReminder
+        : syncReminder && !liveMode
           ? await syncReminderTestWindow(prayerName, offsetSeconds, timezone, liveMode)
           : await getReminderTestSnapshot(prayerName, offsetSeconds, timezone);
       if (requestId === requestIdRef.current) {
@@ -337,6 +338,9 @@ export default function TestToolsPage() {
             </Button>
             <Button variant="contained" onClick={() => fetchSnapshot(true)} disabled={loading}>
               {t('reminderTest.trigger')}
+            </Button>
+            <Button variant="outlined" onClick={() => closeTestReminderWindow()} disabled={loading}>
+              {t('reminderTest.closeReminder')}
             </Button>
             {loading && <CircularProgress size={20} />}
           </Stack>

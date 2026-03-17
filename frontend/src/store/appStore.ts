@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import * as api from '../bindings';
 import type { DaySchedule, HijriDate, Location, NextPrayerInfo, Settings } from '../types';
+import i18n from '../i18n';
 
 interface AppState {
   // Data
@@ -69,6 +70,9 @@ export const useAppStore = create<AppState>((set, get) => ({
         loading: false,
         initialized: true,
       });
+      if (settings?.language) {
+        await i18n.changeLanguage(settings.language);
+      }
     } catch (err) {
       set({
         error: err instanceof Error ? err.message : String(err),
@@ -94,6 +98,9 @@ export const useAppStore = create<AppState>((set, get) => ({
     await api.saveSettings(settings);
     const [location, qibla] = await Promise.all([api.getLocation(), api.getQiblaDirection()]);
     set({ settings, location, qiblaDirection: qibla });
+    if (settings?.language) {
+      await i18n.changeLanguage(settings.language);
+    }
     // Re-fetch prayer data since method/location may have changed
     await get().refreshPrayerData();
   },
@@ -115,6 +122,9 @@ export const useAppStore = create<AppState>((set, get) => ({
       location,
       qiblaDirection: qibla,
     });
+    if (settings?.language) {
+      await i18n.changeLanguage(settings.language);
+    }
   },
 
   detectLocation: async () => {
@@ -125,6 +135,9 @@ export const useAppStore = create<AppState>((set, get) => ({
       // Reload settings (location was updated server-side)
       const settings = await api.getSettings();
       set({ settings });
+      if (settings?.language) {
+        await i18n.changeLanguage(settings.language);
+      }
       await get().refreshPrayerData();
     } catch (err) {
       set({ error: String(err), loading: false });

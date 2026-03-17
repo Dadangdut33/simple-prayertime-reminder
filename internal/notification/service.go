@@ -23,6 +23,8 @@ type Service struct {
 	lastTestInfo          *ReminderInfo
 	reminderStatePath     string
 	testReminderStatePath string
+	allowCloseReminder    bool
+	allowCloseTest        bool
 }
 
 // NewService creates a new Notification service

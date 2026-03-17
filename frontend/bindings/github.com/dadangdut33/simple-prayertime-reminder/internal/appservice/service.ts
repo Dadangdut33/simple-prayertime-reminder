@@ -46,6 +46,10 @@ export function CheckNativeNotificationPermission(): $CancellablePromise<boolean
     return $Call.ByID(2633779010);
 }
 
+export function CloseTestReminderWindow(): $CancellablePromise<void> {
+    return $Call.ByID(2475091271);
+}
+
 export function DetectLocation(): $CancellablePromise<location$0.Location> {
     return $Call.ByID(3572912391).then(($result: any) => {
         return $$createType1($result);
@@ -268,6 +272,10 @@ export function ResetSettings(): $CancellablePromise<settings$0.Settings> {
     return $Call.ByID(1081576467).then(($result: any) => {
         return $$createType17($result);
     });
+}
+
+export function ResizeReminderWindow(state: string, isTest: boolean): $CancellablePromise<void> {
+    return $Call.ByID(3387659901, state, isTest);
 }
 
 export function SaveBase64File(outputPath: string, base64Data: string): $CancellablePromise<void> {

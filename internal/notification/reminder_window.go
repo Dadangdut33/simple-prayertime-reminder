@@ -168,6 +168,23 @@ func (svc *Service) CloseReminder() {
 	svc.stopAudio()
 }
 
+// ForceCloseReminder closes the reminder window so it is recreated next time.
+func (svc *Service) ForceCloseReminder() {
+	svc.mu.Lock()
+	window := svc.reminderWindow
+	if window == nil {
+		svc.mu.Unlock()
+		return
+	}
+	svc.reminderWindow = nil
+	svc.allowCloseReminder = true
+	svc.mu.Unlock()
+
+	window.Close()
+	svc.stopAudio()
+	log.Info("reminder force-closed")
+}
+
 // CloseTestReminder hides the simulated reminder window
 func (svc *Service) CloseTestReminder() {
 	svc.mu.Lock()
@@ -179,6 +196,52 @@ func (svc *Service) CloseTestReminder() {
 	svc.lastTestInfo = nil
 	log.Info("test reminder closed")
 	svc.stopAudio()
+}
+
+// ResizeReminderWindow adjusts an existing reminder window height based on state.
+func (svc *Service) ResizeReminderWindow(state WindowState, test bool) {
+	svc.mu.Lock()
+	defer svc.mu.Unlock()
+
+	var window *application.WebviewWindow
+	var info *ReminderInfo
+	height, minHeight, maxHeight := reminderBaseH, reminderBaseMinH, reminderBaseMaxH
+	if state == StateAfter {
+		height, minHeight, maxHeight = reminderAfterH, reminderAfterMinH, reminderAfterMaxH
+	}
+	if test {
+		window = svc.testReminderWindow
+		info = svc.lastTestInfo
+	} else {
+		window = svc.reminderWindow
+		info = svc.lastInfo
+	}
+	if window == nil {
+		return
+	}
+	if info != nil && info.Notification != nil {
+		window.SetAlwaysOnTop(info.Notification.AlwaysOnTop)
+	}
+	window.SetMinSize(reminderMinW, minHeight)
+	window.SetMaxSize(reminderMaxW, maxHeight)
+	window.SetSize(reminderW, height)
+}
+
+// ForceCloseTestReminder closes the simulated reminder window so it is recreated next time.
+func (svc *Service) ForceCloseTestReminder() {
+	svc.mu.Lock()
+	window := svc.testReminderWindow
+	if window == nil {
+		svc.mu.Unlock()
+		return
+	}
+	svc.testReminderWindow = nil
+	svc.allowCloseTest = true
+	svc.mu.Unlock()
+
+	window.Close()
+	svc.stopAudio()
+	log.Info("test reminder force-closed")
 }
 
 // EmitLastReminder replays the latest reminder info, if available.
@@ -259,10 +322,18 @@ func (svc *Service) ensureReminderWindowLocked(show bool, alwaysOnTop bool, heig
 			BackgroundColour: application.NewRGB(20, 20, 30),
 		})
 		svc.reminderWindow.RegisterHook(events.Common.WindowClosing, func(event *application.WindowEvent) {
-			log.Info("reminder window closing")
+			log.Info("reminder window closing | force it to hide instead")
 			svc.mu.Lock()
-			svc.reminderWindow = nil
+			allowClose := svc.allowCloseReminder
+			svc.allowCloseReminder = false
+			if allowClose {
+				svc.mu.Unlock()
+				svc.stopAudio()
+				return
+			}
 			svc.mu.Unlock()
+			event.Cancel()
+			svc.reminderWindow.Hide()
 			svc.stopAudio()
 		})
 	} else {
@@ -304,10 +375,18 @@ func (svc *Service) ensureTestReminderWindowLocked(show bool, alwaysOnTop bool, 
 			BackgroundColour: application.NewRGB(20, 20, 30),
 		})
 		svc.testReminderWindow.RegisterHook(events.Common.WindowClosing, func(event *application.WindowEvent) {
-			log.Info("test reminder window closing")
+			log.Info("test reminder window closing | force it to hide instead")
 			svc.mu.Lock()
-			svc.testReminderWindow = nil
+			allowClose := svc.allowCloseTest
+			svc.allowCloseTest = false
+			if allowClose {
+				svc.mu.Unlock()
+				svc.stopAudio()
+				return
+			}
 			svc.mu.Unlock()
+			event.Cancel()
+			svc.testReminderWindow.Hide()
 			svc.stopAudio()
 		})
 	} else {

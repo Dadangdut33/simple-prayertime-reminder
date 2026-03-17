@@ -721,6 +721,23 @@ func (s *Service) DismissTestReminder() {
 	log.Info("test reminder dismissed")
 }
 
+func (s *Service) CloseTestReminderWindow() {
+	if s.notifSvc != nil {
+		s.notifSvc.ForceCloseTestReminder()
+	}
+	if s.audioSvc != nil {
+		s.audioSvc.Stop()
+	}
+	log.Info("test reminder window closed")
+}
+
+func (s *Service) ResizeReminderWindow(state string, isTest bool) {
+	if s.notifSvc == nil {
+		return
+	}
+	s.notifSvc.ResizeReminderWindow(notification.WindowState(state), isTest)
+}
+
 func (s *Service) PlayAdhan(isFajr bool) error {
 	if s.audioSvc == nil {
 		return nil
