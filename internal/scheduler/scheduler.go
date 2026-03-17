@@ -14,6 +14,7 @@ const (
 	audioStartTimeout = 5 * time.Second
 	audioStopTimeout  = 15 * time.Minute
 	audioPollInterval = 250 * time.Millisecond
+	ontimeGrace       = 20 * time.Second
 )
 
 func toReminderNotificationSettings(cfg settings.NotificationSettings) *notification.ReminderNotificationSettings {
@@ -125,6 +126,12 @@ func (svc *Service) scheduleDayReminders(cfg settings.Settings) {
 			delay := e.t.Sub(now)
 			log.Info("schedule on-time reminder", "prayer", e.name, "delay", delay)
 			go svc.fireAfterDelay(e, notification.StateOnTime, delay, notifCfg, cfg.Language)
+		} else {
+			elapsed := now.Sub(e.t)
+			if elapsed >= 0 && elapsed <= ontimeGrace {
+				log.Info("fire on-time reminder immediately", "prayer", e.name, "elapsed", elapsed)
+				go svc.fireAfterDelay(e, notification.StateOnTime, 0, notifCfg, cfg.Language)
+			}
 		}
 
 		// Schedule "after" reminder
