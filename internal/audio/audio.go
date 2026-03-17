@@ -102,6 +102,11 @@ func (svc *Service) Play(isFajr bool, volume float64) error {
 }
 
 func parseWav(data []byte) (pcm []byte, sampleRate int, channels int, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("wav: decode panic: %v", r)
+		}
+	}()
 	reader := wav.NewReader(bytes.NewReader(data))
 	format, err := reader.Format()
 	if err != nil {
