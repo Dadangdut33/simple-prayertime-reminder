@@ -103,7 +103,6 @@ jobs:
           DEPLOY_GTK_VERSION=4 \
           ./linuxdeploy-${{ matrix.linuxdeploy_arch }}.AppImage \
             --appdir squashfs-root \
-            --plugin gtk \
             --output appimage
 
           # Move result to bin/ with correct arch suffix
