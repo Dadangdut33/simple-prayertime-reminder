@@ -5,10 +5,10 @@ go 1.25
 require (
 	github.com/ebitengine/oto/v3 v3.4.0
 	github.com/hablullah/go-prayer v1.1.1
-	github.com/hajimehoshi/go-mp3 v0.3.4
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c
 	github.com/wailsapp/wails/v3 v3.0.0-alpha.74
 	github.com/xuri/excelize/v2 v2.10.1
+	github.com/youpy/go-wav v0.3.2
 	golang.org/x/mod v0.32.0
 	golang.org/x/sys v0.41.0
 )
@@ -55,6 +55,8 @@ require (
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/xuri/efp v0.0.1 // indirect
 	github.com/xuri/nfp v0.0.2-0.20250530014748-2ddeb826f9a9 // indirect
+	github.com/youpy/go-riff v0.1.0 // indirect
+	github.com/zaf/g711 v0.0.0-20190814101024-76a4a538f52b // indirect
 	golang.org/x/crypto v0.48.0 // indirect
 	golang.org/x/net v0.50.0 // indirect
 	golang.org/x/text v0.34.0 // indirect

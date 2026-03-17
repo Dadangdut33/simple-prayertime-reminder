@@ -8,9 +8,11 @@ import (
 
 // Service manages adhan audio playback
 type Service struct {
-	ctx     *oto.Context
-	player  *oto.Player
-	mu      sync.Mutex
-	ready   chan struct{}
-	initErr error
+	ctx          *oto.Context
+	player       *oto.Player
+	mu           sync.Mutex
+	ready        chan struct{}
+	initErr      error
+	sampleRate   int
+	channelCount int
 }
