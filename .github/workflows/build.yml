@@ -84,35 +84,6 @@ jobs:
           fi
           wails3 task linux:package ARCH=${{ matrix.arch }}
 
-      - name: Download linuxdeploy
-        run: |
-          wget -q "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-${{matrix.linuxdeploy_arch}}.AppImage"
-          chmod +x linuxdeploy-${{matrix.linuxdeploy_arch}}.AppImage
-
-      - name: Repackage AppImage with bundled WebKit
-        run: |
-          APP_NAME="simple-prayertime-reminder"
-
-          # Find whatever AppImage wails produced and extract it
-          WAILS_APPIMAGE=$(find bin/ -name "*.AppImage" | head -1)
-          echo "Found AppImage: $WAILS_APPIMAGE"
-          ./${WAILS_APPIMAGE} --appimage-extract
-
-          # Re-bundle with proper GTK/WebKit libs
-          ARCH="${{ matrix.linuxdeploy_arch }}" \
-          DEPLOY_GTK_VERSION=4 \
-          ./linuxdeploy-${{ matrix.linuxdeploy_arch }}.AppImage \
-            --appdir squashfs-root \
-            --output appimage
-
-          # Move result to bin/ with correct arch suffix
-          if [ "${{ matrix.arch }}" = "amd64" ]; then
-            SUFFIX="x86_64"
-          else
-            SUFFIX="aarch64"
-          fi
-          mv *-${SUFFIX}.AppImage "bin/${APP_NAME}-${SUFFIX}.AppImage"
-
       - name: Rename binary with version
         run: |
           APP_NAME="simple-prayertime-reminder"
