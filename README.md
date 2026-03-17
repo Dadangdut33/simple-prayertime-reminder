@@ -1,22 +1,18 @@
-<p align="center">
-  <img src="https://github.com/Dadangdut33/simple-prayertime-reminder/blob/main/assets/display_icon.png?raw=true" width="250" alt="Simple Prayertime Reminder Logo">
-</p>
+<!-- markdownlint-disable MD029 MD041 MD036 MD056 -->
 
-<h1 align="center">Simple PrayerTime Reminder</h1>
+![Simple Prayertime Reminder Logo](./assets/display_icon.png)
 
-<p align="center">
-  A desktop Muslim companion app for prayer times, reminders, Qibla, and more.
-</p>
+# Simple PrayerTime Reminder
 
-<p align="center">
-  <a href="https://github.com/Dadangdut33/simple-prayertime-reminder/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/Dadangdut33/simple-prayertime-reminder"></a>
-  <a href="https://github.com/Dadangdut33/simple-prayertime-reminder/pulls"><img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/Dadangdut33/simple-prayertime-reminder"></a>
-  <a href="https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest"><img alt="GitHub release" src="https://img.shields.io/github/v/release/Dadangdut33/simple-prayertime-reminder"></a>
-  <a href="https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest"><img alt="GitHub downloads" src="https://img.shields.io/github/downloads/Dadangdut33/simple-prayertime-reminder/total?label=downloads%20(github)"></a>
-  <a href="https://sourceforge.net/projects/simple-prayertime-reminder/files/latest/download"><img alt="SourceForge downloads" src="https://img.shields.io/sourceforge/dt/simple-prayertime-reminder.svg?label=downloads%20(sourceforge)"></a>
-  <a href="https://github.com/Dadangdut33/simple-prayertime-reminder/stargazers"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/Dadangdut33/simple-prayertime-reminder?style=social"></a>
-  <a href="https://github.com/Dadangdut33/simple-prayertime-reminder/network/members"><img alt="GitHub forks" src="https://img.shields.io/github/forks/Dadangdut33/simple-prayertime-reminder?style=social"></a>
-</p>
+A desktop Muslim companion app for prayer times, reminders, Qibla, and more.
+
+[![GitHub issues](https://img.shields.io/github/issues/Dadangdut33/simple-prayertime-reminder)](https://github.com/Dadangdut33/simple-prayertime-reminder/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/Dadangdut33/simple-prayertime-reminder)](https://github.com/Dadangdut33/simple-prayertime-reminder/pulls)
+[![GitHub release](https://img.shields.io/github/v/release/Dadangdut33/simple-prayertime-reminder)](https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest)
+[![GitHub downloads](<https://img.shields.io/github/downloads/Dadangdut33/simple-prayertime-reminder/total?label=downloads%20(github)>)](https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest)
+[![SourceForge downloads](<https://img.shields.io/sourceforge/dt/simple-prayertime-reminder.svg?label=downloads%20(sourceforge)>)](https://sourceforge.net/projects/simple-prayertime-reminder/files/latest/download)
+[![GitHub Repo stars](https://img.shields.io/github/stars/Dadangdut33/simple-prayertime-reminder?style=social)](https://github.com/Dadangdut33/simple-prayertime-reminder/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/Dadangdut33/simple-prayertime-reminder?style=social)](https://github.com/Dadangdut33/simple-prayertime-reminder/network/members)
 
 This project was previously Electron-based. It now uses a Go backend with a React frontend powered by Wails v3.
 
@@ -31,22 +27,17 @@ This project was previously Electron-based. It now uses a Go backend with a Reac
 - System tray integration and reminder window
 - Embedded Quran page (quran.com) with simple note system
 
-## Showcase
+## Preview
 
-<details open>
-  <summary>Preview</summary>
-  <p align="center">
-    <img src="https://raw.githubusercontent.com/Dadangdut33/simple-prayertime-reminder/master/preview/1.png" width="700" alt="Preview 1">
-    <img src="https://raw.githubusercontent.com/Dadangdut33/simple-prayertime-reminder/master/preview/1p.png" width="700" alt="Preview 1 modal">
-    <img src="https://raw.githubusercontent.com/Dadangdut33/simple-prayertime-reminder/master/preview/1_1.png" width="700" alt="Preview 1 dark">
-    <img src="https://raw.githubusercontent.com/Dadangdut33/simple-prayertime-reminder/master/preview/1_1p.png" width="700" alt="Preview 1 dark modal">
-    <img src="https://raw.githubusercontent.com/Dadangdut33/simple-prayertime-reminder/master/preview/2.png" width="700" alt="Preview 2">
-    <img src="https://raw.githubusercontent.com/Dadangdut33/simple-prayertime-reminder/master/preview/3.png" width="700" alt="Preview 3">
-    <img src="https://raw.githubusercontent.com/Dadangdut33/simple-prayertime-reminder/master/preview/4.png" width="700" alt="Preview 4">
-    <img src="https://raw.githubusercontent.com/Dadangdut33/simple-prayertime-reminder/master/preview/5.png" alt="Preview 5">
-    <img src="https://raw.githubusercontent.com/Dadangdut33/simple-prayertime-reminder/master/preview/6.png" alt="Preview 6">
-  </p>
-</details>
+| Light                                      | Dark                                      |
+| ------------------------------------------ | ----------------------------------------- |
+| ![Home - Light](./preview/1_l.png)         | ![Home - Dark](./preview/1_d.png)         |
+| ![Schedule - Light](./preview/2_l.png)     | ![Schedule - Dark](./preview/2_d.png)     |
+| ![world cities - Light](./preview/3_l.png) | ![world cities - Dark](./preview/3_d.png) |
+| ![quran embed - Light](./preview/4_l.png)  | ![quran embed - Dark](./preview/4_d.png)  |
+| ![settings - Light](./preview/5_l.png)     | ![settings - Dark](./preview/5_d.png)     |
+| ![about - Light](./preview/6_l.png)        | ![about - Dark](./preview/6_d.png)        |
+| ![Tray](./preview/tray.png)                |
 
 ## Download
 
@@ -55,11 +46,88 @@ This project was previously Electron-based. It now uses a Go backend with a Reac
 
 ## Installation
 
-1. Download the latest release from [GitHub](https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest).
-2. Extract or install the package for your platform.
-3. Run the application.
+### Windows
 
-## Linux AppImage Notes (Non-Debian/Ubuntu)
+**Installer:**
+
+1. Download the latest `*-installer.exe` from [GitHub Releases](https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest).
+2. Run the installer and follow the prompts.
+3. Launch the app from the Start menu.
+
+**Portable (no installer):**
+
+1. Download the latest Windows portable `.exe` (without `installer` in the name).
+2. Place it anywhere (e.g., `C:\Apps\simple-prayertime-reminder\`).
+3. Double‑click to run.
+
+### macOS
+
+**App bundle:**
+
+1. Download the latest macOS `.app.zip` from [GitHub Releases](https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest).
+2. Unzip it.
+3. Move `Simple Prayertime Reminder.app` to `Applications` and open it.
+
+**Raw binary:**
+
+1. Download the macOS raw binary from [GitHub Releases](https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest).
+2. Put it somewhere in your PATH, for example:
+
+```bash
+mkdir -p ~/.local/bin
+mv simple-prayertime-reminder ~/.local/bin/
+chmod +x ~/.local/bin/simple-prayertime-reminder
+```
+
+### Linux
+
+**Recommended (AppImage/DEB/RPM):**
+
+1. Download the latest Linux package from [GitHub Releases](https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest).
+2. Use the package appropriate for your distro (AppImage/DEB/RPM).
+
+**Raw binary:**
+
+1. Download the Linux binary from [GitHub Releases](https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest).
+2. Put it somewhere in your PATH, for example:
+
+```bash
+mkdir -p ~/.local/bin
+mv simple-prayertime-reminder ~/.local/bin/
+chmod +x ~/.local/bin/simple-prayertime-reminder
+```
+
+3. optionally, Create a desktop entry so it shows up in your launcher:
+
+```bash
+# change the username to your username
+mkdir -p ~/.local/share/applications
+cat > ~/.local/share/applications/simple-prayertime-reminder.desktop <<'EOF'
+[Desktop Entry]
+Name=Simple Prayertime Reminder
+Exec=/home/{USERNAME}/.local/bin/simple-prayertime-reminder
+Icon=prayer-time
+Type=Application
+Categories=Utility;
+Terminal=false
+EOF
+```
+
+4. Update the icon path if you want a custom icon (PNG recommended). For example:
+
+```bash
+mkdir -p ~/.local/share/icons
+curl -L "https://raw.githubusercontent.com/Dadangdut33/simple-prayertime-reminder/main/assets/icon.png" -o ~/.local/share/icons/simple-prayertime-reminder.png
+```
+
+Then set in the desktop entry:
+
+```bash
+# change the username to your actual username
+Icon=/home/{USERNAME}/.local/share/icons/simple-prayertime-reminder.png
+```
+
+### Linux AppImage Notes (Non-Debian/Ubuntu)
 
 The AppImage is built on Ubuntu and expects WebKitGTK helper binaries in Debian-style paths.
 On other distros, install WebKitGTK and add a compatibility symlink so the helper can be found.
@@ -88,11 +156,47 @@ sudo mkdir -p /usr/lib/x86_64-linux-gnu
 sudo ln -s /usr/lib64/webkit2gtk-4.1 /usr/lib/x86_64-linux-gnu/webkit2gtk-4.1
 ```
 
+### Install via Script
+
+> **Requirements:** [Go 1.21+](https://go.dev/dl/), [pnpm](https://pnpm.io/installation), and [git](https://git-scm.com/)
+
+**Linux / macOS**
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/dadangdut33/simple-prayertime-reminder/main/scripts/install.sh)
+```
+
+**Windows (PowerShell)**
+
+```powershell
+irm https://raw.githubusercontent.com/dadangdut33/simple-prayertime-reminder/main/scripts/install.ps1 | iex
+```
+
+The script will:
+
+1. Build the frontend with pnpm
+2. Install the binary to your Go bin directory (`$(go env GOPATH)/bin`)
+
+Make sure `$(go env GOPATH)/bin` (Linux/macOS) or `%GOPATH%\bin` (Windows) is in your `PATH`.
+
+> **Why not `go install` directly?**  
+> This app bundles a frontend (HTML/JS) that must be built before the Go binary is compiled. The install scripts handle that automatically.
+
 ## Uninstallation
 
-- Installer build: run the uninstaller.
-- Portable build: remove the extracted folder.
-- Windows only: if you enabled auto-start in an older version, you may still have a registry entry under `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run`.
+- Installer build : run the uninstaller.
+- Portable build : remove the portable app and its folder.
+- Script installation (Linux / macOS) :
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/dadangdut33/simple-prayertime-reminder/main/scripts/uninstall.sh)
+```
+
+- Script installation (Windows) :
+
+```powershell
+irm https://raw.githubusercontent.com/dadangdut33/simple-prayertime-reminder/main/scripts/uninstall.ps1 | iex
+```
 
 ## Development Setup
 
@@ -194,6 +298,12 @@ wails3 task package
 
 Generated binaries are written to `bin/`.
 
+### GitHub Actions (Build Triggers)
+
+- **Tag push**: any `v*` tag triggers full CI and creates a draft release.
+- **Manual run**: use the Actions page (workflow_dispatch).
+- **Master push**: only runs when the commit message includes `[ci build]`.
+
 ## Useful Commands
 
 Run the desktop app in development mode:
@@ -258,9 +368,9 @@ The file is created automatically on first run.
 
 ## Attribution
 
-- <a href="https://youtu.be/iaWZ_3D6vOQ">Adhan uploaded by Ayat via YouTube</a>
-- <a href="https://quran.com">Default link for Quran embed webview</a>
-- <a href="https://www.flaticon.com/free-icons/mosque" title="mosque icons">Mosque icons created by Freepik - Flaticon</a>
+- [Adhan uploaded by Ayat via YouTube](https://youtu.be/iaWZ_3D6vOQ)
+- [Default link for Quran embed webview](https://quran.com)
+- [Mosque icons created by Freepik - Flaticon](https://www.flaticon.com/free-icons/mosque)
 
 ## License
 

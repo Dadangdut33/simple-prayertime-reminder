@@ -30,7 +30,7 @@ func (svc *Service) sendNativeNotificationLocked(info ReminderInfo, sticky bool)
 		log.Error("native notification send failed", "error", err)
 	}
 	if sticky {
-		log.Info("native notification sticky requested (platform support may vary)")
+		log.Info("sticky notification is not yet supported")
 	}
 }
 

@@ -226,7 +226,7 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
             />
           </Box>
 
-          <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={2} alignItems="flex-start">
+          {/* <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={2} alignItems="flex-start">
             <Box flex={1}>
               <Typography variant="subtitle1">{t('settings.alarms.nativeSticky')}</Typography>
               <Typography variant="body2" color="text.secondary">
@@ -238,7 +238,7 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
               disabled={!local.notification.useNativeNotification}
               onChange={(event) => setNotification({ nativeNotificationSticky: event.target.checked })}
             />
-          </Box>
+          </Box> */}
         </Box>
       </Box>
 
