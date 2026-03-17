@@ -22,9 +22,11 @@ jobs:
       matrix:
         include:
           - arch: amd64
-            os: ubuntu-latest
+            os: ubuntu-22.04
+            linuxdeploy_arch: x86_64
           - arch: arm64
             os: ubuntu-24.04-arm
+            linuxdeploy_arch: aarch64
     steps:
       - uses: actions/checkout@v6
 
@@ -65,6 +67,12 @@ jobs:
           go install github.com/wailsapp/wails/v3/cmd/wails3@latest
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
+      - name: Get version
+        id: version
+        run: |
+          VERSION=$(awk 'BEGIN{ininfo=0} /^info:/{ininfo=1;next} /^[^[:space:]]/{if($0!~/^info:/)ininfo=0} ininfo && $1=="version:"{gsub(/"/,"",$2);print $2;exit}' build/config.yml)
+          echo "app_version=$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Build + Package (linux)
         env:
           GOARCH: ${{ matrix.arch }}
@@ -76,20 +84,52 @@ jobs:
           fi
           wails3 task linux:package ARCH=${{ matrix.arch }}
 
-      - name: Get version
-        id: version
+      - name: Download linuxdeploy
         run: |
-          VERSION=$(awk 'BEGIN{ininfo=0} /^info:/{ininfo=1;next} /^[^[:space:]]/{if($0!~/^info:/)ininfo=0} ininfo && $1=="version:"{gsub(/"/,"",$2);print $2;exit}' build/config.yml)
-          echo "app_version=$VERSION" >> "$GITHUB_OUTPUT"
+          ARCH="${{ matrix.linuxdeploy_arch }}"
+          wget -q "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-${ARCH}.AppImage"
+          wget -q "https://github.com/linuxdeploy/linuxdeploy-plugin-gtk/releases/download/continuous/linuxdeploy-plugin-gtk-${ARCH}.AppImage"
+          chmod +x linuxdeploy-*.AppImage
+
+      - name: Repackage AppImage with bundled WebKit
+        run: |
+          APP_NAME="simple-prayertime-reminder"
+          ARCH_LD="${{ matrix.linuxdeploy_arch }}"
+
+          # Find whatever AppImage wails produced and extract it
+          WAILS_APPIMAGE=$(find bin/ -name "*.AppImage" | head -1)
+          echo "Found AppImage: $WAILS_APPIMAGE"
+          ./${WAILS_APPIMAGE} --appimage-extract
+
+          # Re-bundle with proper GTK/WebKit libs
+          ARCH="${ARCH_LD}" \
+          DEPLOY_GTK_VERSION=4 \
+          ./linuxdeploy-${ARCH_LD}.AppImage \
+            --appdir squashfs-root \
+            --plugin gtk \
+            --output appimage
+
+          # Move result to bin/ with correct arch suffix
+          if [ "${{ matrix.arch }}" = "amd64" ]; then
+            SUFFIX="x86_64"
+          else
+            SUFFIX="aarch64"
+          fi
+          mv *-${SUFFIX}.AppImage "bin/${APP_NAME}-${SUFFIX}.AppImage"
 
       - name: Rename binary with version
         run: |
           APP_NAME="simple-prayertime-reminder"
           VERSION="${{ steps.version.outputs.app_version }}"
+          if [ "${{ matrix.arch }}" = "amd64" ]; then
+            SUFFIX="x86_64"
+          else
+            SUFFIX="aarch64"
+          fi
           mv "bin/${APP_NAME}" "bin/${APP_NAME}-v${VERSION}-linux-${{ matrix.arch }}"
           # Rename packaged artifacts to include version and arch
-          if [ -f "bin/${APP_NAME}-x86_64.AppImage" ] && [ "${{ matrix.arch }}" = "amd64" ]; then
-            mv "bin/${APP_NAME}-x86_64.AppImage" "bin/${APP_NAME}-v${VERSION}-linux-amd64.AppImage"
+          if [ -f "bin/${APP_NAME}-${SUFFIX}.AppImage" ]; then
+            mv "bin/${APP_NAME}-${SUFFIX}.AppImage" "bin/${APP_NAME}-v${VERSION}-linux-${{ matrix.arch }}.AppImage"
           fi
           if [ -f "bin/${APP_NAME}.deb" ]; then
             mv "bin/${APP_NAME}.deb" "bin/${APP_NAME}-v${VERSION}-linux-${{ matrix.arch }}.deb"

@@ -46,3 +46,5 @@ release/releases/
 # Local notes and config scratch space
 notes/
 config/
+
+build/linux/appimage/build/
