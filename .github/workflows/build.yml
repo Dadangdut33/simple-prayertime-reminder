@@ -86,15 +86,12 @@ jobs:
 
       - name: Download linuxdeploy
         run: |
-          ARCH="${{ matrix.linuxdeploy_arch }}"
-          wget -q "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-${ARCH}.AppImage"
-          wget -q "https://github.com/linuxdeploy/linuxdeploy-plugin-gtk/releases/download/continuous/linuxdeploy-plugin-gtk-${ARCH}.AppImage"
-          chmod +x linuxdeploy-*.AppImage
+          wget -q "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-${{matrix.linuxdeploy_arch}}.AppImage"
+          chmod +x linuxdeploy-${{matrix.linuxdeploy_arch}}.AppImage
 
       - name: Repackage AppImage with bundled WebKit
         run: |
           APP_NAME="simple-prayertime-reminder"
-          ARCH_LD="${{ matrix.linuxdeploy_arch }}"
 
           # Find whatever AppImage wails produced and extract it
           WAILS_APPIMAGE=$(find bin/ -name "*.AppImage" | head -1)
@@ -102,9 +99,9 @@ jobs:
           ./${WAILS_APPIMAGE} --appimage-extract
 
           # Re-bundle with proper GTK/WebKit libs
-          ARCH="${ARCH_LD}" \
+          ARCH="${{ matrix.linuxdeploy_arch }}" \
           DEPLOY_GTK_VERSION=4 \
-          ./linuxdeploy-${ARCH_LD}.AppImage \
+          ./linuxdeploy-${{ matrix.linuxdeploy_arch }}.AppImage \
             --appdir squashfs-root \
             --plugin gtk \
             --output appimage
