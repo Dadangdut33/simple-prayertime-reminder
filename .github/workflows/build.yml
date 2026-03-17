@@ -19,13 +19,13 @@ jobs:
           - arch: arm64
             os: ubuntu-24.04-arm
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
 
@@ -38,7 +38,7 @@ jobs:
         id: pnpm-store
         run: echo "path=$(pnpm store path)" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: ${{ steps.pnpm-store.outputs.path }}
           key: ${{ runner.os }}-pnpm-${{ hashFiles('frontend/pnpm-lock.yaml') }}
@@ -74,8 +74,21 @@ jobs:
           APP_NAME="simple-prayertime-reminder"
           VERSION=$(awk 'BEGIN{ininfo=0} /^info:/{ininfo=1;next} /^[^[:space:]]/{if($0!~/^info:/)ininfo=0} ininfo && $1=="version:"{gsub(/"/,"",$2);print $2;exit}' build/config.yml)
           mv "bin/${APP_NAME}" "bin/${APP_NAME}-v${VERSION}-linux-${{ matrix.arch }}"
+          # Rename packaged artifacts to include version and arch
+          if [ -f "bin/${APP_NAME}-x86_64.AppImage" ] && [ "${{ matrix.arch }}" = "amd64" ]; then
+            mv "bin/${APP_NAME}-x86_64.AppImage" "bin/${APP_NAME}-v${VERSION}-linux-amd64.AppImage"
+          fi
+          if [ -f "bin/${APP_NAME}.deb" ]; then
+            mv "bin/${APP_NAME}.deb" "bin/${APP_NAME}-v${VERSION}-linux-${{ matrix.arch }}.deb"
+          fi
+          if [ -f "bin/${APP_NAME}.rpm" ]; then
+            mv "bin/${APP_NAME}.rpm" "bin/${APP_NAME}-v${VERSION}-linux-${{ matrix.arch }}.rpm"
+          fi
+          if [ -f "bin/${APP_NAME}.pkg.tar.zst" ]; then
+            mv "bin/${APP_NAME}.pkg.tar.zst" "bin/${APP_NAME}-v${VERSION}-linux-${{ matrix.arch }}.pkg.tar.zst"
+          fi
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: linux-${{ matrix.arch }}
           path: bin/**
@@ -88,13 +101,13 @@ jobs:
       matrix:
         arch: [amd64, arm64]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
 
@@ -110,7 +123,7 @@ jobs:
         run: |
           "path=$(pnpm store path)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: ${{ steps.pnpm-store.outputs.path }}
           key: ${{ runner.os }}-pnpm-${{ hashFiles('frontend/pnpm-lock.yaml') }}
@@ -147,8 +160,9 @@ jobs:
           }
           Write-Host "Version: $version"
           Move-Item -Force "bin\\$app.exe" "bin\\$app-v$version-windows-${{ matrix.arch }}.exe"
+          Move-Item -Force "bin\\$app-${{ matrix.arch }}-installer.exe" "bin\\$app-v$version-windows-${{ matrix.arch }}-installer.exe"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: windows-${{ matrix.arch }}
           path: |
@@ -163,13 +177,13 @@ jobs:
       matrix:
         arch: [amd64, arm64]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
 
@@ -182,7 +196,7 @@ jobs:
         id: pnpm-store
         run: echo "path=$(pnpm store path)" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: ${{ steps.pnpm-store.outputs.path }}
           key: ${{ runner.os }}-pnpm-${{ hashFiles('frontend/pnpm-lock.yaml') }}
@@ -201,8 +215,11 @@ jobs:
           APP_NAME="simple-prayertime-reminder"
           VERSION=$(awk 'BEGIN{ininfo=0} /^info:/{ininfo=1;next} /^[^[:space:]]/{if($0!~/^info:/)ininfo=0} ininfo && $1=="version:"{gsub(/"/,"",$2);print $2;exit}' build/config.yml)
           mv "bin/${APP_NAME}" "bin/${APP_NAME}-v${VERSION}-darwin-${{ matrix.arch }}"
+          if [ -d "bin/${APP_NAME}.app" ]; then
+            mv "bin/${APP_NAME}.app" "bin/${APP_NAME}-v${VERSION}-darwin-${{ matrix.arch }}.app"
+          fi
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: macos-${{ matrix.arch }}
           path: |
