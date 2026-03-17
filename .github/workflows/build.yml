@@ -49,6 +49,9 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
             pkg-config gcc libasound2-dev libgtk-3-dev libwebkit2gtk-4.1-dev \
             libgtk-4-dev libwebkitgtk-6.0-dev libfuse2
+          if [ "${{ matrix.arch }}" = "arm64" ]; then
+            sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu
+          fi
 
       - name: Install wails3
         run: |
@@ -61,6 +64,9 @@ jobs:
           GIT_COMMITTER_NAME: 'github-actions[bot]'
           GIT_COMMITTER_EMAIL: 'github-actions[bot]@users.noreply.github.com'
         run: |
+          if [ "${{ matrix.arch }}" = "arm64" ]; then
+            export CC=aarch64-linux-gnu-gcc
+          fi
           wails3 task linux:package ARCH=${{ matrix.arch }}
 
       - name: Rename binary with version
@@ -132,17 +138,14 @@ jobs:
         shell: pwsh
         run: |
           $app = "simple-prayertime-reminder"
-          $version = $null
-          $inInfo = $false
-          Get-Content build/config.yml | ForEach-Object {
-            $line = $_
-            if ($line -match '^\s*info:\s*$') { $inInfo = $true; return }
-            if ($line -match '^[^\s]' -and $line -notmatch '^\s*info:\s*$') { $inInfo = $false }
-            if ($inInfo -and $line -match '^\s*version:\s*"?([^"]+)"?\s*$') {
-              $version = $Matches[1].Trim()
-            }
+          $content = Get-Content build/config.yml -Raw
+          # Match version under info: block specifically
+          if ($content -match '(?ms)^info:.*?version:\s*"([0-9]+\.[0-9]+\.[0-9][^"]*)"') {
+            $version = $Matches[1]
+          } else {
+            throw "Could not parse version from build/config.yml"
           }
-          if (-not $version) { throw "Could not parse version from build/config.yml" }
+          Write-Host "Version: $version"
           Move-Item -Force "bin\\$app.exe" "bin\\$app-v$version-windows-${{ matrix.arch }}.exe"
 
       - uses: actions/upload-artifact@v4
