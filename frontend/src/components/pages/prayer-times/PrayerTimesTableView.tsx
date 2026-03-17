@@ -16,10 +16,11 @@ import {
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import type { DaySchedule, HijriCalendarDay } from '../../../types';
+import type { DaySchedule, HijriCalendarDay, PrayerCalendarSystem } from '../../../types';
 import { formatTime } from '../../../utils/helpers';
 import { buildHijriMap, formatHijriDateShort } from './helpers';
 import { useTranslation } from 'react-i18next';
+import i18n from '../../../i18n';
 
 interface PrayerTimesTableViewProps {
   activeMonth: Dayjs;
@@ -28,13 +29,14 @@ interface PrayerTimesTableViewProps {
   schedules: DaySchedule[];
   hijriDays: HijriCalendarDay[];
   timeFormat: '12h' | '24h';
+  calendarSystem: PrayerCalendarSystem;
   onPrevMonth: () => void;
   onNextMonth: () => void;
   onToday: () => void;
 }
 
 function formatDateShort(dateStr: string): string {
-  return dayjs(dateStr).format('ddd, D MMM');
+  return dayjs(dateStr).locale(i18n.language).format('dddd, D MMM');
 }
 
 export default function PrayerTimesTableView({
@@ -44,6 +46,7 @@ export default function PrayerTimesTableView({
   schedules,
   hijriDays,
   timeFormat,
+  calendarSystem,
   onPrevMonth,
   onNextMonth,
   onToday,
@@ -54,12 +57,7 @@ export default function PrayerTimesTableView({
 
   return (
     <Card sx={{ p: 3, borderRadius: 0.5 }}>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={3}
-      >
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Box display="flex" alignItems="center" gap={1.5}>
           <CalendarMonthIcon color="primary" />
           <Typography variant="h3">{activeMonthLabel || activeMonth.format('MMMM YYYY')}</Typography>
@@ -90,15 +88,13 @@ export default function PrayerTimesTableView({
                 t('prayerNames.asr'),
                 t('prayerNames.maghrib'),
                 t('prayerNames.isha'),
-              ].map(
-                (label, index) => (
-                  <TableCell key={label} align={index === 0 ? 'left' : 'center'}>
-                    <Typography variant="overline" fontWeight={600}>
-                      {label}
-                    </Typography>
-                  </TableCell>
-                ),
-              )}
+              ].map((label, index) => (
+                <TableCell key={label} align={index === 0 ? 'left' : 'center'}>
+                  <Typography variant="overline" fontWeight={600}>
+                    {label}
+                  </Typography>
+                </TableCell>
+              ))}
             </TableRow>
           </TableHead>
 
@@ -113,6 +109,16 @@ export default function PrayerTimesTableView({
               schedules.map((schedule) => {
                 const isToday = schedule.date.startsWith(todayIso);
                 const hijriDate = hijriByDate[schedule.date.slice(0, 10)];
+                const primaryDateLabel =
+                  calendarSystem === 'hijri' && hijriDate
+                    ? formatHijriDateShort(hijriDate)
+                    : formatDateShort(schedule.date);
+                const secondaryDateLabel =
+                  calendarSystem === 'hijri'
+                    ? formatDateShort(schedule.date)
+                    : hijriDate
+                      ? formatHijriDateShort(hijriDate)
+                      : null;
 
                 return (
                   <TableRow
@@ -123,25 +129,21 @@ export default function PrayerTimesTableView({
                       }),
                       '&:hover': { bgcolor: 'action.hover' },
                     }}
-                    >
-                      <TableCell>
-                        <Typography
-                          variant="body2"
-                          fontWeight={isToday ? 700 : 500}
-                          color={isToday ? 'primary.main' : 'text.primary'}
-                        >
-                          {formatDateShort(schedule.date)}
+                  >
+                    <TableCell>
+                      <Typography
+                        variant="body2"
+                        fontWeight={isToday ? 700 : 500}
+                        color={isToday ? 'primary.main' : 'text.primary'}
+                      >
+                        {primaryDateLabel}
+                      </Typography>
+                      {secondaryDateLabel ? (
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.25 }}>
+                          {secondaryDateLabel}
                         </Typography>
-                        {hijriDate ? (
-                          <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            sx={{ display: 'block', mt: 0.25 }}
-                          >
-                            {formatHijriDateShort(hijriDate)}
-                          </Typography>
-                        ) : null}
-                      </TableCell>
+                      ) : null}
+                    </TableCell>
                     {[
                       schedule.fajr,
                       schedule.sunrise,

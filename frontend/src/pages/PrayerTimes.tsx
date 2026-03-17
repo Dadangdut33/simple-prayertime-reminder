@@ -218,6 +218,12 @@ export default function PrayerTimes() {
   const calendarPdfRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const tablePdfRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const skipNextPreferenceSave = useRef(false);
+
+  useEffect(() => {
+    if (viewMode === 'table' && calendarSystem === 'side-by-side') {
+      setCalendarSystem('gregorian');
+    }
+  }, [calendarSystem, viewMode]);
   const hijriAnchorPending = useRef(false);
   const selectedDateKey = useMemo(() => selectedDate.format('YYYY-MM-DD'), [selectedDate]);
 
@@ -733,6 +739,7 @@ export default function PrayerTimes() {
           loading={loading}
           schedules={schedules}
           hijriDays={hijriDays}
+          calendarSystem={calendarSystem}
           timeFormat={settings?.timeFormat ?? '24h'}
           onPrevMonth={handlePrevMonth}
           onNextMonth={handleNextMonth}

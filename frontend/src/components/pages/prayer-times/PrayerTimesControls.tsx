@@ -56,22 +56,36 @@ export default function PrayerTimesControls({
         </ToggleButtonGroup>
 
         {viewMode === 'calendar' && (
-          <>
-            <ToggleButtonGroup
-              exclusive
-              size="small"
-              value={calendarSystem}
-              onChange={(_, value: PrayerCalendarSystem | null) => {
-                if (value) {
-                  onCalendarSystemChange(value);
-                }
-              }}
-            >
-              <ToggleButton value="gregorian">{t('prayerTimes.calendarGregorian')}</ToggleButton>
-              <ToggleButton value="hijri">{t('prayerTimes.calendarHijri')}</ToggleButton>
-              <ToggleButton value="side-by-side">{t('prayerTimes.calendarSideBySide')}</ToggleButton>
-            </ToggleButtonGroup>
-          </>
+          <ToggleButtonGroup
+            exclusive
+            size="small"
+            value={calendarSystem}
+            onChange={(_, value: PrayerCalendarSystem | null) => {
+              if (value) {
+                onCalendarSystemChange(value);
+              }
+            }}
+          >
+            <ToggleButton value="gregorian">{t('prayerTimes.calendarGregorian')}</ToggleButton>
+            <ToggleButton value="hijri">{t('prayerTimes.calendarHijri')}</ToggleButton>
+            <ToggleButton value="side-by-side">{t('prayerTimes.calendarSideBySide')}</ToggleButton>
+          </ToggleButtonGroup>
+        )}
+
+        {viewMode === 'table' && (
+          <ToggleButtonGroup
+            exclusive
+            size="small"
+            value={calendarSystem === 'side-by-side' ? 'gregorian' : calendarSystem}
+            onChange={(_, value: PrayerCalendarSystem | null) => {
+              if (value) {
+                onCalendarSystemChange(value);
+              }
+            }}
+          >
+            <ToggleButton value="gregorian">{t('prayerTimes.calendarGregorian')}</ToggleButton>
+            <ToggleButton value="hijri">{t('prayerTimes.calendarHijri')}</ToggleButton>
+          </ToggleButtonGroup>
         )}
 
         <Button variant="text" size="small" color="inherit" onClick={onToday}>

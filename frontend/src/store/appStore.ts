@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import * as api from '../bindings';
 import type { DaySchedule, HijriDate, Location, NextPrayerInfo, Settings } from '../types';
 import i18n from '../i18n';
+import dayjs from 'dayjs';
+import 'dayjs/locale/id';
 
 interface AppState {
   // Data
@@ -72,6 +74,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       });
       if (settings?.language) {
         await i18n.changeLanguage(settings.language);
+        dayjs.locale(settings.language);
       }
     } catch (err) {
       set({
@@ -100,6 +103,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ settings, location, qiblaDirection: qibla });
     if (settings?.language) {
       await i18n.changeLanguage(settings.language);
+      dayjs.locale(settings.language);
     }
     // Re-fetch prayer data since method/location may have changed
     await get().refreshPrayerData();
@@ -124,6 +128,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     });
     if (settings?.language) {
       await i18n.changeLanguage(settings.language);
+      dayjs.locale(settings.language);
     }
   },
 
@@ -137,6 +142,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       set({ settings });
       if (settings?.language) {
         await i18n.changeLanguage(settings.language);
+        dayjs.locale(settings.language);
       }
       await get().refreshPrayerData();
     } catch (err) {

@@ -87,23 +87,27 @@ export function getHijriMonthRangeLabel(days: HijriCalendarDay[]): string {
 }
 
 export function formatMonthHeading(date: Dayjs): string {
-  return date.format('MMMM YYYY');
+  return date.locale(i18n.language).format('MMMM YYYY');
 }
 
 export function formatExportRangeLabel(startDate: Dayjs, endDate: Dayjs): string {
   if (startDate.isSame(endDate, 'day')) {
-    return startDate.format('D MMM YYYY');
+    return startDate.locale(i18n.language).format('D MMM YYYY');
   }
 
   if (startDate.isSame(endDate, 'month')) {
-    return `${startDate.format('D')} - ${endDate.format('D MMM YYYY')}`;
+    return `${startDate.locale(i18n.language).format('D')} - ${endDate.locale(i18n.language).format('D MMM YYYY')}`;
   }
 
   if (startDate.isSame(endDate, 'year')) {
-    return `${startDate.format('D MMM')} - ${endDate.format('D MMM YYYY')}`;
+    return `${startDate.locale(i18n.language).format('D MMM')} - ${endDate
+      .locale(i18n.language)
+      .format('D MMM YYYY')}`;
   }
 
-  return `${startDate.format('D MMM YYYY')} - ${endDate.format('D MMM YYYY')}`;
+  return `${startDate.locale(i18n.language).format('D MMM YYYY')} - ${endDate
+    .locale(i18n.language)
+    .format('D MMM YYYY')}`;
 }
 
 export function getWeekdayHeaders(): string[] {

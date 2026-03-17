@@ -3,11 +3,7 @@ import { useMemo } from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import type { Dayjs } from 'dayjs';
-import type {
-  DaySchedule,
-  HijriCalendarDay,
-  PrayerCalendarSystem,
-} from '../../../types';
+import type { DaySchedule, HijriCalendarDay, PrayerCalendarSystem } from '../../../types';
 import {
   buildHijriMap,
   buildScheduleMap,
@@ -18,6 +14,7 @@ import {
 import PrayerMonthCalendarCard from './PrayerMonthCalendarCard';
 import SelectedDayScheduleCard from './SelectedDayScheduleCard';
 import { useTranslation } from 'react-i18next';
+import i18n from '../../../i18n';
 
 interface PrayerTimesCalendarViewProps {
   activeMonth: Dayjs;
@@ -69,14 +66,8 @@ export default function PrayerTimesCalendarView({
   const hijriRangeLabel = useMemo(() => getHijriMonthRangeLabel(hijriDays), [hijriDays]);
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={i18n.language}>
       <Box display="flex" flexDirection="column" gap={3}>
-        {calendarSystem === 'hijri' && (
-          <Typography variant="body2" color="text.secondary">
-            {t('prayerTimes.hijriModeHint')}
-          </Typography>
-        )}
-
         <Grid container spacing={3} alignItems="stretch">
           {calendarSystem === 'gregorian' && (
             <Grid size={{ xs: 12, xl: 8 }}>
