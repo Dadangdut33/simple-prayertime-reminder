@@ -59,6 +59,35 @@ This project was previously Electron-based. It now uses a Go backend with a Reac
 2. Extract or install the package for your platform.
 3. Run the application.
 
+## Linux AppImage Notes (Non-Debian/Ubuntu)
+
+The AppImage is built on Ubuntu and expects WebKitGTK helper binaries in Debian-style paths.
+On other distros, install WebKitGTK and add a compatibility symlink so the helper can be found.
+
+Arch Linux / Manjaro:
+
+```bash
+sudo pacman -S webkit2gtk gtk3
+sudo mkdir -p /usr/lib/x86_64-linux-gnu
+sudo ln -s /usr/lib/webkit2gtk-4.1 /usr/lib/x86_64-linux-gnu/webkit2gtk-4.1
+```
+
+Fedora / RHEL / Alma / Rocky:
+
+```bash
+sudo dnf install webkit2gtk4.1 gtk3
+sudo mkdir -p /usr/lib/x86_64-linux-gnu
+sudo ln -s /usr/lib64/webkit2gtk-4.1 /usr/lib/x86_64-linux-gnu/webkit2gtk-4.1
+```
+
+openSUSE:
+
+```bash
+sudo zypper install libwebkit2gtk-4_1-0 gtk3
+sudo mkdir -p /usr/lib/x86_64-linux-gnu
+sudo ln -s /usr/lib64/webkit2gtk-4.1 /usr/lib/x86_64-linux-gnu/webkit2gtk-4.1
+```
+
 ## Uninstallation
 
 - Installer build: run the uninstaller.

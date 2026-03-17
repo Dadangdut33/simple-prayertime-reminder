@@ -9,11 +9,15 @@ on:
 jobs:
   linux:
     name: linux-${{ matrix.arch }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        arch: [amd64, arm64]
+        include:
+          - arch: amd64
+            os: ubuntu-latest
+          - arch: arm64
+            os: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
 
@@ -21,7 +25,7 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
 
@@ -51,26 +55,13 @@ jobs:
           go install github.com/wailsapp/wails/v3/cmd/wails3@latest
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
-      - uses: docker/setup-qemu-action@v3
-      - uses: docker/setup-buildx-action@v3
-
-      - name: Build wails-cross image
-        run: |
-          docker buildx build --load --platform linux/${{ matrix.arch }} \
-            -t wails-cross:${{ matrix.arch }} \
-            -f build/docker/Dockerfile.cross build/docker/
-
       - name: Build + Package (linux)
         env:
           GOARCH: ${{ matrix.arch }}
           GIT_COMMITTER_NAME: 'github-actions[bot]'
           GIT_COMMITTER_EMAIL: 'github-actions[bot]@users.noreply.github.com'
         run: |
-          if [ "${{ matrix.arch }}" = "arm64" ]; then
-            wails3 task linux:package ARCH=arm64 HAS_CC=false CROSS_IMAGE=wails-cross:arm64
-          else
-            wails3 task linux:package ARCH=amd64 CROSS_IMAGE=wails-cross:amd64
-          fi
+          wails3 task linux:package ARCH=${{ matrix.arch }}
 
       - name: Rename binary with version
         run: |
@@ -97,7 +88,7 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
 
@@ -141,9 +132,17 @@ jobs:
         shell: pwsh
         run: |
           $app = "simple-prayertime-reminder"
-          $version = (Select-String -Path build/config.yml -Pattern 'version:' -Context 0,2 |
-            Where-Object { $_.Line -match 'version:' -and $_.Context.PreContext -match 'info:' } |
-            Select-Object -First 1).Line.Split(":")[1].Trim().Trim('"')
+          $version = $null
+          $inInfo = $false
+          Get-Content build/config.yml | ForEach-Object {
+            $line = $_
+            if ($line -match '^\s*info:\s*$') { $inInfo = $true; return }
+            if ($line -match '^[^\s]' -and $line -notmatch '^\s*info:\s*$') { $inInfo = $false }
+            if ($inInfo -and $line -match '^\s*version:\s*"?([^"]+)"?\s*$') {
+              $version = $Matches[1].Trim()
+            }
+          }
+          if (-not $version) { throw "Could not parse version from build/config.yml" }
           Move-Item -Force "bin\\$app.exe" "bin\\$app-v$version-windows-${{ matrix.arch }}.exe"
 
       - uses: actions/upload-artifact@v4
@@ -167,7 +166,7 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
 
