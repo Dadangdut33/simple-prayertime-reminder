@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAppStore } from './store/appStore';
 import * as api from './bindings';
 import UpdateAvailableDialog from './components/app/UpdateAvailableDialog';
@@ -52,6 +52,7 @@ export default function App() {
   const { t } = useTranslation();
   const { initialize, loading, initialized, settings } = useAppStore();
   const location = useLocation();
+  const navigate = useNavigate();
   const theme = useTheme();
   const shouldAutoCollapse = useMediaQuery(theme.breakpoints.down('lg'));
   const [drawerCollapsed, setDrawerCollapsed] = useState(shouldAutoCollapse);
@@ -64,6 +65,16 @@ export default function App() {
   useEffect(() => {
     if (!initialized) initialize();
   }, [initialize, initialized]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('view') !== 'reminder') return;
+    const mode = params.get('mode');
+    const next = mode ? `/reminder?mode=${mode}` : '/reminder';
+    if (location.pathname !== next) {
+      navigate(next, { replace: true });
+    }
+  }, [location.pathname, location.search, navigate]);
 
   useEffect(() => {
     setDrawerCollapsed(shouldAutoCollapse);

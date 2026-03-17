@@ -323,7 +323,7 @@ func (svc *Service) ensureReminderWindowLocked(show bool, alwaysOnTop bool, heig
 			AlwaysOnTop:      alwaysOnTop,
 			DisableResize:    false,
 			Hidden:           false,
-			URL:              "/reminder",
+			URL:              "/?view=reminder",
 			BackgroundColour: application.NewRGB(20, 20, 30),
 		})
 		svc.reminderWindow.RegisterHook(events.Common.WindowClosing, func(event *application.WindowEvent) {
@@ -378,7 +378,7 @@ func (svc *Service) ensureTestReminderWindowLocked(show bool, alwaysOnTop bool, 
 			AlwaysOnTop:      alwaysOnTop,
 			DisableResize:    false,
 			Hidden:           false,
-			URL:              "/reminder?mode=test",
+			URL:              "/?view=reminder&mode=test",
 			BackgroundColour: application.NewRGB(20, 20, 30),
 		})
 		svc.testReminderWindow.RegisterHook(events.Common.WindowClosing, func(event *application.WindowEvent) {
