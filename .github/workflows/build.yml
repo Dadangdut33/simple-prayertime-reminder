@@ -1,0 +1,174 @@
+name: Build
+
+on:
+  push:
+    branches: [master]
+    # tags: [v*]
+  workflow_dispatch:
+
+jobs:
+  linux:
+    name: linux-${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [amd64, arm64]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install Linux build deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            pkg-config gcc libgtk-3-dev libwebkit2gtk-4.1-dev \
+            libgtk-4-dev libwebkitgtk-6.0-dev libfuse2
+
+      - name: Install wails3
+        run: |
+          go install github.com/wailsapp/wails/v3/cmd/wails3@latest
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build wails-cross image
+        run: |
+          docker buildx build --load --platform linux/${{ matrix.arch }} \
+            -t wails-cross:${{ matrix.arch }} \
+            -f build/docker/Dockerfile.cross build/docker/
+
+      - name: Build + Package (linux)
+        env:
+          GOARCH: ${{ matrix.arch }}
+          GIT_COMMITTER_NAME: 'github-actions[bot]'
+          GIT_COMMITTER_EMAIL: 'github-actions[bot]@users.noreply.github.com'
+        run: |
+          wails3 task linux:package ARCH=${{ matrix.arch }} CROSS_IMAGE=wails-cross:${{ matrix.arch }}
+
+      - name: Rename binary with version
+        run: |
+          APP_NAME="simple-prayertime-reminder"
+          VERSION=$(awk 'BEGIN{ininfo=0} /^info:/{ininfo=1;next} /^[^[:space:]]/{if($0!~/^info:/)ininfo=0} ininfo && $1=="version:"{gsub(/"/,"",$2);print $2;exit}' build/config.yml)
+          mv "bin/${APP_NAME}" "bin/${APP_NAME}-v${VERSION}-linux-${{ matrix.arch }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-${{ matrix.arch }}
+          path: bin/**
+
+  windows:
+    name: windows-${{ matrix.arch }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [amd64, arm64]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install NSIS
+        run: choco install nsis -y
+
+      - name: Install wails3
+        shell: pwsh
+        run: |
+          go install github.com/wailsapp/wails/v3/cmd/wails3@latest
+          Add-Content $env:GITHUB_PATH "$(go env GOPATH)\\bin"
+
+      - name: Build + Package (windows)
+        run: |
+          wails3 task windows:package ARCH=${{ matrix.arch }}
+
+      - name: Rename binary with version
+        shell: pwsh
+        run: |
+          $app = "simple-prayertime-reminder"
+          $version = (Select-String -Path build/config.yml -Pattern 'version:' -Context 0,2 |
+            Where-Object { $_.Line -match 'version:' -and $_.Context.PreContext -match 'info:' } |
+            Select-Object -First 1).Line.Split(":")[1].Trim().Trim('"')
+          Move-Item -Force "bin\\$app.exe" "bin\\$app-v$version-windows-${{ matrix.arch }}.exe"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-${{ matrix.arch }}
+          path: |
+            bin/**
+            build/windows/nsis/*.exe
+
+  macos:
+    name: macos-${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            os: macos-13
+          - arch: arm64
+            os: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install wails3
+        run: |
+          go install github.com/wailsapp/wails/v3/cmd/wails3@latest
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      - name: Build + Package (macOS)
+        run: |
+          wails3 task darwin:package ARCH=${{ matrix.arch }}
+
+      - name: Rename binary with version
+        run: |
+          APP_NAME="simple-prayertime-reminder"
+          VERSION=$(awk 'BEGIN{ininfo=0} /^info:/{ininfo=1;next} /^[^[:space:]]/{if($0!~/^info:/)ininfo=0} ininfo && $1=="version:"{gsub(/"/,"",$2);print $2;exit}' build/config.yml)
+          mv "bin/${APP_NAME}" "bin/${APP_NAME}-v${VERSION}-darwin-${{ matrix.arch }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-${{ matrix.arch }}
+          path: |
+            bin/**
