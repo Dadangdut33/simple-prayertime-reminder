@@ -14,7 +14,22 @@ A desktop Muslim companion app for prayer times, reminders, Qibla, and more.
 [![GitHub Repo stars](https://img.shields.io/github/stars/Dadangdut33/simple-prayertime-reminder?style=social)](https://github.com/Dadangdut33/simple-prayertime-reminder/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/Dadangdut33/simple-prayertime-reminder?style=social)](https://github.com/Dadangdut33/simple-prayertime-reminder/network/members)
 
-This project was previously Electron-based. It now uses a Go backend with a React frontend powered by Wails v3.
+This project was previously Electron-based which comes with chromium meaning higher bundle size. It now uses Webkit, possible by using Go with Wails V3 while still using modern beautiful frontend powered by React and MUI library.
+
+## Table of Contents
+
+- [Features](#features)
+- [Preview](#preview)
+- [Download](#download)
+- [Installation](#installation)
+- [Uninstallation](#uninstallation)
+- [Development Setup](#development-setup)
+- [Useful Commands](#useful-commands)
+- [Project Layout](#project-layout)
+- [Configuration](#configuration)
+- [Help](#help)
+- [Attribution](#attribution)
+- [License](#license)
 
 ## Features
 
@@ -81,10 +96,20 @@ chmod +x ~/.local/bin/simple-prayertime-reminder
 
 ### Linux
 
-**Recommended (AppImage/DEB/RPM):**
+**Recommended (DEB/RPM):**
 
 1. Download the latest Linux package from [GitHub Releases](https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest).
-2. Use the package appropriate for your distro (AppImage/DEB/RPM).
+2. Use the package appropriate for your distro (DEB/RPM).
+
+**AppImage:**
+
+> [!NOTE]
+> The appimage build might only work properly on debian/ubuntu.
+> You can follow the [notes](#linux-appimage-notes-non-debian-ubuntu) section for making it work but I found that the embed page does not work on my device (Arch linux).
+
+1. Download the appimage version from [GitHub Releases](https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest).
+2. Optionally, use app like gear lever to manage the appimage.
+3. Launch the app.
 
 **Raw binary:**
 
