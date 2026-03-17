@@ -17,9 +17,11 @@ const (
 	reminderBaseMinH = 280
 	reminderBaseMaxH = 300
 	// After reminder have different height because of its size
-	reminderAfterH    = 580
-	reminderAfterMinH = 580
-	reminderAfterMaxH = 640
+	reminderAfterH    = 560
+	reminderAfterMinH = 560
+	reminderAfterMaxH = 620
+	// for test window because it have debug stuff
+	testWindowHOffset = 80
 )
 
 // ShowReminder creates or updates the reminder window with prayer info
@@ -212,6 +214,9 @@ func (svc *Service) ResizeReminderWindow(state WindowState, test bool) {
 	if test {
 		window = svc.testReminderWindow
 		info = svc.lastTestInfo
+		height += testWindowHOffset
+		minHeight += testWindowHOffset
+		maxHeight += testWindowHOffset
 	} else {
 		window = svc.reminderWindow
 		info = svc.lastInfo
@@ -222,9 +227,9 @@ func (svc *Service) ResizeReminderWindow(state WindowState, test bool) {
 	if info != nil && info.Notification != nil {
 		window.SetAlwaysOnTop(info.Notification.AlwaysOnTop)
 	}
+	window.SetSize(reminderW, height)
 	window.SetMinSize(reminderMinW, minHeight)
 	window.SetMaxSize(reminderMaxW, maxHeight)
-	window.SetSize(reminderW, height)
 }
 
 // ForceCloseTestReminder closes the simulated reminder window so it is recreated next time.
@@ -356,13 +361,15 @@ func (svc *Service) ensureTestReminderWindowLocked(show bool, alwaysOnTop bool, 
 		"minHeight", minHeight,
 		"alwaysOnTop", alwaysOnTop,
 	)
-	heightOffset := 0 // add h offset because debug window have some debug component
+	height += testWindowHOffset
+	minHeight += testWindowHOffset
+	maxHeight += testWindowHOffset
 	if svc.testReminderWindow == nil {
 		log.Info("creating test reminder window")
 		svc.testReminderWindow = svc.app.Window.NewWithOptions(application.WebviewWindowOptions{
 			Title:            "Prayer Reminder (Simulated)",
 			Width:            reminderW,
-			Height:           height + heightOffset,
+			Height:           height,
 			MinWidth:         reminderMinW,
 			MinHeight:        minHeight,
 			MaxWidth:         reminderMaxW,
@@ -392,7 +399,7 @@ func (svc *Service) ensureTestReminderWindowLocked(show bool, alwaysOnTop bool, 
 	} else {
 		log.Info("test reminder window still exist")
 		svc.testReminderWindow.SetAlwaysOnTop(alwaysOnTop)
-		svc.testReminderWindow.SetSize(reminderW, height+heightOffset)
+		svc.testReminderWindow.SetSize(reminderW, height)
 		svc.testReminderWindow.SetMinSize(reminderMinW, minHeight)
 		svc.testReminderWindow.SetMaxSize(reminderMaxW, maxHeight)
 	}

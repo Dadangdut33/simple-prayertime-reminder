@@ -112,11 +112,12 @@ This starts the Go backend, the Vite dev server for `frontend/`, and the desktop
 
 We welcome translation contributions via pull request.
 
-1. Copy `frontend/src/i18n/locales/en.ts` to a new locale file (e.g. `frontend/src/i18n/locales/id.ts`).
-2. Add the new locale to `frontend/src/i18n/index.ts` resources.
-3. Use a standard language code (ISO 639-1 or BCP 47, e.g. `id`, `en-GB`).
-4. The language selector automatically lists available locales.
-5. Open a pull request with your changes.
+1. Copy [`frontend/src/i18n/locales/en.ts`](frontend/src/i18n/locales/en.ts) to a new locale file (e.g. `frontend/src/i18n/locales/id.ts`) and then edit it.
+2. Also translate the hadith in the [`frontend/src/i18n/shared/reminder_quotes.json`](frontend/src/i18n/shared/reminder_quotes.json) file.
+3. Add the new locale to `frontend/src/i18n/index.ts` resources.
+4. Use a standard language code (ISO 639-1 or BCP 47, e.g. `id`, `en`).
+5. The language selector automatically lists available locales.
+6. Open a pull request with your changes.
 
 #### Using Fake Time
 

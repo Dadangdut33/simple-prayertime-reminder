@@ -1,3 +1,5 @@
+import reminderQuotes from '../shared/reminder_quotes.json';
+
 const en = {
   app: {
     name: 'Simple Prayertime Reminder',
@@ -690,11 +692,10 @@ const en = {
     afterTitle: '{{minutes}} minutes have passed after {{prayer}} prayer',
     beforeDetail: '{{prayer}} starts in {{minutes}}m {{seconds}}s',
     afterDetail: '{{minutes}}m {{seconds}}s have passed after {{prayer}} prayer',
-    afterQuoteBefore: 'Narrated Umm Farwah:\n\nThe Messenger of Allah (ﷺ) was asked: Which of the actions is best? ',
-    afterQuoteEmphasis: 'He replied: Observing prayer early in its period.',
-    afterQuoteAfter:
-      "Al-Khuza'i narrated in his version from his aunt named Umm Farwah who took the oath of allegiance to the Prophet (ﷺ): He was questioned.",
-    afterReference: 'Reference: Sunan Abi Dawud 426 (Kitab Al-Salat)',
+    afterQuoteBefore: reminderQuotes.en.afterQuoteBefore,
+    afterQuoteEmphasis: reminderQuotes.en.afterQuoteEmphasis,
+    afterQuoteAfter: reminderQuotes.en.afterQuoteAfter,
+    afterReference: reminderQuotes.en.afterReference,
     startsIn: 'Prayer starts in {{minutes}} minutes',
     started: 'It is now prayer time',
     active: 'Have you prayed yet?',

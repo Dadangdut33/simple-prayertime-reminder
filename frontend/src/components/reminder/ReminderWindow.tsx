@@ -142,8 +142,8 @@ export default function ReminderWindow({
             {t('reminder.autoDismissAfterAdhan')}
           </Typography>
         )}
-        {/* {extra} */}
-        {/* {debug} */}
+        {extra}
+        {debug}
         {onDismiss && (
           <Button fullWidth size="large" variant="contained" onClick={onDismiss}>
             {dismissLabel ?? t('reminder.dismiss')}

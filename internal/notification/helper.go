@@ -11,17 +11,14 @@ func reminderQuoteByLang(lang string, withQuote bool) reminderQuote {
 	if !withQuote {
 		return reminderQuote{}
 	}
-	switch lang {
-	case "id":
-		return reminderQuote{
-			quote: "Umm Farwah berkata: Rasulullah SAW ditanya: \"Amal apakah yang paling utama?\" Beliau menjawab: \"Shalat di awal waktunya.\" Al-Khuza'i menyebutkan dalam haditsnya dari bibinya yang bernama Umm Farwah yang telah membai'at Nabi SAW: Beliau ditanya.",
-			ref:   "Referensi: Hadits Sunan Abu Dawud No. 426 - Kitab Shalat",
-		}
-	default:
-		return reminderQuote{
-			quote: "Narrated Umm Farwah:\n\nThe Messenger of Allah (ﷺ) was asked: Which of the actions is best? He replied: Observing prayer early in its period.\n\nAl-Khuza'i narrated in his version from his aunt named Umm Farwah who took the oath of allegiance to the Prophet (ﷺ): He was questioned.",
-			ref:   "Reference: Sunan Abi Dawud 426",
-		}
+	translations := loadReminderQuotes()
+	locale, ok := translations[lang]
+	if !ok {
+		locale = translations["en"]
+	}
+	return reminderQuote{
+		quote: locale.AfterQuoteBefore + "\n\n" + locale.AfterQuoteEmphasis + "\n\n" + locale.AfterQuoteAfter,
+		ref:   locale.AfterReference,
 	}
 }
 

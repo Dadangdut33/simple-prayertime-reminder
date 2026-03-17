@@ -1,3 +1,5 @@
+import reminderQuotes from '../shared/reminder_quotes.json';
+
 const id = {
   app: {
     name: 'Simple Prayertime Reminder',
@@ -626,11 +628,10 @@ const id = {
     afterTitle: '{{minutes}} menit telah berlalu setelah salat {{prayer}}',
     beforeDetail: '{{prayer}} dimulai dalam {{minutes}}m {{seconds}}s',
     afterDetail: '{{minutes}}m {{seconds}}s telah berlalu setelah salat {{prayer}}',
-    afterQuoteBefore: 'Umm Farwah berkata: Rasulullah SAW ditanya: "Amal apakah yang paling utama?" ',
-    afterQuoteEmphasis: 'Beliau menjawab: "Shalat di awal waktunya."',
-    afterQuoteAfter:
-      "Al-Khuza'i menyebutkan dalam haditsnya dari bibinya yang bernama Umm Farwah yang telah membai'at Nabi SAW: Beliau ditanya.",
-    afterReference: 'Referensi: Hadits Sunan Abu Dawud No. 426 - Kitab Shalat',
+    afterQuoteBefore: reminderQuotes.id.afterQuoteBefore,
+    afterQuoteEmphasis: reminderQuotes.id.afterQuoteEmphasis,
+    afterQuoteAfter: reminderQuotes.id.afterQuoteAfter,
+    afterReference: reminderQuotes.id.afterReference,
     startsIn: 'Salat dimulai dalam {{minutes}} menit',
     started: 'Waktu salat tiba',
     active: 'Sudahkah Anda melakukan salat?',

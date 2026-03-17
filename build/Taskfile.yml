@@ -82,6 +82,7 @@ tasks:
     summary: Generates bindings for the frontend
     deps:
       - task: go:mod:tidy
+      - task: generate:reminder-quotes
     sources:
       - "**/*.[jt]s"
       - exclude: frontend/**/*
@@ -93,6 +94,15 @@ tasks:
       - frontend/bindings/**/*
     cmds:
       - wails3 generate bindings -f '{{.BUILD_FLAGS}}' -clean=true -ts
+
+  generate:reminder-quotes:
+    summary: Copies reminder quote translations for backend embed
+    sources:
+      - "frontend/src/i18n/shared/reminder_quotes.json"
+    generates:
+      - "internal/notification/i18n/reminder_quotes.json"
+    cmds:
+      - cp frontend/src/i18n/shared/reminder_quotes.json internal/notification/i18n/reminder_quotes.json
 
   generate:icons:
     summary: Copies the real application icons from `assets/` into the build output locations used by packaging tasks.
