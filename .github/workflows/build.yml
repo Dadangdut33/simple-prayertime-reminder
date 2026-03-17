@@ -3,8 +3,11 @@ name: Build
 on:
   push:
     branches: [master]
-    # tags: [v*]
+    tags: [v*]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   linux:
@@ -160,7 +163,8 @@ jobs:
           }
           Write-Host "Version: $version"
           Move-Item -Force "bin\\$app.exe" "bin\\$app-v$version-windows-${{ matrix.arch }}.exe"
-          Move-Item -Force "bin\\$app-${{ matrix.arch }}-installer.exe" "bin\\$app-v$version-windows-${{ matrix.arch }}-installer.exe"
+          Move-Item -Force "bin\\$app-amd64-installer.exe" "bin\\$app-v$version-windows-${{ matrix.arch }}-installer.exe"
+          # the packaged version become amd64 somehow?? so we use that name instead
 
       - uses: actions/upload-artifact@v7
         with:
@@ -219,8 +223,34 @@ jobs:
             mv "bin/${APP_NAME}.app" "bin/${APP_NAME}-v${VERSION}-darwin-${{ matrix.arch }}.app"
           fi
 
+      - name: Zip app bundle (macOS)
+        run: |
+          APP_NAME="simple-prayertime-reminder"
+          VERSION=$(awk 'BEGIN{ininfo=0} /^info:/{ininfo=1;next} /^[^[:space:]]/{if($0!~/^info:/)ininfo=0} ininfo && $1=="version:"{gsub(/"/,"",$2);print $2;exit}' build/config.yml)
+          APP_DIR="bin/${APP_NAME}-v${VERSION}-darwin-${{ matrix.arch }}.app"
+          if [ -d "$APP_DIR" ]; then
+            ditto -c -k --sequesterRsrc --keepParent "$APP_DIR" "bin/${APP_NAME}-v${VERSION}-darwin-${{ matrix.arch }}.app.zip"
+          fi
+
       - uses: actions/upload-artifact@v7
         with:
           name: macos-${{ matrix.arch }}
           path: |
             bin/**
+
+  release:
+    name: draft-release
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    needs: [linux, windows, macos]
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: dist
+
+      - name: Upload to draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: |
+            dist/**/*
