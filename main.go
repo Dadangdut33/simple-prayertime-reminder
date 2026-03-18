@@ -41,6 +41,9 @@ func shouldStartHidden(args []string) bool {
 //go:embed assets/icon.png
 var appIcon []byte
 
+//go:embed assets/favicon-32x32.png
+var appIconIco []byte
+
 //go:embed all:frontend/dist
 var assets embed.FS
 
@@ -154,7 +157,7 @@ func main() {
 	})
 
 	// System tray
-	trayState := tray.Setup(app, appSvc, mainWindow, appName, appIcon, func() {
+	trayState := tray.Setup(app, appSvc, mainWindow, appName, appIconIco, func() {
 		allowQuit.Store(true)
 		app.Quit()
 	})
