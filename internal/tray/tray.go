@@ -20,7 +20,7 @@ const (
 	trayLeftClickNone         = "none"
 )
 
-func Setup(app *application.App, appSvc *appservice.Service, mainWindow application.Window, appName string, appIcon []byte) *MenuState {
+func Setup(app *application.App, appSvc *appservice.Service, mainWindow application.Window, appName string, appIcon []byte, onQuit func()) *MenuState {
 	tray := app.SystemTray.New()
 	trayLabel := buildTrayIdentityLabel(appSvc, appName)
 
@@ -32,7 +32,7 @@ func Setup(app *application.App, appSvc *appservice.Service, mainWindow applicat
 
 	tray.SetTooltip(trayLabel)
 	tray.SetIcon(appIcon)
-	state, menu := buildTrayMenu(app, appSvc, mainWindow, trayLabel, appIcon, appName)
+	state, menu := buildTrayMenu(app, appSvc, mainWindow, trayLabel, appIcon, appName, onQuit)
 	tray.SetMenu(menu)
 	state.forceMenuOnce.Store(true)
 	tray.OnRightClick(func() {
@@ -76,6 +76,7 @@ func buildTrayMenu(
 	trayLabel string,
 	appIcon []byte,
 	appName string,
+	onQuit func(),
 ) (*MenuState, *application.Menu) {
 	menu := app.Menu.New()
 	state := &MenuState{
@@ -99,6 +100,10 @@ func buildTrayMenu(
 	})
 	menu.AddSeparator()
 	menu.Add("Quit").OnClick(func(_ *application.Context) {
+		if onQuit != nil {
+			onQuit()
+			return
+		}
 		app.Quit()
 	})
 

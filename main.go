@@ -4,6 +4,7 @@ import (
 	"embed"
 	"os"
 	"path/filepath"
+	"sync/atomic"
 
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/appservice"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/audio"
@@ -18,6 +19,7 @@ import (
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/tray"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
+	"github.com/wailsapp/wails/v3/pkg/events"
 	"github.com/wailsapp/wails/v3/pkg/services/notifications"
 )
 
@@ -101,6 +103,12 @@ func main() {
 		Mac: application.MacOptions{
 			ApplicationShouldTerminateAfterLastWindowClosed: false,
 		},
+		Windows: application.WindowsOptions{
+			DisableQuitOnLastWindowClosed: true,
+		},
+		Linux: application.LinuxOptions{
+			DisableQuitOnLastWindowClosed: true,
+		},
 	})
 
 	// Notification and Scheduler need app to emit events/manage windows
@@ -135,10 +143,21 @@ func main() {
 			TitleBar:                application.MacTitleBarHiddenInset,
 		},
 	})
-	_ = mainWindow
+
+	var allowQuit atomic.Bool
+	mainWindow.RegisterHook(events.Common.WindowClosing, func(event *application.WindowEvent) {
+		if allowQuit.Load() {
+			return
+		}
+		event.Cancel()
+		mainWindow.Hide()
+	})
 
 	// System tray
-	trayState := tray.Setup(app, appSvc, mainWindow, appName, appIcon)
+	trayState := tray.Setup(app, appSvc, mainWindow, appName, appIcon, func() {
+		allowQuit.Store(true)
+		app.Quit()
+	})
 	appservice.SetSettingsChangedHandler(appSvc, func(cfg settings.Settings) {
 		if trayState != nil {
 			trayState.UpdateLeftClickAction(cfg.TrayLeftClick)
