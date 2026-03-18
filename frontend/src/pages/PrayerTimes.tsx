@@ -741,6 +741,7 @@ export default function PrayerTimes() {
           hijriDays={hijriDays}
           calendarSystem={calendarSystem}
           timeFormat={settings?.timeFormat ?? '24h'}
+          timeZone={settings?.location.timezone}
           onPrevMonth={handlePrevMonth}
           onNextMonth={handleNextMonth}
           onToday={() => setSelectedDate(dayjs())}
@@ -754,6 +755,7 @@ export default function PrayerTimes() {
           loading={loading}
           calendarSystem={calendarSystem}
           timeFormat={settings?.timeFormat ?? '24h'}
+          timeZone={settings?.location.timezone}
           useArabicIndicDigits={useArabicIndicDigits}
           onSelectedDateChange={setSelectedDate}
           onMonthChange={setMonth}
@@ -870,6 +872,7 @@ export default function PrayerTimes() {
                 schedules={exportSchedulesByMonth[month.format('YYYY-MM')] ?? []}
                 hijriByDate={exportHijriByDate}
                 timeFormat={settings?.timeFormat ?? '24h'}
+                timeZone={settings?.location.timezone}
                 layout={exportTableLayout}
                 useTwoColumnPrayerGrid={useTwoColumnPrayerGrid}
                 metadata={exportMetadata}

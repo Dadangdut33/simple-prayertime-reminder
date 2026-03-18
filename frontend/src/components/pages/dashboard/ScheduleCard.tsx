@@ -1,6 +1,6 @@
 import { Box, Card, Typography } from '@mui/material';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-import { formatTime } from '../../../utils/helpers';
+import { formatTime, formatTimeInZone } from '../../../utils/helpers';
 import { useTranslation } from 'react-i18next';
 
 interface PrayerEntry {
@@ -12,9 +12,17 @@ interface ScheduleCardProps {
   prayers: readonly PrayerEntry[];
   nextPrayerName?: string;
   isAllPassed: boolean;
+  timeZone?: string;
+  timeFormat?: '12h' | '24h';
 }
 
-export default function ScheduleCard({ prayers, nextPrayerName, isAllPassed }: ScheduleCardProps) {
+export default function ScheduleCard({
+  prayers,
+  nextPrayerName,
+  isAllPassed,
+  timeZone,
+  timeFormat = '24h',
+}: ScheduleCardProps) {
   const { t } = useTranslation();
   return (
     <Card sx={{ p: 3 }}>
@@ -57,7 +65,7 @@ export default function ScheduleCard({ prayers, nextPrayerName, isAllPassed }: S
                 color={isNext ? 'primary.main' : 'text.primary'}
                 sx={{ fontVariantNumeric: 'tabular-nums' }}
               >
-                {formatTime(p.time)}
+                {timeZone ? formatTimeInZone(p.time, timeZone, timeFormat) : formatTime(p.time, timeFormat)}
               </Typography>
             </Box>
           );

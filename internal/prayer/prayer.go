@@ -179,7 +179,17 @@ func (svc *Service) GetScheduleForDate(date time.Time) (DaySchedule, error) {
 
 // GetTodaySchedule returns today's prayer schedule
 func (svc *Service) GetTodaySchedule() (DaySchedule, error) {
-	return svc.GetScheduleForDate(clock.Now())
+	svc.mu.RLock()
+	timezone := svc.cfg.Timezone
+	svc.mu.RUnlock()
+
+	loc, err := time.LoadLocation(timezone)
+	if err != nil {
+		log.Warn("timezone load failed, using UTC", "timezone", timezone, "error", err)
+		loc = time.UTC
+	}
+
+	return svc.GetScheduleForDate(clock.Now().In(loc))
 }
 
 // GetNextPrayer returns info about the next upcoming prayer

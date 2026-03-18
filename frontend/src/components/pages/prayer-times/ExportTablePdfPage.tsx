@@ -1,6 +1,6 @@
 import { Box, Grid, Typography } from '@mui/material';
 import type { DaySchedule, HijriDate } from '../../../types';
-import { formatTime } from '../../../utils/helpers';
+import { formatTime, formatTimeInZone } from '../../../utils/helpers';
 import type { ExportMetadataSummary, PrayerTableLayout } from './ExportPrayerTimesDialog';
 import { formatHijriDateShort } from './helpers';
 import i18n from '../../../i18n';
@@ -11,6 +11,7 @@ interface ExportTablePdfPageProps {
   schedules: DaySchedule[];
   hijriByDate: Record<string, HijriDate>;
   timeFormat: '12h' | '24h';
+  timeZone?: string;
   layout: PrayerTableLayout;
   useTwoColumnPrayerGrid: boolean;
   metadata: ExportMetadataSummary;
@@ -22,6 +23,7 @@ function PrayerTable({
   schedules,
   hijriByDate,
   timeFormat,
+  timeZone,
   prayerKeys,
   labels,
   compact = false,
@@ -30,6 +32,7 @@ function PrayerTable({
   schedules: DaySchedule[];
   hijriByDate: Record<string, HijriDate>;
   timeFormat: '12h' | '24h';
+  timeZone?: string;
   prayerKeys: PrayerKey[];
   labels: string[];
   compact?: boolean;
@@ -96,7 +99,11 @@ function PrayerTable({
                 </>
               )}
               {prayerKeys.map((key) => (
-                <td key={`${schedule.date}-${String(key)}`}>{formatTime(schedule[key], timeFormat)}</td>
+                <td key={`${schedule.date}-${String(key)}`}>
+                  {timeZone
+                    ? formatTimeInZone(schedule[key], timeZone, timeFormat)
+                    : formatTime(schedule[key], timeFormat)}
+                </td>
               ))}
             </tr>
           );
@@ -112,6 +119,7 @@ export default function ExportTablePdfPage({
   schedules,
   hijriByDate,
   timeFormat,
+  timeZone,
   layout,
   useTwoColumnPrayerGrid,
   metadata,
@@ -175,6 +183,7 @@ export default function ExportTablePdfPage({
             schedules={leftSchedules}
             hijriByDate={hijriByDate}
             timeFormat={timeFormat}
+            timeZone={timeZone}
             prayerKeys={['fajr', 'sunrise', 'zuhr', 'asr', 'maghrib', 'isha']}
             labels={[
               i18n.t('prayerNames.fajr'),
@@ -190,6 +199,7 @@ export default function ExportTablePdfPage({
             schedules={rightSchedules}
             hijriByDate={hijriByDate}
             timeFormat={timeFormat}
+            timeZone={timeZone}
             prayerKeys={['fajr', 'sunrise', 'zuhr', 'asr', 'maghrib', 'isha']}
             labels={[
               i18n.t('prayerNames.fajr'),
@@ -207,6 +217,7 @@ export default function ExportTablePdfPage({
           schedules={schedules}
           hijriByDate={hijriByDate}
           timeFormat={timeFormat}
+          timeZone={timeZone}
           prayerKeys={['fajr', 'sunrise', 'zuhr', 'asr', 'maghrib', 'isha']}
           labels={[
             i18n.t('prayerNames.fajr'),

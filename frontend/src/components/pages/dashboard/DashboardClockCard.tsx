@@ -8,6 +8,7 @@ interface DashboardClockCardProps {
   settings: Settings;
   analogClockSize: number;
   digitalClockText: string;
+  timeZoneLabel?: string;
 }
 
 export default function DashboardClockCard({
@@ -15,6 +16,7 @@ export default function DashboardClockCard({
   settings,
   analogClockSize,
   digitalClockText,
+  timeZoneLabel,
 }: DashboardClockCardProps) {
   const { t } = useTranslation();
   const analogFormatHour = (_locale: string | undefined, hour: number) => {
@@ -127,7 +129,7 @@ export default function DashboardClockCard({
             {digitalClockText}
           </Typography>
           <Typography variant="body2" color="text.secondary" mt={1}>
-            {t('dashboard.clock.localTime')}
+            {timeZoneLabel ? t('dashboard.clock.timezoneLabel', { tz: timeZoneLabel }) : t('dashboard.clock.localTime')}
           </Typography>
         </Box>
       )}

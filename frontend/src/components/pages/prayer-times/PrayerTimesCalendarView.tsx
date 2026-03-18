@@ -24,6 +24,7 @@ interface PrayerTimesCalendarViewProps {
   loading: boolean;
   calendarSystem: PrayerCalendarSystem;
   timeFormat: '12h' | '24h';
+  timeZone?: string;
   useArabicIndicDigits: boolean;
   onSelectedDateChange: (date: Dayjs) => void;
   onMonthChange: (month: Dayjs) => void;
@@ -42,6 +43,7 @@ export default function PrayerTimesCalendarView({
   loading,
   calendarSystem,
   timeFormat,
+  timeZone,
   useArabicIndicDigits,
   onSelectedDateChange,
   onMonthChange,
@@ -149,6 +151,7 @@ export default function PrayerTimesCalendarView({
               hijriDate={selectedHijri}
               loading={loading}
               timeFormat={timeFormat}
+              timeZone={timeZone}
             />
           </Grid>
         </Grid>

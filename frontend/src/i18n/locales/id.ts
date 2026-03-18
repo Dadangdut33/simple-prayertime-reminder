@@ -81,6 +81,7 @@ const id = {
     clock: {
       title: 'Waktu Saat Ini',
       localTime: 'Waktu lokal.',
+      timezoneLabel: 'Zona waktu: {{tz}}',
     },
   },
   compass: {

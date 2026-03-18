@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import { Box, Card, Chip, Divider, Skeleton, Typography } from '@mui/material';
 import type { Dayjs } from 'dayjs';
 import type { DaySchedule, HijriDate } from '../../../types';
-import { formatTime, getPrayerList } from '../../../utils/helpers';
+import { formatTime, formatTimeInZone, getPrayerList } from '../../../utils/helpers';
 import {
   formatHijriDateLabel,
   formatLongGregorianDate,
@@ -16,6 +16,7 @@ interface SelectedDayScheduleCardProps {
   hijriDate: HijriDate | null;
   loading: boolean;
   timeFormat: '12h' | '24h';
+  timeZone?: string;
 }
 
 export default function SelectedDayScheduleCard({
@@ -24,6 +25,7 @@ export default function SelectedDayScheduleCard({
   hijriDate,
   loading,
   timeFormat,
+  timeZone,
 }: SelectedDayScheduleCardProps) {
   const { t } = useTranslation();
   const isToday = toIsoDate(selectedDate) === dayjs().format('YYYY-MM-DD');
@@ -84,7 +86,7 @@ export default function SelectedDayScheduleCard({
                 fontWeight={700}
                 sx={{ fontVariantNumeric: 'tabular-nums' }}
               >
-                {formatTime(entry.time, timeFormat)}
+                {timeZone ? formatTimeInZone(entry.time, timeZone, timeFormat) : formatTime(entry.time, timeFormat)}
               </Typography>
             </Box>
           ))}

@@ -1,5 +1,5 @@
 import { Box, Card, Chip, LinearProgress, Typography } from '@mui/material';
-import { formatDuration, formatTime } from '../../../utils/helpers';
+import { formatDuration, formatTime, formatTimeInZone } from '../../../utils/helpers';
 import { useTranslation } from 'react-i18next';
 
 interface PrayerMoment {
@@ -17,6 +17,8 @@ interface NextPrayerCardProps {
   previousPrayerInfo: PrayerMoment | null;
   elapsedSeconds: number;
   progress: number;
+  timeZone?: string;
+  timeFormat?: '12h' | '24h';
 }
 
 export default function NextPrayerCard({
@@ -29,6 +31,8 @@ export default function NextPrayerCard({
   previousPrayerInfo,
   elapsedSeconds,
   progress,
+  timeZone,
+  timeFormat = '24h',
 }: NextPrayerCardProps) {
   const { t } = useTranslation();
   const progressLabel = progress >= 100 ? 100 : Math.floor(progress);
@@ -113,10 +117,19 @@ export default function NextPrayerCard({
           <Box display="flex" justifyContent="space-between" alignItems="center" gap={2} mt={1}>
             <Typography variant="caption" color="text.secondary">
               {previousPrayerInfo?.name} •{' '}
-              {previousPrayerInfo ? formatTime(previousPrayerInfo.time.toISOString()) : '--:--'}
+              {previousPrayerInfo
+                ? timeZone
+                  ? formatTimeInZone(previousPrayerInfo.time.toISOString(), timeZone, timeFormat)
+                  : formatTime(previousPrayerInfo.time.toISOString(), timeFormat)
+                : '--:--'}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {nextPrayerLabel} • {nextPrayerTime ? formatTime(nextPrayerTime) : '--:--'}
+              {nextPrayerLabel} •{' '}
+              {nextPrayerTime
+                ? timeZone
+                  ? formatTimeInZone(nextPrayerTime, timeZone, timeFormat)
+                  : formatTime(nextPrayerTime, timeFormat)
+                : '--:--'}
             </Typography>
           </Box>
         </Box>

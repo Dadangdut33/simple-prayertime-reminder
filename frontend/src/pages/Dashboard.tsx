@@ -19,6 +19,16 @@ export default function Dashboard() {
   const { todaySchedule, hijriDate, location, qiblaDirection, settings, loading } = useAppStore();
   const { t } = useTranslation();
   const now = useClock();
+  const timeZone = settings?.location.timezone || undefined;
+  const timeFormat = settings?.timeFormat ?? '24h';
+  let zonedNow = now;
+  if (timeZone) {
+    try {
+      zonedNow = new Date(now.toLocaleString('en-US', { timeZone }));
+    } catch {
+      zonedNow = now;
+    }
+  }
 
   if (loading || !todaySchedule || !settings) {
     return null; // handled by App shell
@@ -102,7 +112,7 @@ export default function Dashboard() {
       : 0;
   const analogClockSize = clamp(settings.dashboard.analogClockSize || 200, 160, 280);
   const digitalClockText = formatDigitalClock(
-    now,
+    zonedNow,
     settings.dashboard.digitalClockFormat,
     settings.dashboard.digitalClockCustom,
   );
@@ -124,20 +134,29 @@ export default function Dashboard() {
             previousPrayerInfo={previousPrayerInfo}
             elapsedSeconds={elapsedSeconds}
             progress={progress}
+            timeZone={timeZone}
+            timeFormat={timeFormat}
           />
 
           {settings.dashboard.showClock && (
             <DashboardClockCard
-              now={now}
+              now={zonedNow}
               settings={settings}
               analogClockSize={analogClockSize}
               digitalClockText={digitalClockText}
+              timeZoneLabel={timeZone}
             />
           )}
         </Box>
 
         <Box display="grid" gap={3}>
-          <ScheduleCard prayers={prayers} nextPrayerName={scheduleHighlightLabel} isAllPassed={isAllPassed} />
+          <ScheduleCard
+            prayers={prayers}
+            nextPrayerName={scheduleHighlightLabel}
+            isAllPassed={isAllPassed}
+            timeZone={timeZone}
+            timeFormat={timeFormat}
+          />
 
           <QiblaCard location={location} qiblaDirection={qiblaDirection} qiblaCompassLabel={qiblaCompassLabel} />
         </Box>

@@ -81,6 +81,7 @@ const en = {
     clock: {
       title: 'Current Time',
       localTime: 'Local Time.',
+      timezoneLabel: 'Timezone: {{tz}}',
     },
   },
   compass: {

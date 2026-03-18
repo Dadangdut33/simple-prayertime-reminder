@@ -17,7 +17,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import type { DaySchedule, HijriCalendarDay, PrayerCalendarSystem } from '../../../types';
-import { formatTime } from '../../../utils/helpers';
+import { formatTime, formatTimeInZone } from '../../../utils/helpers';
 import { buildHijriMap, formatHijriDateShort } from './helpers';
 import { useTranslation } from 'react-i18next';
 import i18n from '../../../i18n';
@@ -29,6 +29,7 @@ interface PrayerTimesTableViewProps {
   schedules: DaySchedule[];
   hijriDays: HijriCalendarDay[];
   timeFormat: '12h' | '24h';
+  timeZone?: string;
   calendarSystem: PrayerCalendarSystem;
   onPrevMonth: () => void;
   onNextMonth: () => void;
@@ -46,6 +47,7 @@ export default function PrayerTimesTableView({
   schedules,
   hijriDays,
   timeFormat,
+  timeZone,
   calendarSystem,
   onPrevMonth,
   onNextMonth,
@@ -157,7 +159,7 @@ export default function PrayerTimesTableView({
                         align="center"
                         sx={{ fontVariantNumeric: 'tabular-nums' }}
                       >
-                        {formatTime(value, timeFormat)}
+                        {timeZone ? formatTimeInZone(value, timeZone, timeFormat) : formatTime(value, timeFormat)}
                       </TableCell>
                     ))}
                   </TableRow>

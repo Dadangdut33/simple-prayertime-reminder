@@ -528,7 +528,13 @@ func (s *Service) SetManualLocation(loc location.Location) error {
 }
 
 func (s *Service) GetTodaySchedule() (prayer.DaySchedule, error) {
-	schedule, err := s.prayerSvc.GetTodaySchedule()
+	cfg := s.settingsSvc.Get()
+	loc, err := time.LoadLocation(cfg.Location.Timezone)
+	if err != nil {
+		loc = time.UTC
+	}
+	now := clock.Now().In(loc)
+	schedule, err := s.prayerSvc.GetScheduleForDate(now)
 	if err != nil {
 		log.Error("today schedule failed", "error", err)
 		return prayer.DaySchedule{}, err
@@ -622,7 +628,12 @@ func (s *Service) GetHijriDateRange(startDate, endDate string) ([]hijri.Calendar
 }
 
 func (s *Service) GetNextPrayer() (prayer.NextPrayerInfo, error) {
-	return s.prayerSvc.GetNextPrayer(clock.Now())
+	cfg := s.settingsSvc.Get()
+	loc, err := time.LoadLocation(cfg.Location.Timezone)
+	if err != nil {
+		loc = time.UTC
+	}
+	return s.prayerSvc.GetNextPrayer(clock.Now().In(loc))
 }
 
 func (s *Service) GetTodayHijri() (hijri.HijriDate, error) {
