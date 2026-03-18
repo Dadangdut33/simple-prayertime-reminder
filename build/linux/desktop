@@ -1,5 +1,5 @@
 [Desktop Entry]
-Version=2.0
+Version=1.0
 Name=Simple PrayerTime Reminder
 Comment=A Muslim Companion Desktop App
 # The Exec line includes %u to pass the URL to the application
