@@ -18,18 +18,37 @@ This project was previously Electron-based which comes with chromium meaning hig
 
 ## Table of Contents
 
-- [Features](#features)
-- [Preview](#preview)
-- [Download](#download)
-- [Installation](#installation)
-- [Uninstallation](#uninstallation)
-- [Development Setup](#development-setup)
-- [Useful Commands](#useful-commands)
-- [Project Layout](#project-layout)
-- [Configuration](#configuration)
-- [Help](#help)
-- [Attribution](#attribution)
-- [License](#license)
+- [Simple PrayerTime Reminder](#simple-prayertime-reminder)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Preview](#preview)
+  - [Download](#download)
+  - [Installation](#installation)
+    - [Windows](#windows)
+    - [macOS](#macos)
+    - [Linux](#linux)
+    - [Linux AppImage Notes For Non-Debian/Ubuntu](#linux-appimage-notes-for-non-debianubuntu)
+    - [Install via Script](#install-via-script)
+  - [Updating the App](#updating-the-app)
+    - [Installer](#installer)
+    - [Portable](#portable)
+    - [Script Installation](#script-installation)
+  - [Uninstallation](#uninstallation)
+  - [Development Setup](#development-setup)
+    - [Requirements](#requirements)
+    - [First-time setup](#first-time-setup)
+    - [Run in development mode](#run-in-development-mode)
+    - [Contributing Translations](#contributing-translations)
+      - [Using Fake Time](#using-fake-time)
+      - [Stopping Rogue Process](#stopping-rogue-process)
+    - [Build the app](#build-the-app)
+    - [GitHub Actions (Build Triggers)](#github-actions-build-triggers)
+  - [Useful Commands](#useful-commands)
+  - [Project Layout](#project-layout)
+  - [Configuration](#configuration)
+  - [Help](#help)
+  - [Attribution](#attribution)
+  - [License](#license)
 
 ## Features
 
@@ -205,6 +224,20 @@ Make sure `$(go env GOPATH)/bin` (Linux/macOS) or `%GOPATH%\bin` (Windows) is in
 
 > **Why not `go install` directly?**  
 > This app bundles a frontend (HTML/JS) that must be built before the Go binary is compiled. The install scripts handle that automatically.
+
+## Updating the App
+
+### Installer
+
+Download the latest installer and run it.
+
+### Portable
+
+Replace the portable app with the newest release.
+
+### Script Installation
+
+Run again the one-liner in [Install via Script](#install-via-script)
 
 ## Uninstallation
 
