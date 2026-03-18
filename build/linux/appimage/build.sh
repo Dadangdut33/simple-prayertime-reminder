@@ -17,17 +17,19 @@ cp "${DESKTOP_FILE}" "${APP_DIR}/"
 if [[ $(uname -m) == *x86_64* ]]; then
     # Download linuxdeploy and make it executable
     wget -q -4 -N https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
-    chmod +x linuxdeploy-x86_64.AppImage
+    wget -q -4 -N https://raw.githubusercontent.com/linuxdeploy/linuxdeploy-plugin-gtk/master/linuxdeploy-plugin-gtk.sh
+    chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-gtk.sh
 
     # Run linuxdeploy to bundle the application
-    ./linuxdeploy-x86_64.AppImage --appdir "${APP_DIR}" --output appimage
+    ./linuxdeploy-x86_64.AppImage --appdir "${APP_DIR}" --output appimage --plugin gtk
 else
     # Download linuxdeploy and make it executable (arm64)
     wget -q -4 -N https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-aarch64.AppImage
-    chmod +x linuxdeploy-aarch64.AppImage
+    wget -q -4 -N https://raw.githubusercontent.com/linuxdeploy/linuxdeploy-plugin-gtk/master/linuxdeploy-plugin-gtk.sh
+    chmod +x linuxdeploy-aarch64.AppImage linuxdeploy-plugin-gtk.sh
 
     # Run linuxdeploy to bundle the application (arm64)
-    ./linuxdeploy-aarch64.AppImage --appdir "${APP_DIR}" --output appimage
+    ./linuxdeploy-aarch64.AppImage --appdir "${APP_DIR}" --output appimage --plugin gtk
 fi
 
 # Rename the generated AppImage
