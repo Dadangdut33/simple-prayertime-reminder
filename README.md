@@ -104,8 +104,7 @@ chmod +x ~/.local/bin/simple-prayertime-reminder
 **AppImage:**
 
 > [!NOTE]
-> The appimage build might only work properly on debian/ubuntu.
-> You can follow the [notes](#linux-appimage-notes-non-debian-ubuntu) section for making it work but I found that the embed page does not work on my device (Arch linux).
+> The appimage build might only work properly on debian/ubuntu. This is because the github action runner is using ubuntu and since we are using webkit, the dependencies wont match. To fix this for other distroy, you can follow the [notes](#linux-appimage-notes-for-non-debianubuntu) section for making it work on other distro. The app will work but I found that the embed page feature does not work on my device (Arch linux).
 
 1. Download the appimage version from [GitHub Releases](https://github.com/Dadangdut33/simple-prayertime-reminder/releases/latest).
 2. Optionally, use app like gear lever to manage the appimage.
@@ -152,7 +151,7 @@ Then set in the desktop entry:
 Icon=/home/{USERNAME}/.local/share/icons/simple-prayertime-reminder.png
 ```
 
-### Linux AppImage Notes (Non-Debian/Ubuntu)
+### Linux AppImage Notes For Non-Debian/Ubuntu
 
 The AppImage is built on Ubuntu and expects WebKitGTK helper binaries in Debian-style paths.
 On other distros, install WebKitGTK and add a compatibility symlink so the helper can be found.
