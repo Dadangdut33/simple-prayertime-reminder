@@ -30,9 +30,6 @@ This project was previously Electron-based which comes with chromium meaning hig
     - [Linux AppImage Notes For Non-Debian/Ubuntu](#linux-appimage-notes-for-non-debianubuntu)
     - [Install via Script](#install-via-script)
   - [Updating the App](#updating-the-app)
-    - [Installer](#installer)
-    - [Portable](#portable)
-    - [Script Installation](#script-installation)
   - [Uninstallation](#uninstallation)
   - [Development Setup](#development-setup)
     - [Requirements](#requirements)
@@ -211,6 +208,14 @@ bash <(curl -fsSL https://raw.githubusercontent.com/dadangdut33/simple-prayertim
 
 **Windows (PowerShell)**
 
+> You may need to allow script execution first. Run this in PowerShell as Administrator:
+>
+> ```powershell
+> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+> ```
+>
+> This only needs to be done once. `RemoteSigned` allows local scripts and downloaded scripts that are signed; using `CurrentUser` scope means it won't affect other users and doesn't require admin.
+
 ```powershell
 irm https://raw.githubusercontent.com/dadangdut33/simple-prayertime-reminder/main/scripts/install.ps1 | iex
 ```
@@ -219,6 +224,7 @@ The script will:
 
 1. Build the frontend with pnpm
 2. Install the binary to your Go bin directory (`$(go env GOPATH)/bin`)
+3. Create a desktop entry for the app.
 
 Make sure `$(go env GOPATH)/bin` (Linux/macOS) or `%GOPATH%\bin` (Windows) is in your `PATH`.
 
@@ -227,17 +233,9 @@ Make sure `$(go env GOPATH)/bin` (Linux/macOS) or `%GOPATH%\bin` (Windows) is in
 
 ## Updating the App
 
-### Installer
-
-Download the latest installer and run it.
-
-### Portable
-
-Replace the portable app with the newest release.
-
-### Script Installation
-
-Run again the one-liner in [Install via Script](#install-via-script)
+- Installer build : Download the latest installer and run it.
+- Portable build : Replace the portable app with the newest release.
+- Script installation (Linux / macOS) : Run again the one-liner in [Install via Script](#install-via-script)
 
 ## Uninstallation
 

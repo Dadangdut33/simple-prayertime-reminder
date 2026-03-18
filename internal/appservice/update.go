@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"runtime"
 	"strings"
 	"time"
 
@@ -153,7 +154,11 @@ func buildUpdateInstructions(appInfo AppInfo, latest releaseInfo) UpdateInfo {
 		update.UpdateDetail = "This copy was installed with Go. Run the command below to fetch and install the latest tagged version."
 		update.ActionLabel = "Open Repository"
 		update.ReleaseURL = appInfo.RepositoryURL
-		update.UpdateCommand = "go install github.com/dadangdut33/simple-prayertime-reminder@latest"
+		if runtime.GOOS == "windows" {
+			update.UpdateCommand = "irm https://raw.githubusercontent.com/dadangdut33/simple-prayertime-reminder/main/scripts/install.ps1 | iex"
+		} else {
+			update.UpdateCommand = "bash <(curl -fsSL https://raw.githubusercontent.com/dadangdut33/simple-prayertime-reminder/main/scripts/install.sh)"
+		}
 	case "Snap":
 		update.UpdateTitle = "Update through Snap"
 		update.UpdateDetail = "This copy appears to be installed with Snap. Refresh the package or download the newest release manually."

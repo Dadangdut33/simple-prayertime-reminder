@@ -62,7 +62,35 @@ try {
 } finally {
   Pop-Location
 }
-Success "Binary installed to $InstallDir\$BinaryName"
+Success "Binary installed to $InstallDir\$BinaryName.exe"
+
+# ─── Start Menu shortcut ──────────────────────────────────────────────────────
+Log "Creating Start Menu shortcut..."
+
+$StartMenuDir  = Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs"
+$ShortcutPath  = Join-Path $StartMenuDir "$BinaryName.lnk"
+$BinaryPath    = Join-Path $InstallDir "$BinaryName.exe"
+$IconSrc       = Join-Path $TmpDir "assets\icon.png"
+$IconDir       = Join-Path $env:LOCALAPPDATA "$BinaryName"
+$IconDest      = Join-Path $IconDir "$BinaryName.ico"
+
+# Copy icon if it exists in the repo assets
+if (Test-Path $IconSrc) {
+  New-Item -ItemType Directory -Force -Path $IconDir | Out-Null
+  Copy-Item -Force $IconSrc $IconDest
+}
+
+$WshShell  = New-Object -ComObject WScript.Shell
+$Shortcut  = $WshShell.CreateShortcut($ShortcutPath)
+$Shortcut.TargetPath       = $BinaryPath
+$Shortcut.WorkingDirectory = $InstallDir
+$Shortcut.Description      = "A simple Muslim companion app."
+if (Test-Path $IconDest) {
+  $Shortcut.IconLocation = $IconDest
+}
+$Shortcut.Save()
+
+Success "Start Menu shortcut created at $ShortcutPath"
 
 # ─── Cleanup ──────────────────────────────────────────────────────────────────
 Remove-Item -Recurse -Force $TmpDir
