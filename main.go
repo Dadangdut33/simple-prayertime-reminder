@@ -4,6 +4,7 @@ import (
 	"embed"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sync/atomic"
 
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/appservice"
@@ -43,6 +44,9 @@ var appIcon []byte
 
 //go:embed assets/favicon-32x32.png
 var appIconIco []byte
+
+//go:embed assets/favicon-16x16.png
+var appIconTrayTiny []byte
 
 //go:embed all:frontend/dist
 var assets embed.FS
@@ -157,7 +161,11 @@ func main() {
 	})
 
 	// System tray
-	trayState := tray.Setup(app, appSvc, mainWindow, appName, appIconIco, func() {
+	trayIconBytes := appIconIco
+	if runtime.GOOS == "windows" {
+		trayIconBytes = appIconTrayTiny
+	}
+	trayState := tray.Setup(app, appSvc, mainWindow, appName, trayIconBytes, func() {
 		allowQuit.Store(true)
 		app.Quit()
 	})
