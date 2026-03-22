@@ -1,4 +1,9 @@
 #Requires -Version 5.1
+[CmdletBinding()]
+param(
+  [string]$Version = ""   # optional: pass a git tag, e.g. -Version v2.0.0
+)
+
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
@@ -19,6 +24,63 @@ function Fatal   {
   exit 1
 }
 
+# Helper: compare two semantic version strings, returns true if $a >= $b
+function SemVerGte {
+  param([string]$a, [string]$b)
+  $pa = $a -replace '^v','' -split '\.' | ForEach-Object { [int]$_ }
+  $pb = $b -replace '^v','' -split '\.' | ForEach-Object { [int]$_ }
+  for ($i = 0; $i -lt [Math]::Max($pa.Count, $pb.Count); $i++) {
+    $va = if ($i -lt $pa.Count) { $pa[$i] } else { 0 }
+    $vb = if ($i -lt $pb.Count) { $pb[$i] } else { 0 }
+    if ($va -gt $vb) { return $true }
+    if ($va -lt $vb) { return $false }
+  }
+  return $true  # equal
+}
+
+# ─── Resolve version ──────────────────────────────────────────────────────────
+# Priority: -Version arg > interactive prompt (with tag list) > latest
+if ($Version -eq "") {
+  # Fetch and filter tags >= v2.0.0
+  Write-Host "==> Fetching available versions..." -ForegroundColor Cyan
+  try {
+    $rawTags = git ls-remote --tags --refs "https://github.com/$Repo.git" 2>$null |
+      ForEach-Object { ($_ -split '\s+')[1] -replace 'refs/tags/','' } |
+      Where-Object { $_ -match '^v\d+\.\d+(\.\d+)?$' } |
+      Where-Object { SemVerGte $_ "v2.0.0" } |
+      Sort-Object { 
+        $parts = ($_ -replace '^v','') -split '\.' | ForEach-Object { [int]$_ }
+        # Pad to 3 parts for consistent sort
+        while ($parts.Count -lt 3) { $parts += 0 }
+        [version]("$($parts[0]).$($parts[1]).$($parts[2])")
+      } |
+      Select-Object -Last 20  # cap at 20 entries
+
+    if (-not $rawTags) {
+      Write-Host "  (No tags >= v2.0.0 found, will install latest)" -ForegroundColor Yellow
+    } else {
+      Write-Host ""
+      Write-Host "  Available versions (v2.0.0 and above):" -ForegroundColor White
+      foreach ($tag in $rawTags) {
+        Write-Host "    * $tag" -ForegroundColor Cyan
+      }
+      Write-Host ""
+    }
+  } catch {
+    Write-Host "  (Could not fetch tags: $_)" -ForegroundColor Yellow
+  }
+
+  Write-Host "?  Enter a version tag to install (e.g. v2.0.0), or press Enter for latest:" -ForegroundColor Yellow
+  $input = Read-Host
+  $Version = $input.Trim()
+}
+
+if ($Version -ne "") {
+  Write-Host "   Installing version: $Version" -ForegroundColor White
+} else {
+  Write-Host "   Installing: latest" -ForegroundColor White
+}
+
 # ─── Dependency checks ────────────────────────────────────────────────────────
 Log "Checking dependencies..."
 
@@ -35,17 +97,23 @@ if (-not (Get-Command wails3 -ErrorAction SilentlyContinue)) {
   go install github.com/wailsapp/wails/v3/cmd/wails3@latest
   if ($LASTEXITCODE -ne 0) { Fatal "Failed to install wails3" }
   $env:PATH = "$InstallDir;$env:PATH"
+}
 
 Success "Dependencies OK"
 
 # ─── Clone repo ───────────────────────────────────────────────────────────────
-Log "Cloning repository..."
-git clone --depth=1 "https://github.com/$Repo.git" $TmpDir
-if ($LASTEXITCODE -ne 0) { Fatal "git clone failed" }
-Success "Repository cloned"
+if ($Version -ne "") {
+  Log "Cloning repository at tag $Version..."
+  git clone --depth=1 --branch $Version "https://github.com/$Repo.git" $TmpDir
+  if ($LASTEXITCODE -ne 0) { Fatal "Failed to clone tag '$Version'. Make sure it exists: https://github.com/$Repo/tags" }
+} else {
+  Log "Cloning repository (latest)..."
+  git clone --depth=1 "https://github.com/$Repo.git" $TmpDir
+  if ($LASTEXITCODE -ne 0) { Fatal "git clone failed" }
 }
+Success "Repository cloned"
 
-# ─── Install app ────────────────────────────────────────────────────────
+# ─── Build app ────────────────────────────────────────────────────────────────
 Log "Building app..."
 Push-Location $TmpDir
 try {
@@ -58,6 +126,7 @@ try {
 $BinPath = Join-Path $TmpDir "bin\$BinaryName.exe"
 if (-not (Test-Path $BinPath)) { Fatal "Build output not found at $BinPath" }
 
+# ─── Install binary ───────────────────────────────────────────────────────────
 Log "Installing binary..."
 New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
 $DestPath = Join-Path $InstallDir "$BinaryName.exe"
@@ -76,7 +145,6 @@ $IconSrc       = Join-Path $TmpDir "assets\icon.png"
 $IconDir       = Join-Path $env:LOCALAPPDATA "$BinaryName"
 $IconDest      = Join-Path $IconDir "$BinaryName.ico"
 
-# Copy icon if it exists in the repo assets
 if (Test-Path $IconSrc) {
   New-Item -ItemType Directory -Force -Path $IconDir | Out-Null
   Copy-Item -Force $IconSrc $IconDest

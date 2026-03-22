@@ -12,6 +12,7 @@ OS_NAME="$(uname -s | tr '[:upper:]' '[:lower:]')"
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
+YELLOW='\033[0;33m'
 BOLD='\033[1m'
 RESET='\033[0m'
 
@@ -20,6 +21,43 @@ success() { echo -e "${GREEN}✔${RESET}  $*"; }
 fatal()   { echo -e "${RED}✖${RESET}  $*" >&2; rm -rf "$TMP_DIR"; exit 1; }
 
 trap 'rm -rf "$TMP_DIR"' EXIT
+
+# ─── Resolve version ───
+# Priority: CLI arg > interactive prompt (with tag list) > latest
+if [[ "${1:-}" != "" ]]; then
+  VERSION="$1"
+else
+  # Fetch and filter tags >= v2.0.0
+  echo -e "${CYAN}==>${RESET} ${BOLD}Fetching available versions...${RESET}"
+  TAGS="$(git ls-remote --tags --refs "https://github.com/${REPO}.git" \
+    | awk '{print $2}' \
+    | sed 's|refs/tags/||' \
+    | grep -E '^v[0-9]+\.[0-9]+(\.[0-9]+)?$' \
+    | awk -F'[v.]' '{ if ($2+0 > 2 || ($2+0 == 2 && $3+0 >= 0)) print }' \
+    | sort -V \
+    | tail -n 20)"  # cap at 20 entries to avoid overwhelming output
+
+  if [[ -z "$TAGS" ]]; then
+    echo -e "${YELLOW}  (No tags >= v2.0.0 found, will install latest)${RESET}"
+  else
+    echo ""
+    echo -e "  Available versions ${BOLD}(v2.0.0 and above)${RESET}:"
+    while IFS= read -r tag; do
+      echo -e "    ${CYAN}•${RESET} $tag"
+    done <<< "$TAGS"
+    echo ""
+  fi
+
+  echo -e "${YELLOW}?${RESET}  Enter a version tag to install (e.g. v2.0.0), or press Enter for latest:"
+  read -r VERSION
+  VERSION="${VERSION:-}"
+fi
+
+if [[ -n "$VERSION" ]]; then
+  echo -e "    Installing version: ${BOLD}${VERSION}${RESET}"
+else
+  echo -e "    Installing: ${BOLD}latest${RESET}"
+fi
 
 # ─── Dependency checks ───
 log "Checking dependencies..."
@@ -42,14 +80,20 @@ fi
 success "Dependencies OK"
 
 # ─── Clone repo ───
-log "Cloning repository..."
-git clone --depth=1 "https://github.com/${REPO}.git" "$TMP_DIR"
+if [[ -n "$VERSION" ]]; then
+  log "Cloning repository at tag ${VERSION}..."
+  git clone --depth=1 --branch "$VERSION" "https://github.com/${REPO}.git" "$TMP_DIR" \
+    || fatal "Failed to clone tag '${VERSION}'. Make sure it exists: https://github.com/${REPO}/tags"
+else
+  log "Cloning repository (latest)..."
+  git clone --depth=1 "https://github.com/${REPO}.git" "$TMP_DIR"
+fi
 success "Repository cloned"
 
 # ─── Read version ───
 APP_VERSION="$(awk 'BEGIN{ininfo=0} /^info:/{ininfo=1;next} /^[^[:space:]]/{if($0!~/^info:/)ininfo=0} ininfo && $1=="version:"{gsub(/"/,"",$2);print $2;exit}' "$TMP_DIR/build/config.yml")"
 if [[ -z "${APP_VERSION:-}" ]]; then
-  APP_VERSION="unknown"
+  APP_VERSION="${VERSION:-unknown}"
 fi
 
 # ─── Build frontend ───
