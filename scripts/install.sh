@@ -57,11 +57,6 @@ log "Installing frontend dependencies..."
 (cd "$TMP_DIR/$FRONTEND_DIR" && pnpm install --frozen-lockfile)
 success "Frontend dependencies installed"
 
-log "Building frontend..."
-(cd "$TMP_DIR/$FRONTEND_DIR" && pnpm run build)
-success "Frontend built"
-
-# ─── Install Go binary ───
 log "Building app..."
 (cd "$TMP_DIR" && wails3 build)
 

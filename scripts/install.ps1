@@ -44,23 +44,8 @@ git clone --depth=1 "https://github.com/$Repo.git" $TmpDir
 if ($LASTEXITCODE -ne 0) { Fatal "git clone failed" }
 Success "Repository cloned"
 }
-# ─── Build frontend ───────────────────────────────────────────────────────────
-Push-Location (Join-Path $TmpDir $FrontendDir)
-try {
-  Log "Installing frontend dependencies..."
-  pnpm install --frozen-lockfile
-  if ($LASTEXITCODE -ne 0) { Fatal "pnpm install failed" }
-  Success "Frontend dependencies installed"
 
-  Log "Building frontend..."
-  pnpm run build
-  if ($LASTEXITCODE -ne 0) { Fatal "pnpm build failed" }
-  Success "Frontend built"
-} finally {
-  Pop-Location
-}
-
-# ─── Install Go binary ────────────────────────────────────────────────────────
+# ─── Install app ────────────────────────────────────────────────────────
 Log "Building app..."
 Push-Location $TmpDir
 try {
