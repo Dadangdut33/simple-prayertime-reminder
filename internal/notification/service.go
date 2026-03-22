@@ -67,3 +67,15 @@ func (svc *Service) EmitSettingsUpdate(cfg settings.Settings) {
 	svc.app.Event.Emit("settings:update", cfg)
 	log.Info("settings update emitted")
 }
+
+// EmitPrayerUpdate broadcasts that a prayer time has been reached.
+func (svc *Service) EmitPrayerUpdate(prayerName string, state WindowState) {
+	if svc == nil || svc.app == nil {
+		return
+	}
+	svc.app.Event.Emit("prayer:update", map[string]string{
+		"prayer": prayerName,
+		"state":  string(state),
+	})
+	log.Info("prayer update emitted", "prayer", prayerName, "state", state)
+}

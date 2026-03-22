@@ -6,6 +6,7 @@ import UpdateAvailableDialog from './components/app/UpdateAvailableDialog';
 import type { UpdateInfo } from './types';
 import { useTranslation } from 'react-i18next';
 import Onboarding from './pages/Onboarding';
+import { Events } from '@wailsio/runtime';
 
 import {
   Box,
@@ -50,7 +51,7 @@ const NAV_ITEMS = [
 
 export default function App() {
   const { t } = useTranslation();
-  const { initialize, loading, initialized, settings } = useAppStore();
+  const { initialize, loading, initialized, settings, refreshPrayerData } = useAppStore();
   const location = useLocation();
   const navigate = useNavigate();
   const theme = useTheme();
@@ -65,6 +66,21 @@ export default function App() {
   useEffect(() => {
     if (!initialized) initialize();
   }, [initialize, initialized]);
+
+  useEffect(() => {
+    if (!initialized) {
+      return;
+    }
+
+    const handler = () => {
+      void refreshPrayerData();
+    };
+
+    Events.On('prayer:update', handler);
+    return () => {
+      Events.Off('prayer:update');
+    };
+  }, [initialized, refreshPrayerData]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -129,9 +145,7 @@ export default function App() {
 
   const drawerWidth = drawerCollapsed ? DRAWER_COLLAPSED_WIDTH : DRAWER_WIDTH;
 
-  const visibleNavItems = settings?.enableTestTools
-    ? NAV_ITEMS
-    : NAV_ITEMS.filter((item) => item.to !== '/test-tools');
+  const visibleNavItems = settings?.enableTestTools ? NAV_ITEMS : NAV_ITEMS.filter((item) => item.to !== '/test-tools');
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>

@@ -67,13 +67,14 @@ func (svc *Service) UpdateConfig(cfg settings.Settings) {
 }
 
 func (svc *Service) run(cfg settings.Settings) {
+	loc := resolveScheduleLocation(cfg)
 	for {
 		log.Info("scheduler day cycle start")
-		svc.scheduleDayReminders(cfg)
+		svc.scheduleDayReminders(cfg, loc)
 
 		// Wait until next midnight (or stop signal)
-		now := clock.Now()
-		nextMidnight := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 5, 0, now.Location())
+		now := clock.Now().In(loc)
+		nextMidnight := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 5, 0, loc)
 		wait := nextMidnight.Sub(now)
 		if wait < 0 {
 			wait = time.Second
@@ -88,7 +89,7 @@ func (svc *Service) run(cfg settings.Settings) {
 	}
 }
 
-func (svc *Service) scheduleDayReminders(cfg settings.Settings) {
+func (svc *Service) scheduleDayReminders(cfg settings.Settings, loc *time.Location) {
 	sched, err := svc.prayerSvc.GetTodaySchedule()
 	if err != nil {
 		log.Error("schedule load failed", "error", err)
@@ -106,7 +107,7 @@ func (svc *Service) scheduleDayReminders(cfg settings.Settings) {
 		{name: "Isha", t: sched.Isha, isFajr: false, notifSettings: notifCfg.Prayers.Isha},
 	}
 
-	now := clock.Now()
+	now := clock.Now().In(loc)
 	for _, entry := range entries {
 		if !entry.notifSettings.Enabled || entry.t.IsZero() {
 			continue
@@ -146,6 +147,18 @@ func (svc *Service) scheduleDayReminders(cfg settings.Settings) {
 	}
 }
 
+func resolveScheduleLocation(cfg settings.Settings) *time.Location {
+	if cfg.Location.Timezone == "" {
+		return time.UTC
+	}
+	loc, err := time.LoadLocation(cfg.Location.Timezone)
+	if err != nil {
+		log.Warn("scheduler timezone load failed, using UTC", "timezone", cfg.Location.Timezone, "error", err)
+		return time.UTC
+	}
+	return loc
+}
+
 func (svc *Service) fireAfterDelay(
 	entry prayerEntry,
 	state notification.WindowState,
@@ -178,6 +191,10 @@ func (svc *Service) fireAfterDelay(
 		Notification:  toReminderNotificationSettings(notifCfg),
 	})
 	log.Info("reminder fired", "prayer", entry.name, "state", state, "offsetMinutes", offsetMinutes)
+
+	if state == notification.StateOnTime {
+		svc.notifSvc.EmitPrayerUpdate(entry.name, state)
+	}
 
 	if !notifCfg.PersistentReminder && notifCfg.AutoDismissSeconds > 0 {
 		delay := time.Duration(notifCfg.AutoDismissSeconds) * time.Second
