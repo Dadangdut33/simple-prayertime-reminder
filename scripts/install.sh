@@ -63,7 +63,7 @@ success "Frontend built"
 
 # ─── Install Go binary ───
 log "Building app..."
-(cd "$TMP_DIR" && CGO_ENABLED=1 wails3 build -tags production)
+(cd "$TMP_DIR" && wails3 build)
 
 BIN_PATH="$TMP_DIR/bin/$BINARY_NAME"
 APP_BUNDLE_PATH="$TMP_DIR/bin/$BINARY_NAME.app"

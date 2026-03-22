@@ -29,6 +29,13 @@ if (-not (Get-Command git  -ErrorAction SilentlyContinue)) { Fatal "git is not i
 $goVersion = [Version]((go version) -replace "go version go(\S+).*", '$1')
 if ($goVersion -lt [Version]"1.21") { Fatal "Go 1.21+ required, found $goVersion" }
 
+# ─── Install wails3 if needed ─────────────────────────────────────────────────
+if (-not (Get-Command wails3 -ErrorAction SilentlyContinue)) {
+  Log "Installing wails3..."
+  go install github.com/wailsapp/wails/v3/cmd/wails3@latest
+  if ($LASTEXITCODE -ne 0) { Fatal "Failed to install wails3" }
+  $env:PATH = "$InstallDir;$env:PATH"
+
 Success "Dependencies OK"
 
 # ─── Clone repo ───────────────────────────────────────────────────────────────
@@ -36,7 +43,7 @@ Log "Cloning repository..."
 git clone --depth=1 "https://github.com/$Repo.git" $TmpDir
 if ($LASTEXITCODE -ne 0) { Fatal "git clone failed" }
 Success "Repository cloned"
-
+}
 # ─── Build frontend ───────────────────────────────────────────────────────────
 Push-Location (Join-Path $TmpDir $FrontendDir)
 try {
@@ -54,14 +61,24 @@ try {
 }
 
 # ─── Install Go binary ────────────────────────────────────────────────────────
-Log "Installing Go binary..."
+Log "Building app..."
 Push-Location $TmpDir
 try {
-  go install .
-  if ($LASTEXITCODE -ne 0) { Fatal "go install failed" }
+  wails3 build
+  if ($LASTEXITCODE -ne 0) { Fatal "wails3 build failed" }
 } finally {
   Pop-Location
 }
+
+$BinPath = Join-Path $TmpDir "bin\$BinaryName.exe"
+if (-not (Test-Path $BinPath)) { Fatal "Build output not found at $BinPath" }
+
+Log "Installing binary..."
+New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
+$DestPath = Join-Path $InstallDir "$BinaryName.exe"
+Remove-Item -Force $DestPath -ErrorAction SilentlyContinue
+Copy-Item -Force $BinPath $DestPath
+
 Success "Binary installed to $InstallDir\$BinaryName.exe"
 
 # ─── Start Menu shortcut ──────────────────────────────────────────────────────
