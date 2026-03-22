@@ -27,6 +27,7 @@ import (
 const (
 	appName        = "Simple PrayerTime Reminder"
 	appDescription = "A simple, Muslim companion app."
+	appIdentifier  = "com.dadangdut33.SimplePrayertimeReminder"
 )
 
 func shouldStartHidden(args []string) bool {
@@ -96,6 +97,8 @@ func main() {
 
 	logger.Info("creating application")
 	nativeNotifSvc := notifications.New()
+	var mainWindow *application.WebviewWindow
+	var showMainOnStart atomic.Bool
 	app := application.New(application.Options{
 		Name:        appName,
 		Description: appDescription,
@@ -116,6 +119,17 @@ func main() {
 		Linux: application.LinuxOptions{
 			DisableQuitOnLastWindowClosed: true,
 		},
+		SingleInstance: &application.SingleInstanceOptions{
+			UniqueID: appIdentifier,
+			OnSecondInstanceLaunch: func(_ application.SecondInstanceData) {
+				if mainWindow != nil {
+					mainWindow.Show()
+					mainWindow.Focus()
+					return
+				}
+				showMainOnStart.Store(true)
+			},
+		},
 	})
 
 	// Notification and Scheduler need app to emit events/manage windows
@@ -135,7 +149,7 @@ func main() {
 
 	// Main window
 	logger.Info("creating main window")
-	mainWindow := app.Window.NewWithOptions(application.WebviewWindowOptions{
+	mainWindow = app.Window.NewWithOptions(application.WebviewWindowOptions{
 		Title:            appName,
 		Width:            1024,
 		Height:           700,
@@ -159,6 +173,10 @@ func main() {
 		event.Cancel()
 		mainWindow.Hide()
 	})
+	if showMainOnStart.Swap(false) {
+		mainWindow.Show()
+		mainWindow.Focus()
+	}
 
 	// System tray
 	trayIconBytes := appIconIco
