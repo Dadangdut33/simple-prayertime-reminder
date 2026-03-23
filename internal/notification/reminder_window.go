@@ -13,12 +13,12 @@ const (
 	reminderMinW = 380
 	reminderMaxW = 500
 	// H
-	reminderBaseH    = 280
-	reminderBaseMinH = 280
-	reminderBaseMaxH = 340
+	reminderBaseH    = 320
+	reminderBaseMinH = 320
+	reminderBaseMaxH = 360
 	// After reminder have different height because of its size
-	reminderAfterH    = 560
-	reminderAfterMinH = 560
+	reminderAfterH    = 580
+	reminderAfterMinH = 580
 	reminderAfterMaxH = 640
 	// for test window because it have debug stuff
 	testWindowHOffset = 80

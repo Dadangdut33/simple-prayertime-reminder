@@ -1,6 +1,7 @@
 package scheduler
 
 import (
+	"sync"
 	"time"
 
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/audio"
@@ -19,8 +20,12 @@ type prayerEntry struct {
 
 // Service schedules prayer reminders
 type Service struct {
-	prayerSvc *prayer.Service
-	audioSvc  *audio.Service
-	notifSvc  *notification.Service
-	stopCh    chan struct{}
+	prayerSvc      *prayer.Service
+	audioSvc       *audio.Service
+	notifSvc       *notification.Service
+	stopCh         chan struct{}
+	prayerTickMu   sync.Mutex
+	prayerTickSeen map[string]struct{}
+	suppressMu     sync.Mutex
+	suppressed     map[string]struct{}
 }

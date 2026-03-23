@@ -34,10 +34,12 @@ func toReminderNotificationSettings(cfg settings.NotificationSettings) *notifica
 // NewService creates a new Scheduler service
 func NewService(p *prayer.Service, a *audio.Service, n *notification.Service) *Service {
 	return &Service{
-		prayerSvc: p,
-		audioSvc:  a,
-		notifSvc:  n,
-		stopCh:    make(chan struct{}),
+		prayerSvc:      p,
+		audioSvc:       a,
+		notifSvc:       n,
+		stopCh:         make(chan struct{}),
+		prayerTickSeen: make(map[string]struct{}),
+		suppressed:     make(map[string]struct{}),
 	}
 }
 
@@ -108,6 +110,8 @@ func (svc *Service) scheduleDayReminders(cfg settings.Settings, loc *time.Locati
 	}
 
 	now := clock.Now().In(loc)
+	svc.resetPrayerTickForDay(sched.Date)
+	svc.resetSuppressedForDay(sched.Date)
 	for _, entry := range entries {
 		if !entry.notifSettings.Enabled || entry.t.IsZero() {
 			continue
@@ -159,6 +163,70 @@ func resolveScheduleLocation(cfg settings.Settings) *time.Location {
 	return loc
 }
 
+func (svc *Service) resetPrayerTickForDay(day string) {
+	if day == "" {
+		return
+	}
+	svc.prayerTickMu.Lock()
+	if _, ok := svc.prayerTickSeen["_day:"+day]; ok {
+		svc.prayerTickMu.Unlock()
+		return
+	}
+	svc.prayerTickSeen = make(map[string]struct{})
+	svc.prayerTickSeen["_day:"+day] = struct{}{}
+	svc.prayerTickMu.Unlock()
+}
+
+func (svc *Service) markPrayerTick(name string, at time.Time) bool {
+	if name == "" || at.IsZero() {
+		return false
+	}
+	key := name + "|" + at.Format("2006-01-02")
+	svc.prayerTickMu.Lock()
+	if _, ok := svc.prayerTickSeen[key]; ok {
+		svc.prayerTickMu.Unlock()
+		return false
+	}
+	svc.prayerTickSeen[key] = struct{}{}
+	svc.prayerTickMu.Unlock()
+	return true
+}
+
+func (svc *Service) SuppressPrayer(prayerName string, day string) {
+	if prayerName == "" || day == "" {
+		return
+	}
+	key := prayerName + "|" + day
+	svc.suppressMu.Lock()
+	svc.suppressed[key] = struct{}{}
+	svc.suppressMu.Unlock()
+}
+
+func (svc *Service) isSuppressed(prayerName string, at time.Time) bool {
+	if prayerName == "" || at.IsZero() {
+		return false
+	}
+	key := prayerName + "|" + at.Format("2006-01-02")
+	svc.suppressMu.Lock()
+	_, ok := svc.suppressed[key]
+	svc.suppressMu.Unlock()
+	return ok
+}
+
+func (svc *Service) resetSuppressedForDay(day string) {
+	if day == "" {
+		return
+	}
+	svc.suppressMu.Lock()
+	if _, ok := svc.suppressed["_day:"+day]; ok {
+		svc.suppressMu.Unlock()
+		return
+	}
+	svc.suppressed = make(map[string]struct{})
+	svc.suppressed["_day:"+day] = struct{}{}
+	svc.suppressMu.Unlock()
+}
+
 func (svc *Service) fireAfterDelay(
 	entry prayerEntry,
 	state notification.WindowState,
@@ -182,6 +250,11 @@ func (svc *Service) fireAfterDelay(
 		offsetMinutes = entry.notifSettings.AfterMinutes
 	}
 
+	if svc.isSuppressed(entry.name, entry.t) {
+		log.Info("reminder suppressed", "prayer", entry.name, "state", state)
+		return
+	}
+
 	svc.notifSvc.ShowReminder(notification.ReminderInfo{
 		PrayerName:    entry.name,
 		State:         state,
@@ -193,7 +266,9 @@ func (svc *Service) fireAfterDelay(
 	log.Info("reminder fired", "prayer", entry.name, "state", state, "offsetMinutes", offsetMinutes)
 
 	if state == notification.StateOnTime {
-		svc.notifSvc.EmitPrayerUpdate(entry.name, state)
+		if svc.markPrayerTick(entry.name, entry.t) {
+			svc.notifSvc.EmitPrayerUpdate(entry.name, state)
+		}
 	}
 
 	if !notifCfg.PersistentReminder && notifCfg.AutoDismissSeconds > 0 {
