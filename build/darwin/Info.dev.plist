@@ -10,11 +10,11 @@
         <key>CFBundleIdentifier</key>
             <string>com.dadangdut33.simple-prayertime-reminder</string>
         <key>CFBundleVersion</key>
-            <string>2.0.0</string>
+            <string>2.0.1-dev</string>
         <key>CFBundleGetInfoString</key>
-            <string>This is a comment</string>
+            <string>A Simple Prayertime Reminder</string>
         <key>CFBundleShortVersionString</key>
-            <string>2.0.0</string>
+            <string>2.0.1-dev</string>
         <key>CFBundleIconFile</key>
             <string>icons</string>
         <key>LSMinimumSystemVersion</key>
@@ -22,7 +22,7 @@
         <key>NSHighResolutionCapable</key>
             <string>true</string>
         <key>NSHumanReadableCopyright</key>
-            <string>© 2026, My Company</string>
+            <string>© 2026, Dadangdut33</string>
         <key>NSAppTransportSecurity</key>
         <dict>
             <key>NSAllowsLocalNetworking</key>

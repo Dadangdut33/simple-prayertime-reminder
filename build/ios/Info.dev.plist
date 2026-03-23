@@ -13,9 +13,9 @@
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>2.0.0-dev</string>
+    <string>2.0.1-dev</string>
     <key>CFBundleVersion</key>
-    <string>2.0.0</string>
+    <string>2.0.1-dev</string>
     <key>LSRequiresIPhoneOS</key>
     <true/>
     <key>MinimumOSVersion</key>
@@ -52,11 +52,11 @@
     <true/>
     
     <key>NSHumanReadableCopyright</key>
-    <string>© 2026, My Company</string>
+    <string>© 2026, Dadangdut33</string>
     
     
     <key>CFBundleGetInfoString</key>
-    <string>This is a comment</string>
+    <string>A Simple Prayertime Reminder</string>
     
 </dict>
 </plist>

@@ -1,19 +1,18 @@
 package appservice
 
 import (
+	"bufio"
 	"os"
 	"path/filepath"
 	"runtime"
-	"runtime/debug"
 	"strings"
 
 	"github.com/pkg/browser"
 )
 
-const (
-	defaultAppVersion = "2.0.0"
-	repositoryURL     = "https://github.com/dadangdut33/simple-prayertime-reminder"
-)
+const repositoryURL = "https://github.com/dadangdut33/simple-prayertime-reminder"
+
+var buildVersion string
 
 type AppInfo struct {
 	Version         string `json:"version"`
@@ -35,13 +34,50 @@ func ConfigDirectory() (string, error) {
 }
 
 func resolveVersion() string {
-	if buildInfo, ok := debug.ReadBuildInfo(); ok {
-		if version := buildInfo.Main.Version; version != "" && version != "(devel)" {
-			return version
+	if buildVersion != "" {
+		return buildVersion
+	}
+	if cfgVersion := readVersionFromBuildConfig(); cfgVersion != "" {
+		return cfgVersion
+	}
+	return "unknown"
+}
+
+func readVersionFromBuildConfig() string {
+	file, err := os.Open("build/config.yml")
+	if err != nil {
+		return ""
+	}
+	defer file.Close()
+
+	inInfo := false
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		trimmed := strings.TrimSpace(line)
+		if strings.HasPrefix(trimmed, "info:") && !strings.HasPrefix(trimmed, "info: ") {
+			inInfo = true
+			continue
+		}
+		if inInfo {
+			if len(line) > 0 && line[0] != ' ' && line[0] != '\t' {
+				inInfo = false
+			}
+		}
+		if !inInfo {
+			continue
+		}
+		if strings.HasPrefix(trimmed, "version:") {
+			value := strings.TrimSpace(strings.TrimPrefix(trimmed, "version:"))
+			value = strings.SplitN(value, "#", 2)[0]
+			value = strings.TrimSpace(value)
+			value = strings.Trim(value, "\"'")
+			if value != "" {
+				return value
+			}
 		}
 	}
-
-	return defaultAppVersion
+	return ""
 }
 
 func humanOS(goos string) string {

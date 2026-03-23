@@ -3,7 +3,6 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAppStore } from './store/appStore';
 import * as api from './bindings';
 import UpdateAvailableDialog from './components/app/UpdateAvailableDialog';
-import type { UpdateInfo } from './types';
 import { useTranslation } from 'react-i18next';
 import Onboarding from './pages/Onboarding';
 import { Events } from '@wailsio/runtime';
@@ -51,13 +50,13 @@ const NAV_ITEMS = [
 
 export default function App() {
   const { t } = useTranslation();
-  const { initialize, loading, initialized, settings, refreshPrayerData } = useAppStore();
+  const { initialize, loading, initialized, settings, refreshPrayerData, updateDialogInfo, showUpdateDialog } =
+    useAppStore();
   const location = useLocation();
   const navigate = useNavigate();
   const theme = useTheme();
   const shouldAutoCollapse = useMediaQuery(theme.breakpoints.down('lg'));
   const [drawerCollapsed, setDrawerCollapsed] = useState(shouldAutoCollapse);
-  const [startupUpdateInfo, setStartupUpdateInfo] = useState<UpdateInfo | null>(null);
   const [startupUpdateCheckDone, setStartupUpdateCheckDone] = useState(false);
 
   // Reminder window lives on its own route with no sidebar
@@ -102,18 +101,22 @@ export default function App() {
     }
 
     let active = true;
-    setStartupUpdateCheckDone(true);
 
     async function checkForUpdates() {
       try {
         const update = await api.checkForUpdates();
+        console.log('Checking for update');
         if (!active || !update.hasUpdate) {
           return;
         }
+        console.log('Check done', update);
 
-        setStartupUpdateInfo(update);
+        showUpdateDialog(update);
       } catch {
+        console.error('Error checking for update');
         // Silent failure: startup update checks should not interrupt app launch.
+      } finally {
+        setStartupUpdateCheckDone(true);
       }
     }
 
@@ -149,13 +152,13 @@ export default function App() {
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-      {startupUpdateInfo && (
+      {updateDialogInfo && (
         <UpdateAvailableDialog
           open
-          update={startupUpdateInfo}
-          onClose={() => setStartupUpdateInfo(null)}
+          update={updateDialogInfo}
+          onClose={() => showUpdateDialog(null)}
           onOpenAction={async () => {
-            await api.openURL(startupUpdateInfo.releaseUrl);
+            await api.openURL(updateDialogInfo.releaseUrl);
           }}
         />
       )}

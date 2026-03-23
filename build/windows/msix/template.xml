@@ -17,7 +17,7 @@
         PackageDisplayName="Simple PrayerTime Reminder"
         PublisherName="CN=Dadangdut33"
         PublisherDisplayName="Dadangdut33"
-        Version="2.0.0.0"
+        Version="2.0.1.0"
         PackageDescription="A Muslim Companion Desktop App">
         <Capabilities>
             <Capability Name="runFullTrust" />

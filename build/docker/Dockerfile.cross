@@ -187,6 +187,9 @@ if [ "$GOOS" = "windows" ]; then
     EXT=".exe"
     LDFLAGS="-s -w -H windowsgui"
 fi
+if [ -n "$APP_VERSION" ]; then
+    LDFLAGS="$LDFLAGS -X github.com/dadangdut33/simple-prayertime-reminder/internal/appservice.buildVersion=${APP_VERSION}"
+fi
 
 TAGS="production"
 if [ -n "$EXTRA_TAGS" ]; then

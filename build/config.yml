@@ -10,7 +10,7 @@ info:
   productIdentifier: "com.dadangdut33.SimplePrayertimeReminder" # The unique product identifier
   description: "A simple prayertime reminder application for desktop" # The application description
   copyright: "(c) 2026, Dadangdut33" # Copyright text
-  comments: "" # Comments
+  comments: "A Simple Prayertime Reminder" # Comments
   version: "2.0.1" # The application version
   # cfBundleIconName: "appicon" # The macOS icon name in Assets.car icon bundles (optional)
   #                               # Should match the name of your .icon file without the extension

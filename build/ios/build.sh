@@ -4,8 +4,8 @@ set -e
 # Build configuration
 APP_NAME="simple-prayertime-reminder"
 BUNDLE_ID="com.dadangdut33.simple-prayertime-reminder"
-VERSION="2.0.0"
-BUILD_NUMBER="2.0.0"
+VERSION="2.0.1"
+BUILD_NUMBER="2.0.1"
 BUILD_DIR="build/ios"
 TARGET="simulator"
 

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import * as api from '../bindings';
-import type { DaySchedule, HijriDate, Location, NextPrayerInfo, Settings } from '../types';
+import type { DaySchedule, HijriDate, Location, NextPrayerInfo, Settings, UpdateInfo } from '../types';
 import i18n from '../i18n';
 import dayjs from 'dayjs';
 import 'dayjs/locale/id';
@@ -18,6 +18,7 @@ interface AppState {
   loading: boolean;
   error: string | null;
   initialized: boolean;
+  updateDialogInfo: UpdateInfo | null;
 
   // Actions
   initialize: () => Promise<void>;
@@ -26,6 +27,7 @@ interface AppState {
   resetSettings: () => Promise<void>;
   detectLocation: () => Promise<void>;
   clearError: () => void;
+  showUpdateDialog: (update: UpdateInfo | null) => void;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -38,6 +40,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   loading: true,
   error: null,
   initialized: false,
+  updateDialogInfo: null,
 
   initialize: async () => {
     set({ loading: true, error: null });
@@ -151,4 +154,5 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   clearError: () => set({ error: null }),
+  showUpdateDialog: (update) => set({ updateDialogInfo: update }),
 }));

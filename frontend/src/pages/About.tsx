@@ -10,6 +10,7 @@ import packageJson from '../../package.json';
 import * as api from '../bindings';
 import type { AppInfo, UpdateInfo } from '../types';
 import { useTranslation } from 'react-i18next';
+import { useAppStore } from '../store/appStore';
 
 type LatestReleaseState = {
   status: 'idle' | 'checking' | 'success' | 'error';
@@ -19,6 +20,7 @@ type LatestReleaseState = {
 
 export default function AboutPage() {
   const { t } = useTranslation();
+  const { showUpdateDialog } = useAppStore();
   const [appInfo, setAppInfo] = useState<AppInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -74,6 +76,9 @@ export default function AboutPage() {
         status: 'success',
         update,
       });
+      if (update.hasUpdate) {
+        showUpdateDialog(update);
+      }
     } catch (err) {
       setLatestRelease({
         status: 'error',

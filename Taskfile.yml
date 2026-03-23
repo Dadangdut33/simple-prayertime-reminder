@@ -13,8 +13,21 @@ vars:
   BIN_DIR: "bin"
   VITE_PORT: "{{.WAILS_VITE_PORT | default 9245}}"
   TIME: "{{.TIME}}"
+  APP_VERSION:
+    sh: "go run ./build/tools/get-version"
 
 tasks:
+  set:version:
+    summary: Update app version across build files
+    desc: |
+      Usage: wails3 task set:version VERSION=2.0.1
+             wails3 task set:version VERSION=2.0.1 DRY_RUN=true
+    preconditions:
+      - sh: 'test -n "{{.VERSION}}"'
+        msg: "VERSION is required. Example: wails3 task set:version VERSION=2.0.1"
+    cmds:
+      - go run ./build/tools/set-version {{.VERSION}} {{if eq .DRY_RUN "true"}}--dry-run{{end}}
+
   build:
     summary: Builds the application
     cmds:

@@ -296,6 +296,20 @@ wails3 task dev
 
 This starts the Go backend, the Vite dev server for `frontend/`, and the desktop app together.
 
+### Bump App Version (Dev Helper)
+
+Use the bundled version update task to update version strings across build files.
+
+```bash
+wails3 task set:version VERSION=2.0.1
+```
+
+Dry run:
+
+```bash
+wails3 task set:version VERSION=2.0.1 DRY_RUN=true
+```
+
 ### Contributing Translations
 
 We welcome translation contributions via pull request.
