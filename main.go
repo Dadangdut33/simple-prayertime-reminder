@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"sync/atomic"
+	"time"
 
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/appservice"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/audio"
@@ -56,6 +57,11 @@ func main() {
 	logger := logging.With("main")
 	startHidden := shouldStartHidden(os.Args[1:])
 	logger.Info("app starting", "startHidden", startHidden)
+	if startHidden {
+		logger.Info("Showing for 3 second and then hiding window")
+	} else {
+		logger.Info("Opening normally")
+	}
 
 	// Initialize core services
 	configPath, err := appservice.ConfigDirectory()
@@ -98,7 +104,7 @@ func main() {
 	logger.Info("creating application")
 	nativeNotifSvc := notifications.New()
 	var mainWindow *application.WebviewWindow
-	var showMainOnStart atomic.Bool
+	var showMainOnSecondInstance atomic.Bool
 	app := application.New(application.Options{
 		Name:        appName,
 		Description: appDescription,
@@ -127,7 +133,7 @@ func main() {
 					mainWindow.Focus()
 					return
 				}
-				showMainOnStart.Store(true)
+				showMainOnSecondInstance.Store(true)
 			},
 		},
 	})
@@ -155,7 +161,6 @@ func main() {
 		Height:           700,
 		MinWidth:         800,
 		MinHeight:        580,
-		Hidden:           startHidden,
 		URL:              "/",
 		BackgroundColour: application.NewRGB(15, 15, 25),
 		Mac: application.MacWindow{
@@ -173,7 +178,14 @@ func main() {
 		event.Cancel()
 		mainWindow.Hide()
 	})
-	if showMainOnStart.Swap(false) {
+	if startHidden {
+		mainWindow.Show()
+		// show window for at least 3 second and then hide
+		time.AfterFunc(3*time.Second, func() {
+			mainWindow.Hide()
+		})
+	}
+	if showMainOnSecondInstance.Swap(false) {
 		mainWindow.Show()
 		mainWindow.Focus()
 	}
