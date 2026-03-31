@@ -302,6 +302,10 @@ export function SearchTimezones(query: string, limit: number): $CancellablePromi
     });
 }
 
+export function SelectAdhanAudioFile(isFajr: boolean, currentPath: string): $CancellablePromise<string> {
+    return $Call.ByID(84610059, isFajr, currentPath);
+}
+
 export function SetManualLocation(loc: location$0.Location): $CancellablePromise<void> {
     return $Call.ByID(67415564, loc);
 }

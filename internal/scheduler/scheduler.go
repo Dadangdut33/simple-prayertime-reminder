@@ -24,6 +24,8 @@ func toReminderNotificationSettings(cfg settings.NotificationSettings) *notifica
 		AutoDismissAfterAdhan:    cfg.AutoDismissAfterAdhan,
 		PlayAdhan:                cfg.PlayAdhan,
 		AdhanVolume:              cfg.AdhanVolume,
+		CustomAdhanPath:          cfg.CustomAdhanPath,
+		CustomAdhanFajrPath:      cfg.CustomAdhanFajrPath,
 		AlwaysOnTop:              cfg.AlwaysOnTop,
 		UseNativeNotification:    cfg.UseNativeNotification,
 		NativeNotificationSticky: cfg.NativeNotificationSticky,
@@ -255,7 +257,7 @@ func (svc *Service) fireAfterDelay(
 		return
 	}
 
-	svc.notifSvc.ShowReminder(notification.ReminderInfo{
+	triggerID := svc.notifSvc.ShowReminder(notification.ReminderInfo{
 		PrayerName:    entry.name,
 		State:         state,
 		MinutesLeft:   minutesLeft,
@@ -274,18 +276,22 @@ func (svc *Service) fireAfterDelay(
 	if !notifCfg.PersistentReminder && notifCfg.AutoDismissSeconds > 0 {
 		delay := time.Duration(notifCfg.AutoDismissSeconds) * time.Second
 		if svc.shouldWaitForAdhan(state, notifCfg) {
-			go svc.closeAfterAdhan(delay)
+			go svc.closeAfterAdhan(delay, triggerID)
 		} else {
-			go svc.closeAfterDelay(delay)
+			go svc.closeAfterDelay(delay, triggerID)
 		}
 	}
 }
 
-func (svc *Service) closeAfterDelay(delay time.Duration) {
+func (svc *Service) closeAfterDelay(delay time.Duration, triggerID int64) {
 	select {
 	case <-svc.stopCh:
 		return
 	case <-time.After(delay):
+	}
+	if triggerID != 0 && (svc.notifSvc == nil || !svc.notifSvc.IsReminderTriggerActive(triggerID)) {
+		log.Info("skip stale auto dismiss reminder", "triggerId", triggerID)
+		return
 	}
 	log.Info("auto dismiss reminder", "delay", delay)
 	svc.notifSvc.CloseReminder()
@@ -295,28 +301,31 @@ func (svc *Service) shouldWaitForAdhan(state notification.WindowState, cfg setti
 	return state == notification.StateOnTime && cfg.PlayAdhan && cfg.AutoDismissAfterAdhan
 }
 
-func (svc *Service) closeAfterAdhan(delay time.Duration) {
+func (svc *Service) closeAfterAdhan(delay time.Duration, triggerID int64) {
 	if svc.audioSvc == nil {
-		svc.closeAfterDelay(delay)
+		svc.closeAfterDelay(delay, triggerID)
 		return
 	}
 
-	started := svc.waitForAudioState(true, audioStartTimeout)
+	started := svc.waitForAudioState(true, audioStartTimeout, triggerID)
 	if !started {
-		svc.closeAfterDelay(delay)
+		svc.closeAfterDelay(delay, triggerID)
 		return
 	}
 
-	_ = svc.waitForAudioState(false, audioStopTimeout)
-	svc.closeAfterDelay(delay)
+	_ = svc.waitForAudioState(false, audioStopTimeout, triggerID)
+	svc.closeAfterDelay(delay, triggerID)
 }
 
-func (svc *Service) waitForAudioState(target bool, timeout time.Duration) bool {
+func (svc *Service) waitForAudioState(target bool, timeout time.Duration, triggerID int64) bool {
 	deadline := time.Now().Add(timeout)
 	ticker := time.NewTicker(audioPollInterval)
 	defer ticker.Stop()
 
 	for {
+		if triggerID != 0 && (svc.notifSvc == nil || !svc.notifSvc.IsReminderTriggerActive(triggerID)) {
+			return false
+		}
 		if svc.audioSvc != nil && svc.audioSvc.IsPlaying() == target {
 			return true
 		}

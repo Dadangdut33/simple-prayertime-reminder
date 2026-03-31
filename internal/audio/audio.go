@@ -6,8 +6,13 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"math"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/ebitengine/oto/v3"
+	"github.com/hajimehoshi/go-mp3"
 	"github.com/youpy/go-wav"
 )
 
@@ -63,7 +68,7 @@ func (svc *Service) waitReady() bool {
 
 // Play plays the adhan audio. Pass isFajr=true to play the Fajr adhan.
 // volume is in range 0.0 to 1.0.
-func (svc *Service) Play(isFajr bool, volume float64) error {
+func (svc *Service) Play(isFajr bool, volume float64, customPath string, customFajrPath string) error {
 	if !svc.waitReady() {
 		if svc.initErr != nil {
 			return fmt.Errorf("audio context failed: %w", svc.initErr)
@@ -77,28 +82,173 @@ func (svc *Service) Play(isFajr bool, volume float64) error {
 	// Stop any existing playback
 	svc.stopLocked()
 
-	data := adhanNormalData
-	if isFajr {
-		data = adhanFajrData
-	}
+	data, sourcePath, usedCustom := resolvePlaybackSource(isFajr, customPath, customFajrPath)
 
-	pcm, sampleRate, channels, err := parseWav(data)
+	pcm, sampleRate, channels, err := decodeAudioData(data, sourcePath)
+	if err != nil && usedCustom {
+		log.Warn("custom adhan decode failed, using embedded fallback", "path", sourcePath, "error", err)
+		data, sourcePath, _ = resolvePlaybackSource(isFajr, "", "")
+		pcm, sampleRate, channels, err = decodeAudioData(data, sourcePath)
+	}
 	if err != nil {
 		return err
 	}
-	if svc.sampleRate != 0 && sampleRate != svc.sampleRate {
-		return fmt.Errorf("wav sample rate mismatch: expected %d, got %d", svc.sampleRate, sampleRate)
-	}
-	if svc.channelCount != 0 && channels != svc.channelCount {
-		return fmt.Errorf("wav channel count mismatch: expected %d, got %d", svc.channelCount, channels)
+	if svc.sampleRate > 0 && svc.channelCount > 0 &&
+		(sampleRate != svc.sampleRate || channels != svc.channelCount) {
+		pcm, err = convertPCM16LE(pcm, sampleRate, channels, svc.sampleRate, svc.channelCount)
+		if err != nil {
+			return fmt.Errorf(
+				"audio format conversion failed (src=%dHz/%dch, dst=%dHz/%dch): %w",
+				sampleRate, channels, svc.sampleRate, svc.channelCount, err,
+			)
+		}
 	}
 
 	player := svc.ctx.NewPlayer(bytes.NewReader(pcm))
 	player.SetVolume(clamp(volume, 0, 1))
 	player.Play()
 	svc.player = player
-	log.Info("adhan play", "fajr", isFajr, "volume", volume)
+	log.Info("adhan play", "fajr", isFajr, "volume", volume, "source", sourcePath)
 	return nil
+}
+
+func resolvePlaybackSource(isFajr bool, customPath string, customFajrPath string) (data []byte, sourcePath string, usedCustom bool) {
+	data = adhanNormalData
+	sourcePath = "embedded:adhan.wav"
+	selectedPath := strings.TrimSpace(customPath)
+	if isFajr {
+		data = adhanFajrData
+		sourcePath = "embedded:adhan_fajr.wav"
+		selectedPath = strings.TrimSpace(customFajrPath)
+	}
+	if selectedPath == "" {
+		return data, sourcePath, false
+	}
+	customData, readErr := os.ReadFile(selectedPath)
+	if readErr != nil {
+		log.Warn("custom adhan read failed, using embedded fallback", "path", selectedPath, "error", readErr)
+		return data, sourcePath, false
+	}
+	return customData, selectedPath, true
+}
+
+func decodeAudioData(data []byte, sourcePath string) (pcm []byte, sampleRate int, channels int, err error) {
+	ext := strings.ToLower(filepath.Ext(sourcePath))
+	switch ext {
+	case ".mp3":
+		return parseMP3(data)
+	case ".wav", "":
+		return parseWav(data)
+	default:
+		pcm, sampleRate, channels, err = parseWav(data)
+		if err == nil {
+			return pcm, sampleRate, channels, nil
+		}
+		return parseMP3(data)
+	}
+}
+
+func parseMP3(data []byte) (pcm []byte, sampleRate int, channels int, err error) {
+	decoder, err := mp3.NewDecoder(bytes.NewReader(data))
+	if err != nil {
+		return nil, 0, 0, fmt.Errorf("mp3: decode init failed: %w", err)
+	}
+	pcm, err = io.ReadAll(decoder)
+	if err != nil {
+		return nil, 0, 0, fmt.Errorf("mp3: decode failed: %w", err)
+	}
+	sampleRate = decoder.SampleRate()
+	channels = 2 // go-mp3 decoder output is stereo 16-bit little-endian PCM.
+	return pcm, sampleRate, channels, nil
+}
+
+func convertPCM16LE(pcm []byte, srcRate int, srcChannels int, dstRate int, dstChannels int) ([]byte, error) {
+	if srcRate <= 0 || dstRate <= 0 {
+		return nil, fmt.Errorf("invalid sample rate")
+	}
+	if srcChannels != 1 && srcChannels != 2 {
+		return nil, fmt.Errorf("unsupported source channels: %d", srcChannels)
+	}
+	if dstChannels != 1 && dstChannels != 2 {
+		return nil, fmt.Errorf("unsupported destination channels: %d", dstChannels)
+	}
+	if len(pcm)%2 != 0 {
+		return nil, fmt.Errorf("invalid pcm byte length")
+	}
+
+	samples := make([]int16, len(pcm)/2)
+	for i := range samples {
+		samples[i] = int16(binary.LittleEndian.Uint16(pcm[i*2 : i*2+2]))
+	}
+	frames := len(samples) / srcChannels
+	if frames == 0 {
+		return nil, fmt.Errorf("empty pcm")
+	}
+
+	outFrames := int(math.Round(float64(frames) * float64(dstRate) / float64(srcRate)))
+	if outFrames < 1 {
+		outFrames = 1
+	}
+
+	outSamples := make([]int16, outFrames*dstChannels)
+	for i := 0; i < outFrames; i++ {
+		var srcPos float64
+		if outFrames == 1 || frames == 1 {
+			srcPos = 0
+		} else {
+			srcPos = float64(i) * float64(frames-1) / float64(outFrames-1)
+		}
+		base := int(srcPos)
+		next := base + 1
+		if next >= frames {
+			next = base
+		}
+		frac := srcPos - float64(base)
+
+		var left, right float64
+		if srcChannels == 1 {
+			v0 := float64(samples[base])
+			v1 := float64(samples[next])
+			left = v0 + (v1-v0)*frac
+			right = left
+		} else {
+			l0 := float64(samples[base*2])
+			l1 := float64(samples[next*2])
+			r0 := float64(samples[base*2+1])
+			r1 := float64(samples[next*2+1])
+			left = l0 + (l1-l0)*frac
+			right = r0 + (r1-r0)*frac
+		}
+
+		if dstChannels == 1 {
+			mono := (left + right) / 2
+			if mono > pcm16Max {
+				mono = pcm16Max
+			} else if mono < pcm16Min {
+				mono = pcm16Min
+			}
+			outSamples[i] = int16(mono)
+		} else {
+			if left > pcm16Max {
+				left = pcm16Max
+			} else if left < pcm16Min {
+				left = pcm16Min
+			}
+			if right > pcm16Max {
+				right = pcm16Max
+			} else if right < pcm16Min {
+				right = pcm16Min
+			}
+			outSamples[i*2] = int16(left)
+			outSamples[i*2+1] = int16(right)
+		}
+	}
+
+	out := make([]byte, len(outSamples)*2)
+	for i, v := range outSamples {
+		binary.LittleEndian.PutUint16(out[i*2:i*2+2], uint16(v))
+	}
+	return out, nil
 }
 
 func parseWav(data []byte) (pcm []byte, sampleRate int, channels int, err error) {

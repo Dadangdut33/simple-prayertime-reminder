@@ -5,6 +5,7 @@ go 1.25
 require (
 	github.com/ebitengine/oto/v3 v3.4.0
 	github.com/hablullah/go-prayer v1.1.1
+	github.com/hajimehoshi/go-mp3 v0.3.4
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c
 	github.com/wailsapp/wails/v3 v3.0.0-alpha.74
 	github.com/xuri/excelize/v2 v2.10.1

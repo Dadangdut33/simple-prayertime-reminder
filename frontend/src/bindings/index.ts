@@ -175,6 +175,10 @@ export const saveQuranData = (data: QuranData): Promise<void> =>
   AppService.SaveQuranData(data as any) as any;
 export const readTextFile = (path: string): Promise<string> =>
   AppService.ReadTextFile(path) as any;
+export const selectAdhanAudioFile = (
+  isFajr: boolean,
+  currentPath: string,
+): Promise<string> => AppService.SelectAdhanAudioFile(isFajr, currentPath) as any;
 export const getReminderTestSnapshot = (
   prayerName: string,
   offsetSeconds: number,

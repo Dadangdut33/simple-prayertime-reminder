@@ -25,7 +25,7 @@ const (
 )
 
 // ShowReminder creates or updates the reminder window with prayer info
-func (svc *Service) ShowReminder(info ReminderInfo) {
+func (svc *Service) ShowReminder(info ReminderInfo) int64 {
 	svc.mu.Lock()
 	defer svc.mu.Unlock()
 
@@ -69,10 +69,11 @@ func (svc *Service) ShowReminder(info ReminderInfo) {
 	// Emit event so the reminder page can update
 	svc.app.Event.Emit("reminder:update", info)
 	log.Info("reminder shown", "prayer", info.PrayerName, "state", info.State, "offsetMinutes", info.OffsetMinutes, "triggerId", info.TriggerID)
+	return info.TriggerID
 }
 
 // ShowTestReminder creates or updates the simulated reminder window with prayer info.
-func (svc *Service) ShowTestReminder(info ReminderInfo) {
+func (svc *Service) ShowTestReminder(info ReminderInfo) int64 {
 	svc.mu.Lock()
 	info.TriggerID = time.Now().UnixMilli()
 	latest := info
@@ -111,6 +112,7 @@ func (svc *Service) ShowTestReminder(info ReminderInfo) {
 
 	svc.app.Event.Emit("reminder:test-update", info)
 	log.Info("test reminder shown", "prayer", info.PrayerName, "state", info.State, "offsetMinutes", info.OffsetMinutes, "triggerId", info.TriggerID, "live", info.Live)
+	return info.TriggerID
 }
 
 // UpdateTestState updates the simulated reminder window's state without forcing it to show.
@@ -300,6 +302,24 @@ func (svc *Service) LastTestReminder() *ReminderInfo {
 	}
 	copy := *svc.lastTestInfo
 	return &copy
+}
+
+func (svc *Service) IsReminderTriggerActive(triggerID int64) bool {
+	if triggerID == 0 {
+		return false
+	}
+	svc.mu.Lock()
+	defer svc.mu.Unlock()
+	return svc.lastInfo != nil && svc.lastInfo.TriggerID == triggerID
+}
+
+func (svc *Service) IsTestReminderTriggerActive(triggerID int64) bool {
+	if triggerID == 0 {
+		return false
+	}
+	svc.mu.Lock()
+	defer svc.mu.Unlock()
+	return svc.lastTestInfo != nil && svc.lastTestInfo.TriggerID == triggerID
 }
 
 func (svc *Service) ensureReminderWindowLocked(show bool, alwaysOnTop bool, height int, minHeight int, maxHeight int) {

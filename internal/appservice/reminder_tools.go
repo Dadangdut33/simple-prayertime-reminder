@@ -79,15 +79,17 @@ func scheduleToMap(s prayer.DaySchedule) map[string]string {
 
 func toReminderNotificationSettings(cfg settings.NotificationSettings) *notification.ReminderNotificationSettings {
 	return &notification.ReminderNotificationSettings{
-		PersistentReminder:   cfg.PersistentReminder,
-		AutoDismissSeconds:   cfg.AutoDismissSeconds,
-		AutoDismissAfterAdhan: cfg.AutoDismissAfterAdhan,
-		PlayAdhan:            cfg.PlayAdhan,
-		AdhanVolume:          cfg.AdhanVolume,
-		AlwaysOnTop:          cfg.AlwaysOnTop,
-		UseNativeNotification: cfg.UseNativeNotification,
+		PersistentReminder:       cfg.PersistentReminder,
+		AutoDismissSeconds:       cfg.AutoDismissSeconds,
+		AutoDismissAfterAdhan:    cfg.AutoDismissAfterAdhan,
+		PlayAdhan:                cfg.PlayAdhan,
+		AdhanVolume:              cfg.AdhanVolume,
+		CustomAdhanPath:          cfg.CustomAdhanPath,
+		CustomAdhanFajrPath:      cfg.CustomAdhanFajrPath,
+		AlwaysOnTop:              cfg.AlwaysOnTop,
+		UseNativeNotification:    cfg.UseNativeNotification,
 		NativeNotificationSticky: cfg.NativeNotificationSticky,
-		UseNativeDialog:      cfg.UseNativeDialog,
+		UseNativeDialog:          cfg.UseNativeDialog,
 	}
 }
 
@@ -228,8 +230,9 @@ func (s *Service) TriggerReminderTest(prayerName string, offsetSeconds int, time
 
 	offsetMinutes := int(math.Round(float64(snapshot.OffsetSeconds) / 60.0))
 	cfg := s.settingsSvc.Get()
+	triggerID := int64(0)
 	if s.notifSvc != nil {
-		s.notifSvc.ShowTestReminder(notification.ReminderInfo{
+		triggerID = s.notifSvc.ShowTestReminder(notification.ReminderInfo{
 			PrayerName:    snapshot.PrayerName,
 			State:         notification.WindowState(snapshot.State),
 			MinutesLeft:   snapshot.MinutesLeft,
@@ -246,44 +249,55 @@ func (s *Service) TriggerReminderTest(prayerName string, offsetSeconds int, time
 		if snapshot.State == string(notification.StateOnTime) &&
 			cfg.Notification.PlayAdhan &&
 			cfg.Notification.AutoDismissAfterAdhan {
-			go s.closeTestAfterAdhan(delay)
+			go s.closeTestAfterAdhan(delay, triggerID)
 		} else {
-			go s.closeTestAfterDelay(delay)
+			go s.closeTestAfterDelay(delay, triggerID)
 		}
 	}
 
 	return snapshot, nil
 }
 
-func (s *Service) closeTestAfterDelay(delay time.Duration) {
+func (s *Service) closeTestAfterDelay(delay time.Duration, triggerID int64) {
 	time.Sleep(delay)
+	if triggerID != 0 && (s.notifSvc == nil || !s.notifSvc.IsTestReminderTriggerActive(triggerID)) {
+		log.Info("skip stale auto dismiss test reminder", "triggerId", triggerID)
+		return
+	}
 	if s.notifSvc != nil {
 		s.notifSvc.CloseTestReminder()
 	}
 }
 
-func (s *Service) closeTestAfterAdhan(delay time.Duration) {
+func (s *Service) closeTestAfterAdhan(delay time.Duration, triggerID int64) {
 	if s.audioSvc == nil {
-		s.closeTestAfterDelay(delay)
+		s.closeTestAfterDelay(delay, triggerID)
 		return
 	}
 
-	started := waitForAudioState(s.audioSvc, true, 5*time.Second)
+	started := waitForAudioState(s.audioSvc, true, 5*time.Second, func() bool {
+		return s.notifSvc != nil && s.notifSvc.IsTestReminderTriggerActive(triggerID)
+	})
 	if !started {
-		s.closeTestAfterDelay(delay)
+		s.closeTestAfterDelay(delay, triggerID)
 		return
 	}
 
-	_ = waitForAudioState(s.audioSvc, false, 15*time.Minute)
-	s.closeTestAfterDelay(delay)
+	_ = waitForAudioState(s.audioSvc, false, 15*time.Minute, func() bool {
+		return s.notifSvc != nil && s.notifSvc.IsTestReminderTriggerActive(triggerID)
+	})
+	s.closeTestAfterDelay(delay, triggerID)
 }
 
-func waitForAudioState(audioSvc *audio.Service, target bool, timeout time.Duration) bool {
+func waitForAudioState(audioSvc *audio.Service, target bool, timeout time.Duration, keepWaiting func() bool) bool {
 	deadline := time.Now().Add(timeout)
 	ticker := time.NewTicker(250 * time.Millisecond)
 	defer ticker.Stop()
 
 	for {
+		if keepWaiting != nil && !keepWaiting() {
+			return false
+		}
 		if audioSvc != nil && audioSvc.IsPlaying() == target {
 			return true
 		}

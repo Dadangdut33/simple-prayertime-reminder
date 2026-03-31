@@ -760,7 +760,12 @@ func (s *Service) PlayAdhan(isFajr bool) error {
 		return nil
 	}
 	cfg := s.settingsSvc.Get()
-	if err := s.audioSvc.Play(isFajr, cfg.Notification.AdhanVolume); err != nil {
+	if err := s.audioSvc.Play(
+		isFajr,
+		cfg.Notification.AdhanVolume,
+		cfg.Notification.CustomAdhanPath,
+		cfg.Notification.CustomAdhanFajrPath,
+	); err != nil {
 		log.Error("play adhan failed", "error", err, "fajr", isFajr)
 		return err
 	}

@@ -38,6 +38,8 @@ type NotificationSettings struct {
 	Style                    NotificationStyle     `json:"style"`
 	PlayAdhan                bool                  `json:"playAdhan"`
 	AdhanVolume              float64               `json:"adhanVolume"` // 0.0 to 1.0
+	CustomAdhanPath          string                `json:"customAdhanPath"`
+	CustomAdhanFajrPath      string                `json:"customAdhanFajrPath"`
 	PersistentReminder       bool                  `json:"persistentReminder"`
 	AutoDismissSeconds       int                   `json:"autoDismissSeconds"`
 	AutoDismissAfterAdhan    bool                  `json:"autoDismissAfterAdhan"`
@@ -118,23 +120,23 @@ type WorldPrayerSettings struct {
 
 // Settings holds the full app configuration.
 type Settings struct {
-	Location         LocationSettings     `json:"location"`
-	Prayer           PrayerSettings       `json:"prayer"`
-	Notification     NotificationSettings `json:"notification"`
-	Dashboard        DashboardSettings    `json:"dashboard"`
-	PrayerTimes      PrayerTimesSettings  `json:"prayerTimes"`
-	WorldPrayer      WorldPrayerSettings  `json:"worldPrayer"`
-	Theme            string               `json:"theme"`
-	ThemePreset      string               `json:"themePreset"`
-	Language         string               `json:"language"`
-	LogLevel         string               `json:"logLevel"`
-	AutoStart        bool                 `json:"autoStart"`
-	AutoCheckUpdates bool                 `json:"autoCheckUpdates"`
-	TrayLeftClick    string               `json:"trayLeftClick"`
-	HijriDateOffset  int                  `json:"hijriDateOffset"`
-	TimeFormat       string               `json:"timeFormat"`
-	EnableTestTools  bool                 `json:"enableTestTools"`
-	OnboardingCompleted bool              `json:"onboardingCompleted"`
+	Location            LocationSettings     `json:"location"`
+	Prayer              PrayerSettings       `json:"prayer"`
+	Notification        NotificationSettings `json:"notification"`
+	Dashboard           DashboardSettings    `json:"dashboard"`
+	PrayerTimes         PrayerTimesSettings  `json:"prayerTimes"`
+	WorldPrayer         WorldPrayerSettings  `json:"worldPrayer"`
+	Theme               string               `json:"theme"`
+	ThemePreset         string               `json:"themePreset"`
+	Language            string               `json:"language"`
+	LogLevel            string               `json:"logLevel"`
+	AutoStart           bool                 `json:"autoStart"`
+	AutoCheckUpdates    bool                 `json:"autoCheckUpdates"`
+	TrayLeftClick       string               `json:"trayLeftClick"`
+	HijriDateOffset     int                  `json:"hijriDateOffset"`
+	TimeFormat          string               `json:"timeFormat"`
+	EnableTestTools     bool                 `json:"enableTestTools"`
+	OnboardingCompleted bool                 `json:"onboardingCompleted"`
 }
 
 // Service handles settings loading and saving

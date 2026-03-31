@@ -1,4 +1,4 @@
-import { Box, Button, FormControlLabel, Slider, Switch, Typography } from '@mui/material';
+import { Box, Button, FormControlLabel, Slider, TextField, Switch, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import NumberField from '../../ui/NumberField';
 import { PRAYER_NAMES, type Settings } from '../../../types';
@@ -7,6 +7,7 @@ import {
   checkNativeNotificationPermission,
   playAdhan,
   requestNativeNotificationPermission,
+  selectAdhanAudioFile,
   stopAdhan,
 } from '../../../bindings';
 interface AlarmSettingsTabProps {
@@ -50,6 +51,22 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
       await stopAdhan();
     } catch (e) {
       console.error('Error stopping audio');
+      console.error(e);
+    }
+  };
+
+  const selectAudioFile = async (isFajr: boolean) => {
+    try {
+      const currentPath = isFajr ? local.notification.customAdhanFajrPath : local.notification.customAdhanPath;
+      const selectedPath = await selectAdhanAudioFile(isFajr, currentPath);
+      if (!selectedPath) return;
+      if (isFajr) {
+        setNotification({ customAdhanFajrPath: selectedPath });
+      } else {
+        setNotification({ customAdhanPath: selectedPath });
+      }
+    } catch (e) {
+      console.error('Error selecting audio file');
       console.error(e);
     }
   };
@@ -104,6 +121,47 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
         <Button variant="outlined" size="small" color="error" onClick={stopPreview}>
           {t('settings.alarms.previewAdhanStop')}
         </Button>
+      </Box>
+
+      <Box display="flex" flexDirection="column" gap={2}>
+        <Typography variant="subtitle1">{t('settings.alarms.customAudioFiles')}</Typography>
+        <Typography variant="body2" color="text.secondary">
+          {t('settings.alarms.customAudioFilesDesc')}
+        </Typography>
+
+        <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr auto auto' }} gap={1.25} alignItems="center">
+          <TextField
+            fullWidth
+            size="small"
+            label={t('settings.alarms.customAdhanPath')}
+            placeholder={t('settings.alarms.customAdhanPathPlaceholder')}
+            value={local.notification.customAdhanPath}
+            slotProps={{ input: { readOnly: true } }}
+          />
+          <Button variant="outlined" size="small" onClick={() => void selectAudioFile(false)}>
+            {t('settings.alarms.selectAudioFile')}
+          </Button>
+          <Button variant="text" size="small" onClick={() => setNotification({ customAdhanPath: '' })}>
+            {t('settings.alarms.clearAudioFile')}
+          </Button>
+        </Box>
+
+        <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr auto auto' }} gap={1.25} alignItems="center">
+          <TextField
+            fullWidth
+            size="small"
+            label={t('settings.alarms.customAdhanFajrPath')}
+            placeholder={t('settings.alarms.customAdhanPathPlaceholder')}
+            value={local.notification.customAdhanFajrPath}
+            slotProps={{ input: { readOnly: true } }}
+          />
+          <Button variant="outlined" size="small" onClick={() => void selectAudioFile(true)}>
+            {t('settings.alarms.selectAudioFile')}
+          </Button>
+          <Button variant="text" size="small" onClick={() => setNotification({ customAdhanFajrPath: '' })}>
+            {t('settings.alarms.clearAudioFile')}
+          </Button>
+        </Box>
       </Box>
 
       <Box pb={3} borderBottom="1px solid" borderColor="divider">

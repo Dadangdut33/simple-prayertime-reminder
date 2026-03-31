@@ -120,6 +120,8 @@ export class NotificationSettings {
      * 0.0 to 1.0
      */
     "adhanVolume": number;
+    "customAdhanPath": string;
+    "customAdhanFajrPath": string;
     "persistentReminder": boolean;
     "autoDismissSeconds": number;
     "autoDismissAfterAdhan": boolean;
@@ -139,6 +141,12 @@ export class NotificationSettings {
         }
         if (!("adhanVolume" in $$source)) {
             this["adhanVolume"] = 0;
+        }
+        if (!("customAdhanPath" in $$source)) {
+            this["customAdhanPath"] = "";
+        }
+        if (!("customAdhanFajrPath" in $$source)) {
+            this["customAdhanFajrPath"] = "";
         }
         if (!("persistentReminder" in $$source)) {
             this["persistentReminder"] = false;
@@ -172,10 +180,10 @@ export class NotificationSettings {
      * Creates a new NotificationSettings instance from a string or object.
      */
     static createFrom($$source: any = {}): NotificationSettings {
-        const $$createField10_0 = $$createType0;
+        const $$createField12_0 = $$createType0;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("prayers" in $$parsedSource) {
-            $$parsedSource["prayers"] = $$createField10_0($$parsedSource["prayers"]);
+            $$parsedSource["prayers"] = $$createField12_0($$parsedSource["prayers"]);
         }
         return new NotificationSettings($$parsedSource as Partial<NotificationSettings>);
     }

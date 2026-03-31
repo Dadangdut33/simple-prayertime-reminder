@@ -129,6 +129,8 @@ func DefaultSettings() Settings {
 			Style:                    NotificationWindow,
 			PlayAdhan:                true,
 			AdhanVolume:              0.5,
+			CustomAdhanPath:          "",
+			CustomAdhanFajrPath:      "",
 			PersistentReminder:       false,
 			AutoDismissSeconds:       30,
 			AutoDismissAfterAdhan:    true,

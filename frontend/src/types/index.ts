@@ -121,6 +121,8 @@ export interface NotificationSettings {
   style: NotificationStyle;
   playAdhan: boolean;
   adhanVolume: number;
+  customAdhanPath: string;
+  customAdhanFajrPath: string;
   persistentReminder: boolean;
   autoDismissSeconds: number;
   autoDismissAfterAdhan: boolean;
@@ -251,6 +253,8 @@ export interface ReminderNotificationSettings {
   autoDismissAfterAdhan: boolean;
   playAdhan: boolean;
   adhanVolume: number;
+  customAdhanPath: string;
+  customAdhanFajrPath: string;
   alwaysOnTop: boolean;
   useNativeNotification: boolean;
   nativeNotificationSticky: boolean;

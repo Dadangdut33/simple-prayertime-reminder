@@ -67,6 +67,8 @@ export class ReminderNotificationSettings {
     "autoDismissAfterAdhan": boolean;
     "playAdhan": boolean;
     "adhanVolume": number;
+    "customAdhanPath": string;
+    "customAdhanFajrPath": string;
     "alwaysOnTop": boolean;
     "useNativeNotification": boolean;
     "nativeNotificationSticky": boolean;
@@ -88,6 +90,12 @@ export class ReminderNotificationSettings {
         }
         if (!("adhanVolume" in $$source)) {
             this["adhanVolume"] = 0;
+        }
+        if (!("customAdhanPath" in $$source)) {
+            this["customAdhanPath"] = "";
+        }
+        if (!("customAdhanFajrPath" in $$source)) {
+            this["customAdhanFajrPath"] = "";
         }
         if (!("alwaysOnTop" in $$source)) {
             this["alwaysOnTop"] = false;

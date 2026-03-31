@@ -16,6 +16,8 @@ type ReminderNotificationSettings struct {
 	AutoDismissAfterAdhan    bool    `json:"autoDismissAfterAdhan"`
 	PlayAdhan                bool    `json:"playAdhan"`
 	AdhanVolume              float64 `json:"adhanVolume"`
+	CustomAdhanPath          string  `json:"customAdhanPath"`
+	CustomAdhanFajrPath      string  `json:"customAdhanFajrPath"`
 	AlwaysOnTop              bool    `json:"alwaysOnTop"`
 	UseNativeNotification    bool    `json:"useNativeNotification"`
 	NativeNotificationSticky bool    `json:"nativeNotificationSticky"`
