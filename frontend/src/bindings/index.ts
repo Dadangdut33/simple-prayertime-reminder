@@ -148,6 +148,8 @@ export const getTestReminderState = (): Promise<ReminderInfo | null> =>
   AppService.GetTestReminderState() as any;
 export const playAdhan = (isFajr: boolean): Promise<void> =>
   AppService.PlayAdhan(isFajr) as any;
+export const ackAdhanPlayback = (triggerID: number, isTest: boolean): Promise<void> =>
+  AppService.AckAdhanPlayback(triggerID, isTest) as any;
 export const stopAdhan = (): Promise<void> => AppService.StopAdhan() as any;
 export const resizeReminderWindow = (state: string, isTest: boolean): Promise<void> =>
   AppService.ResizeReminderWindow(state, isTest) as any;
@@ -165,6 +167,8 @@ export const getAppInfo = (): Promise<AppInfo> =>
   AppService.GetAppInfo() as any;
 export const checkForUpdates = (): Promise<UpdateInfo> =>
   AppService.CheckForUpdates() as any;
+export const checkForUpdatesSilent = (): Promise<UpdateInfo> =>
+  AppService.CheckForUpdatesSilent() as any;
 export const openConfigLocation = (): Promise<void> =>
   AppService.OpenConfigLocation() as any;
 export const openURL = (url: string): Promise<void> =>

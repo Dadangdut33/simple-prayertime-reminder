@@ -779,6 +779,12 @@ func (s *Service) StopAdhan() {
 	log.Info("stop adhan requested")
 }
 
+func (s *Service) AckAdhanPlayback(triggerID int64, isTest bool) {
+	if s.notifSvc != nil {
+		s.notifSvc.AckAdhanPlayback(triggerID, isTest)
+	}
+}
+
 func (s *Service) CheckNativeNotificationPermission() (bool, error) {
 	if s.notifSvc == nil {
 		return false, fmt.Errorf("notification service not available")

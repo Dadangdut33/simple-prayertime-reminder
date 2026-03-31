@@ -3,6 +3,7 @@ package appservice
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"runtime"
 	"strings"
@@ -110,7 +111,12 @@ func fetchLatestRelease() (releaseInfo, error) {
 	defer tagResp.Body.Close()
 
 	if tagResp.StatusCode < 200 || tagResp.StatusCode >= 300 {
-		return releaseInfo{}, fmt.Errorf("unable to check GitHub for the latest version")
+		bodyPreview, _ := io.ReadAll(io.LimitReader(tagResp.Body, 512))
+		return releaseInfo{}, fmt.Errorf(
+			"unable to check GitHub for the latest version (status=%d, body=%q)",
+			tagResp.StatusCode,
+			strings.TrimSpace(string(bodyPreview)),
+		)
 	}
 
 	var payload []struct {
@@ -196,4 +202,17 @@ func (s *Service) CheckForUpdates() (UpdateInfo, error) {
 	result.HasUpdate = currentSemver != "" && latestSemver != "" && semver.Compare(currentSemver, latestSemver) < 0
 
 	return result, nil
+}
+
+// CheckForUpdatesSilent is intended for startup auto-check.
+// It never returns an error to avoid noisy IPC failures when GitHub is temporarily unreachable.
+func (s *Service) CheckForUpdatesSilent() UpdateInfo {
+	result, err := s.CheckForUpdates()
+	if err != nil {
+		log.Warn("startup update check failed", "error", err)
+		return UpdateInfo{
+			HasUpdate: false,
+		}
+	}
+	return result
 }

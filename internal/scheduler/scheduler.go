@@ -314,6 +314,9 @@ func (svc *Service) closeAfterAdhan(delay time.Duration, triggerID int64) {
 	}
 
 	_ = svc.waitForAudioState(false, audioStopTimeout, triggerID)
+	if svc.notifSvc != nil && triggerID != 0 {
+		svc.notifSvc.EmitAutoDismissCountdown(triggerID, int(delay/time.Second), false)
+	}
 	svc.closeAfterDelay(delay, triggerID)
 }
 

@@ -2,13 +2,20 @@ import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAppStore } from './store/appStore';
 import * as api from './bindings';
+import type { ReminderInfo } from './types';
 import UpdateAvailableDialog from './components/app/UpdateAvailableDialog';
 import { useTranslation } from 'react-i18next';
 import Onboarding from './pages/Onboarding';
 import { Events } from '@wailsio/runtime';
+import { getPrayerDisplayName } from './utils/helpers';
 
 import {
   Box,
+  Alert,
+  AlertTitle,
+  Button,
+  Collapse,
+  Fade,
   IconButton,
   Drawer,
   List,
@@ -58,6 +65,8 @@ export default function App() {
   const shouldAutoCollapse = useMediaQuery(theme.breakpoints.down('lg'));
   const [drawerCollapsed, setDrawerCollapsed] = useState(shouldAutoCollapse);
   const [startupUpdateCheckDone, setStartupUpdateCheckDone] = useState(false);
+  const [activeReminder, setActiveReminder] = useState<{ info: ReminderInfo; isTest: boolean } | null>(null);
+  const [bannerOpen, setBannerOpen] = useState(false);
 
   // Reminder window lives on its own route with no sidebar
   const isReminder = location.pathname === '/reminder';
@@ -82,6 +91,44 @@ export default function App() {
   }, [initialized, refreshPrayerData]);
 
   useEffect(() => {
+    const showReminderBanner = (next: { info: ReminderInfo; isTest: boolean }) => {
+      setActiveReminder(next);
+      setBannerOpen(true);
+    };
+
+    const onReminderUpdate = () => {
+      void api.getReminderState().then((info) => {
+        if (!info) return;
+        showReminderBanner({ info, isTest: false });
+      });
+    };
+    const onTestReminderUpdate = () => {
+      void api.getTestReminderState().then((info) => {
+        if (!info) return;
+        showReminderBanner({ info, isTest: true });
+      });
+    };
+    const onReminderClosed = () => {
+      setBannerOpen(false);
+    };
+    const onTestReminderClosed = () => {
+      setBannerOpen(false);
+    };
+
+    Events.On('reminder:update', onReminderUpdate);
+    Events.On('reminder:test-update', onTestReminderUpdate);
+    Events.On('reminder:closed', onReminderClosed);
+    Events.On('reminder:test-closed', onTestReminderClosed);
+
+    return () => {
+      Events.Off('reminder:update');
+      Events.Off('reminder:test-update');
+      Events.Off('reminder:closed');
+      Events.Off('reminder:test-closed');
+    };
+  }, []);
+
+  useEffect(() => {
     const params = new URLSearchParams(location.search);
     if (params.get('view') !== 'reminder') return;
     const mode = params.get('mode');
@@ -104,7 +151,7 @@ export default function App() {
 
     async function checkForUpdates() {
       try {
-        const update = await api.checkForUpdates();
+        const update = await api.checkForUpdatesSilent();
         console.log('Checking for update');
         if (!active || !update.hasUpdate) {
           return;
@@ -147,6 +194,9 @@ export default function App() {
   }
 
   const drawerWidth = drawerCollapsed ? DRAWER_COLLAPSED_WIDTH : DRAWER_WIDTH;
+  const activePrayerLabel = activeReminder ? getPrayerDisplayName(activeReminder.info.prayerName) : '';
+  const isReminderActive = Boolean(activeReminder && activeReminder.info.state !== 'after');
+  const reminderAlertSeverity: 'warning' | 'info' = isReminderActive ? 'warning' : 'info';
 
   const visibleNavItems = settings?.enableTestTools ? NAV_ITEMS : NAV_ITEMS.filter((item) => item.to !== '/test-tools');
 
@@ -322,6 +372,61 @@ export default function App() {
           height: '100vh',
         }}
       >
+        <Collapse
+          in={Boolean(activeReminder) && bannerOpen}
+          timeout={280}
+          unmountOnExit
+          onExited={() => setActiveReminder(null)}
+        >
+          {activeReminder && (
+            <Fade in={bannerOpen} timeout={{ enter: 220, exit: 220 }}>
+              <Box
+                key={activeReminder.info.triggerId ?? `${activeReminder.info.prayerName}-${activeReminder.info.state}`}
+                sx={{
+                  p: 2,
+                  pb: 0,
+                  animation: bannerOpen ? 'mainReminderSlideIn 280ms ease-out' : undefined,
+                  '@keyframes mainReminderSlideIn': {
+                    from: { opacity: 0, transform: 'translateY(-8px)' },
+                    to: { opacity: 1, transform: 'translateY(0)' },
+                  },
+                }}
+              >
+                <Alert sx={{ border: '1px solid', borderColor: 'divider' }} severity={reminderAlertSeverity}>
+                  <AlertTitle>{t('mainReminder.title')}</AlertTitle>
+                  <div className="flex flex-col">
+                    {t('mainReminder.message', {
+                      prayer: activePrayerLabel,
+                      state: t(`mainReminder.states.${activeReminder.info.state}`),
+                    })}
+                    {activeReminder.isTest && (
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
+                        {t('mainReminder.testLabel')}
+                      </Typography>
+                    )}
+                    <div className="mt-4">
+                      <Button
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                        onClick={() => {
+                          setBannerOpen(false);
+                          if (activeReminder.isTest) {
+                            void api.dismissTestReminder();
+                          } else {
+                            void api.dismissReminder();
+                          }
+                        }}
+                      >
+                        {t('mainReminder.dismiss')}
+                      </Button>
+                    </div>
+                  </div>
+                </Alert>
+              </Box>
+            </Fade>
+          )}
+        </Collapse>
         <Outlet />
       </Box>
     </Box>

@@ -180,8 +180,8 @@ func main() {
 	})
 	if startHidden {
 		mainWindow.Show()
-		// show window for at least 3 second and then hide
-		time.AfterFunc(3*time.Second, func() {
+		// show window for at least 5 second and then hide
+		time.AfterFunc(5*time.Second, func() {
 			mainWindow.Hide()
 		})
 	}

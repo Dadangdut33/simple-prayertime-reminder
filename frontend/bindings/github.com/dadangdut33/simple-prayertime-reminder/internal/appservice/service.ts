@@ -36,8 +36,22 @@ import * as settings$0 from "../settings/models.js";
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
+export function AckAdhanPlayback(triggerID: number, isTest: boolean): $CancellablePromise<void> {
+    return $Call.ByID(2512026133, triggerID, isTest);
+}
+
 export function CheckForUpdates(): $CancellablePromise<$models.UpdateInfo> {
     return $Call.ByID(2121986746).then(($result: any) => {
+        return $$createType0($result);
+    });
+}
+
+/**
+ * CheckForUpdatesSilent is intended for startup auto-check.
+ * It never returns an error to avoid noisy IPC failures when GitHub is temporarily unreachable.
+ */
+export function CheckForUpdatesSilent(): $CancellablePromise<$models.UpdateInfo> {
+    return $Call.ByID(796587723).then(($result: any) => {
         return $$createType0($result);
     });
 }

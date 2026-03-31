@@ -62,6 +62,7 @@ func (svc *Service) ShowReminder(info ReminderInfo) int64 {
 	if notif != nil && notif.UseNativeDialog {
 		svc.playAdhanForDialog(info, notif)
 	}
+	svc.scheduleAdhanFallbackLocked(info, notif, false)
 	if showDialog {
 		svc.enqueueNativeDialog(info)
 	}
@@ -106,6 +107,9 @@ func (svc *Service) ShowTestReminder(info ReminderInfo) int64 {
 	if notif != nil && notif.UseNativeDialog {
 		svc.playAdhanForDialog(info, notif)
 	}
+	svc.mu.Lock()
+	svc.scheduleAdhanFallbackLocked(info, notif, true)
+	svc.mu.Unlock()
 	if showDialog {
 		svc.enqueueNativeDialog(info)
 	}
@@ -165,10 +169,17 @@ func (svc *Service) CloseReminder() {
 	svc.mu.Lock()
 	defer svc.mu.Unlock()
 
+	triggerID := int64(0)
 	if svc.reminderWindow != nil {
 		svc.reminderWindow.Hide()
 	}
+	if svc.lastInfo != nil {
+		triggerID = svc.lastInfo.TriggerID
+		svc.clearAdhanFallbackLocked(svc.lastInfo.TriggerID, false)
+	}
+	svc.lastInfo = nil
 	log.Info("reminder closed")
+	svc.app.Event.Emit("reminder:closed", map[string]int64{"triggerId": triggerID})
 	svc.stopAudio()
 }
 
@@ -182,10 +193,17 @@ func (svc *Service) ForceCloseReminder() {
 	}
 	svc.reminderWindow = nil
 	svc.allowCloseReminder = true
+	triggerID := int64(0)
+	if svc.lastInfo != nil {
+		triggerID = svc.lastInfo.TriggerID
+		svc.clearAdhanFallbackLocked(svc.lastInfo.TriggerID, false)
+	}
+	svc.lastInfo = nil
 	svc.mu.Unlock()
 
 	window.Close()
 	svc.stopAudio()
+	svc.app.Event.Emit("reminder:closed", map[string]int64{"triggerId": triggerID})
 	log.Info("reminder force-closed")
 }
 
@@ -194,11 +212,17 @@ func (svc *Service) CloseTestReminder() {
 	svc.mu.Lock()
 	defer svc.mu.Unlock()
 
+	triggerID := int64(0)
 	if svc.testReminderWindow != nil {
 		svc.testReminderWindow.Hide()
 	}
+	if svc.lastTestInfo != nil {
+		triggerID = svc.lastTestInfo.TriggerID
+		svc.clearAdhanFallbackLocked(svc.lastTestInfo.TriggerID, true)
+	}
 	svc.lastTestInfo = nil
 	log.Info("test reminder closed")
+	svc.app.Event.Emit("reminder:test-closed", map[string]int64{"triggerId": triggerID})
 	svc.stopAudio()
 }
 
@@ -244,10 +268,17 @@ func (svc *Service) ForceCloseTestReminder() {
 	}
 	svc.testReminderWindow = nil
 	svc.allowCloseTest = true
+	triggerID := int64(0)
+	if svc.lastTestInfo != nil {
+		triggerID = svc.lastTestInfo.TriggerID
+		svc.clearAdhanFallbackLocked(svc.lastTestInfo.TriggerID, true)
+	}
+	svc.lastTestInfo = nil
 	svc.mu.Unlock()
 
 	window.Close()
 	svc.stopAudio()
+	svc.app.Event.Emit("reminder:test-closed", map[string]int64{"triggerId": triggerID})
 	log.Info("test reminder force-closed")
 }
 
@@ -358,8 +389,7 @@ func (svc *Service) ensureReminderWindowLocked(show bool, alwaysOnTop bool, heig
 			}
 			svc.mu.Unlock()
 			event.Cancel()
-			svc.reminderWindow.Hide()
-			svc.stopAudio()
+			svc.CloseReminder()
 		})
 	} else {
 		log.Info("reminder window still exist")
@@ -413,8 +443,7 @@ func (svc *Service) ensureTestReminderWindowLocked(show bool, alwaysOnTop bool, 
 			}
 			svc.mu.Unlock()
 			event.Cancel()
-			svc.testReminderWindow.Hide()
-			svc.stopAudio()
+			svc.CloseTestReminder()
 		})
 	} else {
 		log.Info("test reminder window still exist")

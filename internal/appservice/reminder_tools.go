@@ -286,6 +286,9 @@ func (s *Service) closeTestAfterAdhan(delay time.Duration, triggerID int64) {
 	_ = waitForAudioState(s.audioSvc, false, 15*time.Minute, func() bool {
 		return s.notifSvc != nil && s.notifSvc.IsTestReminderTriggerActive(triggerID)
 	})
+	if s.notifSvc != nil && triggerID != 0 {
+		s.notifSvc.EmitAutoDismissCountdown(triggerID, int(delay/time.Second), true)
+	}
 	s.closeTestAfterDelay(delay, triggerID)
 }
 

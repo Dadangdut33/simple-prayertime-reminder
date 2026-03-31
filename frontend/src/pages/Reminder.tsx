@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import {
+  ackAdhanPlayback,
   dismissReminder,
   dismissTestReminder,
   emitReminderInfo,
@@ -29,6 +30,7 @@ export default function ReminderPage() {
   const lastPlayKeyRef = useRef<string | null>(null);
   const lastInfoKeyRef = useRef<string | null>(null);
   const autoDismissAtRef = useRef<number | null>(null);
+  const currentTriggerIdRef = useRef<number | null>(null);
   const infoReceivedAtRef = useRef<number | null>(null);
   const prayerTimeMsRef = useRef<number | null>(null);
   const clock = useClock();
@@ -87,10 +89,18 @@ export default function ReminderPage() {
 
   useEffect(() => {
     const eventName = isTest ? 'reminder:test-update' : 'reminder:update';
+    const autoDismissEventName = isTest ? 'reminder:test-auto-dismiss-countdown' : 'reminder:auto-dismiss-countdown';
     Events.On(eventName, () => {
       void (isTest ? getTestReminderState() : getReminderState()).then((state) => {
         applyInfo(state, true);
       });
+    });
+    Events.On(autoDismissEventName, (payload) => {
+      const raw = payload as { data?: { triggerId?: number; seconds?: number }; triggerId?: number; seconds?: number };
+      const data = raw?.data ?? raw;
+      if (!data || typeof data.triggerId !== 'number' || typeof data.seconds !== 'number') return;
+      if (!currentTriggerIdRef.current || currentTriggerIdRef.current !== data.triggerId) return;
+      autoDismissAtRef.current = Date.now() + Math.max(0, data.seconds) * 1000;
     });
 
     if (isTest) {
@@ -107,6 +117,7 @@ export default function ReminderPage() {
 
     return () => {
       Events.Off(eventName);
+      Events.Off(autoDismissEventName);
     };
   }, [isTest]);
 
@@ -152,6 +163,10 @@ export default function ReminderPage() {
   }, [displayState, hasState, info, isTest]);
 
   useEffect(() => {
+    currentTriggerIdRef.current = typeof info?.triggerId === 'number' ? info.triggerId : null;
+  }, [info?.triggerId]);
+
+  useEffect(() => {
     if (!notificationSettings) return;
     if (!info) return;
     const shouldWaitForAdhan =
@@ -159,7 +174,7 @@ export default function ReminderPage() {
       notificationSettings.autoDismissSeconds > 0 &&
       notificationSettings.autoDismissAfterAdhan &&
       notificationSettings.playAdhan &&
-      displayState === 'ontime';
+      info.state === 'ontime';
 
     if (
       !notificationSettings.persistentReminder &&
@@ -171,7 +186,7 @@ export default function ReminderPage() {
     } else {
       autoDismissAtRef.current = null;
     }
-  }, [displayState, info, notificationSettings]);
+  }, [info, notificationSettings]);
 
   const offsetLabel = useMemo(() => {
     if (!offsetMinutes || Number.isNaN(offsetMinutes)) return null;
@@ -209,10 +224,14 @@ export default function ReminderPage() {
     const key = `${info.prayerName}|${prayerTimeMs ?? 0}|${isTest ? 'test' : 'real'}`;
     if (lastPlayKeyRef.current === key) return;
     lastPlayKeyRef.current = key;
-    void playAdhan(info.prayerName === PRAYER_NAME_FAJR).catch((e) => {
-      console.error('Fail to play audio');
-      console.error(e);
-    });
+    void playAdhan(info.prayerName === PRAYER_NAME_FAJR)
+      .then(async () => {
+        await ackAdhanPlayback(info.triggerId as number, isTest);
+      })
+      .catch((e) => {
+        console.error('Fail to play audio');
+        console.error(e);
+      });
   }, [displayState, hasState, info, isTest, notificationSettings?.playAdhan, prayerTimeMs]);
 
   const autoDismissSecondsLeft = (() => {

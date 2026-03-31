@@ -54,6 +54,17 @@ const id = {
     worldCities: 'Kota Dunia',
     testTools: 'Alat Uji',
   },
+  mainReminder: {
+    title: 'Jendela Pengingat Aktif',
+    message: 'Pengingat {{prayer}} - Saat ini {{state}}.',
+    dismiss: 'Tutup Pengingat',
+    testLabel: 'Mode pengingat uji',
+    states: {
+      before: 'menjelang waktu salat',
+      ontime: 'tepat waktu salat',
+      after: 'setelah waktu salat',
+    },
+  },
   dashboard: {
     header: {
       title: 'Dasbor',

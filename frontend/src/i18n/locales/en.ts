@@ -54,6 +54,17 @@ const en = {
     worldCities: 'World Cities',
     testTools: 'Test Tools',
   },
+  mainReminder: {
+    title: 'Reminder Window Active',
+    message: '{{prayer}} reminder - it is currently {{state}}.',
+    dismiss: 'Dismiss',
+    testLabel: 'Test reminder mode',
+    states: {
+      before: 'before prayer time',
+      ontime: 'prayer time',
+      after: 'after prayer time',
+    },
+  },
   dashboard: {
     header: {
       title: 'Dashboard',
