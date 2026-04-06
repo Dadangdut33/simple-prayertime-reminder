@@ -714,17 +714,6 @@ func (s *Service) DismissReminder() {
 	if s.audioSvc != nil {
 		s.audioSvc.Stop()
 	}
-	if s.schedulerSvc != nil {
-		if last := loadReminderState(s.reminderStatePath); last != nil && last.PrayerName != "" {
-			cfg := s.settingsSvc.Get()
-			loc, err := time.LoadLocation(cfg.Location.Timezone)
-			if err != nil {
-				loc = time.UTC
-			}
-			day := clock.Now().In(loc).Format("2006-01-02")
-			s.schedulerSvc.SuppressPrayer(last.PrayerName, day)
-		}
-	}
 	log.Info("reminder dismissed")
 }
 

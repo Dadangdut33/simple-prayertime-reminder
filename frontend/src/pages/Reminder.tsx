@@ -70,6 +70,10 @@ export default function ReminderPage() {
   const applyInfo = (next: ReminderInfo | null, force = false) => {
     if (!next) {
       lastInfoKeyRef.current = null;
+      lastPlayKeyRef.current = null;
+      autoDismissAtRef.current = null;
+      currentTriggerIdRef.current = null;
+      lastResizeStateRef.current = null;
       setHasState(false);
       setInfo(fallbackInfo);
       infoReceivedAtRef.current = null;
@@ -90,10 +94,14 @@ export default function ReminderPage() {
   useEffect(() => {
     const eventName = isTest ? 'reminder:test-update' : 'reminder:update';
     const autoDismissEventName = isTest ? 'reminder:test-auto-dismiss-countdown' : 'reminder:auto-dismiss-countdown';
+    const closedEventName = isTest ? 'reminder:test-closed' : 'reminder:closed';
     Events.On(eventName, () => {
       void (isTest ? getTestReminderState() : getReminderState()).then((state) => {
         applyInfo(state, true);
       });
+    });
+    Events.On(closedEventName, () => {
+      applyInfo(null, true);
     });
     Events.On(autoDismissEventName, (payload) => {
       const raw = payload as { data?: { triggerId?: number; seconds?: number }; triggerId?: number; seconds?: number };
@@ -117,6 +125,7 @@ export default function ReminderPage() {
 
     return () => {
       Events.Off(eventName);
+      Events.Off(closedEventName);
       Events.Off(autoDismissEventName);
     };
   }, [isTest]);

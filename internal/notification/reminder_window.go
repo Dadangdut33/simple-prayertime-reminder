@@ -178,6 +178,7 @@ func (svc *Service) CloseReminder() {
 		svc.clearAdhanFallbackLocked(svc.lastInfo.TriggerID, false)
 	}
 	svc.lastInfo = nil
+	svc.clearStateLocked(svc.reminderStatePath)
 	log.Info("reminder closed")
 	svc.app.Event.Emit("reminder:closed", map[string]int64{"triggerId": triggerID})
 	svc.stopAudio()
@@ -199,6 +200,7 @@ func (svc *Service) ForceCloseReminder() {
 		svc.clearAdhanFallbackLocked(svc.lastInfo.TriggerID, false)
 	}
 	svc.lastInfo = nil
+	svc.clearStateLocked(svc.reminderStatePath)
 	svc.mu.Unlock()
 
 	window.Close()
@@ -221,6 +223,7 @@ func (svc *Service) CloseTestReminder() {
 		svc.clearAdhanFallbackLocked(svc.lastTestInfo.TriggerID, true)
 	}
 	svc.lastTestInfo = nil
+	svc.clearStateLocked(svc.testReminderStatePath)
 	log.Info("test reminder closed")
 	svc.app.Event.Emit("reminder:test-closed", map[string]int64{"triggerId": triggerID})
 	svc.stopAudio()
@@ -274,6 +277,7 @@ func (svc *Service) ForceCloseTestReminder() {
 		svc.clearAdhanFallbackLocked(svc.lastTestInfo.TriggerID, true)
 	}
 	svc.lastTestInfo = nil
+	svc.clearStateLocked(svc.testReminderStatePath)
 	svc.mu.Unlock()
 
 	window.Close()
@@ -400,7 +404,7 @@ func (svc *Service) ensureReminderWindowLocked(show bool, alwaysOnTop bool, heig
 	}
 	if show {
 		log.Info("show reminder window")
-		svc.reminderWindow.Show()
+		svc.restoreAndFocusWindowLocked(svc.reminderWindow)
 	}
 }
 
@@ -454,6 +458,21 @@ func (svc *Service) ensureTestReminderWindowLocked(show bool, alwaysOnTop bool, 
 	}
 	if show {
 		log.Info("show test reminder window")
-		svc.testReminderWindow.Show()
+		svc.restoreAndFocusWindowLocked(svc.testReminderWindow)
 	}
+}
+
+func (svc *Service) restoreAndFocusWindowLocked(window *application.WebviewWindow) {
+	if window == nil {
+		return
+	}
+	// On some platforms Show() alone does not reliably bring back an existing
+	// reminder window for the first on-time transition, especially when audio
+	// playback starts immediately. Restore and focus it explicitly.
+	if window.IsMinimised() {
+		window.UnMinimise()
+		window.Restore()
+	}
+	window.Show()
+	window.Focus()
 }

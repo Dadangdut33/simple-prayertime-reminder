@@ -31,3 +31,12 @@ func (svc *Service) writeStateLocked(path string, info ReminderInfo) {
 		}
 	}
 }
+
+func (svc *Service) clearStateLocked(path string) {
+	if path == "" {
+		return
+	}
+	if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
+		log.Error("state clear failed", "error", err, "path", path)
+	}
+}
