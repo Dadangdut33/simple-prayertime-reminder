@@ -10,7 +10,7 @@
   <Identity 
     Name="com.dadangdut33.simple-prayertime-reminder"
     Publisher="CN=Dadangdut33"
-    Version="2.0.4.0" 
+    Version="2.0.5.0" 
     ProcessorArchitecture="x64" />
   
   <Properties>
