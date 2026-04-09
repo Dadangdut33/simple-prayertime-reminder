@@ -10,11 +10,11 @@
         <key>CFBundleIdentifier</key>
             <string>com.dadangdut33.simple-prayertime-reminder</string>
         <key>CFBundleVersion</key>
-            <string>2.0.5-dev</string>
+            <string>2.0.6-dev</string>
         <key>CFBundleGetInfoString</key>
             <string>A Simple Prayertime Reminder</string>
         <key>CFBundleShortVersionString</key>
-            <string>2.0.5-dev</string>
+            <string>2.0.6-dev</string>
         <key>CFBundleIconFile</key>
             <string>icons</string>
         <key>LSMinimumSystemVersion</key>
