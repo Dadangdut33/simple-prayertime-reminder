@@ -6,6 +6,33 @@
 import { Create as $Create } from "@wailsio/runtime";
 
 /**
+ * A Location maps time instants to the zone in use at that time.
+ * Typically, the Location represents the collection of time offsets
+ * in use in a geographical area. For many Locations the time offset varies
+ * depending on whether daylight savings time is in use at the time instant.
+ * 
+ * Location is used to provide a time zone in a printed Time value and for
+ * calculations involving intervals that may cross daylight savings time
+ * boundaries.
+ */
+export class Location {
+
+    /** Creates a new Location instance. */
+    constructor($$source: Partial<Location> = {}) {
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new Location instance from a string or object.
+     */
+    static createFrom($$source: any = {}): Location {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new Location($$parsedSource as Partial<Location>);
+    }
+}
+
+/**
  * A Time represents an instant in time with nanosecond precision.
  * 
  * Programs using times should typically store and pass them as values,

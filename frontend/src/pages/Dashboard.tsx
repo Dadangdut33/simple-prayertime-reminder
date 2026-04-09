@@ -16,7 +16,7 @@ import {
 } from '../utils/helpers';
 
 export default function Dashboard() {
-  const { todaySchedule, hijriDate, location, qiblaDirection, settings, loading } = useAppStore();
+  const { todaySchedule, nextPrayer, hijriDate, location, qiblaDirection, settings, loading } = useAppStore();
   const { t } = useTranslation();
   const now = useClock();
   const timeZone = settings?.location.timezone || undefined;
@@ -33,6 +33,29 @@ export default function Dashboard() {
   if (loading || !todaySchedule || !settings) {
     return null; // handled by App shell
   }
+
+  const getDayKey = (value: Date) => {
+    try {
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).formatToParts(value);
+      const year = parts.find((part) => part.type === 'year')?.value;
+      const month = parts.find((part) => part.type === 'month')?.value;
+      const day = parts.find((part) => part.type === 'day')?.value;
+      if (year && month && day) {
+        return `${year}-${month}-${day}`;
+      }
+    } catch {
+      // Fall through to local date key.
+    }
+    const year = value.getFullYear();
+    const month = String(value.getMonth() + 1).padStart(2, '0');
+    const day = String(value.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
   const prayers = getPrayerList(todaySchedule);
   const canonicalPrayers = [
@@ -58,14 +81,20 @@ export default function Dashboard() {
     previousPrayer = { name: 'Isha', time: previousIsha };
   }
 
-  let upcomingPrayer = canonicalPrayers.find((prayer) => prayer.time > now) ?? null;
+  let upcomingPrayer =
+    nextPrayer && nextPrayer.time
+      ? { name: nextPrayer.name, time: new Date(nextPrayer.time) }
+      : canonicalPrayers.find((prayer) => prayer.time > now) ?? null;
+  if (upcomingPrayer && Number.isNaN(upcomingPrayer.time.getTime())) {
+    upcomingPrayer = canonicalPrayers.find((prayer) => prayer.time > now) ?? null;
+  }
   if (!upcomingPrayer) {
     const tomorrowFajr = new Date(todaySchedule.fajr);
     tomorrowFajr.setDate(tomorrowFajr.getDate() + 1);
     upcomingPrayer = { name: 'Fajr', time: tomorrowFajr };
   }
 
-  const isAllPassed = upcomingPrayer.name === 'Fajr' && upcomingPrayer.time.getDate() !== now.getDate();
+  const isAllPassed = upcomingPrayer.name === 'Fajr' && getDayKey(upcomingPrayer.time) !== getDayKey(now);
   const secondsSincePrevious = Math.max(0, Math.floor((now.getTime() - previousPrayer.time.getTime()) / 1000));
   const isOnTime = secondsSincePrevious >= 0 && secondsSincePrevious < graceSeconds;
   const displayPrayer = isOnTime ? previousPrayer : upcomingPrayer;

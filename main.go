@@ -202,6 +202,7 @@ func main() {
 	appservice.SetSettingsChangedHandler(appSvc, func(cfg settings.Settings) {
 		if trayState != nil {
 			trayState.UpdateLeftClickAction(cfg.TrayLeftClick)
+			trayState.Refresh()
 		}
 	})
 

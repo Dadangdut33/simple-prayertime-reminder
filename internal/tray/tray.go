@@ -84,6 +84,8 @@ func buildTrayMenu(
 		titleItem:    menu.Add("Today's Prayer Times").SetEnabled(false),
 		dateItem:     menu.Add("Loading today's schedule...").SetEnabled(false),
 		prayerNames:  []string{"Fajr", "Sunrise", "Zuhr", "Asr", "Maghrib", "Isha"},
+		appSvc:       appSvc,
+		appName:      appName,
 	}
 
 	for _, prayerName := range state.prayerNames {
@@ -96,7 +98,7 @@ func buildTrayMenu(
 		mainWindow.Focus()
 	})
 	menu.Add("Refresh Prayer Times").OnClick(func(_ *application.Context) {
-		state.refresh(appSvc, appName)
+		state.Refresh()
 	})
 	menu.AddSeparator()
 	menu.Add("Quit").OnClick(func(_ *application.Context) {
@@ -107,7 +109,7 @@ func buildTrayMenu(
 		app.Quit()
 	})
 
-	state.refresh(appSvc, appName)
+	state.Refresh()
 	startTrayRefreshLoop(app, appSvc, state, appName)
 
 	return state, menu
@@ -129,15 +131,23 @@ func startTrayRefreshLoop(app *application.App, appSvc *appservice.Service, stat
 			case <-done:
 				return
 			case <-ticker.C:
-				state.refresh(appSvc, appName)
+				state.Refresh()
 			}
 		}
 	}()
 }
 
+func (s *MenuState) Refresh() {
+	if s == nil || s.appSvc == nil {
+		return
+	}
+	s.refresh(s.appSvc, s.appName)
+}
+
 func (s *MenuState) refresh(appSvc *appservice.Service, appName string) {
 	s.identityItem.SetLabel(buildTrayIdentityLabel(appSvc, appName))
 	s.UpdateLeftClickAction(getTrayLeftClickAction(appSvc))
+	trayLoc := appSvc.GetConfiguredLocation()
 
 	schedule, err := appSvc.GetTodaySchedule()
 	if err != nil {
@@ -155,7 +165,7 @@ func (s *MenuState) refresh(appSvc *appservice.Service, appName string) {
 	}
 
 	s.titleItem.SetHidden(true)
-	s.dateItem.SetLabel("- " + formatTrayScheduleDate(schedule) + " -")
+	s.dateItem.SetLabel("- " + formatTrayScheduleDate(schedule, trayLoc) + " -")
 
 	times := []struct {
 		name string
@@ -173,7 +183,7 @@ func (s *MenuState) refresh(appSvc *appservice.Service, appName string) {
 		if idx >= len(s.prayerItems) {
 			break
 		}
-		s.prayerItems[idx].SetLabel(fmt.Sprintf("%s: %s", entry.name, formatTrayPrayerTime(entry.time)))
+		s.prayerItems[idx].SetLabel(fmt.Sprintf("%s: %s", entry.name, formatTrayPrayerTime(entry.time, trayLoc)))
 	}
 }
 
@@ -230,8 +240,12 @@ func (s *MenuState) tryOpenMenu(tray *application.SystemTray) {
 	tray.OpenMenu()
 }
 
-func formatTrayScheduleDate(schedule prayer.DaySchedule) string {
+func formatTrayScheduleDate(schedule prayer.DaySchedule, loc *time.Location) string {
 	if parsed, err := time.Parse("2006-01-02", schedule.Date); err == nil {
+		if loc == nil {
+			loc = time.UTC
+		}
+		parsed = time.Date(parsed.Year(), parsed.Month(), parsed.Day(), 0, 0, 0, 0, loc)
 		return parsed.Format("Mon, 02 Jan 2006")
 	}
 
@@ -244,6 +258,9 @@ func formatTrayScheduleDate(schedule prayer.DaySchedule) string {
 		schedule.Isha,
 	} {
 		if !prayerTime.IsZero() {
+			if loc != nil {
+				prayerTime = prayerTime.In(loc)
+			}
 			return prayerTime.Format("Mon, 02 Jan 2006")
 		}
 	}
@@ -251,9 +268,12 @@ func formatTrayScheduleDate(schedule prayer.DaySchedule) string {
 	return schedule.Date
 }
 
-func formatTrayPrayerTime(value time.Time) string {
+func formatTrayPrayerTime(value time.Time, loc *time.Location) string {
 	if value.IsZero() {
 		return "--"
+	}
+	if loc != nil {
+		value = value.In(loc)
 	}
 
 	return value.Format("03:04 PM")

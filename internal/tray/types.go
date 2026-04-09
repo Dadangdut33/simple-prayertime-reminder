@@ -4,6 +4,7 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"github.com/dadangdut33/simple-prayertime-reminder/internal/appservice"
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
@@ -18,4 +19,7 @@ type MenuState struct {
 	leftClickAction string
 	skipNextClick   atomic.Bool
 	forceMenuOnce   atomic.Bool
+
+	appSvc  *appservice.Service
+	appName string
 }

@@ -189,6 +189,11 @@ func loadLocationOrUTC(timezone string) *time.Location {
 	return loc
 }
 
+func (s *Service) GetConfiguredLocation() *time.Location {
+	cfg := s.settingsSvc.Get()
+	return loadLocationOrUTC(cfg.Location.Timezone)
+}
+
 func updateLogLevel(cfg settings.Settings) {
 	configDir, err := ConfigDirectory()
 	if err != nil {
@@ -543,7 +548,7 @@ func (s *Service) GetTodaySchedule() (prayer.DaySchedule, error) {
 }
 
 func (s *Service) GetScheduleForDate(dateStr string) (prayer.DaySchedule, error) {
-	t, err := time.Parse("2006-01-02", dateStr)
+	t, err := parseDateInLocation(dateStr, s.GetConfiguredLocation())
 	if err != nil {
 		log.Error("parse schedule date failed", "error", err, "date", dateStr)
 		return prayer.DaySchedule{}, err
@@ -566,7 +571,7 @@ func (s *Service) GetMonthSchedule(year, month int) ([]prayer.DaySchedule, error
 }
 
 func (s *Service) GetScheduleRange(startDate, endDate string) ([]prayer.DaySchedule, error) {
-	start, end, err := parseDateRange(startDate, endDate)
+	start, end, err := parseDateRangeInLocation(startDate, endDate, s.GetConfiguredLocation())
 	if err != nil {
 		log.Error("parse date range failed", "error", err, "start", startDate, "end", endDate)
 		return nil, err
@@ -602,7 +607,7 @@ func (s *Service) GetMonthHijriDates(year, month int) ([]hijri.CalendarDay, erro
 }
 
 func (s *Service) GetHijriDateRange(startDate, endDate string) ([]hijri.CalendarDay, error) {
-	start, end, err := parseDateRange(startDate, endDate)
+	start, end, err := parseDateRangeInLocation(startDate, endDate, s.GetConfiguredLocation())
 	if err != nil {
 		return nil, err
 	}
@@ -1003,13 +1008,24 @@ func (s *Service) buildRangeExportRows(startDate, endDate string) ([]export.Mont
 	return rows, nil
 }
 
-func parseDateRange(startDate, endDate string) (time.Time, time.Time, error) {
-	start, err := time.Parse("2006-01-02", startDate)
+func parseDateInLocation(dateStr string, loc *time.Location) (time.Time, error) {
+	if loc == nil {
+		loc = time.UTC
+	}
+	parsed, err := time.Parse("2006-01-02", dateStr)
+	if err != nil {
+		return time.Time{}, err
+	}
+	return time.Date(parsed.Year(), parsed.Month(), parsed.Day(), 0, 0, 0, 0, loc), nil
+}
+
+func parseDateRangeInLocation(startDate, endDate string, loc *time.Location) (time.Time, time.Time, error) {
+	start, err := parseDateInLocation(startDate, loc)
 	if err != nil {
 		return time.Time{}, time.Time{}, fmt.Errorf("invalid start date: %w", err)
 	}
 
-	end, err := time.Parse("2006-01-02", endDate)
+	end, err := parseDateInLocation(endDate, loc)
 	if err != nil {
 		return time.Time{}, time.Time{}, fmt.Errorf("invalid end date: %w", err)
 	}
