@@ -198,12 +198,7 @@ export interface PrayerSettings {
 
 export type ClockType = 'digital' | 'analog';
 export type DigitalClockFormatPreset =
-  | '24h-seconds'
-  | '24h-short'
-  | '12h-seconds'
-  | '12h-short'
-  | 'weekday-date'
-  | 'custom';
+  '24h-seconds' | '24h-short' | '12h-seconds' | '12h-short' | 'weekday-date' | 'custom';
 export type ThemePreset = 'indigo' | 'emerald' | 'sunset' | 'rose' | 'ocean';
 export type PrayerTimesViewMode = 'table' | 'calendar';
 export type PrayerCalendarSystem = 'gregorian' | 'hijri' | 'side-by-side';

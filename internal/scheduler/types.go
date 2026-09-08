@@ -24,6 +24,9 @@ type Service struct {
 	audioSvc       *audio.Service
 	notifSvc       *notification.Service
 	stopCh         chan struct{}
+	cfgMu          sync.RWMutex
+	cfg            settings.Settings
+	monitorOnce    sync.Once
 	prayerTickMu   sync.Mutex
 	prayerTickSeen map[string]struct{}
 	suppressMu     sync.Mutex

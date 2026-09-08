@@ -162,8 +162,7 @@ const getDesignTokens = (mode: 'light' | 'dark', preset: ThemePreset): ThemeOpti
         styleOverrides: {
           '*': {
             scrollbarWidth: 'thin',
-            scrollbarColor:
-              mode === 'light' ? '#b6bccf #eef0f6' : '#3a415e #0f1322',
+            scrollbarColor: mode === 'light' ? '#b6bccf #eef0f6' : '#3a415e #0f1322',
           },
           '*::-webkit-scrollbar': {
             width: '10px',
@@ -194,10 +193,13 @@ const getDesignTokens = (mode: 'light' | 'dark', preset: ThemePreset): ThemeOpti
             alignItems: 'center',
             gap: 8,
           },
-          containedPrimary: {
-            boxShadow: mode === 'light' ? `0 10px 24px ${colors.primary}38` : `0 10px 24px ${colors.primaryLight}42`,
-            '&:hover': {
-              boxShadow: mode === 'light' ? `0 14px 28px ${colors.primary}47` : `0 14px 28px ${colors.primaryLight}52`,
+          contained: {
+            '&.MuiButton-colorPrimary': {
+              boxShadow: mode === 'light' ? `0 10px 24px ${colors.primary}38` : `0 10px 24px ${colors.primaryLight}42`,
+              '&:hover': {
+                boxShadow:
+                  mode === 'light' ? `0 14px 28px ${colors.primary}47` : `0 14px 28px ${colors.primaryLight}52`,
+              },
             },
           },
           outlined: {

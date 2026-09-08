@@ -15,6 +15,8 @@ const (
 	audioStopTimeout  = 15 * time.Minute
 	audioPollInterval = 250 * time.Millisecond
 	ontimeGrace       = 20 * time.Second
+	clockMonitorInterval = 30 * time.Second
+	clockJumpThreshold   = 90 * time.Second
 )
 
 func toReminderNotificationSettings(cfg settings.NotificationSettings) *notification.ReminderNotificationSettings {
@@ -48,6 +50,8 @@ func NewService(p *prayer.Service, a *audio.Service, n *notification.Service) *S
 // Start begins the scheduling loop, which re-evaluates each midnight
 func (svc *Service) Start(cfg settings.Settings) {
 	log.Info("scheduler start")
+	svc.setConfig(cfg)
+	svc.startClockMonitor()
 	go svc.run(cfg)
 }
 
@@ -61,6 +65,7 @@ func (svc *Service) Stop() {
 // UpdateConfig restarts scheduling with new settings
 func (svc *Service) UpdateConfig(cfg settings.Settings) {
 	log.Info("scheduler update config")
+	svc.setConfig(cfg)
 	select {
 	case <-svc.stopCh: // already stopped, ignore
 	default:
@@ -68,6 +73,54 @@ func (svc *Service) UpdateConfig(cfg settings.Settings) {
 	}
 	svc.stopCh = make(chan struct{})
 	go svc.run(cfg)
+}
+
+func (svc *Service) setConfig(cfg settings.Settings) {
+	svc.cfgMu.Lock()
+	svc.cfg = cfg
+	svc.cfgMu.Unlock()
+}
+
+func (svc *Service) getConfig() settings.Settings {
+	svc.cfgMu.RLock()
+	defer svc.cfgMu.RUnlock()
+	return svc.cfg
+}
+
+func (svc *Service) startClockMonitor() {
+	svc.monitorOnce.Do(func() {
+		go svc.monitorClockChanges()
+	})
+}
+
+func (svc *Service) monitorClockChanges() {
+	ticker := time.NewTicker(clockMonitorInterval)
+	defer ticker.Stop()
+
+	var previous time.Time
+	for range ticker.C {
+		cfg := svc.getConfig()
+		loc := resolveScheduleLocation(cfg)
+		now := clock.Now().In(loc)
+		if previous.IsZero() {
+			previous = now
+			continue
+		}
+
+		elapsed := now.Sub(previous)
+		drift := elapsed - clockMonitorInterval
+		if drift < 0 {
+			drift = -drift
+		}
+		if drift > clockJumpThreshold {
+			log.Warn("clock jump detected, rescheduling reminders", "previous", previous, "current", now, "elapsed", elapsed)
+			previous = now
+			svc.UpdateConfig(cfg)
+			continue
+		}
+
+		previous = now
+	}
 }
 
 func (svc *Service) run(cfg settings.Settings) {

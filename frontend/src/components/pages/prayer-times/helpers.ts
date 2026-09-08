@@ -20,10 +20,7 @@ export function toArabicIndicDigits(value: number | string): string {
   return String(value).replace(/\d/g, (digit) => '٠١٢٣٤٥٦٧٨٩'[Number(digit)]);
 }
 
-export function formatHijriDayNumber(
-  value: number,
-  useArabicIndicDigits: boolean,
-): string {
+export function formatHijriDayNumber(value: number, useArabicIndicDigits: boolean): string {
   return useArabicIndicDigits ? toArabicIndicDigits(value) : String(value);
 }
 
@@ -43,10 +40,7 @@ export function formatHijriDateShort(hijri?: HijriDate | null): string {
   return `${hijri.day} ${getHijriMonthName(hijri.month)} ${hijri.year} AH`;
 }
 
-export function formatCalendarTimeCompact(
-  isoOrTimeStr: string,
-  format: '12h' | '24h' = '24h',
-): string {
+export function formatCalendarTimeCompact(isoOrTimeStr: string, format: '12h' | '24h' = '24h'): string {
   if (!isoOrTimeStr) return '--:--';
 
   const date = new Date(isoOrTimeStr);
@@ -100,9 +94,7 @@ export function formatExportRangeLabel(startDate: Dayjs, endDate: Dayjs): string
   }
 
   if (startDate.isSame(endDate, 'year')) {
-    return `${startDate.locale(i18n.language).format('D MMM')} - ${endDate
-      .locale(i18n.language)
-      .format('D MMM YYYY')}`;
+    return `${startDate.locale(i18n.language).format('D MMM')} - ${endDate.locale(i18n.language).format('D MMM YYYY')}`;
   }
 
   return `${startDate.locale(i18n.language).format('D MMM YYYY')} - ${endDate
@@ -151,9 +143,7 @@ export function getCalendarDayPresentation(
 ): CalendarDayPresentation {
   const gregorianDay = String(date.date());
   const gregorianMonth = date.format('MMM');
-  const hijriDay = hijriDate
-    ? formatHijriDayNumber(hijriDate.day, useArabicIndicDigits)
-    : '';
+  const hijriDay = hijriDate ? formatHijriDayNumber(hijriDate.day, useArabicIndicDigits) : '';
 
   if (mode === 'hijri') {
     return {
@@ -168,8 +158,6 @@ export function getCalendarDayPresentation(
     primaryLabel: gregorianDay,
     primaryContext: '',
     secondaryLabel: hijriDay,
-    secondaryContext: hijriDate
-      ? getHijriMonthName(hijriDate.month).replace('al-', '')
-      : '',
+    secondaryContext: hijriDate ? getHijriMonthName(hijriDate.month).replace('al-', '') : '',
   };
 }

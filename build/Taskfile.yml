@@ -26,7 +26,17 @@ tasks:
     summary: Build the frontend project
     dir: frontend
     sources:
-      - "**/*"
+      # Hash build inputs, avoiding node_modules and generated dist assets.
+      - "src/**/*"
+      - "bindings/**/*"
+      - "public/**/*"
+      - "../assets/**/*"
+      - "index.html"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "tsconfig*.json"
+      - "vite.config.*"
     generates:
       - dist/**/*
     deps:

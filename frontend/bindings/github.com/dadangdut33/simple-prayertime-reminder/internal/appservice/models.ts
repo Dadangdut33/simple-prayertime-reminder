@@ -11,9 +11,6 @@ import * as prayer$0 from "../prayer/models.js";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
 import * as settings$0 from "../settings/models.js";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore: Unused imports
-import * as time$0 from "../../../../../time/models.js";
 
 export class AppInfo {
     "version": string;
@@ -372,7 +369,7 @@ export class UpdateInfo {
 export class WorldPrayerCitySummary {
     "city": settings$0.WorldPrayerCity;
     "offsetSeconds": number;
-    "currentTime": time$0.Time;
+    "currentTime": string;
     "nextPrayer": prayer$0.NextPrayerInfo;
     "today": prayer$0.DaySchedule;
 
@@ -385,7 +382,7 @@ export class WorldPrayerCitySummary {
             this["offsetSeconds"] = 0;
         }
         if (!("currentTime" in $$source)) {
-            this["currentTime"] = null;
+            this["currentTime"] = "0001-01-01T00:00:00.000Z";
         }
         if (!("nextPrayer" in $$source)) {
             this["nextPrayer"] = (new prayer$0.NextPrayerInfo());

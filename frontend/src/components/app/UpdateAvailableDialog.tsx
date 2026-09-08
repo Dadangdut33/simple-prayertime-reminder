@@ -10,12 +10,7 @@ interface UpdateAvailableDialogProps {
   onOpenAction: () => Promise<void>;
 }
 
-export default function UpdateAvailableDialog({
-  open,
-  update,
-  onClose,
-  onOpenAction,
-}: UpdateAvailableDialogProps) {
+export default function UpdateAvailableDialog({ open, update, onClose, onOpenAction }: UpdateAvailableDialogProps) {
   const { t } = useTranslation();
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
@@ -31,7 +26,13 @@ export default function UpdateAvailableDialog({
         <Typography variant="subtitle2" gutterBottom>
           {update.updateTitle}
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary',
+            mb: 2,
+          }}
+        >
           {update.updateDetail}
         </Typography>
 
@@ -54,7 +55,14 @@ export default function UpdateAvailableDialog({
               borderColor: 'divider',
             }}
           >
-            <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.75 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+                display: 'block',
+                mb: 0.75,
+              }}
+            >
               {t('updates.recommendedCommand')}
             </Typography>
             <Typography variant="body2" sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>

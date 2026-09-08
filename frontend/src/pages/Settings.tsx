@@ -106,7 +106,12 @@ export default function SettingsPage() {
     });
 
   return (
-    <Box p={4} mx="auto">
+    <Box
+      sx={{
+        p: 4,
+        mx: 'auto',
+      }}
+    >
       <SettingsHeader saveLabel={saveLabel} saveState={saveState} onReset={() => setResetDialogOpen(true)} />
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>

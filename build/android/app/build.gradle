@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace 'com.wails.app'
-    compileSdk 34
+    compileSdk 37
 
     buildFeatures {
         buildConfig = true
@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId "com.wails.app"
-        minSdk 21
+        minSdk 24
         targetSdk 34
         versionCode 1
         versionName "1.0"
@@ -49,15 +49,16 @@ android {
     }
 
     // Packaging options
-    packagingOptions {
+    packaging {
         // Don't strip Go symbols in debug builds
-        doNotStrip '*/arm64-v8a/libwails.so'
-        doNotStrip '*/x86_64/libwails.so'
+        jniLibs {
+            keepDebugSymbols += ['*/arm64-v8a/libwails.so', '*/x86_64/libwails.so']
+        }
     }
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.webkit:webkit:1.9.0'
-    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.appcompat:appcompat:1.8.0'
+    implementation 'androidx.webkit:webkit:1.17.0'
+    implementation 'com.google.android.material:material:1.14.0'
 }

@@ -26,20 +26,24 @@ export default function PrayerTimesControls({
   const { t } = useTranslation();
   return (
     <Box
-      display="flex"
-      justifyContent="space-between"
-      alignItems={{ xs: 'stretch', lg: 'center' }}
-      flexDirection={{ xs: 'column', lg: 'row' }}
-      gap={2}
-      mb={3}
+      sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: { xs: 'stretch', lg: 'center' },
+        flexDirection: { xs: 'column', lg: 'row' },
+        gap: 2,
+        mb: 3,
+      }}
     >
       <Box
-        display="flex"
-        alignItems={{ xs: 'stretch', sm: 'center' }}
-        flexDirection={{ xs: 'column', sm: 'row' }}
-        gap={1.25}
-        flexWrap="wrap"
-        width={'100%'}
+        sx={{
+          display: 'flex',
+          alignItems: { xs: 'stretch', sm: 'center' },
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: 1.25,
+          flexWrap: 'wrap',
+          width: '100%',
+        }}
       >
         <ToggleButtonGroup
           exclusive

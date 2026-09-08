@@ -84,7 +84,7 @@ export default function Dashboard() {
   let upcomingPrayer =
     nextPrayer && nextPrayer.time
       ? { name: nextPrayer.name, time: new Date(nextPrayer.time) }
-      : canonicalPrayers.find((prayer) => prayer.time > now) ?? null;
+      : (canonicalPrayers.find((prayer) => prayer.time > now) ?? null);
   if (upcomingPrayer && Number.isNaN(upcomingPrayer.time.getTime())) {
     upcomingPrayer = canonicalPrayers.find((prayer) => prayer.time > now) ?? null;
   }
@@ -148,11 +148,26 @@ export default function Dashboard() {
   const qiblaCompassLabel = bearingToCompassLabel(qiblaDirection ?? 0);
 
   return (
-    <Box p={4}>
+    <Box
+      sx={{
+        p: 4,
+      }}
+    >
       <DashboardHeader now={now} hijriDate={hijriDate} location={location} />
 
-      <Box display="grid" gridTemplateColumns={{ xs: '1fr', lg: '1.2fr 0.8fr' }} gap={3}>
-        <Box display="grid" gap={3}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', lg: '1.2fr 0.8fr' },
+          gap: 3,
+        }}
+      >
+        <Box
+          sx={{
+            display: 'grid',
+            gap: 3,
+          }}
+        >
           <NextPrayerCard
             displayPrayerLabel={displayPrayerLabel}
             nextPrayerLabel={upcomingPrayerLabel}
@@ -178,7 +193,12 @@ export default function Dashboard() {
           )}
         </Box>
 
-        <Box display="grid" gap={3}>
+        <Box
+          sx={{
+            display: 'grid',
+            gap: 3,
+          }}
+        >
           <ScheduleCard
             prayers={prayers}
             nextPrayerName={scheduleHighlightLabel}

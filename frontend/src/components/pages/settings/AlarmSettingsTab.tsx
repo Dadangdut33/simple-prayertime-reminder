@@ -97,11 +97,28 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
   };
 
   return (
-    <Box display="flex" flexDirection="column" gap={3}>
-      <Box display="flex" justifyContent="space-between" alignItems="center">
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 3,
+      }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
         <Box>
           <Typography variant="subtitle1">{t('settings.alarms.playAdhan')}</Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {t('settings.alarms.playAdhanDesc')}
           </Typography>
         </Box>
@@ -111,7 +128,13 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
         />
       </Box>
 
-      <Box display="flex" flexWrap="wrap" gap={1}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 1,
+        }}
+      >
         <Button variant="outlined" size="small" onClick={() => playPreview(false)}>
           {t('settings.alarms.previewAdhan')}
         </Button>
@@ -123,13 +146,31 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
         </Button>
       </Box>
 
-      <Box display="flex" flexDirection="column" gap={2}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+        }}
+      >
         <Typography variant="subtitle1">{t('settings.alarms.customAudioFiles')}</Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary',
+          }}
+        >
           {t('settings.alarms.customAudioFilesDesc')}
         </Typography>
 
-        <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr auto auto' }} gap={1.25} alignItems="center">
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: '1fr auto auto' },
+            gap: 1.25,
+            alignItems: 'center',
+          }}
+        >
           <TextField
             fullWidth
             size="small"
@@ -146,7 +187,14 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
           </Button>
         </Box>
 
-        <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr auto auto' }} gap={1.25} alignItems="center">
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: '1fr auto auto' },
+            gap: 1.25,
+            alignItems: 'center',
+          }}
+        >
           <TextField
             fullWidth
             size="small"
@@ -164,12 +212,35 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
         </Box>
       </Box>
 
-      <Box pb={3} borderBottom="1px solid" borderColor="divider">
-        <Box display="flex" justifyContent="space-between" mb={1}>
-          <Typography variant="body2" color="text.secondary">
+      <Box
+        sx={{
+          pb: 3,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            mb: 1,
+          }}
+        >
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {t('settings.alarms.adhanVolume')}
           </Typography>
-          <Typography variant="body2" color="primary.main" fontWeight={600}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'primary.main',
+              fontWeight: 600,
+            }}
+          >
             {t('settings.alarms.adhanVolumeValue', {
               value: Math.round(local.notification.adhanVolume * 100),
             })}
@@ -184,12 +255,40 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
         />
       </Box>
 
-      <Box display={'grid'} gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={3}>
-        <Box display={'flex'} flexDirection={'column'} gap={3}>
-          <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={2} alignItems="flex-start">
-            <Box flex={1}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+          gap: 3,
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 3,
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', md: 'row' },
+              gap: 2,
+              alignItems: 'flex-start',
+            }}
+          >
+            <Box
+              sx={{
+                flex: 1,
+              }}
+            >
               <Typography variant="subtitle1">{t('settings.alarms.alwaysOnTop')}</Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                }}
+              >
                 {t('settings.alarms.alwaysOnTopDesc')}
               </Typography>
             </Box>
@@ -199,10 +298,26 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
               onChange={(event) => setNotification({ alwaysOnTop: event.target.checked })}
             />
           </Box>
-          <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={2} alignItems="flex-start">
-            <Box flex={1}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', md: 'row' },
+              gap: 2,
+              alignItems: 'flex-start',
+            }}
+          >
+            <Box
+              sx={{
+                flex: 1,
+              }}
+            >
               <Typography variant="subtitle1">{t('settings.alarms.persistent')}</Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                }}
+              >
                 {t('settings.alarms.persistentDesc')}
               </Typography>
             </Box>
@@ -229,10 +344,26 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
             />
           </Box>
 
-          <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={2} alignItems="flex-start">
-            <Box flex={1}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', md: 'row' },
+              gap: 2,
+              alignItems: 'flex-start',
+            }}
+          >
+            <Box
+              sx={{
+                flex: 1,
+              }}
+            >
               <Typography variant="subtitle1">{t('settings.alarms.autoDismissAfterAdhan')}</Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                }}
+              >
                 {t('settings.alarms.autoDismissAfterAdhanDesc')}
               </Typography>
             </Box>
@@ -247,15 +378,44 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
             />
           </Box>
         </Box>
-        <Box display={'flex'} flexDirection={'column'} gap={3}>
-          <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={2} alignItems="flex-start">
-            <Box flex={1}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 3,
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', md: 'row' },
+              gap: 2,
+              alignItems: 'flex-start',
+            }}
+          >
+            <Box
+              sx={{
+                flex: 1,
+              }}
+            >
               <Typography variant="subtitle1">{t('settings.alarms.useNativeDialog')}</Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                }}
+              >
                 {t('settings.alarms.useNativeDialogDesc')}
               </Typography>
               {local.notification.useNativeDialog && (
-                <Typography variant="caption" color="warning.main" display="block" mt={0.5}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'warning.main',
+                    display: 'block',
+                    mt: 0.5,
+                  }}
+                >
                   {t('settings.alarms.useNativeDialogNote')}
                 </Typography>
               )}
@@ -266,14 +426,37 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
             />
           </Box>
 
-          <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={2} alignItems="flex-start">
-            <Box flex={1}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', md: 'row' },
+              gap: 2,
+              alignItems: 'flex-start',
+            }}
+          >
+            <Box
+              sx={{
+                flex: 1,
+              }}
+            >
               <Typography variant="subtitle1">{t('settings.alarms.useNativeNotification')}</Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                }}
+              >
                 {t('settings.alarms.useNativeNotificationDesc')}
               </Typography>
               {nativePermission === false && (
-                <Typography variant="caption" color="warning.main" display="block" mt={0.5}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'warning.main',
+                    display: 'block',
+                    mt: 0.5,
+                  }}
+                >
                   {nativePermissionError ? nativePermissionError : t('settings.alarms.nativePermissionDenied')}
                 </Typography>
               )}
@@ -301,10 +484,21 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
       </Box>
 
       <Box>
-        <Typography variant="subtitle2" mb={2}>
+        <Typography
+          variant="subtitle2"
+          sx={{
+            mb: 2,
+          }}
+        >
           {t('settings.alarms.title')}
         </Typography>
-        <Box display="grid" gridTemplateColumns={{ xs: '1fr', lg: '1fr 1fr' }} gap={2}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' },
+            gap: 2,
+          }}
+        >
           {PRAYER_NAMES.map((prayerName) => {
             const key = prayerName.toLowerCase() as keyof typeof local.notification.prayers;
             const alarm = local.notification.prayers[key];
@@ -312,12 +506,14 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
             return (
               <Box
                 key={prayerName}
-                p={2}
-                bgcolor="action.hover"
-                borderRadius={0.5}
-                display="flex"
-                flexDirection="column"
-                gap={2}
+                sx={{
+                  p: 2,
+                  bgcolor: 'action.hover',
+                  borderRadius: 0.5,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 2,
+                }}
               >
                 <FormControlLabel
                   control={
@@ -336,7 +532,15 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
                       }
                     />
                   }
-                  label={<Typography fontWeight={600}>{t(`prayerNames.${key}`)}</Typography>}
+                  label={
+                    <Typography
+                      sx={{
+                        fontWeight: 600,
+                      }}
+                    >
+                      {t(`prayerNames.${key}`)}
+                    </Typography>
+                  }
                   sx={{
                     m: 0,
                     justifyContent: 'space-between',
@@ -345,10 +549,10 @@ export default function AlarmSettingsTab({ local, setNotification }: AlarmSettin
                 />
 
                 <Box
-                  display="grid"
-                  gridTemplateColumns="1fr 1fr"
-                  gap={2}
                   sx={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: 2,
                     opacity: alarm.enabled ? 1 : 0.4,
                     pointerEvents: alarm.enabled ? 'auto' : 'none',
                   }}

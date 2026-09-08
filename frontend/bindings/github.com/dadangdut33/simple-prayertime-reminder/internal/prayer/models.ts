@@ -5,21 +5,17 @@
 // @ts-ignore: Unused imports
 import { Create as $Create } from "@wailsio/runtime";
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore: Unused imports
-import * as time$0 from "../../../../../time/models.js";
-
 /**
  * DaySchedule holds the full set of prayer times for a day
  */
 export class DaySchedule {
     "date": string;
-    "fajr": time$0.Time;
-    "sunrise": time$0.Time;
-    "zuhr": time$0.Time;
-    "asr": time$0.Time;
-    "maghrib": time$0.Time;
-    "isha": time$0.Time;
+    "fajr": string;
+    "sunrise": string;
+    "zuhr": string;
+    "asr": string;
+    "maghrib": string;
+    "isha": string;
     "isNormal": boolean;
 
     /** Creates a new DaySchedule instance. */
@@ -28,22 +24,22 @@ export class DaySchedule {
             this["date"] = "";
         }
         if (!("fajr" in $$source)) {
-            this["fajr"] = null;
+            this["fajr"] = "0001-01-01T00:00:00.000Z";
         }
         if (!("sunrise" in $$source)) {
-            this["sunrise"] = null;
+            this["sunrise"] = "0001-01-01T00:00:00.000Z";
         }
         if (!("zuhr" in $$source)) {
-            this["zuhr"] = null;
+            this["zuhr"] = "0001-01-01T00:00:00.000Z";
         }
         if (!("asr" in $$source)) {
-            this["asr"] = null;
+            this["asr"] = "0001-01-01T00:00:00.000Z";
         }
         if (!("maghrib" in $$source)) {
-            this["maghrib"] = null;
+            this["maghrib"] = "0001-01-01T00:00:00.000Z";
         }
         if (!("isha" in $$source)) {
-            this["isha"] = null;
+            this["isha"] = "0001-01-01T00:00:00.000Z";
         }
         if (!("isNormal" in $$source)) {
             this["isNormal"] = false;
@@ -66,7 +62,7 @@ export class DaySchedule {
  */
 export class NextPrayerInfo {
     "name": string;
-    "time": time$0.Time;
+    "time": string;
 
     /** Creates a new NextPrayerInfo instance. */
     constructor($$source: Partial<NextPrayerInfo> = {}) {
@@ -74,7 +70,7 @@ export class NextPrayerInfo {
             this["name"] = "";
         }
         if (!("time" in $$source)) {
-            this["time"] = null;
+            this["time"] = "0001-01-01T00:00:00.000Z";
         }
 
         Object.assign(this, $$source);

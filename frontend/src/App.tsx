@@ -91,6 +91,20 @@ export default function App() {
   }, [initialized, refreshPrayerData]);
 
   useEffect(() => {
+    if (!initialized) {
+      return;
+    }
+
+    const id = window.setInterval(() => {
+      void refreshPrayerData();
+    }, 60_000);
+
+    return () => {
+      window.clearInterval(id);
+    };
+  }, [initialized, refreshPrayerData]);
+
+  useEffect(() => {
     const showReminderBanner = (next: { info: ReminderInfo; isTest: boolean }) => {
       setActiveReminder(next);
       setBannerOpen(true);
@@ -180,9 +194,22 @@ export default function App() {
 
   if (loading && !initialized) {
     return (
-      <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100vh">
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100vh',
+        }}
+      >
         <CircularProgress color="primary" sx={{ mb: 2 }} />
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary',
+          }}
+        >
           {t('app.loading')}
         </Typography>
       </Box>
@@ -282,7 +309,13 @@ export default function App() {
             </Box>
             {!drawerCollapsed && (
               <Box>
-                <Typography variant="subtitle2" fontWeight="bold" lineHeight={1.2}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    fontWeight: 'bold',
+                    lineHeight: 1.2,
+                  }}
+                >
                   {t('app.name')}
                 </Typography>
               </Box>
@@ -338,10 +371,12 @@ export default function App() {
                     {!drawerCollapsed && (
                       <ListItemText
                         primary={label}
-                        primaryTypographyProps={{
-                          variant: 'body2',
-                          fontWeight: isActive ? 600 : 500,
-                          color: isActive ? 'primary.main' : 'text.secondary',
+                        slotProps={{
+                          primary: {
+                            variant: 'body2',
+                            sx: { fontWeight: isActive ? 600 : 500 },
+                            color: isActive ? 'primary.main' : 'text.secondary',
+                          },
                         }}
                       />
                     )}
@@ -400,7 +435,13 @@ export default function App() {
                       state: t(`mainReminder.states.${activeReminder.info.state}`),
                     })}
                     {activeReminder.isTest && (
-                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: 'text.secondary',
+                          mt: 0.5,
+                        }}
+                      >
                         {t('mainReminder.testLabel')}
                       </Typography>
                     )}

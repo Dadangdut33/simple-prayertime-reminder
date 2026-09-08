@@ -59,26 +59,61 @@ export default function NextPrayerCard({
         }}
       />
 
-      <Typography variant="overline" color="text.secondary" fontWeight={600} letterSpacing={1.5}>
+      <Typography
+        variant="overline"
+        sx={{
+          color: 'text.secondary',
+          fontWeight: 600,
+          letterSpacing: 1.5,
+        }}
+      >
         {t('dashboard.nextPrayer.title')}
       </Typography>
 
-      <Box display="flex" justifyContent="space-between" alignItems="flex-start" mt={1}>
-        <Typography variant="h2" fontSize="2.5rem" color="primary.main" fontWeight={700} lineHeight={1}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          mt: 1,
+        }}
+      >
+        <Typography
+          variant="h2"
+          sx={{
+            fontSize: '2.5rem',
+            color: 'primary.main',
+            fontWeight: 700,
+            lineHeight: 1,
+          }}
+        >
           {displayPrayerLabel || '...'}
         </Typography>
         {isAllPassed && <Chip label={t('dashboard.nextPrayer.tomorrow')} color="secondary" size="small" />}
       </Box>
 
-      <Box mt={4} pt={3} borderTop="1px solid" borderColor="divider">
-        <Typography variant="body2" color="text.secondary" mb={1}>
+      <Box
+        sx={{
+          mt: 4,
+          pt: 3,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+        }}
+      >
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary',
+            mb: 1,
+          }}
+        >
           {timeLabel}
         </Typography>
         <Typography
           variant="h3"
-          fontSize="3.5rem"
-          fontWeight={800}
           sx={{
+            fontSize: '3.5rem',
+            fontWeight: 800,
             fontVariantNumeric: 'tabular-nums',
             letterSpacing: '-0.02em',
           }}
@@ -86,15 +121,37 @@ export default function NextPrayerCard({
           {countdown}
         </Typography>
 
-        <Box mt={2.5}>
-          <Box display="flex" justifyContent="space-between" alignItems="center" gap={2} mb={1}>
-            <Typography variant="body2" color="text.secondary">
+        <Box
+          sx={{
+            mt: 2.5,
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: 2,
+              mb: 1,
+            }}
+          >
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+              }}
+            >
               {t('dashboard.nextPrayer.since', {
                 duration: formatDuration(elapsedSeconds),
                 label: previousPrayerInfo?.name ?? '--',
               })}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+              }}
+            >
               {progressLabel}%
             </Typography>
           </Box>
@@ -114,8 +171,21 @@ export default function NextPrayerCard({
             }}
           />
 
-          <Box display="flex" justifyContent="space-between" alignItems="center" gap={2} mt={1}>
-            <Typography variant="caption" color="text.secondary">
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: 2,
+              mt: 1,
+            }}
+          >
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+              }}
+            >
               {previousPrayerInfo?.name} •{' '}
               {previousPrayerInfo
                 ? timeZone
@@ -123,7 +193,12 @@ export default function NextPrayerCard({
                   : formatTime(previousPrayerInfo.time.toISOString(), timeFormat)
                 : '--:--'}
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+              }}
+            >
               {nextPrayerLabel} •{' '}
               {nextPrayerTime
                 ? timeZone

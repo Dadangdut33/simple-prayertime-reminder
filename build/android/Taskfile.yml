@@ -5,9 +5,9 @@ includes:
 
 vars:
   APP_ID: '{{.APP_ID | default "com.wails.app"}}'
-  MIN_SDK: '21'
+  MIN_SDK: '24'
   TARGET_SDK: '34'
-  NDK_VERSION: 'r26d'
+  NDK_VERSION: '29.0.14206865'
 
 tasks:
   install:deps:

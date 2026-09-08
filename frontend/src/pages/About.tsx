@@ -102,9 +102,24 @@ export default function AboutPage() {
   }
 
   return (
-    <Box p={4}>
-      <Box mb={4}>
-        <Box display="flex" alignItems="center" gap={1.5} mb={1.5}>
+    <Box
+      sx={{
+        p: 4,
+      }}
+    >
+      <Box
+        sx={{
+          mb: 4,
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+            mb: 1.5,
+          }}
+        >
           <Box
             sx={{
               width: 40,
@@ -121,13 +136,24 @@ export default function AboutPage() {
           </Box>
           <Typography variant="h2">{t('about.title')}</Typography>
         </Box>
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary',
+          }}
+        >
           {t('about.subtitle')}
         </Typography>
       </Box>
 
       {loading ? (
-        <Box display="flex" justifyContent="center" py={10}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            py: 10,
+          }}
+        >
           <CircularProgress />
         </Box>
       ) : error ? (
@@ -142,22 +168,54 @@ export default function AboutPage() {
             }}
           >
             <Typography variant="h1">{t('app.name')}</Typography>
-            <Typography variant="overline" mt={1} mb={2} color="text.secondary">
+            <Typography
+              variant="overline"
+              sx={{
+                mt: 1,
+                mb: 2,
+                color: 'text.secondary',
+              }}
+            >
               {t('about.tagline')}
             </Typography>
           </Card>
 
-          <Box display="grid" gridTemplateColumns={{ xs: '1fr', xl: '1fr 1fr' }} gap={3}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', xl: '1fr 1fr' },
+              gap: 3,
+            }}
+          >
             <Card sx={{ p: 3 }}>
-              <Box display="flex" alignItems="center" gap={1.25} mb={2}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.25,
+                  mb: 2,
+                }}
+              >
                 <UpdateIcon color="primary" fontSize="small" />
                 <Typography variant="subtitle1">{t('about.version')}</Typography>
               </Box>
 
-              <Typography variant="body2" color="text.secondary" mb={1}>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                  mb: 1,
+                }}
+              >
                 {t('about.installedVersion')}
               </Typography>
-              <Typography variant="h2" color="primary.main" mb={2}>
+              <Typography
+                variant="h2"
+                sx={{
+                  color: 'primary.main',
+                  mb: 2,
+                }}
+              >
                 {currentVersion}
               </Typography>
 
@@ -191,28 +249,50 @@ export default function AboutPage() {
             </Card>
 
             <Card sx={{ p: 3 }}>
-              <Box display="flex" alignItems="center" gap={1.25} mb={2}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.25,
+                  mb: 2,
+                }}
+              >
                 <ComputerOutlinedIcon color="primary" fontSize="small" />
                 <Typography variant="subtitle1">{t('about.environment')}</Typography>
               </Box>
 
               <Stack spacing={2.5}>
                 <Box>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'text.secondary',
+                    }}
+                  >
                     {t('about.detectedOs')}
                   </Typography>
                   <Typography variant="h3">{appInfo.detectedOs}</Typography>
                 </Box>
                 <Divider />
                 <Box>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'text.secondary',
+                    }}
+                  >
                     {t('about.installMethod')}
                   </Typography>
                   <Typography variant="h3">{appInfo.installMethod}</Typography>
                 </Box>
                 <Divider />
                 <Box>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'text.secondary',
+                    }}
+                  >
                     {t('about.executablePath')}
                   </Typography>
                   <Typography variant="body2" sx={{ wordBreak: 'break-all', fontFamily: 'monospace' }}>
@@ -223,12 +303,25 @@ export default function AboutPage() {
             </Card>
 
             <Card sx={{ p: 3 }}>
-              <Box display="flex" alignItems="center" gap={1.25} mb={2}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.25,
+                  mb: 2,
+                }}
+              >
                 <Package2OutlinedIcon color="primary" fontSize="small" />
                 <Typography variant="subtitle1">{t('about.repository')}</Typography>
               </Box>
 
-              <Typography variant="body2" color="text.secondary" mb={1}>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                  mb: 1,
+                }}
+              >
                 {t('about.sourceCode')}
               </Typography>
               <Typography variant="body2" sx={{ wordBreak: 'break-all', fontFamily: 'monospace', mb: 2 }}>
@@ -240,19 +333,38 @@ export default function AboutPage() {
             </Card>
 
             <Card sx={{ p: 3 }}>
-              <Box display="flex" alignItems="center" gap={1.25} mb={2}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.25,
+                  mb: 2,
+                }}
+              >
                 <FolderOpenOutlinedIcon color="primary" fontSize="small" />
                 <Typography variant="subtitle1">{t('about.configLocation')}</Typography>
               </Box>
 
-              <Typography variant="body2" color="text.secondary" mb={1}>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                  mb: 1,
+                }}
+              >
                 {t('about.configDirectory')}
               </Typography>
               <Typography variant="body2" sx={{ wordBreak: 'break-all', fontFamily: 'monospace', mb: 2 }}>
                 {appInfo.configDirectory}
               </Typography>
 
-              <Typography variant="body2" color="text.secondary" mb={1}>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                  mb: 1,
+                }}
+              >
                 {t('about.configFile')}
               </Typography>
               <Typography variant="body2" sx={{ wordBreak: 'break-all', fontFamily: 'monospace', mb: 2.5 }}>

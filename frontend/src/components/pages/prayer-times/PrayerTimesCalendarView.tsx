@@ -69,8 +69,20 @@ export default function PrayerTimesCalendarView({
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={i18n.language}>
-      <Box display="flex" flexDirection="column" gap={3}>
-        <Grid container spacing={3} alignItems="stretch">
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 3,
+        }}
+      >
+        <Grid
+          container
+          spacing={3}
+          sx={{
+            alignItems: 'stretch',
+          }}
+        >
           {calendarSystem === 'gregorian' && (
             <Grid size={{ xs: 12, xl: 8 }}>
               <PrayerMonthCalendarCard
@@ -157,7 +169,12 @@ export default function PrayerTimesCalendarView({
         </Grid>
 
         {!loading && selectedHijri && (
-          <Typography variant="caption" color="text.secondary">
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {t('prayerTimes.calendar.selectedDay', { date: formatHijriDateLabel(selectedHijri) })}
           </Typography>
         )}

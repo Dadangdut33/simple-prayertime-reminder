@@ -11,13 +11,30 @@ interface PrayerSettingsTabProps {
 export default function PrayerSettingsTab({ local, setPrayer }: PrayerSettingsTabProps) {
   const { t } = useTranslation();
   return (
-    <Box display="flex" flexDirection="column" gap={3}>
-      <Alert severity="info">
-        {t('settings.prayer.disclaimer')}
-      </Alert>
-      <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={3}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 3,
+      }}
+    >
+      <Alert severity="info">{t('settings.prayer.disclaimer')}</Alert>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+          gap: 3,
+        }}
+      >
         <Box>
-          <Typography variant="caption" color="text.secondary" mb={1} display="block">
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'text.secondary',
+              mb: 1,
+              display: 'block',
+            }}
+          >
             {t('settings.prayer.method')}
           </Typography>
           <Select
@@ -25,9 +42,7 @@ export default function PrayerSettingsTab({ local, setPrayer }: PrayerSettingsTa
             fullWidth
             value={local.prayer.method}
             MenuProps={{
-              PaperProps: {
-                sx: { maxHeight: 320 },
-              },
+              slotProps: { paper: { sx: { maxHeight: 320 } } },
             }}
             onChange={(event) => setPrayer({ method: event.target.value })}
           >
@@ -40,7 +55,14 @@ export default function PrayerSettingsTab({ local, setPrayer }: PrayerSettingsTa
         </Box>
 
         <Box>
-          <Typography variant="caption" color="text.secondary" mb={1} display="block">
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'text.secondary',
+              mb: 1,
+              display: 'block',
+            }}
+          >
             {t('settings.prayer.asrMethod')}
           </Typography>
           <Select
@@ -48,9 +70,7 @@ export default function PrayerSettingsTab({ local, setPrayer }: PrayerSettingsTa
             fullWidth
             value={local.prayer.asrMethod}
             MenuProps={{
-              PaperProps: {
-                sx: { maxHeight: 320 },
-              },
+              slotProps: { paper: { sx: { maxHeight: 320 } } },
             }}
             onChange={(event) => setPrayer({ asrMethod: event.target.value })}
           >
@@ -62,12 +82,14 @@ export default function PrayerSettingsTab({ local, setPrayer }: PrayerSettingsTa
 
       {local.prayer.method === 'Custom' && (
         <Box
-          display="grid"
-          gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }}
-          gap={3}
-          p={2}
-          bgcolor="action.hover"
-          borderRadius={2}
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+            gap: 3,
+            p: 2,
+            bgcolor: 'action.hover',
+            borderRadius: 2,
+          }}
         >
           <NumberField
             label={t('settings.prayer.customFajr')}
@@ -103,18 +125,31 @@ export default function PrayerSettingsTab({ local, setPrayer }: PrayerSettingsTa
         </Box>
       )}
 
-      <Box mt={2}>
-        <Typography variant="subtitle2" mb={2}>
+      <Box
+        sx={{
+          mt: 2,
+        }}
+      >
+        <Typography
+          variant="subtitle2"
+          sx={{
+            mb: 2,
+          }}
+        >
           {t('settings.prayer.offsets')}
         </Typography>
         <Box
-          display="grid"
-          gridTemplateColumns={{
-            xs: '1fr',
-            sm: '1fr 1fr',
-            lg: 'repeat(3, 1fr)',
+          sx={{
+            display: 'grid',
+
+            gridTemplateColumns: {
+              xs: '1fr',
+              sm: '1fr 1fr',
+              lg: 'repeat(3, 1fr)',
+            },
+
+            gap: 2,
           }}
-          gap={2}
         >
           {PRAYER_NAMES.map((prayerName) => {
             const key = prayerName.toLowerCase() as keyof typeof local.prayer.offsets;

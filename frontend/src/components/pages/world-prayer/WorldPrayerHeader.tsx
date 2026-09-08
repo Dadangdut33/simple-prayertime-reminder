@@ -23,15 +23,24 @@ export default function WorldPrayerHeader({ sortBy, onSortChange, onAddCity }: W
   const { t } = useTranslation();
   return (
     <Box
-      display="flex"
-      justifyContent="space-between"
-      alignItems={{ xs: 'flex-start', md: 'center' }}
-      flexDirection={{ xs: 'column', md: 'row' }}
-      gap={2}
-      mb={4}
+      sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: { xs: 'flex-start', md: 'center' },
+        flexDirection: { xs: 'column', md: 'row' },
+        gap: 2,
+        mb: 4,
+      }}
     >
       <Box>
-        <Box display="flex" alignItems="center" gap={1.5} mb={1.5}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+            mb: 1.5,
+          }}
+        >
           <Box
             sx={{
               width: 40,
@@ -48,13 +57,31 @@ export default function WorldPrayerHeader({ sortBy, onSortChange, onAddCity }: W
           </Box>
           <Typography variant="h2">{t('worldPrayer.title')}</Typography>
         </Box>
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary',
+          }}
+        >
           {t('worldPrayer.subtitle')} <b>{t('worldPrayer.noteStrong')}</b> {t('worldPrayer.note')}
         </Typography>
       </Box>
 
-      <Box display="flex" gap={1} alignItems="center" flexWrap="wrap">
-        <Box display="flex" alignItems="center" gap={1}>
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 1,
+          alignItems: 'center',
+          flexWrap: 'wrap',
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+          }}
+        >
           <SortIcon fontSize="small" color="action" />
           <Select size="small" value={sortBy} onChange={(event) => onSortChange(event.target.value as WorldPrayerSort)}>
             {SORT_OPTIONS.map((option) => (

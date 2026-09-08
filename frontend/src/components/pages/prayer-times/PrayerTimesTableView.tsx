@@ -59,13 +59,32 @@ export default function PrayerTimesTableView({
 
   return (
     <Card sx={{ p: 3, borderRadius: 0.5 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Box display="flex" alignItems="center" gap={1.5}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 3,
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+          }}
+        >
           <CalendarMonthIcon color="primary" />
           <Typography variant="h3">{activeMonthLabel || activeMonth.format('MMMM YYYY')}</Typography>
         </Box>
 
-        <Box display="flex" gap={1} alignItems="center">
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 1,
+            alignItems: 'center',
+          }}
+        >
           <IconButton onClick={onPrevMonth} size="small">
             <ChevronLeftIcon />
           </IconButton>
@@ -92,7 +111,12 @@ export default function PrayerTimesTableView({
                 t('prayerNames.isha'),
               ].map((label, index) => (
                 <TableCell key={label} align={index === 0 ? 'left' : 'center'}>
-                  <Typography variant="overline" fontWeight={600}>
+                  <Typography
+                    variant="overline"
+                    sx={{
+                      fontWeight: 600,
+                    }}
+                  >
                     {label}
                   </Typography>
                 </TableCell>
@@ -135,13 +159,22 @@ export default function PrayerTimesTableView({
                     <TableCell>
                       <Typography
                         variant="body2"
-                        fontWeight={isToday ? 700 : 500}
                         color={isToday ? 'primary.main' : 'text.primary'}
+                        sx={{
+                          fontWeight: isToday ? 700 : 500,
+                        }}
                       >
                         {primaryDateLabel}
                       </Typography>
                       {secondaryDateLabel ? (
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.25 }}>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: 'text.secondary',
+                            display: 'block',
+                            mt: 0.25,
+                          }}
+                        >
                           {secondaryDateLabel}
                         </Typography>
                       ) : null}

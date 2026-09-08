@@ -26,14 +26,34 @@ export default function ScheduleCard({
   const { t } = useTranslation();
   return (
     <Card sx={{ p: 3 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="overline" color="text.secondary" fontWeight={600} letterSpacing={1.5}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 2,
+        }}
+      >
+        <Typography
+          variant="overline"
+          sx={{
+            color: 'text.secondary',
+            fontWeight: 600,
+            letterSpacing: 1.5,
+          }}
+        >
           {t('dashboard.schedule.title')}
         </Typography>
         <NotificationsActiveIcon fontSize="small" color="disabled" />
       </Box>
 
-      <Box display="flex" flexDirection="column" gap={0.5}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 0.5,
+        }}
+      >
         {prayers.map((p) => {
           const isNext = p.name === nextPrayerName && !isAllPassed;
           return (
@@ -56,14 +76,22 @@ export default function ScheduleCard({
                 },
               }}
             >
-              <Typography variant="body1" fontWeight={500} color={isNext ? 'primary.main' : 'text.primary'}>
+              <Typography
+                variant="body1"
+                color={isNext ? 'primary.main' : 'text.primary'}
+                sx={{
+                  fontWeight: 500,
+                }}
+              >
                 {p.name}
               </Typography>
               <Typography
                 variant="h6"
-                fontWeight={700}
                 color={isNext ? 'primary.main' : 'text.primary'}
-                sx={{ fontVariantNumeric: 'tabular-nums' }}
+                sx={{
+                  fontWeight: 700,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
               >
                 {timeZone ? formatTimeInZone(p.time, timeZone, timeFormat) : formatTime(p.time, timeFormat)}
               </Typography>

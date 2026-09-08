@@ -1,4 +1,15 @@
-import { Box, FormControlLabel, Link, MenuItem, Select, Slider, Stack, Switch, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  FormControlLabel,
+  Link,
+  MenuItem,
+  Select,
+  Slider,
+  Stack,
+  Switch,
+  TextField,
+  Typography,
+} from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AppsIcon from '@mui/icons-material/Apps';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
@@ -43,25 +54,40 @@ export default function GeneralSettingsTab({
     t('settings.general.hijri.adjustmentMark', { value: value > 0 ? `+${value}` : String(value) });
 
   return (
-    <Box display="flex" flexDirection="column" gap={3}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 3,
+      }}
+    >
       <Box
-        p={3}
-        border="1px solid"
-        borderColor="divider"
-        borderRadius={0.5}
         sx={{
+          p: 3,
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 0.5,
+
           background: (theme) =>
             `linear-gradient(135deg, ${theme.palette.primary.main}08, ${theme.palette.background.paper})`,
         }}
       >
         <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems={{ xs: 'flex-start', md: 'center' }}
-          flexDirection={{ xs: 'column', md: 'row' }}
-          gap={2}
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: { xs: 'flex-start', md: 'center' },
+            flexDirection: { xs: 'column', md: 'row' },
+            gap: 2,
+          }}
         >
-          <Box display="flex" gap={1.5} alignItems="flex-start">
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1.5,
+              alignItems: 'flex-start',
+            }}
+          >
             <Box
               sx={{
                 width: 40,
@@ -79,7 +105,12 @@ export default function GeneralSettingsTab({
             </Box>
             <Box>
               <Typography variant="subtitle1">{t('settings.general.clock.title')}</Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                }}
+              >
                 {t('settings.general.clock.description')}
               </Typography>
             </Box>
@@ -98,10 +129,30 @@ export default function GeneralSettingsTab({
         </Box>
 
         {local.dashboard.showClock ? (
-          <Box mt={3} display="flex" flexDirection="column" gap={3}>
-            <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={3}>
+          <Box
+            sx={{
+              mt: 3,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 3,
+            }}
+          >
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+                gap: 3,
+              }}
+            >
               <Box>
-                <Typography variant="caption" color="text.secondary" mb={1} display="block">
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'text.secondary',
+                    mb: 1,
+                    display: 'block',
+                  }}
+                >
                   {t('settings.general.clock.styleLabel')}
                 </Typography>
                 <Select
@@ -121,13 +172,39 @@ export default function GeneralSettingsTab({
             </Box>
 
             {local.dashboard.clockType === 'digital' && (
-              <Box p={2.5} border="1px solid" borderColor="divider" borderRadius={0.5} bgcolor="background.paper">
-                <Typography variant="subtitle2" mb={2}>
+              <Box
+                sx={{
+                  p: 2.5,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: 0.5,
+                  bgcolor: 'background.paper',
+                }}
+              >
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    mb: 2,
+                  }}
+                >
                   {t('settings.general.clock.digitalSettings')}
                 </Typography>
-                <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={3}>
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+                    gap: 3,
+                  }}
+                >
                   <Box>
-                    <Typography variant="caption" color="text.secondary" mb={1} display="block">
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: 'text.secondary',
+                        mb: 1,
+                        display: 'block',
+                      }}
+                    >
                       {t('settings.general.clock.displayFormat')}
                     </Typography>
                     <Select
@@ -151,7 +228,14 @@ export default function GeneralSettingsTab({
 
                   {local.dashboard.digitalClockFormat === 'custom' && (
                     <Box>
-                      <Typography variant="caption" color="text.secondary" mb={1} display="block">
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: 'text.secondary',
+                          mb: 1,
+                          display: 'block',
+                        }}
+                      >
                         {t('settings.general.clock.customFormat')}
                       </Typography>
                       <TextField
@@ -169,14 +253,38 @@ export default function GeneralSettingsTab({
                   )}
                 </Box>
 
-                <Box mt={2} p={2} borderRadius={0.5} bgcolor="action.hover" color="text.secondary">
-                  <Typography variant="caption" display="block">
+                <Box
+                  sx={{
+                    mt: 2,
+                    p: 2,
+                    borderRadius: 0.5,
+                    bgcolor: 'action.hover',
+                    color: 'text.secondary',
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      display: 'block',
+                    }}
+                  >
                     {t('settings.general.clock.tokensHint')}
                   </Typography>
-                  <Typography variant="caption" display="block">
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      display: 'block',
+                    }}
+                  >
                     {t('settings.general.clock.dateTokensHint')}
                   </Typography>
-                  <Typography variant="subtitle2" color="text.primary" mt={1.5}>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      color: 'text.primary',
+                      mt: 1.5,
+                    }}
+                  >
                     {t('settings.general.clock.preview', { value: clockFormatPreview })}
                   </Typography>
                 </Box>
@@ -184,18 +292,49 @@ export default function GeneralSettingsTab({
             )}
 
             {local.dashboard.clockType === 'analog' && (
-              <Box p={2.5} border="1px solid" borderColor="divider" borderRadius={0.5} bgcolor="background.paper">
-                <Typography variant="subtitle2" mb={2}>
+              <Box
+                sx={{
+                  p: 2.5,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: 0.5,
+                  bgcolor: 'background.paper',
+                }}
+              >
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    mb: 2,
+                  }}
+                >
                   {t('settings.general.clock.analogSettings')}
                 </Typography>
 
                 <Stack spacing={2}>
                   <Box>
-                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                      <Typography variant="caption" color="text.secondary">
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        mb: 1,
+                      }}
+                    >
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: 'text.secondary',
+                        }}
+                      >
                         {t('settings.general.clock.clockSize')}
                       </Typography>
-                      <Typography variant="body2" color="primary.main" fontWeight={700}>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: 'primary.main',
+                          fontWeight: 700,
+                        }}
+                      >
                         {t('settings.general.clock.sizeValue', {
                           value: Math.round(local.dashboard.analogClockSize),
                         })}
@@ -216,17 +355,24 @@ export default function GeneralSettingsTab({
                   </Box>
 
                   <Box
-                    p={2}
-                    borderRadius={0.5}
-                    bgcolor="action.hover"
-                    display="flex"
-                    flexDirection="column"
-                    justifyContent="space-between"
-                    gap={1.5}
+                    sx={{
+                      p: 2,
+                      borderRadius: 0.5,
+                      bgcolor: 'action.hover',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      gap: 1.5,
+                    }}
                   >
                     <Box>
                       <Typography variant="subtitle2">{t('settings.general.clock.hourNumbers')}</Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: 'text.secondary',
+                        }}
+                      >
                         {t('settings.general.clock.hourNumbersDesc')}
                       </Typography>
                     </Box>
@@ -250,15 +396,41 @@ export default function GeneralSettingsTab({
             )}
           </Box>
         ) : (
-          <Typography variant="body2" color="text.secondary" mt={2.5}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+              mt: 2.5,
+            }}
+          >
             {t('settings.general.clock.hidden')}
           </Typography>
         )}
       </Box>
 
-      <Box display="grid" gridTemplateColumns={{ xs: '1fr', xl: '1.1fr 0.9fr' }} gap={3}>
-        <Box p={3} border="1px solid" borderColor="divider" borderRadius={0.5}>
-          <Box display="flex" gap={1.5} alignItems="flex-start" mb={3}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', xl: '1.1fr 0.9fr' },
+          gap: 3,
+        }}
+      >
+        <Box
+          sx={{
+            p: 3,
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: 0.5,
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1.5,
+              alignItems: 'flex-start',
+              mb: 3,
+            }}
+          >
             <Box
               sx={{
                 width: 40,
@@ -276,15 +448,33 @@ export default function GeneralSettingsTab({
             </Box>
             <Box>
               <Typography variant="subtitle1">{t('settings.general.appearance.title')}</Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                }}
+              >
                 {t('settings.general.appearance.description')}
               </Typography>
             </Box>
           </Box>
 
-          <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={3}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+              gap: 3,
+            }}
+          >
             <Box>
-              <Typography variant="caption" color="text.secondary" mb={1} display="block">
+              <Typography
+                variant="caption"
+                sx={{
+                  color: 'text.secondary',
+                  mb: 1,
+                  display: 'block',
+                }}
+              >
                 {t('settings.general.appearance.timeFormat')}
               </Typography>
               <Select
@@ -304,7 +494,14 @@ export default function GeneralSettingsTab({
             </Box>
 
             <Box>
-              <Typography variant="caption" color="text.secondary" mb={1} display="block">
+              <Typography
+                variant="caption"
+                sx={{
+                  color: 'text.secondary',
+                  mb: 1,
+                  display: 'block',
+                }}
+              >
                 {t('settings.general.appearance.themeMode')}
               </Typography>
               <Select
@@ -320,7 +517,14 @@ export default function GeneralSettingsTab({
             </Box>
 
             <Box>
-              <Typography variant="caption" color="text.secondary" mb={1} display="block">
+              <Typography
+                variant="caption"
+                sx={{
+                  color: 'text.secondary',
+                  mb: 1,
+                  display: 'block',
+                }}
+              >
                 {t('settings.general.appearance.language')}
               </Typography>
               <Select
@@ -340,31 +544,49 @@ export default function GeneralSettingsTab({
                   </MenuItem>
                 ))}
               </Select>
-              <Typography variant="caption" color="text.secondary" mt={1} display="block">
+              <Typography
+                variant="caption"
+                sx={{
+                  color: 'text.secondary',
+                  mt: 1,
+                  display: 'block',
+                }}
+              >
                 {t('settings.general.appearance.languageNotePrefix')}{' '}
-                <Link
-                  component="button"
-                  onClick={() => openURL(REPO_URL)}
-                  sx={{ cursor: 'pointer' }}
-                >
+                <Link component="button" onClick={() => openURL(REPO_URL)} sx={{ cursor: 'pointer' }}>
                   {t('settings.general.appearance.languageNoteLink')}
                 </Link>
               </Typography>
             </Box>
           </Box>
 
-          <Box mt={3}>
-            <Typography variant="caption" color="text.secondary" mb={1} display="block">
+          <Box
+            sx={{
+              mt: 3,
+            }}
+          >
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+                mb: 1,
+                display: 'block',
+              }}
+            >
               {t('settings.general.appearance.themePreset')}
             </Typography>
             <Box
-              display="grid"
-              gridTemplateColumns={{
-                xs: '1fr',
-                sm: '1fr 1fr',
-                xl: 'repeat(5, 1fr)',
+              sx={{
+                display: 'grid',
+
+                gridTemplateColumns: {
+                  xs: '1fr',
+                  sm: '1fr 1fr',
+                  xl: 'repeat(5, 1fr)',
+                },
+
+                gap: 2,
               }}
-              gap={2}
             >
               {THEME_PRESETS.map((preset) => {
                 const active = local.themePreset === preset.value;
@@ -387,7 +609,13 @@ export default function GeneralSettingsTab({
                       },
                     }}
                   >
-                    <Box display="flex" gap={1} mb={1.25}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        gap: 1,
+                        mb: 1.25,
+                      }}
+                    >
                       {themeSwatches[preset.value].map((color) => (
                         <Box
                           key={color}
@@ -409,16 +637,24 @@ export default function GeneralSettingsTab({
         </Box>
 
         <Box
-          p={3}
-          border="1px solid"
-          borderColor="divider"
-          borderRadius={0.5}
           sx={{
+            p: 3,
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: 0.5,
+
             background: (theme) =>
               `linear-gradient(180deg, ${theme.palette.secondary.main}0f, ${theme.palette.background.paper})`,
           }}
         >
-          <Box display="flex" gap={1.5} alignItems="flex-start" mb={3}>
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1.5,
+              alignItems: 'flex-start',
+              mb: 3,
+            }}
+          >
             <Box
               sx={{
                 width: 40,
@@ -436,17 +672,43 @@ export default function GeneralSettingsTab({
             </Box>
             <Box>
               <Typography variant="subtitle1">{t('settings.general.hijri.title')}</Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                }}
+              >
                 {t('settings.general.hijri.description')}
               </Typography>
             </Box>
           </Box>
 
-          <Box p={2.5} borderRadius={0.5} bgcolor="background.paper" border="1px solid" borderColor="divider">
-            <Typography variant="overline" color="text.secondary" display="block">
+          <Box
+            sx={{
+              p: 2.5,
+              borderRadius: 0.5,
+              bgcolor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
+            }}
+          >
+            <Typography
+              variant="overline"
+              sx={{
+                color: 'text.secondary',
+                display: 'block',
+              }}
+            >
               {t('settings.general.hijri.currentAdjustment')}
             </Typography>
-            <Typography variant="h2" color="primary.main" mt={0.5} mb={2}>
+            <Typography
+              variant="h2"
+              sx={{
+                color: 'primary.main',
+                mt: 0.5,
+                mb: 2,
+              }}
+            >
               {hijriAdjustmentLabel}
             </Typography>
             <Slider
@@ -468,14 +730,34 @@ export default function GeneralSettingsTab({
                 })
               }
             />
-            <Typography variant="body2" color="text.secondary" mt={2}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+                mt: 2,
+              }}
+            >
               {t('settings.general.hijri.hint')}
             </Typography>
           </Box>
         </Box>
       </Box>
-      <Box p={3} border="1px solid" borderColor="divider" borderRadius={0.5}>
-        <Box display="flex" gap={1.5} alignItems="flex-start" mb={3}>
+      <Box
+        sx={{
+          p: 3,
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 0.5,
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 1.5,
+            alignItems: 'flex-start',
+            mb: 3,
+          }}
+        >
           <Box
             sx={{
               width: 40,
@@ -493,18 +775,49 @@ export default function GeneralSettingsTab({
           </Box>
           <Box>
             <Typography variant="subtitle1">{t('settings.general.app.title')}</Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+              }}
+            >
               {t('settings.general.app.description')}
             </Typography>
           </Box>
         </Box>
 
-        <Box display={'grid'} gridTemplateColumns={{ xs: '1fr', xl: '1fr 1fr' }} gap={3}>
-          <Box mt={3} p={2.5} borderRadius={0.5} border="1px solid" borderColor="divider" bgcolor="background.paper">
-            <Typography variant="subtitle2" mb={0.75}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', xl: '1fr 1fr' },
+            gap: 3,
+          }}
+        >
+          <Box
+            sx={{
+              mt: 3,
+              p: 2.5,
+              borderRadius: 0.5,
+              border: '1px solid',
+              borderColor: 'divider',
+              bgcolor: 'background.paper',
+            }}
+          >
+            <Typography
+              variant="subtitle2"
+              sx={{
+                mb: 0.75,
+              }}
+            >
               {t('settings.general.app.startup')}
             </Typography>
-            <Typography variant="body2" color="text.secondary" mb={2}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+                mb: 2,
+              }}
+            >
               {t('settings.general.app.startupDesc')}
             </Typography>
 
@@ -525,16 +838,47 @@ export default function GeneralSettingsTab({
             />
           </Box>
 
-          <Box mt={3} p={2.5} borderRadius={0.5} border="1px solid" borderColor="divider" bgcolor="background.paper">
-            <Typography variant="subtitle2" mb={0.75}>
+          <Box
+            sx={{
+              mt: 3,
+              p: 2.5,
+              borderRadius: 0.5,
+              border: '1px solid',
+              borderColor: 'divider',
+              bgcolor: 'background.paper',
+            }}
+          >
+            <Typography
+              variant="subtitle2"
+              sx={{
+                mb: 0.75,
+              }}
+            >
               {t('settings.general.app.tray')}
             </Typography>
-            <Typography variant="body2" color="text.secondary" mb={2}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+                mb: 2,
+              }}
+            >
               {t('settings.general.app.trayDesc')}
             </Typography>
 
-            <Box maxWidth={320}>
-              <Typography variant="caption" color="text.secondary" mb={1} display="block">
+            <Box
+              sx={{
+                maxWidth: 320,
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{
+                  color: 'text.secondary',
+                  mb: 1,
+                  display: 'block',
+                }}
+              >
                 {t('settings.general.app.trayAction')}
               </Typography>
               <Select
@@ -555,11 +899,31 @@ export default function GeneralSettingsTab({
             </Box>
           </Box>
 
-          <Box mt={3} p={2.5} borderRadius={0.5} border="1px solid" borderColor="divider" bgcolor="background.paper">
-            <Typography variant="subtitle2" mb={0.75}>
+          <Box
+            sx={{
+              mt: 3,
+              p: 2.5,
+              borderRadius: 0.5,
+              border: '1px solid',
+              borderColor: 'divider',
+              bgcolor: 'background.paper',
+            }}
+          >
+            <Typography
+              variant="subtitle2"
+              sx={{
+                mb: 0.75,
+              }}
+            >
               {t('settings.general.app.testTools')}
             </Typography>
-            <Typography variant="body2" color="text.secondary" mb={2}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+                mb: 2,
+              }}
+            >
               {t('settings.general.app.testToolsDesc')}
             </Typography>
             <FormControlLabel
@@ -574,11 +938,31 @@ export default function GeneralSettingsTab({
             />
           </Box>
 
-          <Box mt={3} p={2.5} borderRadius={0.5} border="1px solid" borderColor="divider" bgcolor="background.paper">
-            <Typography variant="subtitle2" mb={0.75}>
+          <Box
+            sx={{
+              mt: 3,
+              p: 2.5,
+              borderRadius: 0.5,
+              border: '1px solid',
+              borderColor: 'divider',
+              bgcolor: 'background.paper',
+            }}
+          >
+            <Typography
+              variant="subtitle2"
+              sx={{
+                mb: 0.75,
+              }}
+            >
               {t('settings.general.app.updates')}
             </Typography>
-            <Typography variant="body2" color="text.secondary" mb={2}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+                mb: 2,
+              }}
+            >
               {t('settings.general.app.updatesDesc')}
             </Typography>
 
@@ -599,16 +983,47 @@ export default function GeneralSettingsTab({
             />
           </Box>
 
-          <Box mt={3} p={2.5} borderRadius={0.5} border="1px solid" borderColor="divider" bgcolor="background.paper">
-            <Typography variant="subtitle2" mb={0.75}>
+          <Box
+            sx={{
+              mt: 3,
+              p: 2.5,
+              borderRadius: 0.5,
+              border: '1px solid',
+              borderColor: 'divider',
+              bgcolor: 'background.paper',
+            }}
+          >
+            <Typography
+              variant="subtitle2"
+              sx={{
+                mb: 0.75,
+              }}
+            >
               {t('settings.general.app.logLevel')}
             </Typography>
-            <Typography variant="body2" color="text.secondary" mb={2}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+                mb: 2,
+              }}
+            >
               {t('settings.general.app.logLevelDesc')}
             </Typography>
 
-            <Box maxWidth={320}>
-              <Typography variant="caption" color="text.secondary" mb={1} display="block">
+            <Box
+              sx={{
+                maxWidth: 320,
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{
+                  color: 'text.secondary',
+                  mb: 1,
+                  display: 'block',
+                }}
+              >
                 {t('settings.general.app.logLevelLabel')}
               </Typography>
               <Select

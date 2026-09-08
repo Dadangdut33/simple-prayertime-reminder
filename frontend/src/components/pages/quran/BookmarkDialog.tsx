@@ -16,7 +16,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -155,7 +155,13 @@ export default function BookmarkDialog({
       <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
         <DialogTitle>{t('quran.bookmarksTitle')}</DialogTitle>
         <DialogContent sx={{ pt: 1.5, pb: 2 }}>
-          <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} mb={2}>
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
+            spacing={2}
+            sx={{
+              mb: 2,
+            }}
+          >
             <TextField
               fullWidth
               size="small"
@@ -177,17 +183,25 @@ export default function BookmarkDialog({
               {feedback.message}
             </Alert>
           )}
-          <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '300px 1fr' }} gap={2}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', md: '300px 1fr' },
+              gap: 2,
+            }}
+          >
             <Box>
               <Box
-                p={2}
-                border="1px solid"
-                borderColor="divider"
-                borderRadius={1}
-                mb={2}
-                display="flex"
-                flexDirection="column"
-                gap={1.5}
+                sx={{
+                  p: 2,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: 1,
+                  mb: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1.5,
+                }}
               >
                 <Typography variant="subtitle2">{t('quran.bookmarkManualTitle')}</Typography>
                 <TextField
@@ -215,13 +229,28 @@ export default function BookmarkDialog({
                   {t('quran.bookmarkManualAdd')}
                 </Button>
               </Box>
-              <Typography variant="subtitle2" color="text.secondary" mb={1}>
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  color: 'text.secondary',
+                  mb: 1,
+                }}
+              >
                 {t('quran.bookmarksCount', { count: filtered.length })}
               </Typography>
               <List dense sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
                 {filtered.length === 0 ? (
-                  <Box p={2}>
-                    <Typography variant="body2" color="text.secondary">
+                  <Box
+                    sx={{
+                      p: 2,
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: 'text.secondary',
+                      }}
+                    >
                       {t('quran.bookmarksEmpty')}
                     </Typography>
                   </Box>
@@ -238,7 +267,9 @@ export default function BookmarkDialog({
                         <ListItemText
                           primary={label}
                           secondary={bookmark.note?.trim() ? bookmark.note : t('quran.bookmarksNoNote')}
-                          secondaryTypographyProps={{ noWrap: true }}
+                          slotProps={{
+                            secondary: { noWrap: true },
+                          }}
                         />
                       </ListItemButton>
                     );
@@ -247,18 +278,27 @@ export default function BookmarkDialog({
               </List>
             </Box>
             <Box
-              p={2}
-              border="1px solid"
-              borderColor="divider"
-              borderRadius={1}
-              minHeight={240}
-              display="flex"
-              flexDirection="column"
-              gap={2}
+              sx={{
+                p: 2,
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: 1,
+                minHeight: 240,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2,
+              }}
             >
               {selected ? (
                 <>
-                  <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: 1,
+                    }}
+                  >
                     <Typography variant="subtitle2">{t('quran.bookmarkDetails')}</Typography>
                     <Stack direction="row" spacing={1}>
                       <IconButton
@@ -285,7 +325,9 @@ export default function BookmarkDialog({
                     size="small"
                     fullWidth
                     value={selected.url}
-                    InputProps={{ readOnly: true }}
+                    slotProps={{
+                      input: { readOnly: true },
+                    }}
                   />
                   <TextField
                     label={t('quran.bookmarkNoteLabel')}
@@ -297,7 +339,12 @@ export default function BookmarkDialog({
                   />
                 </>
               ) : (
-                <Typography variant="body2" color="text.secondary">
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: 'text.secondary',
+                  }}
+                >
                   {t('quran.bookmarksEmpty')}
                 </Typography>
               )}
@@ -312,7 +359,12 @@ export default function BookmarkDialog({
       <Dialog open={Boolean(pendingDelete)} onClose={() => setPendingDelete(null)}>
         <DialogTitle>{t('quran.bookmarkDeleteTitle')}</DialogTitle>
         <DialogContent>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {t('quran.bookmarkDeleteBody')}
           </Typography>
         </DialogContent>

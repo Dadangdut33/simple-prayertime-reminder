@@ -141,44 +141,87 @@ export default function ExportTablePdfPage({
         fontFamily: 'Roboto, sans-serif',
       }}
     >
-      <Typography variant="h4" fontWeight={700} mb={0.75}>
+      <Typography
+        variant="h4"
+        sx={{
+          fontWeight: 700,
+          mb: 0.75,
+        }}
+      >
         {activeMonthLabel}
       </Typography>
       <Grid container sx={{ mb: 2.25 }}>
         <Grid size={4}>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {i18n.t('export.summaryCalculation')} {metadata.methodLabel}
           </Typography>
         </Grid>
         <Grid size={8}>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {i18n.t('export.summaryLocation')} {metadata.locationLabel}
           </Typography>
         </Grid>
         <Grid size={4}>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {i18n.t('export.summaryCoordinates')} {metadata.coordinatesLabel}
           </Typography>
         </Grid>
         <Grid size={8}>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {i18n.t('export.summaryTimezone')} {metadata.timezoneLabel}
           </Typography>
         </Grid>
         <Grid size={4}>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {i18n.t('export.summaryElevation')} {metadata.elevationLabel}
           </Typography>
         </Grid>
         <Grid size={8}>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {i18n.t('export.summaryOffsets')} {metadata.offsetSummary}
           </Typography>
         </Grid>
       </Grid>
 
       {splitIntoTwoTables ? (
-        <Box display="grid" gridTemplateColumns="repeat(2, minmax(0, 1fr))" gap={2} alignItems="start">
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+            gap: 2,
+            alignItems: 'start',
+          }}
+        >
           <PrayerTable
             schedules={leftSchedules}
             hijriByDate={hijriByDate}

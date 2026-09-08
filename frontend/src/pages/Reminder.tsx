@@ -276,13 +276,31 @@ export default function ReminderPage() {
           bgcolor: 'rgba(255,255,255,0.03)',
         }}
       >
-        <Typography variant="caption" color="text.secondary" display="block">
+        <Typography
+          variant="caption"
+          sx={{
+            color: 'text.secondary',
+            display: 'block',
+          }}
+        >
           Debug
         </Typography>
-        <Typography variant="caption" color="text.secondary" display="block">
+        <Typography
+          variant="caption"
+          sx={{
+            color: 'text.secondary',
+            display: 'block',
+          }}
+        >
           Prayer: {info.prayerName} · State: {info.state}
         </Typography>
-        <Typography variant="caption" color="text.secondary" display="block">
+        <Typography
+          variant="caption"
+          sx={{
+            color: 'text.secondary',
+            display: 'block',
+          }}
+        >
           Minutes left: {info.minutesLeft} · Offset: {offsetLabel ?? '0m'}
         </Typography>
       </Box>

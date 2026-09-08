@@ -2,8 +2,8 @@ import { useCallback, useMemo } from 'react';
 import { Box, Card, FormControl, IconButton, MenuItem, Select, Skeleton, Typography } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { DateCalendar, PickersDay } from '@mui/x-date-pickers';
-import type { PickersDayProps } from '@mui/x-date-pickers/PickersDay';
+import { DateCalendar, PickerDay } from '@mui/x-date-pickers';
+import type { PickerDayProps } from '@mui/x-date-pickers/PickerDay';
 import dayjs, { type Dayjs } from 'dayjs';
 import 'dayjs-hijri';
 import type { HijriDate } from '../../../types';
@@ -51,7 +51,7 @@ export default function PrayerMonthCalendarCard({
   const todayIso = useMemo(() => dayjs().format('YYYY-MM-DD'), []);
 
   const CalendarDay = useCallback(
-    (props: PickersDayProps) => {
+    (props: PickerDayProps) => {
       const { day, outsideCurrentMonth, ...other } = props;
       const isoDate = toIsoDate(day as Dayjs);
       const hijriDate = hijriByDate[isoDate];
@@ -64,12 +64,12 @@ export default function PrayerMonthCalendarCard({
       );
 
       return (
-        <PickersDay
+        <PickerDay
           {...other}
           day={day}
           outsideCurrentMonth={outsideCurrentMonth}
-          disableMargin
           sx={{
+            '--PickerDay-horizontalMargin': '0px',
             width: '100%',
             maxWidth: 'none',
             height: { xs: 88, md: 96 },
@@ -96,16 +96,37 @@ export default function PrayerMonthCalendarCard({
             },
           }}
         >
-          <Box width="100%" textAlign="left">
-            <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={0.75}>
-              <Typography variant="subtitle2" fontWeight={700} sx={{ lineHeight: 1 }}>
+          <Box
+            sx={{
+              width: '100%',
+              textAlign: 'left',
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                mb: 0.75,
+              }}
+            >
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  fontWeight: 700,
+                  lineHeight: 1,
+                }}
+              >
                 {primaryLabel}
               </Typography>
               <Typography
                 variant="caption"
                 className="calendar-secondary ps-2"
-                color="text.secondary"
-                sx={{ display: 'block', lineHeight: 1 }}
+                sx={{
+                  color: 'text.secondary',
+                  display: 'block',
+                  lineHeight: 1,
+                }}
               >
                 {primaryContext}
               </Typography>
@@ -115,8 +136,8 @@ export default function PrayerMonthCalendarCard({
               <Typography
                 variant="caption"
                 className="calendar-secondary"
-                color="text.secondary"
                 sx={{
+                  color: 'text.secondary',
                   display: 'block',
                   opacity: 0.78,
                   lineHeight: 1.2,
@@ -129,7 +150,7 @@ export default function PrayerMonthCalendarCard({
               </Typography>
             )}
           </Box>
-        </PickersDay>
+        </PickerDay>
       );
     },
     [hijriByDate, mode, todayIso, useArabicIndicDigits],
@@ -184,29 +205,59 @@ export default function PrayerMonthCalendarCard({
         overflow: 'visible',
       }}
     >
-      <Box mb={2}>
+      <Box
+        sx={{
+          mb: 2,
+        }}
+      >
         <Typography variant="h3">{title}</Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary',
+          }}
+        >
           {subtitle}
         </Typography>
       </Box>
 
       {mode === 'hijri' && (
-        <Box display="flex" alignItems="center" justifyContent="space-between" mb={1.5}>
-          <Typography variant="subtitle1" fontWeight={700}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            mb: 1.5,
+          }}
+        >
+          <Typography
+            variant="subtitle1"
+            sx={{
+              fontWeight: 700,
+            }}
+          >
             {subtitle}
           </Typography>
-          <Box display="flex" alignItems="center" gap={1}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+            }}
+          >
             {hijriMonth && hijriYear && onHijriMonthYearChange && (
-              <Box display="flex" gap={1}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: 1,
+                }}
+              >
                 <FormControl size="small" variant="outlined">
                   <Select
                     value={hijriMonth}
                     onChange={(event) => onHijriMonthYearChange(hijriYear, Number(event.target.value))}
                     MenuProps={{
-                      PaperProps: {
-                        sx: { maxHeight: 280 },
-                      },
+                      slotProps: { paper: { sx: { maxHeight: 280 } } },
                     }}
                   >
                     {Array.from({ length: 12 }, (_, index) => index + 1).map((month) => (
@@ -221,9 +272,7 @@ export default function PrayerMonthCalendarCard({
                     value={hijriYear}
                     onChange={(event) => onHijriMonthYearChange(Number(event.target.value), hijriMonth)}
                     MenuProps={{
-                      PaperProps: {
-                        sx: { maxHeight: 280 },
-                      },
+                      slotProps: { paper: { sx: { maxHeight: 280 } } },
                     }}
                   >
                     {Array.from({ length: 21 }, (_, index) => hijriYear - 10 + index).map((year) => (
@@ -235,7 +284,12 @@ export default function PrayerMonthCalendarCard({
                 </FormControl>
               </Box>
             )}
-            <Box display="flex" gap={0.5}>
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 0.5,
+              }}
+            >
               <IconButton size="small" onClick={onPrevMonth}>
                 <ChevronLeftIcon fontSize="small" />
               </IconButton>
@@ -284,20 +338,34 @@ export default function PrayerMonthCalendarCard({
       >
         {mode === 'hijri' ? (
           loading ? (
-            <Box display="grid" gridTemplateColumns="repeat(7, minmax(0, 1fr))" gap={{ xs: 0.85, md: 1.1 }} py={2}>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
+                gap: { xs: 0.85, md: 1.1 },
+                py: 2,
+              }}
+            >
               {Array.from({ length: 42 }).map((_, index) => (
                 <Skeleton key={index} variant="rounded" height={88} />
               ))}
             </Box>
           ) : (
             <>
-              <Box display="grid" gridTemplateColumns="repeat(7, minmax(0, 1fr))" gap={1} mb={1.5}>
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
+                  gap: 1,
+                  mb: 1.5,
+                }}
+              >
                 {getWeekdayHeaders().map((label, index) => (
                   <Typography
                     key={`${label}-${index}`}
                     variant="caption"
-                    color="text.secondary"
                     sx={{
+                      color: 'text.secondary',
                       textAlign: 'center',
                       fontWeight: 600,
                       whiteSpace: 'nowrap',
@@ -312,7 +380,13 @@ export default function PrayerMonthCalendarCard({
                   </Typography>
                 ))}
               </Box>
-              <Box display="grid" gridTemplateColumns="repeat(7, minmax(0, 1fr))" gap={{ xs: 0.85, md: 1.1 }}>
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
+                  gap: { xs: 0.85, md: 1.1 },
+                }}
+              >
                 {hijriCalendarDays.map((day) => {
                   const isoDate = toIsoDate(day);
                   const hijriDate = hijriByDate[isoDate];
@@ -366,9 +440,26 @@ export default function PrayerMonthCalendarCard({
                         },
                       }}
                     >
-                      <Box width="100%">
-                        <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={0.75}>
-                          <Typography variant="subtitle2" fontWeight={700} sx={{ lineHeight: 1 }}>
+                      <Box
+                        sx={{
+                          width: '100%',
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'flex-start',
+                            mb: 0.75,
+                          }}
+                        >
+                          <Typography
+                            variant="subtitle2"
+                            sx={{
+                              fontWeight: 700,
+                              lineHeight: 1,
+                            }}
+                          >
                             {primaryLabel}
                           </Typography>
                           <Typography
@@ -413,7 +504,14 @@ export default function PrayerMonthCalendarCard({
             onMonthChange={(value) => onMonthChange(value as Dayjs)}
             loading={loading}
             renderLoading={() => (
-              <Box display="grid" gridTemplateColumns="repeat(7, minmax(0, 1fr))" gap={{ xs: 0.85, md: 1.1 }} py={2}>
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
+                  gap: { xs: 0.85, md: 1.1 },
+                  py: 2,
+                }}
+              >
                 {Array.from({ length: 42 }).map((_, index) => (
                   <Skeleton key={index} variant="rounded" height={88} />
                 ))}

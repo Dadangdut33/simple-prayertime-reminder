@@ -13,9 +13,7 @@ export default function ResetSettingsDialog({ open, onClose, onConfirm }: ResetS
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
       <DialogTitle>{t('settings.reset.title')}</DialogTitle>
       <DialogContent>
-        <DialogContentText>
-          {t('settings.reset.description')}
-        </DialogContentText>
+        <DialogContentText>{t('settings.reset.description')}</DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="inherit">

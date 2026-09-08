@@ -101,7 +101,13 @@ export default function ReminderWindow({
 
         {tooltipProps ? <Tooltip {...tooltipProps}>{titleNode}</Tooltip> : titleNode}
 
-        <Typography variant="body1" color="text.secondary" mb={3}>
+        <Typography
+          variant="body1"
+          sx={{
+            color: 'text.secondary',
+            mb: 3,
+          }}
+        >
           {subtitle}
         </Typography>
         {state === 'after' && (
@@ -127,18 +133,37 @@ export default function ReminderWindow({
               </Typography>
               {t('reminder.afterQuoteAfter')}
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+              }}
+            >
               {t('reminder.afterReference')}
             </Typography>
           </Box>
         )}
         {autoDismissSecondsLeft !== null && autoDismissSecondsLeft !== undefined && (
-          <Typography variant="caption" color="text.secondary" display="block" mb={2}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'text.secondary',
+              display: 'block',
+              mb: 2,
+            }}
+          >
             {t('reminder.autoDismissIn', { seconds: autoDismissSecondsLeft })}
           </Typography>
         )}
         {(autoDismissSecondsLeft === null || autoDismissSecondsLeft === undefined) && autoDismissAfterAdhan && (
-          <Typography variant="caption" color="text.secondary" display="block" mb={2}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'text.secondary',
+              display: 'block',
+              mb: 2,
+            }}
+          >
             {t('reminder.autoDismissAfterAdhan')}
           </Typography>
         )}

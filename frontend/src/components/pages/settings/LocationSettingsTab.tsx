@@ -145,22 +145,41 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
   }, [cityQuery, isListMode]);
 
   return (
-    <Box display="flex" flexDirection="column" gap={3}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 3,
+      }}
+    >
       <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        pb={3}
-        borderBottom="1px solid"
-        borderColor="divider"
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          pb: 3,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+        }}
       >
         <Box>
           <Typography variant="subtitle1">{t('settings.location.autoDetectTitle')}</Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {t('settings.location.autoDetectDescription')}
           </Typography>
         </Box>
-        <Box display="flex" alignItems="center" gap={2}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+          }}
+        >
           <Button
             variant="outlined"
             size="small"
@@ -180,9 +199,22 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
       <Alert severity="info">{t('settings.location.autoDetectDisclaimer')}</Alert>
 
       {!isAuto && (
-        <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={3}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+            gap: 3,
+          }}
+        >
           <Box>
-            <Typography variant="caption" color="text.secondary" mb={1} display="block">
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+                mb: 1,
+                display: 'block',
+              }}
+            >
               {t('settings.location.inputMode')}
             </Typography>
             <Select
@@ -203,7 +235,13 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
       )}
 
       {isListMode && (
-        <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={3}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+            gap: 3,
+          }}
+        >
           <Autocomplete
             options={cityOptions}
             value={selectedCity}
@@ -236,12 +274,14 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
                 size="small"
                 placeholder={t('settings.location.citySearchPlaceholder')}
                 slotProps={{
+                  ...params.slotProps,
+
                   input: {
-                    ...params.InputProps,
+                    ...params.slotProps.input,
                     endAdornment: (
                       <>
                         {cityLoading ? <CircularProgress size={16} /> : null}
-                        {params.InputProps.endAdornment}
+                        {params.slotProps.input.endAdornment}
                       </>
                     ),
                   },
@@ -249,7 +289,13 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
               />
             )}
           />
-          <TextField label={t('settings.location.country')} size="small" fullWidth value={local.location.country} disabled />
+          <TextField
+            label={t('settings.location.country')}
+            size="small"
+            fullWidth
+            value={local.location.country}
+            disabled
+          />
           <TextField
             label={t('settings.location.timezone')}
             size="small"
@@ -259,31 +305,61 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
             helperText={!local.location.timezone ? t('settings.location.timezoneRequired') : undefined}
             disabled
           />
-          <NumberField label={t('settings.location.elevation')} size="small" fullWidth value={local.location.elevation} disabled />
-          <NumberField label={t('settings.location.latitude')} size="small" fullWidth value={local.location.latitude} disabled />
-          <NumberField label={t('settings.location.longitude')} size="small" fullWidth value={local.location.longitude} disabled />
+          <NumberField
+            label={t('settings.location.elevation')}
+            size="small"
+            fullWidth
+            value={local.location.elevation}
+            disabled
+          />
+          <NumberField
+            label={t('settings.location.latitude')}
+            size="small"
+            fullWidth
+            value={local.location.latitude}
+            disabled
+          />
+          <NumberField
+            label={t('settings.location.longitude')}
+            size="small"
+            fullWidth
+            value={local.location.longitude}
+            disabled
+          />
         </Box>
       )}
 
       {isListMode && (
         <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems={{ xs: 'flex-start', md: 'center' }}
-          flexDirection={{ xs: 'column', md: 'row' }}
-          gap={2}
-          p={2.5}
-          borderRadius={0.5}
-          border="1px solid"
-          borderColor="divider"
-          bgcolor="background.paper"
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: { xs: 'flex-start', md: 'center' },
+            flexDirection: { xs: 'column', md: 'row' },
+            gap: 2,
+            p: 2.5,
+            borderRadius: 0.5,
+            border: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+          }}
         >
           <Box>
             <Typography variant="subtitle2">{t('settings.location.geonamesTitle')}</Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+              }}
+            >
               {t('settings.location.geonamesNote')}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+              }}
+            >
               {t('settings.location.geonamesUpdated', {
                 date: geonamesInfo?.lastUpdated ?? (geonamesLoading ? t('common.loading') : t('common.unknown')),
               })}
@@ -309,7 +385,13 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
       )}
 
       {(isAuto || isCustomMode) && (
-        <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={3}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+            gap: 3,
+          }}
+        >
           <TextField
             label={t('settings.location.city')}
             size="small"
@@ -351,16 +433,16 @@ export default function LocationSettingsTab({ local, loading, detectLocation, se
                   size="small"
                   required={!isAuto}
                   error={!isAuto && !local.location.timezone}
-                  helperText={
-                    !isAuto && !local.location.timezone ? t('settings.location.timezoneRequired') : undefined
-                  }
+                  helperText={!isAuto && !local.location.timezone ? t('settings.location.timezoneRequired') : undefined}
                   slotProps={{
+                    ...params.slotProps,
+
                     input: {
-                      ...params.InputProps,
+                      ...params.slotProps.input,
                       endAdornment: (
                         <>
                           {timezoneLoading ? <CircularProgress size={16} /> : null}
-                          {params.InputProps.endAdornment}
+                          {params.slotProps.input.endAdornment}
                         </>
                       ),
                     },

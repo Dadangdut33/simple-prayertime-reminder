@@ -85,19 +85,48 @@ export default function WorldPrayerCityCard({
         }
       }}
     >
-      <Box display="flex" justifyContent="space-between" alignItems="flex-start" gap={2} mb={2}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          gap: 2,
+          mb: 2,
+        }}
+      >
         <Box>
-          <Typography variant="h3" mb={0.5}>
+          <Typography
+            variant="h3"
+            sx={{
+              mb: 0.5,
+            }}
+          >
             {cityLabel}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {timezoneLabel}
           </Typography>
-          <Typography variant="caption" color="text.secondary">
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {city.latitude.toFixed(4)}, {city.longitude.toFixed(4)} • {city.elevation} m
           </Typography>
         </Box>
-        <Box display="flex" alignItems="center" gap={0.5}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+          }}
+        >
           {showOrderControls && (
             <IconButton
               size="small"
@@ -156,49 +185,95 @@ export default function WorldPrayerCityCard({
         </Box>
       </Box>
 
-      <Box display="grid" gridTemplateColumns={{ xs: '1fr', sm: 'repeat(3, 1fr)' }} gap={1.5} mb={2}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' },
+          gap: 1.5,
+          mb: 2,
+        }}
+      >
         <Box
-          p={1.5}
-          borderRadius={0.5}
-          border="1px solid"
-          borderColor="divider"
-          bgcolor="background.paper"
+          sx={{
+            p: 1.5,
+            borderRadius: 0.5,
+            border: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+          }}
         >
-          <Typography variant="caption" color="text.secondary">
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {t('worldPrayer.timeDifference')}
           </Typography>
-          <Typography variant="subtitle1" fontWeight={700} sx={{ fontVariantNumeric: 'tabular-nums' }}>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              fontWeight: 700,
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
             {formatOffsetSeconds(summary.offsetSeconds)}
           </Typography>
         </Box>
         <Box
-          p={1.5}
-          borderRadius={0.5}
-          border="1px solid"
-          borderColor="divider"
-          bgcolor="background.paper"
+          sx={{
+            p: 1.5,
+            borderRadius: 0.5,
+            border: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+          }}
         >
-          <Typography variant="caption" color="text.secondary">
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {t('worldPrayer.currentTime')}
           </Typography>
-          <Typography variant="subtitle1" fontWeight={700} sx={{ fontVariantNumeric: 'tabular-nums' }}>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              fontWeight: 700,
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
             {currentTimeLabel}
           </Typography>
         </Box>
         <Box
-          p={1.5}
-          borderRadius={0.5}
-          border="1px solid"
-          borderColor="divider"
-          bgcolor="background.paper"
-          display="flex"
-          flexDirection="column"
-          gap={0.5}
+          sx={{
+            p: 1.5,
+            borderRadius: 0.5,
+            border: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 0.5,
+          }}
         >
-          <Typography variant="caption" color="text.secondary">
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {t('worldPrayer.nextPrayer')}
           </Typography>
-          <Typography variant="subtitle1" fontWeight={700} sx={{ fontVariantNumeric: 'tabular-nums' }}>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              fontWeight: 700,
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
             {nextPrayerTime}
           </Typography>
           <Chip size="small" color="primary" label={nextPrayerLabel} sx={{ alignSelf: 'flex-start' }} />
@@ -208,20 +283,39 @@ export default function WorldPrayerCityCard({
       <Divider sx={{ mb: 2 }} />
 
       <Collapse in={expanded} timeout="auto" unmountOnExit>
-        <Box display="grid" gridTemplateColumns={{ xs: '1fr', sm: '1fr 1fr', lg: 'repeat(3, 1fr)' }} gap={1.5}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', lg: 'repeat(3, 1fr)' },
+            gap: 1.5,
+          }}
+        >
           {getPrayerList(summary.today).map((entry) => (
             <Box
               key={entry.name}
-              p={1.25}
-              borderRadius={0.5}
-              border="1px solid"
-              borderColor="divider"
-              bgcolor="background.paper"
+              sx={{
+                p: 1.25,
+                borderRadius: 0.5,
+                border: '1px solid',
+                borderColor: 'divider',
+                bgcolor: 'background.paper',
+              }}
             >
-              <Typography variant="caption" color="text.secondary">
+              <Typography
+                variant="caption"
+                sx={{
+                  color: 'text.secondary',
+                }}
+              >
                 {entry.name}
               </Typography>
-              <Typography variant="subtitle2" fontWeight={700} sx={{ fontVariantNumeric: 'tabular-nums' }}>
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  fontWeight: 700,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
                 {formatTimeInZone(entry.time, timezoneLabel, timeFormat)}
               </Typography>
             </Box>

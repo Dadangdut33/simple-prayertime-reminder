@@ -89,7 +89,12 @@ export default function ExportCalendarPdfPage({
           background: palette.cardBackground,
         }}
       >
-        <Typography variant="h4" fontWeight={700}>
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: 700,
+          }}
+        >
           {activeMonth.format('MMMM YYYY')}
         </Typography>
         <Typography variant="body1" sx={{ color: palette.subText, mb: 0.5 }}>
@@ -128,7 +133,13 @@ export default function ExportCalendarPdfPage({
           </Grid>
         </Grid>
 
-        <Box display="grid" gridTemplateColumns="repeat(7, minmax(0, 1fr))" gap={1.25}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
+            gap: 1.25,
+          }}
+        >
           {getWeekdayHeaders().map((label) => (
             <Box
               key={label}
@@ -173,13 +184,27 @@ export default function ExportCalendarPdfPage({
                   overflow: 'visible',
                 }}
               >
-                <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={0.55}>
-                  <Typography fontWeight={700} fontSize="1.02rem" sx={{ lineHeight: 1.15, pb: 0.15 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    mb: 0.55,
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: '1.02rem',
+                      lineHeight: 1.15,
+                      pb: 0.15,
+                    }}
+                  >
                     {primaryLabel}
                   </Typography>
                   <Typography
-                    fontSize="0.76rem"
                     sx={{
+                      fontSize: '0.76rem',
                       color: palette.weekdayText,
                       lineHeight: 1.2,
                       pb: 0.1,
@@ -191,8 +216,8 @@ export default function ExportCalendarPdfPage({
 
                 {secondaryContext ? (
                   <Typography
-                    fontSize="0.76rem"
                     sx={{
+                      fontSize: '0.76rem',
                       color: palette.weekdayText,
                       lineHeight: 1.28,
                       minHeight: '1.4em',

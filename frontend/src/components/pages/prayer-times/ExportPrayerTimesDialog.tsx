@@ -210,7 +210,12 @@ export default function ExportPrayerTimesDialog({
         <DialogTitle>{t('export.title')}</DialogTitle>
         <DialogContent dividers>
           <Stack spacing={3}>
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+              }}
+            >
               {t('export.description')}
             </Typography>
 
@@ -240,7 +245,14 @@ export default function ExportPrayerTimesDialog({
                   slotProps={{ textField: { size: 'small', fullWidth: true } }}
                 />
               </Stack>
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: 'text.secondary',
+                  mt: 1,
+                  display: 'block',
+                }}
+              >
                 {t('export.currentRange', { range: rangeLabel })}
               </Typography>
             </Box>
@@ -267,7 +279,12 @@ export default function ExportPrayerTimesDialog({
                   </Typography>
                 </Grid>
                 <Grid size={6}>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'text.secondary',
+                    }}
+                  >
                     <Box component="span" sx={{ fontWeight: 600 }}>
                       {t('export.summaryCoordinates')}
                     </Box>{' '}
@@ -275,7 +292,12 @@ export default function ExportPrayerTimesDialog({
                   </Typography>
                 </Grid>
                 <Grid size={6}>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'text.secondary',
+                    }}
+                  >
                     <Box component="span" sx={{ fontWeight: 600 }}>
                       {t('export.summaryTimezone')}
                     </Box>{' '}
@@ -283,7 +305,12 @@ export default function ExportPrayerTimesDialog({
                   </Typography>
                 </Grid>
                 <Grid size={6}>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'text.secondary',
+                    }}
+                  >
                     <Box component="span" sx={{ fontWeight: 600 }}>
                       {t('export.summaryElevation')}
                     </Box>{' '}
@@ -291,7 +318,12 @@ export default function ExportPrayerTimesDialog({
                   </Typography>
                 </Grid>
                 <Grid size={6}>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'text.secondary',
+                    }}
+                  >
                     <Box component="span" sx={{ fontWeight: 600 }}>
                       {t('export.summaryOffsets')}
                     </Box>{' '}
@@ -355,19 +387,37 @@ export default function ExportPrayerTimesDialog({
             )}
 
             {kind === 'calendar-pdf' && (
-              <Box p={2} border="1px solid" borderColor="divider" borderRadius={0.5} bgcolor="action.hover">
+              <Box
+                sx={{
+                  p: 2,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: 0.5,
+                  bgcolor: 'action.hover',
+                }}
+              >
                 <FormControlLabel
                   control={
                     <Checkbox checked={includeTable} onChange={(event) => setIncludeTable(event.target.checked)} />
                   }
                   label={t('export.includeTable')}
                 />
-                <Typography variant="caption" color="text.secondary" display="block">
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'text.secondary',
+                    display: 'block',
+                  }}
+                >
                   {t('export.includeTableHint')}
                 </Typography>
 
                 {includeTable && (
-                  <Box mt={2.25}>
+                  <Box
+                    sx={{
+                      mt: 2.25,
+                    }}
+                  >
                     <Divider sx={{ mb: 2 }} />
                     <Stack>
                       <Typography variant="subtitle2">{t('export.tableLayout')}</Typography>
@@ -409,7 +459,9 @@ export default function ExportPrayerTimesDialog({
                   placeholder={t('export.chooseLocation')}
                   size="small"
                   fullWidth
-                  InputProps={{ readOnly: true }}
+                  slotProps={{
+                    input: { readOnly: true },
+                  }}
                 />
                 <Button variant="outlined" onClick={() => void chooseOutputPath()}>
                   {t('export.chooseLocation')}

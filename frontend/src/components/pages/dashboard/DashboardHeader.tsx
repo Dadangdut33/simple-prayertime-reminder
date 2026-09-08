@@ -13,16 +13,45 @@ interface DashboardHeaderProps {
 export default function DashboardHeader({ now, hijriDate, location }: DashboardHeaderProps) {
   const { t } = useTranslation();
   return (
-    <Box mb={4}>
+    <Box
+      sx={{
+        mb: 4,
+      }}
+    >
       <Typography variant="h1" gutterBottom>
         {formatLongDate(now)}
       </Typography>
-      <Box display="flex" alignItems="center" gap={2} color="text.secondary">
-        <Typography variant="body2" fontWeight={500}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+          color: 'text.secondary',
+        }}
+      >
+        <Typography
+          variant="body2"
+          sx={{
+            fontWeight: 500,
+          }}
+        >
           {formatHijri(hijriDate)}
         </Typography>
-        <Box width="4px" height="4px" borderRadius="50%" bgcolor="divider" />
-        <Box display="flex" alignItems="center" gap={0.5}>
+        <Box
+          sx={{
+            width: '4px',
+            height: '4px',
+            borderRadius: '50%',
+            bgcolor: 'divider',
+          }}
+        />
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+          }}
+        >
           <LocationOnIcon fontSize="small" />
           <Typography variant="body2">
             {location ? `${location.city}, ${location.country}` : t('common.detecting')}

@@ -77,7 +77,13 @@ export default function WorldPrayerCityDialog({ open, onClose, onAdd }: WorldPra
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>{t('worldPrayer.dialogTitle')}</DialogTitle>
       <DialogContent>
-        <Typography variant="body2" color="text.secondary" mb={2}>
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary',
+            mb: 2,
+          }}
+        >
           {t('worldPrayer.dialogHelper')}
         </Typography>
         <Autocomplete
@@ -96,14 +102,18 @@ export default function WorldPrayerCityDialog({ open, onClose, onAdd }: WorldPra
               label={t('settings.location.searchCity')}
               size="small"
               placeholder={t('worldPrayer.dialogPlaceholder')}
-              InputProps={{
-                ...params.InputProps,
-                endAdornment: (
-                  <>
-                    {loading ? <CircularProgress color="inherit" size={16} /> : null}
-                    {params.InputProps.endAdornment}
-                  </>
-                ),
+              slotProps={{
+                ...params.slotProps,
+
+                input: {
+                  ...params.slotProps.input,
+                  endAdornment: (
+                    <>
+                      {loading ? <CircularProgress color="inherit" size={16} /> : null}
+                      {params.slotProps.input.endAdornment}
+                    </>
+                  ),
+                },
               }}
             />
           )}
@@ -111,7 +121,12 @@ export default function WorldPrayerCityDialog({ open, onClose, onAdd }: WorldPra
             <Box component="li" {...props} key={`${option.id}-${option.label}`}>
               <Box>
                 <Typography variant="subtitle2">{formatCityLabel(option)}</Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'text.secondary',
+                  }}
+                >
                   {option.timezone || t('settings.location.timezoneUnknown')}
                 </Typography>
               </Box>

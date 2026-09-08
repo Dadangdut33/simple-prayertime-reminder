@@ -134,8 +134,7 @@ export default function Onboarding() {
     void updateSettings({ ...next, onboardingCompleted: false });
   };
 
-  const setTheme = (patch: Partial<Settings>) =>
-    applyAndPersist({ ...local, ...patch });
+  const setTheme = (patch: Partial<Settings>) => applyAndPersist({ ...local, ...patch });
 
   const setDashboard = (patch: Partial<Settings['dashboard']>) =>
     applyAndPersist({ ...local, dashboard: { ...local.dashboard, ...patch } });
@@ -154,10 +153,7 @@ export default function Onboarding() {
   const setAllPrayerEnabled = (enabled: boolean) => {
     setNotification({
       prayers: Object.fromEntries(
-        Object.entries(local.notification.prayers).map(([key, value]) => [
-          key,
-          { ...value, enabled },
-        ]),
+        Object.entries(local.notification.prayers).map(([key, value]) => [key, { ...value, enabled }]),
       ) as Settings['notification']['prayers'],
     });
   };
@@ -236,7 +232,12 @@ export default function Onboarding() {
         <Stack spacing={3}>
           <Box>
             <Typography variant="h2">{t('onboarding.title')}</Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+              }}
+            >
               {t('onboarding.subtitle')}
             </Typography>
           </Box>
@@ -270,14 +271,18 @@ export default function Onboarding() {
               <Box>
                 <Typography variant="subtitle1">{t('onboarding.appearance.themePreset')}</Typography>
                 <Box
-                  display="grid"
-                  gridTemplateColumns={{
-                    xs: '1fr',
-                    sm: '1fr 1fr',
-                    xl: 'repeat(5, 1fr)',
+                  sx={{
+                    display: 'grid',
+
+                    gridTemplateColumns: {
+                      xs: '1fr',
+                      sm: '1fr 1fr',
+                      xl: 'repeat(5, 1fr)',
+                    },
+
+                    gap: 2,
+                    mt: 1,
                   }}
-                  gap={2}
-                  mt={1}
                 >
                   {THEME_PRESETS.map((preset) => {
                     const active = local.themePreset === preset.value;
@@ -299,7 +304,13 @@ export default function Onboarding() {
                           },
                         }}
                       >
-                        <Box display="flex" gap={1} mb={1.25}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            gap: 1,
+                            mb: 1.25,
+                          }}
+                        >
                           {themeSwatches[preset.value].map((color) => (
                             <Box
                               key={color}
@@ -333,7 +344,14 @@ export default function Onboarding() {
                     ))}
                   </Select>
                 </FormControl>
-                <Typography variant="caption" color="text.secondary" mt={1} display="block">
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'text.secondary',
+                    mt: 1,
+                    display: 'block',
+                  }}
+                >
                   {t('settings.general.appearance.languageNotePrefix')}{' '}
                   <Link component="button" onClick={() => openURL(repoUrl)} sx={{ cursor: 'pointer' }}>
                     {t('settings.general.appearance.languageNoteLink')}
@@ -365,14 +383,32 @@ export default function Onboarding() {
 
           {activeStep === 1 && (
             <Stack spacing={3}>
-              <Box display="flex" alignItems="center" justifyContent="space-between" gap={2}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 2,
+                }}
+              >
                 <Box>
                   <Typography variant="subtitle1">{t('onboarding.location.autoDetect')}</Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'text.secondary',
+                    }}
+                  >
                     {t('onboarding.location.autoDetectHint')}
                   </Typography>
                 </Box>
-                <Stack direction="row" spacing={1} alignItems="center">
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  sx={{
+                    alignItems: 'center',
+                  }}
+                >
                   <Button
                     variant="outlined"
                     size="small"
@@ -423,12 +459,14 @@ export default function Onboarding() {
                       placeholder={t('onboarding.location.cityPlaceholder')}
                       size="small"
                       slotProps={{
+                        ...params.slotProps,
+
                         input: {
-                          ...params.InputProps,
+                          ...params.slotProps.input,
                           endAdornment: (
                             <>
                               {cityLoading ? <CircularProgress size={16} /> : null}
-                              {params.InputProps.endAdornment}
+                              {params.slotProps.input.endAdornment}
                             </>
                           ),
                         },
@@ -439,11 +477,29 @@ export default function Onboarding() {
               )}
 
               {local.location.autoDetect && (
-                <Box p={2.5} borderRadius={0.5} border="1px solid" borderColor="divider" bgcolor="background.paper">
-                  <Typography variant="subtitle2" mb={1}>
+                <Box
+                  sx={{
+                    p: 2.5,
+                    borderRadius: 0.5,
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    bgcolor: 'background.paper',
+                  }}
+                >
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      mb: 1,
+                    }}
+                  >
                     {t('onboarding.location.detectedTitle')}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'text.secondary',
+                    }}
+                  >
                     {t('onboarding.location.detectedValue', {
                       city: local.location.city,
                       country: local.location.country,
@@ -491,12 +547,14 @@ export default function Onboarding() {
 
               {local.prayer.method === 'Custom' && (
                 <Box
-                  display="grid"
-                  gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }}
-                  gap={3}
-                  p={2}
-                  bgcolor="action.hover"
-                  borderRadius={0.5}
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+                    gap: 3,
+                    p: 2,
+                    bgcolor: 'action.hover',
+                    borderRadius: 0.5,
+                  }}
                 >
                   <NumberField
                     label={t('settings.prayer.customFajr')}
@@ -526,17 +584,25 @@ export default function Onboarding() {
             <Stack spacing={2.5}>
               <FormControlLabel
                 control={
-                  <Switch
-                    checked={reminderEnabled}
-                    onChange={(event) => setAllPrayerEnabled(event.target.checked)}
-                  />
+                  <Switch checked={reminderEnabled} onChange={(event) => setAllPrayerEnabled(event.target.checked)} />
                 }
                 label={t('onboarding.reminder.enable')}
               />
-              <Box display="flex" justifyContent="space-between" alignItems="center">
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
                 <Box>
                   <Typography variant="subtitle1">{t('settings.alarms.playAdhan')}</Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'text.secondary',
+                    }}
+                  >
                     {t('settings.alarms.playAdhanDesc')}
                   </Typography>
                 </Box>
@@ -545,10 +611,21 @@ export default function Onboarding() {
                   onChange={(event) => setNotification({ playAdhan: event.target.checked })}
                 />
               </Box>
-              <Box display="flex" justifyContent="space-between" alignItems="center">
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
                 <Box>
                   <Typography variant="subtitle1">{t('settings.alarms.useNativeDialog')}</Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'text.secondary',
+                    }}
+                  >
                     {t('settings.alarms.useNativeDialogDesc')}
                   </Typography>
                 </Box>
@@ -558,14 +635,32 @@ export default function Onboarding() {
                 />
               </Box>
 
-              <Box display="flex" justifyContent="space-between" alignItems="center">
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
                 <Box>
                   <Typography variant="subtitle1">{t('settings.alarms.useNativeNotification')}</Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'text.secondary',
+                    }}
+                  >
                     {t('settings.alarms.useNativeNotificationDesc')}
                   </Typography>
                   {nativePermission === false && (
-                    <Typography variant="caption" color="warning.main" display="block" mt={0.5}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: 'warning.main',
+                        display: 'block',
+                        mt: 0.5,
+                      }}
+                    >
                       {nativePermissionError ? nativePermissionError : t('settings.alarms.nativePermissionDenied')}
                     </Typography>
                   )}
@@ -575,7 +670,12 @@ export default function Onboarding() {
                   onChange={(event) => handleNativeNotificationToggle(event.target.checked)}
                 />
               </Box>
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                }}
+              >
                 {t('onboarding.reminder.note')}
               </Typography>
             </Stack>
@@ -583,7 +683,13 @@ export default function Onboarding() {
 
           <Divider />
 
-          <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
             <Button
               variant="text"
               onClick={() => setActiveStep((prev) => Math.max(prev - 1, 0))}
@@ -591,7 +697,12 @@ export default function Onboarding() {
             >
               {t('common.back')}
             </Button>
-            <Box display="flex" gap={1}>
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 1,
+              }}
+            >
               {activeStep < steps.length - 1 ? (
                 <Button variant="contained" onClick={() => setActiveStep((prev) => prev + 1)}>
                   {t('common.next')}

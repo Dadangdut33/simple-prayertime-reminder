@@ -84,8 +84,8 @@ export default function Quran() {
 
   return (
     <Box
-      p={4}
       sx={{
+        p: 4,
         display: 'flex',
         flexDirection: 'column',
         gap: 3,
@@ -93,14 +93,23 @@ export default function Quran() {
       }}
     >
       <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems={{ xs: 'flex-start', md: 'center' }}
-        flexDirection={{ xs: 'column', md: 'row' }}
-        gap={2}
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: { xs: 'flex-start', md: 'center' },
+          flexDirection: { xs: 'column', md: 'row' },
+          gap: 2,
+        }}
       >
         <Box>
-          <Box display="flex" alignItems="center" gap={1.5} mb={1.5}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.5,
+              mb: 1.5,
+            }}
+          >
             <Box
               sx={{
                 width: 40,
@@ -117,16 +126,41 @@ export default function Quran() {
             </Box>
             <Typography variant="h2">{t('quran.title')}</Typography>
           </Box>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {t('quran.subtitle')}
           </Typography>
-          <Typography variant="caption" color="text.secondary" display="block" mt={1}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'text.secondary',
+              display: 'block',
+              mt: 1,
+            }}
+          >
             {t('quran.disclaimer')}
           </Typography>
         </Box>
 
-        <Box display="flex" flexWrap="wrap" gap={1.25}>
-          <Box display="flex" gap={1.25} flexWrap="wrap" alignItems="center">
+        <Box
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 1.25,
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1.25,
+              flexWrap: 'wrap',
+              alignItems: 'center',
+            }}
+          >
             <TextField
               size="small"
               label={t('quran.currentUrlLabel')}
@@ -242,7 +276,12 @@ export default function Quran() {
           {bookmarkPrompt === 'add' ? t('quran.bookmarkConfirmAddTitle') : t('quran.bookmarkConfirmRemoveTitle')}
         </DialogTitle>
         <DialogContent>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {bookmarkPrompt === 'add' ? t('quran.bookmarkConfirmAddBody') : t('quran.bookmarkConfirmRemoveBody')}
           </Typography>
         </DialogContent>

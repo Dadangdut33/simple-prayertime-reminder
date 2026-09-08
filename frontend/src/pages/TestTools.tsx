@@ -195,7 +195,11 @@ export default function TestToolsPage() {
 
   if (!enabled) {
     return (
-      <Box p={4}>
+      <Box
+        sx={{
+          p: 4,
+        }}
+      >
         <Alert severity="warning">{t('reminderTest.disabled')}</Alert>
       </Box>
     );
@@ -214,8 +218,21 @@ export default function TestToolsPage() {
   };
 
   return (
-    <Box p={4} display="flex" flexDirection="column" gap={3}>
-      <Box display="flex" alignItems="center" gap={1.5}>
+    <Box
+      sx={{
+        p: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 3,
+      }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1.5,
+        }}
+      >
         <Box
           sx={{
             width: 40,
@@ -232,14 +249,29 @@ export default function TestToolsPage() {
         </Box>
         <Box>
           <Typography variant="h2">{t('reminderTest.title')}</Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {t('reminderTest.subtitle')}
           </Typography>
         </Box>
       </Box>
 
-      <Box display="flex" justifyContent="flex-end">
-        <Box display="flex" gap={1}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 1,
+          }}
+        >
           <Button variant="outlined" size="small" onClick={() => setShowUpdateDialog(true)}>
             {t('reminderTest.showUpdateDialog')}
           </Button>
@@ -263,15 +295,23 @@ export default function TestToolsPage() {
         onOpenAction={async () => openURL(mockUpdate.releaseUrl)}
       />
 
-      <Box display="grid" gridTemplateColumns={{ xs: '1fr', lg: '1fr 1fr' }} gap={3}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' },
+          gap: 3,
+        }}
+      >
         <Box
-          p={3}
-          border="1px solid"
-          borderColor="divider"
-          borderRadius={0.5}
-          display="flex"
-          flexDirection="column"
-          gap={2}
+          sx={{
+            p: 3,
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: 0.5,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+          }}
         >
           <Typography variant="subtitle1">{t('reminderTest.controls')}</Typography>
           <Select
@@ -318,8 +358,10 @@ export default function TestToolsPage() {
             }}
             helperText={timezoneLoading ? t('reminderTest.timezoneLoading') : t('reminderTest.timezoneHint')}
             select
-            SelectProps={{
-              native: false,
+            slotProps={{
+              select: {
+                native: false,
+              },
             }}
           >
             {timezoneOptions.length === 0 ? (
@@ -348,13 +390,15 @@ export default function TestToolsPage() {
         </Box>
 
         <Box
-          p={3}
-          border="1px solid"
-          borderColor="divider"
-          borderRadius={0.5}
-          display="flex"
-          flexDirection="column"
-          gap={2}
+          sx={{
+            p: 3,
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: 0.5,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+          }}
         >
           <Typography variant="subtitle1">{t('reminderTest.snapshot')}</Typography>
           {snapshot ? (
@@ -393,7 +437,12 @@ export default function TestToolsPage() {
               ))}
             </Stack>
           ) : (
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+              }}
+            >
               {t('common.noData')}
             </Typography>
           )}
@@ -401,16 +450,23 @@ export default function TestToolsPage() {
       </Box>
 
       <Box
-        p={3}
-        border="1px solid"
-        borderColor="divider"
-        borderRadius={0.5}
-        display="flex"
-        flexDirection="column"
-        gap={1.5}
+        sx={{
+          p: 3,
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 0.5,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1.5,
+        }}
       >
         <Typography variant="subtitle1">{t('reminderTest.settings')}</Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary',
+          }}
+        >
           {t('reminderTest.settingsSummary', {
             persistent: settings?.notification.persistentReminder ? t('common.yes') : t('common.no'),
             autoDismiss: settings?.notification.autoDismissSeconds ?? 0,
@@ -430,7 +486,9 @@ export default function TestToolsPage() {
             fullWidth
             multiline
             minRows={4}
-            InputProps={{ readOnly: true }}
+            slotProps={{
+              input: { readOnly: true },
+            }}
           />
         )}
       </Box>

@@ -116,9 +116,7 @@ function formatOffsetValue(value: number) {
 function buildExportMetadata(settings: ReturnType<typeof useAppStore.getState>['settings']): ExportMetadataSummary {
   const methodLabel =
     (CALCULATION_METHODS.find((method) => method.value === settings?.prayer.method)?.labelKey
-      ? i18n.t(
-          CALCULATION_METHODS.find((method) => method.value === settings?.prayer.method)?.labelKey as string,
-        )
+      ? i18n.t(CALCULATION_METHODS.find((method) => method.value === settings?.prayer.method)?.labelKey as string)
       : settings?.prayer.method) ?? i18n.t('common.unknown');
 
   if (!settings) {
@@ -169,13 +167,8 @@ async function getHijriMonthRangeForDate(date: Dayjs): Promise<HijriMonthRange |
   const hijriDate = await getHijriForDate(isoDate);
   const searchStart = date.subtract(40, 'day');
   const searchEnd = date.add(40, 'day');
-  const rangeDays = await getHijriDateRange(
-    searchStart.format('YYYY-MM-DD'),
-    searchEnd.format('YYYY-MM-DD'),
-  );
-  const monthDays = rangeDays.filter(
-    (day) => day.hijri.year === hijriDate.year && day.hijri.month === hijriDate.month,
-  );
+  const rangeDays = await getHijriDateRange(searchStart.format('YYYY-MM-DD'), searchEnd.format('YYYY-MM-DD'));
+  const monthDays = rangeDays.filter((day) => day.hijri.year === hijriDate.year && day.hijri.month === hijriDate.month);
 
   if (monthDays.length === 0) {
     return null;
@@ -207,10 +200,8 @@ export default function PrayerTimes() {
   const [exportProgress, setExportProgress] = useState<ExportProgressState | null>(null);
   const [exportStartDate, setExportStartDate] = useState(() => dayjs().startOf('month'));
   const [exportEndDate, setExportEndDate] = useState(() => dayjs().endOf('month'));
-  const [exportCalendarTheme, setExportCalendarTheme] =
-    useState<CalendarExportTheme>('midnight');
-  const [exportTableLayout, setExportTableLayout] =
-    useState<PrayerTableLayout>('horizontal');
+  const [exportCalendarTheme, setExportCalendarTheme] = useState<CalendarExportTheme>('midnight');
+  const [exportTableLayout, setExportTableLayout] = useState<PrayerTableLayout>('horizontal');
   const [useTwoColumnPrayerGrid, setUseTwoColumnPrayerGrid] = useState(true);
   const [exportSchedulesData, setExportSchedulesData] = useState<DaySchedule[]>([]);
   const [exportHijriDaysData, setExportHijriDaysData] = useState<HijriCalendarDay[]>([]);
@@ -243,10 +234,7 @@ export default function PrayerTimes() {
     () => getMonthsInRange(exportStartDate, exportEndDate),
     [exportEndDate, exportStartDate],
   );
-  const exportHijriByDate = useMemo(
-    () => buildHijriMap(exportHijriDaysData),
-    [exportHijriDaysData],
-  );
+  const exportHijriByDate = useMemo(() => buildHijriMap(exportHijriDaysData), [exportHijriDaysData]);
   const hijriByDate = useMemo(() => buildHijriMap(hijriDays), [hijriDays]);
   const selectedHijri = useMemo(
     () => hijriByDate[selectedDate.format('YYYY-MM-DD')] ?? null,
@@ -406,11 +394,7 @@ export default function PrayerTimes() {
     }
 
     let active = true;
-    if (
-      hijriRange &&
-      !selectedDate.isBefore(hijriRange.start, 'day') &&
-      !selectedDate.isAfter(hijriRange.end, 'day')
-    ) {
+    if (hijriRange && !selectedDate.isBefore(hijriRange.start, 'day') && !selectedDate.isAfter(hijriRange.end, 'day')) {
       return () => {
         active = false;
       };
@@ -498,10 +482,7 @@ export default function PrayerTimes() {
       const seed = selectedDate.add(yearDiff * 354, 'day');
       const rangeStart = seed.subtract(430, 'day');
       const rangeEnd = seed.add(430, 'day');
-      const days = await getHijriDateRange(
-        rangeStart.format('YYYY-MM-DD'),
-        rangeEnd.format('YYYY-MM-DD'),
-      );
+      const days = await getHijriDateRange(rangeStart.format('YYYY-MM-DD'), rangeEnd.format('YYYY-MM-DD'));
       const matches = days
         .filter((day) => day.hijri.year === year && day.hijri.month === month)
         .sort((a, b) => a.date.localeCompare(b.date));
@@ -604,8 +585,7 @@ export default function PrayerTimes() {
         }
 
         const progress =
-          calendarProgressStart +
-          ((index + 1) / months.length) * (calendarProgressEnd - calendarProgressStart);
+          calendarProgressStart + ((index + 1) / months.length) * (calendarProgressEnd - calendarProgressStart);
         updateExportProgress(
           progress,
           t('export.progress.renderingCalendar'),
@@ -628,11 +608,7 @@ export default function PrayerTimes() {
         compress: true,
       });
 
-      const addCanvasPage = (
-        canvas: HTMLCanvasElement,
-        addNewPage: boolean,
-        orientation: 'landscape' | 'portrait',
-      ) => {
+      const addCanvasPage = (canvas: HTMLCanvasElement, addNewPage: boolean, orientation: 'landscape' | 'portrait') => {
         if (addNewPage) {
           pdf.addPage(
             orientation === 'portrait' ? [794, 1123] : [1123, 794],
@@ -687,17 +663,8 @@ export default function PrayerTimes() {
           }),
         );
 
-        const tableCanvas = await captureElement(
-          tableRef,
-          request.quality,
-          request.qualityScale,
-          '#ffffff',
-        );
-        addCanvasPage(
-          tableCanvas,
-          !isFirstPage,
-          request.tableLayout === 'vertical' ? 'portrait' : 'landscape',
-        );
+        const tableCanvas = await captureElement(tableRef, request.quality, request.qualityScale, '#ffffff');
+        addCanvasPage(tableCanvas, !isFirstPage, request.tableLayout === 'vertical' ? 'portrait' : 'landscape');
         isFirstPage = false;
       }
 
@@ -718,7 +685,12 @@ export default function PrayerTimes() {
   };
 
   return (
-    <Box p={4} mx="auto">
+    <Box
+      sx={{
+        p: 4,
+        mx: 'auto',
+      }}
+    >
       <PrayerTimesHeader onExport={() => setExportDialogOpen(true)} />
 
       <PrayerTimesControls
@@ -793,10 +765,20 @@ export default function PrayerTimes() {
         >
           <Stack spacing={2}>
             <Box>
-              <Typography variant="h6" fontWeight={700}>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 700,
+                }}
+              >
                 {t('export.backdrop.title')}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                }}
+              >
                 {exportProgress?.title ?? t('export.progress.preparingTitle')}
               </Typography>
             </Box>
@@ -807,16 +789,37 @@ export default function PrayerTimes() {
               sx={{ height: 10, borderRadius: 999 }}
             />
 
-            <Box display="flex" justifyContent="space-between" gap={2}>
-              <Typography variant="body2" color="text.secondary">
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                gap: 2,
+              }}
+            >
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                }}
+              >
                 {exportProgress?.detail ?? t('export.backdrop.detail')}
               </Typography>
-              <Typography variant="body2" fontWeight={700}>
+              <Typography
+                variant="body2"
+                sx={{
+                  fontWeight: 700,
+                }}
+              >
                 {Math.round(exportProgress?.progress ?? 0)}%
               </Typography>
             </Box>
 
-            <Typography variant="caption" color="text.secondary">
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+              }}
+            >
               {t('export.backdrop.locked')}
             </Typography>
           </Stack>
@@ -843,9 +846,7 @@ export default function PrayerTimes() {
             >
               <ExportCalendarPdfPage
                 activeMonth={month}
-                hijriRangeLabel={getHijriMonthRangeLabel(
-                  exportHijriDaysByMonth[month.format('YYYY-MM')] ?? [],
-                )}
+                hijriRangeLabel={getHijriMonthRangeLabel(exportHijriDaysByMonth[month.format('YYYY-MM')] ?? [])}
                 hijriByDate={exportHijriByDate}
                 exportStartDate={exportStartDate}
                 exportEndDate={exportEndDate}

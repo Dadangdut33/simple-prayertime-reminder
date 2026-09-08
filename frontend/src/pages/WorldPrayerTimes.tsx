@@ -290,7 +290,12 @@ export default function WorldPrayerTimes() {
   };
 
   return (
-    <Box px={{ xs: 2.5, md: 4 }} py={{ xs: 3, md: 4 }}>
+    <Box
+      sx={{
+        px: { xs: 2.5, md: 4 },
+        py: { xs: 3, md: 4 },
+      }}
+    >
       <WorldPrayerHeader sortBy={sortBy} onSortChange={setSortBy} onAddCity={() => setDialogOpen(true)} />
 
       {cities.length === 0 ? (
@@ -304,15 +309,31 @@ export default function WorldPrayerTimes() {
             bgcolor: 'background.paper',
           }}
         >
-          <Typography variant="h6" mb={1}>
+          <Typography
+            variant="h6"
+            sx={{
+              mb: 1,
+            }}
+          >
             {t('worldPrayer.emptyTitle')}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {t('worldPrayer.emptyBody')}
           </Typography>
         </Paper>
       ) : loading ? (
-        <Box display="flex" flexDirection="column" gap={2.5}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2.5,
+          }}
+        >
           {[0, 1, 2].map((index) => (
             <Paper
               key={index}
@@ -324,15 +345,33 @@ export default function WorldPrayerTimes() {
                 bgcolor: 'background.paper',
               }}
             >
-              <Box display="flex" justifyContent="space-between" gap={2} mb={2}>
-                <Box flex={1}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  gap: 2,
+                  mb: 2,
+                }}
+              >
+                <Box
+                  sx={{
+                    flex: 1,
+                  }}
+                >
                   <Skeleton variant="text" width="55%" height={28} />
                   <Skeleton variant="text" width="35%" height={20} />
                   <Skeleton variant="text" width="45%" height={18} />
                 </Box>
                 <Skeleton variant="circular" width={28} height={28} />
               </Box>
-              <Box display="grid" gridTemplateColumns={{ xs: '1fr', sm: 'repeat(3, 1fr)' }} gap={1.5} mb={2}>
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' },
+                  gap: 1.5,
+                  mb: 2,
+                }}
+              >
                 {[0, 1, 2].map((slot) => (
                   <Skeleton key={slot} variant="rounded" height={72} />
                 ))}
@@ -351,12 +390,23 @@ export default function WorldPrayerTimes() {
             bgcolor: 'background.paper',
           }}
         >
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {t('worldPrayer.loadError')}
           </Typography>
         </Paper>
       ) : (
-        <Box display="flex" flexDirection="column" gap={3}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 3,
+          }}
+        >
           {sortedSummaries.map((summary) => (
             <WorldPrayerCityCard
               key={getCityKey(summary.city)}
@@ -382,7 +432,12 @@ export default function WorldPrayerTimes() {
       <Dialog open={Boolean(pendingRemoval)} onClose={() => setPendingRemoval(null)} maxWidth="xs" fullWidth>
         <DialogTitle>{t('worldPrayer.removeTitle')}</DialogTitle>
         <DialogContent>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {pendingRemoval
               ? t('worldPrayer.removeBody', { city: formatCityLabel(pendingRemoval) })
               : t('worldPrayer.removeBodyFallback')}
@@ -406,7 +461,14 @@ export default function WorldPrayerTimes() {
       </Dialog>
 
       {cities.length > 0 && sortedSummaries.length > 0 && (
-        <Typography variant="caption" color="text.secondary" display="block" mt={3}>
+        <Typography
+          variant="caption"
+          sx={{
+            color: 'text.secondary',
+            display: 'block',
+            mt: 3,
+          }}
+        >
           {t('worldPrayer.timeDiffNote')}
         </Typography>
       )}

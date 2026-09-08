@@ -15,15 +15,24 @@ export default function SettingsHeader({ saveLabel, saveState, onReset }: Settin
   const { t } = useTranslation();
   return (
     <Box
-      display="flex"
-      justifyContent="space-between"
-      alignItems={{ xs: 'flex-start', md: 'center' }}
-      flexDirection={{ xs: 'column', md: 'row' }}
-      gap={2}
-      mb={4}
+      sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: { xs: 'flex-start', md: 'center' },
+        flexDirection: { xs: 'column', md: 'row' },
+        gap: 2,
+        mb: 4,
+      }}
     >
       <Box>
-        <Box display="flex" alignItems="center" gap={1.5} mb={1.5}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+            mb: 1.5,
+          }}
+        >
           <Box
             sx={{
               width: 40,
@@ -40,16 +49,23 @@ export default function SettingsHeader({ saveLabel, saveState, onReset }: Settin
           </Box>
           <Typography variant="h2">{t('settings.title')}</Typography>
         </Box>
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary',
+          }}
+        >
           {t('settings.headerDescription')}
         </Typography>
       </Box>
 
       <Box
-        display="flex"
-        alignItems={{ xs: 'stretch', md: 'center' }}
-        flexDirection={{ xs: 'column', sm: 'row' }}
-        gap={1}
+        sx={{
+          display: 'flex',
+          alignItems: { xs: 'stretch', md: 'center' },
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: 1,
+        }}
       >
         <Typography variant="body2" color={saveState === 'error' ? 'error.main' : 'text.secondary'}>
           {saveLabel}

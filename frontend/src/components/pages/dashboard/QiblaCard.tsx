@@ -26,10 +26,28 @@ export default function QiblaCard({ location, qiblaDirection, qiblaCompassLabel 
         }}
       />
 
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Box display="flex" alignItems="center" gap={1}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 2,
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+          }}
+        >
           <ExploreIcon fontSize="small" color="primary" />
-          <Typography variant="overline" color="text.secondary">
+          <Typography
+            variant="overline"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {t('dashboard.qibla.title')}
           </Typography>
         </Box>
@@ -43,7 +61,13 @@ export default function QiblaCard({ location, qiblaDirection, qiblaCompassLabel 
         )}
       </Box>
 
-      <Box display="flex" alignItems="center" gap={3.5}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 3.5,
+        }}
+      >
         <Box
           sx={{
             position: 'relative',
@@ -131,16 +155,35 @@ export default function QiblaCard({ location, qiblaDirection, qiblaCompassLabel 
         </Box>
 
         <Box>
-          <Typography variant="body2" color="text.secondary" mb={0.5}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+              mb: 0.5,
+            }}
+          >
             {t('dashboard.qibla.title')}
           </Typography>
           <Typography variant="h2" sx={{ fontSize: '2.35rem', fontVariantNumeric: 'tabular-nums' }}>
             {Math.round(qiblaDirection ?? 0)}°
           </Typography>
-          <Typography variant="body2" color="primary.main" fontWeight={600} mt={0.5}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'primary.main',
+              fontWeight: 600,
+              mt: 0.5,
+            }}
+          >
             {qiblaCompassLabel}
           </Typography>
-          <Typography variant="body2" color="text.secondary" mt={1}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+              mt: 1,
+            }}
+          >
             {t('dashboard.qibla.note')}
           </Typography>
         </Box>

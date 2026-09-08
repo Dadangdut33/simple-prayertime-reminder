@@ -35,6 +35,7 @@ This project was previously Electron-based which comes with chromium meaning hig
     - [Requirements](#requirements)
     - [First-time setup](#first-time-setup)
     - [Run in development mode](#run-in-development-mode)
+    - [Bump App Version (Dev Helper)](#bump-app-version-dev-helper)
     - [Contributing Translations](#contributing-translations)
       - [Using Fake Time](#using-fake-time)
       - [Stopping Rogue Process](#stopping-rogue-process)
@@ -198,7 +199,7 @@ sudo ln -s /usr/lib64/webkit2gtk-4.1 /usr/lib/x86_64-linux-gnu/webkit2gtk-4.1
 
 ### Install via Script
 
-> **Requirements:** [Go 1.21+](https://go.dev/dl/), [pnpm](https://pnpm.io/installation), and [git](https://git-scm.com/)
+> **Requirements:** [Go 1.26+](https://go.dev/dl/), [pnpm](https://pnpm.io/installation), and [git](https://git-scm.com/)
 
 **Linux / macOS**
 
@@ -257,10 +258,18 @@ irm https://raw.githubusercontent.com/dadangdut33/simple-prayertime-reminder/mai
 
 ### Requirements
 
-- Go `1.25+`
-- `pnpm`
+- Go `1.26.0+`
+- Node.js `24` and pnpm `12.3.4` (pinned in `frontend/package.json`)
 - `wails3` CLI
 - Platform dependencies required by Wails/WebView for your OS
+
+On Windows it is recommended to add Git for Windows' `usr/bin` directory to `PATH` so the build
+tasks can find `sh` and `cp`, and keep the Node.js/pnpm directory on `PATH`.
+
+Android builds use Gradle 9.7.1, Android Gradle Plugin 9.4.0, SDK Platform 37,
+and NDK `29.0.14206865`. Install JDK 17 or newer and set `ANDROID_HOME` to your
+Android SDK directory. Android packages now require API 24 or newer because of
+the updated [AndroidX WebKit dependency](https://developer.android.com/jetpack/androidx/releases/webkit).
 
 This repo includes a `Taskfile.yml`, and the Wails CLI can run those tasks directly, so you do not need a separate `task` binary if you use `wails3 task ...`.
 

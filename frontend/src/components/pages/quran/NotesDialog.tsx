@@ -17,7 +17,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
 import AddIcon from '@mui/icons-material/Add';
@@ -128,7 +128,13 @@ export default function NotesDialog({
       <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
         <DialogTitle>{t('quran.notesTitle')}</DialogTitle>
         <DialogContent sx={{ pt: 1.5, pb: 2 }}>
-          <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} mb={2}>
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
+            spacing={2}
+            sx={{
+              mb: 2,
+            }}
+          >
             <TextField
               fullWidth
               size="small"
@@ -153,15 +159,36 @@ export default function NotesDialog({
               {feedback.message}
             </Alert>
           )}
-          <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '300px 1fr' }} gap={2}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', md: '300px 1fr' },
+              gap: 2,
+            }}
+          >
             <Box>
-              <Typography variant="subtitle2" color="text.secondary" mb={1}>
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  color: 'text.secondary',
+                  mb: 1,
+                }}
+              >
                 {t('quran.notesCount', { count: filtered.length })}
               </Typography>
               <List dense sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
                 {filtered.length === 0 ? (
-                  <Box p={2}>
-                    <Typography variant="body2" color="text.secondary">
+                  <Box
+                    sx={{
+                      p: 2,
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: 'text.secondary',
+                      }}
+                    >
                       {t('quran.notesEmpty')}
                     </Typography>
                   </Box>
@@ -178,7 +205,9 @@ export default function NotesDialog({
                         <ListItemText
                           primary={label}
                           secondary={note.body.trim() ? note.body.split('\n')[0] : t('quran.notesEmptyPreview')}
-                          secondaryTypographyProps={{ noWrap: true }}
+                          slotProps={{
+                            secondary: { noWrap: true },
+                          }}
                         />
                       </ListItemButton>
                     );
@@ -187,18 +216,27 @@ export default function NotesDialog({
               </List>
             </Box>
             <Box
-              p={2}
-              border="1px solid"
-              borderColor="divider"
-              borderRadius={1}
-              minHeight={320}
-              display="flex"
-              flexDirection="column"
-              gap={2}
+              sx={{
+                p: 2,
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: 1,
+                minHeight: 320,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2,
+              }}
             >
               {selected ? (
                 <>
-                  <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: 1,
+                    }}
+                  >
                     <Typography variant="subtitle2">{t('quran.notesDetails')}</Typography>
                     <IconButton
                       size="small"
@@ -218,7 +256,12 @@ export default function NotesDialog({
                     onChange={(event) => onUpdate(selected.id, { title: event.target.value })}
                   />
                   <Box>
-                    <Typography variant="subtitle2" mb={1}>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        mb: 1,
+                      }}
+                    >
                       {t('quran.notesBodyLabel')}
                     </Typography>
                     <Box
@@ -274,14 +317,26 @@ export default function NotesDialog({
                       />
                     </Box>
                     {!selected.body.trim() && (
-                      <Typography variant="caption" color="text.secondary" mt={1} display="block">
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: 'text.secondary',
+                          mt: 1,
+                          display: 'block',
+                        }}
+                      >
                         {t('quran.notesEmptyPreview')}
                       </Typography>
                     )}
                   </Box>
                 </>
               ) : (
-                <Typography variant="body2" color="text.secondary">
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: 'text.secondary',
+                  }}
+                >
                   {t('quran.notesEmpty')}
                 </Typography>
               )}
@@ -296,7 +351,12 @@ export default function NotesDialog({
       <Dialog open={Boolean(pendingDelete)} onClose={() => setPendingDelete(null)}>
         <DialogTitle>{t('quran.notesDeleteTitle')}</DialogTitle>
         <DialogContent>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {t('quran.notesDeleteBody')}
           </Typography>
         </DialogContent>

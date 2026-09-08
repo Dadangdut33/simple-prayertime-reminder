@@ -41,39 +41,58 @@ export default function DashboardClockCard({
         }}
       />
 
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="overline" color="text.secondary" fontWeight={600} letterSpacing={1.5}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 2,
+        }}
+      >
+        <Typography
+          variant="overline"
+          sx={{
+            color: 'text.secondary',
+            fontWeight: 600,
+            letterSpacing: 1.5,
+          }}
+        >
           {t('dashboard.clock.title')}
         </Typography>
       </Box>
 
       {settings.dashboard.clockType === 'analog' ? (
         <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
           sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+
             '& .react-clock': {
               borderRadius: '50%',
               overflow: 'hidden',
               transition: 'width 160ms ease, height 160ms ease',
             },
+
             '& .react-clock__face': {
               borderColor: 'divider',
               background: (theme) =>
                 `radial-gradient(circle at top, ${theme.palette.action.hover}, ${theme.palette.background.paper})`,
               boxShadow: (theme) => `inset 0 0 0 1px ${theme.palette.divider}`,
             },
+
             '& .react-clock__hour-mark__body': {
               backgroundColor: 'text.primary',
               borderRadius: 999,
               opacity: 0.92,
             },
+
             '& .react-clock__minute-mark__body': {
               backgroundColor: 'divider',
               borderRadius: 999,
               opacity: 0.9,
             },
+
             '& .react-clock__mark__number': {
               color: 'text.secondary',
               fontFamily: 'Roboto, Segoe UI, sans-serif',
@@ -81,16 +100,19 @@ export default function DashboardClockCard({
               fontSize: `${Math.max(12, analogClockSize * 0.075)}px`,
               lineHeight: 1,
             },
+
             '& .react-clock__hour-hand__body': {
               backgroundColor: 'text.primary',
               borderRadius: 999,
               boxShadow: 1,
             },
+
             '& .react-clock__minute-hand__body': {
               backgroundColor: 'primary.main',
               borderRadius: 999,
               boxShadow: 1,
             },
+
             '& .react-clock__second-hand__body': {
               backgroundColor: 'secondary.main',
               borderRadius: 999,
@@ -128,7 +150,13 @@ export default function DashboardClockCard({
           >
             {digitalClockText}
           </Typography>
-          <Typography variant="body2" color="text.secondary" mt={1}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+              mt: 1,
+            }}
+          >
             {timeZoneLabel ? t('dashboard.clock.timezoneLabel', { tz: timeZoneLabel }) : t('dashboard.clock.localTime')}
           </Typography>
         </Box>

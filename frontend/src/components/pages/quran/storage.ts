@@ -105,9 +105,7 @@ const normalizeData = (data: unknown): QuranData => {
   const bookmarks = Array.isArray(payload.bookmarks)
     ? (payload.bookmarks.map(normalizeBookmark).filter(Boolean) as QuranBookmark[])
     : [];
-  const notes = Array.isArray(payload.notes)
-    ? (payload.notes.map(normalizeNote).filter(Boolean) as QuranNote[])
-    : [];
+  const notes = Array.isArray(payload.notes) ? (payload.notes.map(normalizeNote).filter(Boolean) as QuranNote[]) : [];
   return {
     bookmarks: ensureDefaultBookmark(dedupeBookmarks(bookmarks)),
     notes,
@@ -130,7 +128,7 @@ const loadLegacyItems = () => {
       const list = Array.isArray(parsed)
         ? parsed
         : typeof parsed === 'object' && parsed && 'items' in parsed
-          ? (parsed as { items?: unknown[] }).items ?? []
+          ? ((parsed as { items?: unknown[] }).items ?? [])
           : [];
       legacyBookmarks = list.map(normalizeBookmark).filter(Boolean) as QuranBookmark[];
     }
@@ -146,7 +144,7 @@ const loadLegacyItems = () => {
       const list = Array.isArray(parsed)
         ? parsed
         : typeof parsed === 'object' && parsed && 'items' in parsed
-          ? (parsed as { items?: unknown[] }).items ?? []
+          ? ((parsed as { items?: unknown[] }).items ?? [])
           : [];
       legacyNotes = list.map(normalizeNote).filter(Boolean) as QuranNote[];
     }
@@ -226,17 +224,14 @@ export const useQuranData = () => {
     void saveQuranData(next);
   }, []);
 
-  const updateBookmarks = useCallback(
-    (updater: (prev: QuranBookmark[]) => QuranBookmark[]) => {
-      setData((prev) => {
-        const nextBookmarks = ensureDefaultBookmark(dedupeBookmarks(updater(prev.bookmarks)));
-        const next = { ...prev, bookmarks: nextBookmarks };
-        void saveQuranData(next);
-        return next;
-      });
-    },
-    [],
-  );
+  const updateBookmarks = useCallback((updater: (prev: QuranBookmark[]) => QuranBookmark[]) => {
+    setData((prev) => {
+      const nextBookmarks = ensureDefaultBookmark(dedupeBookmarks(updater(prev.bookmarks)));
+      const next = { ...prev, bookmarks: nextBookmarks };
+      void saveQuranData(next);
+      return next;
+    });
+  }, []);
 
   const updateNotes = useCallback((updater: (prev: QuranNote[]) => QuranNote[]) => {
     setData((prev) => {
@@ -348,7 +343,7 @@ export const useQuranData = () => {
       const list = Array.isArray(incoming)
         ? incoming
         : typeof incoming === 'object' && incoming && 'items' in incoming
-          ? (incoming as { items?: unknown[] }).items ?? []
+          ? ((incoming as { items?: unknown[] }).items ?? [])
           : [];
       const normalized = list.map(normalizeBookmark).filter(Boolean) as QuranBookmark[];
       if (normalized.length === 0) return false;
@@ -363,7 +358,7 @@ export const useQuranData = () => {
       const list = Array.isArray(incoming)
         ? incoming
         : typeof incoming === 'object' && incoming && 'items' in incoming
-          ? (incoming as { items?: unknown[] }).items ?? []
+          ? ((incoming as { items?: unknown[] }).items ?? [])
           : [];
       const normalized = list.map(normalizeNote).filter(Boolean) as QuranNote[];
       if (normalized.length === 0) return false;

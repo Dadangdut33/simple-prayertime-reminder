@@ -4,7 +4,3 @@
 export {
     Location
 } from "./models.js";
-
-export type {
-    Time
-} from "./models.js";
