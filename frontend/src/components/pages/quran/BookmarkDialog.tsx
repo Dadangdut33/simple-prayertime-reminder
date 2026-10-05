@@ -22,9 +22,9 @@ import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { useTranslation } from 'react-i18next';
 import { Dialogs } from '@wailsio/runtime';
-import { readTextFile, saveBase64File } from '../../../bindings';
-import { formatBookmarkSource } from './storage';
-import { QuranBookmark } from '../../../types';
+import { readTextFile, saveBase64File } from '@/bindings';
+import { formatBookmarkSource } from '@/components/pages/quran/storage';
+import { QuranBookmark } from '@/types';
 
 interface BookmarkDialogProps {
   open: boolean;

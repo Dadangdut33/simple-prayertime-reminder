@@ -1,7 +1,7 @@
 import { Box, Button, FormControlLabel, Slider, TextField, Switch, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import NumberField from '../../ui/NumberField';
-import { PRAYER_NAMES, type Settings } from '../../../types';
+import NumberField from '@/components/ui/NumberField';
+import { PRAYER_NAMES, type Settings } from '@/types';
 import { useTranslation } from 'react-i18next';
 import {
   checkNativeNotificationPermission,
@@ -9,7 +9,7 @@ import {
   requestNativeNotificationPermission,
   selectAdhanAudioFile,
   stopAdhan,
-} from '../../../bindings';
+} from '@/bindings';
 interface AlarmSettingsTabProps {
   local: Settings;
   setNotification: (patch: Partial<Settings['notification']>) => void;

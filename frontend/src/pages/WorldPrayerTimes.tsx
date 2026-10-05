@@ -10,13 +10,13 @@ import {
   Skeleton,
   Typography,
 } from '@mui/material';
-import * as api from '../bindings';
-import { useAppStore } from '../store/appStore';
-import type { WorldPrayerCity, WorldPrayerCitySummary, WorldPrayerSort } from '../types';
-import { formatCityLabel } from '../utils/helpers';
-import WorldPrayerHeader from '../components/pages/world-prayer/WorldPrayerHeader';
-import WorldPrayerCityDialog from '../components/pages/world-prayer/WorldPrayerCityDialog';
-import WorldPrayerCityCard from '../components/pages/world-prayer/WorldPrayerCityCard';
+import * as api from '@/bindings';
+import { useAppStore } from '@/store/appStore';
+import type { WorldPrayerCity, WorldPrayerCitySummary, WorldPrayerSort } from '@/types';
+import { formatCityLabel } from '@/utils/helpers';
+import WorldPrayerHeader from '@/components/pages/world-prayer/WorldPrayerHeader';
+import WorldPrayerCityDialog from '@/components/pages/world-prayer/WorldPrayerCityDialog';
+import WorldPrayerCityCard from '@/components/pages/world-prayer/WorldPrayerCityCard';
 import { useTranslation } from 'react-i18next';
 
 const DEFAULT_SORT: WorldPrayerSort = 'name';

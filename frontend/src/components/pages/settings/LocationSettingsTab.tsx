@@ -11,10 +11,10 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import * as api from '../../../bindings';
-import NumberField from '../../ui/NumberField';
-import type { CitySearchResult, GeonamesInfo, Settings } from '../../../types';
-import { formatCityLabel, getCountryName } from '../../../utils/helpers';
+import * as api from '@/bindings';
+import NumberField from '@/components/ui/NumberField';
+import type { CitySearchResult, GeonamesInfo, Settings } from '@/types';
+import { formatCityLabel, getCountryName } from '@/utils/helpers';
 import { useTranslation } from 'react-i18next';
 
 interface LocationSettingsTabProps {

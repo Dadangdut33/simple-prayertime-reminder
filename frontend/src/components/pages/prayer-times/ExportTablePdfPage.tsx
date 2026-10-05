@@ -1,9 +1,9 @@
 import { Box, Grid, Typography } from '@mui/material';
-import type { DaySchedule, HijriDate } from '../../../types';
-import { formatTime, formatTimeInZone } from '../../../utils/helpers';
-import type { ExportMetadataSummary, PrayerTableLayout } from './ExportPrayerTimesDialog';
-import { formatHijriDateShort } from './helpers';
-import i18n from '../../../i18n';
+import type { DaySchedule, HijriDate } from '@/types';
+import { formatTime, formatTimeInZone } from '@/utils/helpers';
+import type { ExportMetadataSummary, PrayerTableLayout } from '@/components/pages/prayer-times/ExportPrayerTimesDialog';
+import { formatHijriDateShort } from '@/components/pages/prayer-times/helpers';
+import i18n from '@/i18n';
 
 interface ExportTablePdfPageProps {
   activeMonthLabel: string;

@@ -27,6 +27,9 @@ import * as notification$0 from "../notification/models.js";
 import * as prayer$0 from "../prayer/models.js";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
+import * as prayersync$0 from "../prayersync/models.js";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
 import * as scheduler$0 from "../scheduler/models.js";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
@@ -176,6 +179,30 @@ export function GetNextPrayer(): $CancellablePromise<prayer$0.NextPrayerInfo> {
     });
 }
 
+export function GetPrayerReferenceLocations(provider: string, parent: string): $CancellablePromise<prayersync$0.TimetableCity[]> {
+    return $Call.ByID(1756503101, provider, parent).then(($result: any) => {
+        return $$createType14($result);
+    });
+}
+
+export function GetPrayerReferenceProviders(): $CancellablePromise<prayersync$0.ProviderInfo[]> {
+    return $Call.ByID(2146340251).then(($result: any) => {
+        return $$createType16($result);
+    });
+}
+
+export function GetPrayerSyncStatus(): $CancellablePromise<prayersync$0.Status> {
+    return $Call.ByID(815211639).then(($result: any) => {
+        return $$createType17($result);
+    });
+}
+
+export function GetPrayerTimetableCities(): $CancellablePromise<prayersync$0.TimetableCity[]> {
+    return $Call.ByID(299299222).then(($result: any) => {
+        return $$createType14($result);
+    });
+}
+
 export function GetQiblaDirection(): $CancellablePromise<number> {
     return $Call.ByID(2384189501);
 }
@@ -186,7 +213,7 @@ export function GetQiblaDirectionFor(lat: number, lon: number): $CancellableProm
 
 export function GetQuranData(): $CancellablePromise<$models.QuranData> {
     return $Call.ByID(2354148668).then(($result: any) => {
-        return $$createType13($result);
+        return $$createType18($result);
     });
 }
 
@@ -195,25 +222,25 @@ export function GetQuranData(): $CancellablePromise<$models.QuranData> {
  */
 export function GetReminderDebugSchedule(): $CancellablePromise<$models.ReminderDebugEntry[]> {
     return $Call.ByID(1456279359).then(($result: any) => {
-        return $$createType15($result);
+        return $$createType20($result);
     });
 }
 
 export function GetReminderInfo(): $CancellablePromise<notification$0.ReminderInfo | null> {
     return $Call.ByID(3787072775).then(($result: any) => {
-        return $$createType17($result);
+        return $$createType22($result);
     });
 }
 
 export function GetReminderState(): $CancellablePromise<notification$0.ReminderInfo | null> {
     return $Call.ByID(479880836).then(($result: any) => {
-        return $$createType17($result);
+        return $$createType22($result);
     });
 }
 
 export function GetReminderTestSnapshot(prayerName: string, offsetSeconds: number, timezone: string): $CancellablePromise<$models.ReminderTestSnapshot> {
     return $Call.ByID(2916182751, prayerName, offsetSeconds, timezone).then(($result: any) => {
-        return $$createType18($result);
+        return $$createType23($result);
     });
 }
 
@@ -231,25 +258,25 @@ export function GetScheduleRange(startDate: string, endDate: string): $Cancellab
 
 export function GetSettings(): $CancellablePromise<settings$0.Settings> {
     return $Call.ByID(1855413340).then(($result: any) => {
-        return $$createType19($result);
+        return $$createType24($result);
     });
 }
 
 export function GetTestReminderInfo(): $CancellablePromise<notification$0.ReminderInfo | null> {
     return $Call.ByID(904619519).then(($result: any) => {
-        return $$createType17($result);
+        return $$createType22($result);
     });
 }
 
 export function GetTestReminderState(): $CancellablePromise<notification$0.ReminderInfo | null> {
     return $Call.ByID(3437621020).then(($result: any) => {
-        return $$createType17($result);
+        return $$createType22($result);
     });
 }
 
 export function GetTimezones(): $CancellablePromise<string[]> {
     return $Call.ByID(3432876695).then(($result: any) => {
-        return $$createType20($result);
+        return $$createType25($result);
     });
 }
 
@@ -267,7 +294,7 @@ export function GetTodaySchedule(): $CancellablePromise<prayer$0.DaySchedule> {
 
 export function GetWorldPrayerTimes(cities: settings$0.WorldPrayerCity[]): $CancellablePromise<$models.WorldPrayerCitySummary[]> {
     return $Call.ByID(4281561666, cities).then(($result: any) => {
-        return $$createType22($result);
+        return $$createType27($result);
     });
 }
 
@@ -293,7 +320,7 @@ export function RequestNativeNotificationPermission(): $CancellablePromise<boole
 
 export function ResetSettings(): $CancellablePromise<settings$0.Settings> {
     return $Call.ByID(1081576467).then(($result: any) => {
-        return $$createType19($result);
+        return $$createType24($result);
     });
 }
 
@@ -315,13 +342,13 @@ export function SaveSettings(cfg: settings$0.Settings): $CancellablePromise<void
 
 export function SearchCities(query: string, limit: number): $CancellablePromise<geonames$0.City[]> {
     return $Call.ByID(2775474700, query, limit).then(($result: any) => {
-        return $$createType24($result);
+        return $$createType29($result);
     });
 }
 
 export function SearchTimezones(query: string, limit: number): $CancellablePromise<string[]> {
     return $Call.ByID(3774805361, query, limit).then(($result: any) => {
-        return $$createType20($result);
+        return $$createType25($result);
     });
 }
 
@@ -341,15 +368,21 @@ export function StopAdhan(): $CancellablePromise<void> {
     return $Call.ByID(2479816481);
 }
 
+export function SyncPrayerOffsets(): $CancellablePromise<prayersync$0.Status> {
+    return $Call.ByID(656955865).then(($result: any) => {
+        return $$createType17($result);
+    });
+}
+
 export function SyncReminderTestWindow(prayerName: string, offsetSeconds: number, timezone: string, live: boolean): $CancellablePromise<$models.ReminderTestSnapshot> {
     return $Call.ByID(3232718466, prayerName, offsetSeconds, timezone, live).then(($result: any) => {
-        return $$createType18($result);
+        return $$createType23($result);
     });
 }
 
 export function TriggerReminderTest(prayerName: string, offsetSeconds: number, timezone: string, live: boolean): $CancellablePromise<$models.ReminderTestSnapshot> {
     return $Call.ByID(2478091023, prayerName, offsetSeconds, timezone, live).then(($result: any) => {
-        return $$createType18($result);
+        return $$createType23($result);
     });
 }
 
@@ -373,15 +406,20 @@ const $$createType9 = hijri$0.HijriDate.createFrom;
 const $$createType10 = prayer$0.DaySchedule.createFrom;
 const $$createType11 = $Create.Array($$createType10);
 const $$createType12 = prayer$0.NextPrayerInfo.createFrom;
-const $$createType13 = $models.QuranData.createFrom;
-const $$createType14 = $models.ReminderDebugEntry.createFrom;
-const $$createType15 = $Create.Array($$createType14);
-const $$createType16 = notification$0.ReminderInfo.createFrom;
-const $$createType17 = $Create.Nullable($$createType16);
-const $$createType18 = $models.ReminderTestSnapshot.createFrom;
-const $$createType19 = settings$0.Settings.createFrom;
-const $$createType20 = $Create.Array($Create.Any);
-const $$createType21 = $models.WorldPrayerCitySummary.createFrom;
-const $$createType22 = $Create.Array($$createType21);
-const $$createType23 = geonames$0.City.createFrom;
-const $$createType24 = $Create.Array($$createType23);
+const $$createType13 = prayersync$0.TimetableCity.createFrom;
+const $$createType14 = $Create.Array($$createType13);
+const $$createType15 = prayersync$0.ProviderInfo.createFrom;
+const $$createType16 = $Create.Array($$createType15);
+const $$createType17 = prayersync$0.Status.createFrom;
+const $$createType18 = $models.QuranData.createFrom;
+const $$createType19 = $models.ReminderDebugEntry.createFrom;
+const $$createType20 = $Create.Array($$createType19);
+const $$createType21 = notification$0.ReminderInfo.createFrom;
+const $$createType22 = $Create.Nullable($$createType21);
+const $$createType23 = $models.ReminderTestSnapshot.createFrom;
+const $$createType24 = settings$0.Settings.createFrom;
+const $$createType25 = $Create.Array($Create.Any);
+const $$createType26 = $models.WorldPrayerCitySummary.createFrom;
+const $$createType27 = $Create.Array($$createType26);
+const $$createType28 = geonames$0.City.createFrom;
+const $$createType29 = $Create.Array($$createType28);

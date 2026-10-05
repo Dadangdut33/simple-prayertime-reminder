@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import { ThemeProvider as MuiThemeProvider, CssBaseline, useMediaQuery } from '@mui/material';
-import { useAppStore } from './store/appStore';
-import { buildAppTheme } from './theme';
-import type { ThemePreset } from './types';
+import { useAppStore } from '@/store/appStore';
+import { buildAppTheme } from '@/theme';
+import type { ThemePreset } from '@/types';
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
   const settings = useAppStore((state) => state.settings);

@@ -6,11 +6,11 @@ import UpdateIcon from '@mui/icons-material/Update';
 import FolderOpenOutlinedIcon from '@mui/icons-material/FolderOpenOutlined';
 import ComputerOutlinedIcon from '@mui/icons-material/ComputerOutlined';
 import Package2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
-import packageJson from '../../package.json';
-import * as api from '../bindings';
-import type { AppInfo, UpdateInfo } from '../types';
+import packageJson from '@frontend/package.json';
+import * as api from '@/bindings';
+import type { AppInfo, UpdateInfo } from '@/types';
 import { useTranslation } from 'react-i18next';
-import { useAppStore } from '../store/appStore';
+import { useAppStore } from '@/store/appStore';
 
 type LatestReleaseState = {
   status: 'idle' | 'checking' | 'success' | 'error';

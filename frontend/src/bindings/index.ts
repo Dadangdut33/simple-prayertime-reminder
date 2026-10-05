@@ -1,4 +1,4 @@
-import { Service as AppService } from '../../bindings/github.com/dadangdut33/simple-prayertime-reminder/internal/appservice/index.ts';
+import { Service as AppService } from '@bindings/github.com/dadangdut33/simple-prayertime-reminder/internal/appservice/index.ts';
 import type {
   AppInfo,
   CitySearchResult,
@@ -16,7 +16,9 @@ import type {
   QuranData,
   WorldPrayerCitySummary,
   UpdateInfo,
-} from '../types';
+  PrayerSyncStatus,
+  PrayerReferenceProvider,
+} from '@/types';
 
 // ---- Settings ----
 export const getSettings = (): Promise<Settings> =>
@@ -53,6 +55,12 @@ export const setManualLocation = (loc: Location): Promise<void> =>
   AppService.SetManualLocation(loc as any) as any;
 
 // ---- Prayer ----
+export const getPrayerSyncStatus = (): Promise<PrayerSyncStatus> => AppService.GetPrayerSyncStatus();
+export const getPrayerReferenceProviders = (): Promise<PrayerReferenceProvider[]> =>
+  AppService.GetPrayerReferenceProviders() as any;
+export const getPrayerTimetableCities = (): Promise<{ id: string; lokasi: string }[]> => AppService.GetPrayerTimetableCities();
+export const getPrayerReferenceLocations = (provider: string, parent = ''): Promise<{ id: string; lokasi: string }[]> => AppService.GetPrayerReferenceLocations(provider, parent);
+export const syncPrayerOffsets = (): Promise<PrayerSyncStatus> => AppService.SyncPrayerOffsets();
 export const getTodaySchedule = (): Promise<DaySchedule> =>
   AppService.GetTodaySchedule() as any;
 export const getScheduleForDate = (dateStr: string): Promise<DaySchedule> =>

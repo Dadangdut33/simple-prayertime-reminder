@@ -24,6 +24,7 @@ type Service struct {
 	audioSvc       *audio.Service
 	notifSvc       *notification.Service
 	stopCh         chan struct{}
+	lifecycleMu    sync.Mutex
 	cfgMu          sync.RWMutex
 	cfg            settings.Settings
 	monitorOnce    sync.Once

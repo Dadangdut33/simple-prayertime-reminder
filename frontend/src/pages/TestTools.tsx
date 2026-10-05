@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import { useTranslation } from 'react-i18next';
-import { useAppStore } from '../store/appStore';
+import { useAppStore } from '@/store/appStore';
 import {
   getDebugTimeInfo,
   getReminderTestSnapshot,
@@ -24,10 +24,10 @@ import {
   syncReminderTestWindow,
   triggerReminderTest,
   closeTestReminderWindow,
-} from '../bindings';
-import type { DebugTimeInfo, ReminderTestSnapshot, UpdateInfo } from '../types';
-import NumberField from '../components/ui/NumberField';
-import UpdateAvailableDialog from '../components/app/UpdateAvailableDialog';
+} from '@/bindings';
+import type { DebugTimeInfo, ReminderTestSnapshot, UpdateInfo } from '@/types';
+import NumberField from '@/components/ui/NumberField';
+import UpdateAvailableDialog from '@/components/app/UpdateAvailableDialog';
 
 const PRAYER_OPTIONS = ['Fajr', 'Sunrise', 'Zuhr', 'Asr', 'Maghrib', 'Isha'] as const;
 

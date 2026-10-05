@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { useAppStore } from './store/appStore';
-import * as api from './bindings';
-import type { ReminderInfo } from './types';
-import UpdateAvailableDialog from './components/app/UpdateAvailableDialog';
+import { useAppStore } from '@/store/appStore';
+import * as api from '@/bindings';
+import type { ReminderInfo } from '@/types';
+import UpdateAvailableDialog from '@/components/app/UpdateAvailableDialog';
 import { useTranslation } from 'react-i18next';
-import Onboarding from './pages/Onboarding';
+import Onboarding from '@/pages/Onboarding';
 import { Events } from '@wailsio/runtime';
-import { getPrayerDisplayName } from './utils/helpers';
+import { getPrayerDisplayName } from '@/utils/helpers';
 
 import {
   Box,
@@ -40,7 +40,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
-import appLogo from '../../assets/icons/icon.png';
+import appLogo from '@assets/icons/icon.png';
 
 const DRAWER_WIDTH = 240;
 const DRAWER_COLLAPSED_WIDTH = 78;

@@ -3,14 +3,14 @@ import { Box, Card, Chip, Collapse, Divider, IconButton, Typography } from '@mui
 import CloseIcon from '@mui/icons-material/Close';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import type { WorldPrayerCitySummary } from '../../../types';
+import type { WorldPrayerCitySummary } from '@/types';
 import {
   formatCityLabel,
   formatOffsetSeconds,
   formatTimeInZone,
   getPrayerDisplayName,
   getPrayerList,
-} from '../../../utils/helpers';
+} from '@/utils/helpers';
 import { useTranslation } from 'react-i18next';
 
 interface WorldPrayerCityCardProps {

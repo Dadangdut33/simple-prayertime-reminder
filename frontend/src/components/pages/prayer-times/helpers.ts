@@ -1,6 +1,6 @@
 import dayjs, { type Dayjs } from 'dayjs';
-import type { DaySchedule, HijriCalendarDay, HijriDate } from '../../../types';
-import i18n from '../../../i18n';
+import type { DaySchedule, HijriCalendarDay, HijriDate } from '@/types';
+import i18n from '@/i18n';
 
 export type CalendarMode = 'gregorian' | 'hijri';
 

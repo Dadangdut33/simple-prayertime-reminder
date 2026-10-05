@@ -84,3 +84,47 @@ export class NextPrayerInfo {
         return new NextPrayerInfo($$parsedSource as Partial<NextPrayerInfo>);
     }
 }
+
+/**
+ * PrayerOffsets stores minute-based offsets for each prayer
+ */
+export class PrayerOffsets {
+    "fajr": number;
+    "sunrise": number;
+    "zuhr": number;
+    "asr": number;
+    "maghrib": number;
+    "isha": number;
+
+    /** Creates a new PrayerOffsets instance. */
+    constructor($$source: Partial<PrayerOffsets> = {}) {
+        if (!("fajr" in $$source)) {
+            this["fajr"] = 0;
+        }
+        if (!("sunrise" in $$source)) {
+            this["sunrise"] = 0;
+        }
+        if (!("zuhr" in $$source)) {
+            this["zuhr"] = 0;
+        }
+        if (!("asr" in $$source)) {
+            this["asr"] = 0;
+        }
+        if (!("maghrib" in $$source)) {
+            this["maghrib"] = 0;
+        }
+        if (!("isha" in $$source)) {
+            this["isha"] = 0;
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new PrayerOffsets instance from a string or object.
+     */
+    static createFrom($$source: any = {}): PrayerOffsets {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new PrayerOffsets($$parsedSource as Partial<PrayerOffsets>);
+    }
+}

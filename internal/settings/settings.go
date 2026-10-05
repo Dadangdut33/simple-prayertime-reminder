@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/geonames"
+	"github.com/dadangdut33/simple-prayertime-reminder/internal/prayersync"
 )
 
 func worldPrayerCityFromGeonames(city geonames.City) WorldPrayerCity {
@@ -118,6 +119,7 @@ func DefaultSettings() Settings {
 			Timezone:   "Asia/Jakarta",
 		},
 		Prayer: PrayerSettings{
+			AutoOffset:            prayersync.DefaultConfig(),
 			Method:                "MWL",
 			AsrMethod:             "Shafii",
 			Offsets:               PrayerOffsets{},
@@ -199,6 +201,8 @@ func NewService(configDir string) (*Service, error) {
 
 // Load reads settings from disk (merges with defaults for any missing fields)
 func (s *Service) Load() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	data, err := os.ReadFile(s.configPath)
 	if err != nil {
 		return err
@@ -215,6 +219,9 @@ func (s *Service) Load() error {
 	if !hasOnboarding {
 		loaded.OnboardingCompleted = true
 	}
+	if err := loaded.Prayer.AutoOffset.Validate(); err != nil {
+		loaded.Prayer.AutoOffset = prayersync.DefaultConfig()
+	}
 
 	s.settings = loaded
 	log.Info("settings read from disk", "path", s.configPath)
@@ -223,6 +230,12 @@ func (s *Service) Load() error {
 
 // Save writes settings to disk
 func (s *Service) Save() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.saveLocked()
+}
+
+func (s *Service) saveLocked() error {
 	data, err := json.MarshalIndent(s.settings, "", "  ")
 	if err != nil {
 		return fmt.Errorf("failed to marshal settings: %w", err)
@@ -236,28 +249,53 @@ func (s *Service) Save() error {
 
 // Get returns the current settings
 func (s *Service) Get() Settings {
-	return s.settings
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	result := s.settings
+	result.WorldPrayer.Cities = append([]WorldPrayerCity(nil), result.WorldPrayer.Cities...)
+	return result
 }
 
 // Update replaces the current settings and saves them
 func (s *Service) Update(updated Settings) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if err := updated.Prayer.AutoOffset.Validate(); err != nil {
+		return err
+	}
+	previous := s.settings
 	s.settings = updated
+	s.settings.WorldPrayer.Cities = append([]WorldPrayerCity(nil), updated.WorldPrayer.Cities...)
 	log.Info("settings updated")
-	return s.Save()
+	if err := s.saveLocked(); err != nil {
+		s.settings = previous
+		return err
+	}
+	return nil
 }
 
 // UpdatePartial allows updating specific fields while preserving others
 func (s *Service) UpdatePartial(updater func(*Settings)) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	previous := s.settings
+	s.settings.WorldPrayer.Cities = append([]WorldPrayerCity(nil), previous.WorldPrayer.Cities...)
 	updater(&s.settings)
+	if err := s.settings.Prayer.AutoOffset.Validate(); err != nil {
+		s.settings = previous
+		return err
+	}
 	log.Info("settings updated (partial)")
-	return s.Save()
+	if err := s.saveLocked(); err != nil {
+		s.settings = previous
+		return err
+	}
+	return nil
 }
 
 // Reset restores default settings and saves them
 func (s *Service) Reset() error {
-	s.settings = defaultSettings()
-	log.Info("settings reset to default")
-	return s.Save()
+	return s.Update(defaultSettings())
 }
 
 func defaultSettings() Settings {

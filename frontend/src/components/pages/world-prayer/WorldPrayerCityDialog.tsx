@@ -11,9 +11,9 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import * as api from '../../../bindings';
-import type { CitySearchResult } from '../../../types';
-import { formatCityLabel } from '../../../utils/helpers';
+import * as api from '@/bindings';
+import type { CitySearchResult } from '@/types';
+import { formatCityLabel } from '@/utils/helpers';
 import { useTranslation } from 'react-i18next';
 
 interface WorldPrayerCityDialogProps {

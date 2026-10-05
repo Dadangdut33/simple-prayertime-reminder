@@ -3,18 +3,18 @@ import { useMemo } from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import type { Dayjs } from 'dayjs';
-import type { DaySchedule, HijriCalendarDay, PrayerCalendarSystem } from '../../../types';
+import type { DaySchedule, HijriCalendarDay, PrayerCalendarSystem } from '@/types';
 import {
   buildHijriMap,
   buildScheduleMap,
   formatHijriDateLabel,
   formatMonthHeading,
   getHijriMonthRangeLabel,
-} from './helpers';
-import PrayerMonthCalendarCard from './PrayerMonthCalendarCard';
-import SelectedDayScheduleCard from './SelectedDayScheduleCard';
+} from '@/components/pages/prayer-times/helpers';
+import PrayerMonthCalendarCard from '@/components/pages/prayer-times/PrayerMonthCalendarCard';
+import SelectedDayScheduleCard from '@/components/pages/prayer-times/SelectedDayScheduleCard';
 import { useTranslation } from 'react-i18next';
-import i18n from '../../../i18n';
+import i18n from '@/i18n';
 
 interface PrayerTimesCalendarViewProps {
   activeMonth: Dayjs;

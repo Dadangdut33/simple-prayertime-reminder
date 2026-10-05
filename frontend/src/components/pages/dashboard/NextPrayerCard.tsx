@@ -1,5 +1,5 @@
 import { Box, Card, Chip, LinearProgress, Typography } from '@mui/material';
-import { formatDuration, formatTime, formatTimeInZone } from '../../../utils/helpers';
+import { formatDuration, formatTime, formatTimeInZone } from '@/utils/helpers';
 import { useTranslation } from 'react-i18next';
 
 interface PrayerMoment {

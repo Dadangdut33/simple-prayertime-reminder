@@ -24,9 +24,9 @@ import AddIcon from '@mui/icons-material/Add';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import { Dialogs } from '@wailsio/runtime';
-import { readTextFile, saveBase64File } from '../../../bindings';
-import { formatNotePreview } from './storage';
-import { QuranNote } from '../../../types';
+import { readTextFile, saveBase64File } from '@/bindings';
+import { formatNotePreview } from '@/components/pages/quran/storage';
+import { QuranNote } from '@/types';
 
 interface NotesDialogProps {
   open: boolean;

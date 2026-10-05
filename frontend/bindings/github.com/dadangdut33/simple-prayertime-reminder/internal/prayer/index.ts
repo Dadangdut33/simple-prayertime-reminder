@@ -3,5 +3,6 @@
 
 export {
     DaySchedule,
-    NextPrayerInfo
+    NextPrayerInfo,
+    PrayerOffsets
 } from "./models.js";

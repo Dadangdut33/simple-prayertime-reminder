@@ -10,6 +10,12 @@
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@bindings/*": ["./bindings/*"],
+      "@assets/*": ["./../assets/*"],
+      "@frontend/*": ["./*"]
+    },
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",

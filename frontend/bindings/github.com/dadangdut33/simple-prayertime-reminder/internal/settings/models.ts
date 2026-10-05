@@ -5,6 +5,10 @@
 // @ts-ignore: Unused imports
 import { Create as $Create } from "@wailsio/runtime";
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
+import * as prayersync$0 from "../prayersync/models.js";
+
 /**
  * DashboardSettings controls dashboard widgets and presentation.
  */
@@ -358,6 +362,7 @@ export class PrayerOffsets {
  * PrayerSettings holds prayer calculation configuration
  */
 export class PrayerSettings {
+    "autoOffset": prayersync$0.Config;
     "method": string;
     "asrMethod": string;
     "offsets": PrayerOffsets;
@@ -367,6 +372,9 @@ export class PrayerSettings {
 
     /** Creates a new PrayerSettings instance. */
     constructor($$source: Partial<PrayerSettings> = {}) {
+        if (!("autoOffset" in $$source)) {
+            this["autoOffset"] = (new prayersync$0.Config());
+        }
         if (!("method" in $$source)) {
             this["method"] = "";
         }
@@ -393,10 +401,14 @@ export class PrayerSettings {
      * Creates a new PrayerSettings instance from a string or object.
      */
     static createFrom($$source: any = {}): PrayerSettings {
-        const $$createField2_0 = $$createType2;
+        const $$createField0_0 = $$createType2;
+        const $$createField3_0 = $$createType3;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        if ("autoOffset" in $$parsedSource) {
+            $$parsedSource["autoOffset"] = $$createField0_0($$parsedSource["autoOffset"]);
+        }
         if ("offsets" in $$parsedSource) {
-            $$parsedSource["offsets"] = $$createField2_0($$parsedSource["offsets"]);
+            $$parsedSource["offsets"] = $$createField3_0($$parsedSource["offsets"]);
         }
         return new PrayerSettings($$parsedSource as Partial<PrayerSettings>);
     }
@@ -528,12 +540,12 @@ export class Settings {
      * Creates a new Settings instance from a string or object.
      */
     static createFrom($$source: any = {}): Settings {
-        const $$createField0_0 = $$createType3;
-        const $$createField1_0 = $$createType4;
-        const $$createField2_0 = $$createType5;
-        const $$createField3_0 = $$createType6;
-        const $$createField4_0 = $$createType7;
-        const $$createField5_0 = $$createType8;
+        const $$createField0_0 = $$createType4;
+        const $$createField1_0 = $$createType5;
+        const $$createField2_0 = $$createType6;
+        const $$createField3_0 = $$createType7;
+        const $$createField4_0 = $$createType8;
+        const $$createField5_0 = $$createType9;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("location" in $$parsedSource) {
             $$parsedSource["location"] = $$createField0_0($$parsedSource["location"]);
@@ -636,7 +648,7 @@ export class WorldPrayerSettings {
      * Creates a new WorldPrayerSettings instance from a string or object.
      */
     static createFrom($$source: any = {}): WorldPrayerSettings {
-        const $$createField0_0 = $$createType10;
+        const $$createField0_0 = $$createType11;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("cities" in $$parsedSource) {
             $$parsedSource["cities"] = $$createField0_0($$parsedSource["cities"]);
@@ -648,12 +660,13 @@ export class WorldPrayerSettings {
 // Private type creation functions
 const $$createType0 = PerPrayerNotification.createFrom;
 const $$createType1 = PrayerNotificationSetting.createFrom;
-const $$createType2 = PrayerOffsets.createFrom;
-const $$createType3 = LocationSettings.createFrom;
-const $$createType4 = PrayerSettings.createFrom;
-const $$createType5 = NotificationSettings.createFrom;
-const $$createType6 = DashboardSettings.createFrom;
-const $$createType7 = PrayerTimesSettings.createFrom;
-const $$createType8 = WorldPrayerSettings.createFrom;
-const $$createType9 = WorldPrayerCity.createFrom;
-const $$createType10 = $Create.Array($$createType9);
+const $$createType2 = prayersync$0.Config.createFrom;
+const $$createType3 = PrayerOffsets.createFrom;
+const $$createType4 = LocationSettings.createFrom;
+const $$createType5 = PrayerSettings.createFrom;
+const $$createType6 = NotificationSettings.createFrom;
+const $$createType7 = DashboardSettings.createFrom;
+const $$createType8 = PrayerTimesSettings.createFrom;
+const $$createType9 = WorldPrayerSettings.createFrom;
+const $$createType10 = WorldPrayerCity.createFrom;
+const $$createType11 = $Create.Array($$createType10);

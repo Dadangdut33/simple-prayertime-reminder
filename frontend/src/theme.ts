@@ -1,5 +1,5 @@
 import { createTheme, ThemeOptions } from '@mui/material/styles';
-import type { ThemePreset } from './types';
+import type { ThemePreset } from '@/types';
 
 type PresetPalette = {
   primary: string;

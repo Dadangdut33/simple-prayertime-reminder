@@ -10,14 +10,14 @@ import {
   getTestReminderState,
   playAdhan,
   resizeReminderWindow,
-} from '../bindings';
-import type { ReminderInfo } from '../types';
-import { PRAYER_NAME_FAJR, PRAYER_NAME_SUNRISE } from '../types';
+} from '@/bindings';
+import type { ReminderInfo } from '@/types';
+import { PRAYER_NAME_FAJR, PRAYER_NAME_SUNRISE } from '@/types';
 import { useTranslation } from 'react-i18next';
-import { getPrayerDisplayName } from '../utils/helpers';
-import { useAppStore } from '../store/appStore';
-import { useClock } from '../hooks';
-import ReminderWindow from '../components/reminder/ReminderWindow';
+import { getPrayerDisplayName } from '@/utils/helpers';
+import { useAppStore } from '@/store/appStore';
+import { useClock } from '@/hooks';
+import ReminderWindow from '@/components/reminder/ReminderWindow';
 import { Events } from '@wailsio/runtime';
 
 export default function ReminderPage() {

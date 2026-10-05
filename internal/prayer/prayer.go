@@ -19,6 +19,9 @@ func NewService() *Service {
 // SetConfig updates the prayer configuration and clears cache
 func (svc *Service) SetConfig(cfg PrayerConfig) {
 	svc.mu.Lock()
+	if calculationKey(svc.cfg) != calculationKey(cfg) || !cfg.AutoOffsetEnabled {
+		svc.online = nil
+	}
 	svc.cfg = cfg
 	svc.yearCache = make(map[int][]prayer.Schedule)
 	svc.mu.Unlock()
@@ -140,7 +143,10 @@ func (svc *Service) computeYear(year int) ([]prayer.Schedule, error) {
 	}
 
 	svc.mu.Lock()
-	svc.yearCache[year] = schedules
+	// A settings change during calculation must not populate the new cache.
+	if svc.cfg == cfgSnapshot {
+		svc.yearCache[year] = schedules
+	}
 	svc.mu.Unlock()
 	log.Info("prayer schedule cached", "year", year)
 	return schedules, nil
@@ -174,7 +180,7 @@ func (svc *Service) GetScheduleForDate(date time.Time) (DaySchedule, error) {
 		return DaySchedule{}, fmt.Errorf("date out of range: %v", date)
 	}
 
-	return toDay(schedules[idx]), nil
+	return svc.applyOnline(toDay(schedules[idx])), nil
 }
 
 // GetTodaySchedule returns today's prayer schedule
@@ -194,6 +200,12 @@ func (svc *Service) GetTodaySchedule() (DaySchedule, error) {
 
 // GetNextPrayer returns info about the next upcoming prayer
 func (svc *Service) GetNextPrayer(now time.Time) (NextPrayerInfo, error) {
+	svc.mu.RLock()
+	timezone := svc.cfg.Timezone
+	svc.mu.RUnlock()
+	if loc, err := time.LoadLocation(timezone); err == nil {
+		now = now.In(loc)
+	}
 	sched, err := svc.GetScheduleForDate(now)
 	if err != nil {
 		log.Error("next prayer schedule failed", "error", err)
@@ -229,6 +241,9 @@ func (svc *Service) GetNextPrayer(now time.Time) (NextPrayerInfo, error) {
 
 // GetMonthSchedule returns prayer schedule for an entire calendar month
 func (svc *Service) GetMonthSchedule(year, month int) ([]DaySchedule, error) {
+	if month < 1 || month > 12 {
+		return nil, fmt.Errorf("month must be between 1 and 12")
+	}
 	schedules, err := svc.computeYear(year)
 	if err != nil {
 		log.Error("month schedule compute failed", "error", err, "year", year)
@@ -249,7 +264,7 @@ func (svc *Service) GetMonthSchedule(year, month int) ([]DaySchedule, error) {
 
 	result := make([]DaySchedule, 0, endIdx-startIdx+1)
 	for i := startIdx; i <= endIdx; i++ {
-		result = append(result, toDay(schedules[i]))
+		result = append(result, svc.applyOnline(toDay(schedules[i])))
 	}
 	return result, nil
 }

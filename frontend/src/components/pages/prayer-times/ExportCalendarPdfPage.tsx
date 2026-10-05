@@ -1,9 +1,17 @@
 import { Box, Grid, Typography } from '@mui/material';
 import type { Dayjs } from 'dayjs';
-import type { HijriDate } from '../../../types';
-import type { CalendarExportTheme, ExportMetadataSummary } from './ExportPrayerTimesDialog';
-import { getCalendarDayPresentation, getMonthCalendarDays, getWeekdayHeaders, toIsoDate } from './helpers';
-import i18n from '../../../i18n';
+import type { HijriDate } from '@/types';
+import type {
+  CalendarExportTheme,
+  ExportMetadataSummary,
+} from '@/components/pages/prayer-times/ExportPrayerTimesDialog';
+import {
+  getCalendarDayPresentation,
+  getMonthCalendarDays,
+  getWeekdayHeaders,
+  toIsoDate,
+} from '@/components/pages/prayer-times/helpers';
+import i18n from '@/i18n';
 
 interface ExportCalendarPdfPageProps {
   activeMonth: Dayjs;

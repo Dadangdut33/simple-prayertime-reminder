@@ -1,6 +1,75 @@
-import reminderQuotes from '../shared/reminder_quotes.json';
+import reminderQuotes from '@/i18n/shared/reminder_quotes.json';
 
 const en = {
+  autoOffset: {
+    aladhan: 'AlAdhan · Worldwide calculations',
+    jakim: 'JAKIM · Malaysia / e-Solat',
+    diyanet: 'Diyanet · Türkiye / EzanVakti mirror',
+    muis: 'MUIS · Singapore / data.gov.sg',
+    myquran: 'myQuran · Indonesia / Kemenag timetable',
+    province: 'Province',
+    district: 'District',
+    zone: 'Prayer zone',
+    providerHints: {
+      aladhan:
+        'This is the online reference convention; the local calculation below remains your offline fallback. Your Shafii/Hanafi Asr setting applies to both.',
+      myquran: 'Kemenag city timetable via myQuran, using Shafii Asr. Select a new city when you travel.',
+      jakim:
+        'Official JAKIM zone timetable. Use Asia/Kuala_Lumpur or Asia/Kuching and standard Asr. Choose your zone again when travelling.',
+      diyanet:
+        'Diyanet timetables through the independent EzanVakti mirror, without an account. Türkiye only: use Europe/Istanbul and standard Asr. Coverage is a rolling range; check cached dates below. Diyanet’s direct API requires an approved account.',
+      muis: 'Official MUIS timetable from Singapore’s government data API. Use Asia/Singapore and standard Asr. Supports 2026 onward; future years depend on MUIS publication.',
+    },
+    regionalIncompatible:
+      'Select the provider’s regional timezone in Location and Shafii/standard Asr. Published timetables use a fixed Asr convention; use AlAdhan for a Hanafi calculation.',
+    regionalPrivacy:
+      'Using this feature might send your configured coordinates / location and timezone to the selected provider. Source:',
+    subtitle: 'Match a reference timetable, with offline fallback.',
+    sourceTitle: 'Timetable source',
+    scheduleTitle: 'Sync schedule',
+    statusTitle: 'Sync status',
+    detailsTitle: 'About accuracy, manual offsets & privacy',
+    provider: 'Provider',
+    city: 'Timetable city / regency',
+    cityHint: 'City timezone: {{timezone}}. Check Location settings if this is incorrect.',
+    retry: 'Retry',
+    title: 'Automatic prayer-time offsets',
+    explanation:
+      'Follow a regional timetable with daily adjustments and offline caching. Compare the reference with your local mosque.',
+    limitations:
+      'Online times are also calculated and may differ from your local mosque or community. Check the chosen convention and location. When a date has no downloaded timetable, the app uses its local calculation.',
+    enable: 'Use automatic offsets from an online timetable',
+    privacy:
+      'When enabled, syncing sends your configured coordinates, timezone, and Asr convention to AlAdhan. No account or API key is needed. Source:',
+    method: 'Online reference convention',
+    regional: 'Automatic regional convention',
+    startup: 'Sync on every app startup',
+    interval: 'Sync every (hours)',
+    intervalHint:
+      '1–720 hours. Use 0 to disable periodic sync. Sync runs while the app is open, including in the tray.',
+    manualHint:
+      'Manual offsets remain separate and are added after the automatic correction. Existing manual corrections may no longer be needed. Downloaded corrections apply only to their own dates and your configured location, including reminders and exports; world-city schedules keep their local calculations.',
+    manualSummary:
+      'Added after the online timetable or local calculation. Check existing offsets before comparing sources.',
+    onboardingHint:
+      'Your choice is saved when you finish setup. Startup sync runs after setup if selected; otherwise, use Sync now in Settings or wait for the interval.',
+    syncNow: 'Sync now',
+    syncing: 'Syncing…',
+    never: 'Never',
+    minutes: 'min',
+    active: 'Today uses the downloaded timetable plus your manual offsets. Cached dates remain available offline.',
+    localFallback:
+      'Today uses the local calculation plus your manual offsets. No automatic correction is active for today.',
+    lastSync: 'Last successful sync: {{time}}',
+    nextSync: 'Next automatic attempt: {{time}}',
+    reference: '{{provider}} · {{method}} · Cached dates: {{from}} to {{through}}',
+    endpoint: 'API endpoint: {{url}}',
+    corrections: 'Today’s automatic corrections (minutes, before manual offsets)',
+    banner:
+      'Timetables vary by region. Automatic prayer-time offsets can align your schedule with an online reference; compare it with your local community.',
+    configure: 'Configure auto offsets',
+    exportMethod: '{{method}} · Online reference for cached dates; local calculation otherwise',
+  },
   app: {
     name: 'Simple Prayertime Reminder',
     loading: 'Loading prayer data...',
@@ -351,7 +420,7 @@ const en = {
     },
     prayer: {
       disclaimer:
-        'Prayer times are calculated with the `go-prayer` library. Please verify the results with your local mosque or community.',
+        'Choose your local calculation convention and, optionally, an online reference. Verify the schedule with your local mosque or authority.',
       method: 'Calculation Method',
       asrMethod: 'Asr Method',
       offsets: 'Offsets',

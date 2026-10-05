@@ -25,7 +25,7 @@ Run from the repository root:
 
 Format Go with `gofmt`; use lowercase package names and exported PascalCase identifiers. Keep platform-specific implementations in files such as `autostart_windows.go`.
 
-Follow frontend Prettier settings: two-space indentation, single quotes, semicolons, trailing commas, and a 120-character print width. Use PascalCase component filenames and camelCase functions and variables. With MUI 9, use `sx` for system styles and `slotProps` for component slots. Keep translations in `frontend/src/i18n/locales/`; register new locales in `i18n/index.ts`.
+Follow frontend Prettier settings: two-space indentation, single quotes, semicolons, trailing commas, and a 120-character print width. Use PascalCase component filenames and camelCase functions and variables. Use `@/…` for imports from `frontend/src/`; use `@bindings/…`, `@assets/…`, or `@frontend/…` for generated bindings, shared assets, and frontend-root files. With MUI 9, use `sx` for system styles and `slotProps` for component slots. Keep translations in `frontend/src/i18n/locales/`; register new locales in `i18n/index.ts`.
 
 ## Testing Guidelines
 

@@ -52,6 +52,7 @@ This project was previously Electron-based which comes with chromium meaning hig
 
 - Daily prayer schedule and next-prayer countdown
 - Configurable prayer calculation method, offsets, and reminder timing
+- Optional online timetables syncronization.
 - Adhan playback with adjustable volume
 - Auto-detected or manual location setup
 - Qibla direction
@@ -294,7 +295,7 @@ cd ..
 3. Install the Wails v3 CLI if you do not already have it:
 
 ```bash
-go install github.com/wailsapp/wails/v3/cmd/wails3@latest
+go install github.com/wailsapp/wails/v3/cmd/wails3@v3.0.0-beta.27
 ```
 
 ### Run in development mode

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { QuranBookmark, QuranData, QuranNote } from '../../../types';
-import { getQuranData, saveQuranData } from '../../../bindings';
+import type { QuranBookmark, QuranData, QuranNote } from '@/types';
+import { getQuranData, saveQuranData } from '@/bindings';
 
 const DEFAULT_QURAN_URL = 'https://quran.com';
 const LEGACY_BOOKMARKS_KEY = 'quran_bookmarks';

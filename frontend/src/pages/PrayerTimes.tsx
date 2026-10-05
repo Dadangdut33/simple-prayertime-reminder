@@ -8,37 +8,37 @@ import {
   getMonthHijriDates,
   getMonthSchedule,
   getScheduleRange,
-} from '../bindings';
-import { saveBase64File } from '../bindings';
-import PrayerTimesHeader from '../components/pages/prayer-times/PrayerTimesHeader';
-import PrayerTimesControls from '../components/pages/prayer-times/PrayerTimesControls';
-import PrayerTimesTableView from '../components/pages/prayer-times/PrayerTimesTableView';
-import PrayerTimesCalendarView from '../components/pages/prayer-times/PrayerTimesCalendarView';
+} from '@/bindings';
+import { saveBase64File } from '@/bindings';
+import PrayerTimesHeader from '@/components/pages/prayer-times/PrayerTimesHeader';
+import PrayerTimesControls from '@/components/pages/prayer-times/PrayerTimesControls';
+import PrayerTimesTableView from '@/components/pages/prayer-times/PrayerTimesTableView';
+import PrayerTimesCalendarView from '@/components/pages/prayer-times/PrayerTimesCalendarView';
 import ExportPrayerTimesDialog, {
   type CalendarExportTheme,
   type ExportMetadataSummary,
   type ExportQuality,
   type PrayerTableLayout,
   type PrayerTimesExportRequest,
-} from '../components/pages/prayer-times/ExportPrayerTimesDialog';
-import ExportCalendarPdfPage from '../components/pages/prayer-times/ExportCalendarPdfPage';
-import ExportTablePdfPage from '../components/pages/prayer-times/ExportTablePdfPage';
+} from '@/components/pages/prayer-times/ExportPrayerTimesDialog';
+import ExportCalendarPdfPage from '@/components/pages/prayer-times/ExportCalendarPdfPage';
+import ExportTablePdfPage from '@/components/pages/prayer-times/ExportTablePdfPage';
 import {
   buildHijriMap,
   formatExportRangeLabel,
   formatMonthHeading,
   getHijriMonthRangeLabel,
-} from '../components/pages/prayer-times/helpers';
-import { useAppStore } from '../store/appStore';
+} from '@/components/pages/prayer-times/helpers';
+import { useAppStore } from '@/store/appStore';
 import {
   CALCULATION_METHODS,
   type DaySchedule,
   type HijriCalendarDay,
   type PrayerCalendarSystem,
   type PrayerTimesViewMode,
-} from '../types';
+} from '@/types';
 import { Backdrop, Box, LinearProgress, Paper, Stack, Typography } from '@mui/material';
-import i18n from '../i18n';
+import i18n from '@/i18n';
 import { useTranslation } from 'react-i18next';
 
 function moveToMonth(current: Dayjs, nextMonth: Dayjs): Dayjs {
@@ -141,7 +141,9 @@ function buildExportMetadata(settings: ReturnType<typeof useAppStore.getState>['
     .map(([key, value]) => `${key.charAt(0).toUpperCase()}${key.slice(1)} ${formatOffsetValue(value)}`);
 
   return {
-    methodLabel,
+    methodLabel: settings.prayer.autoOffset.enabled
+      ? i18n.t('autoOffset.exportMethod', { method: methodLabel })
+      : methodLabel,
     locationLabel,
     coordinatesLabel: `${settings.location.latitude.toFixed(4)}, ${settings.location.longitude.toFixed(4)}`,
     timezoneLabel: settings.location.timezone || i18n.t('prayerTimes.unknownTimezone'),
@@ -187,7 +189,8 @@ async function getHijriMonthRangeForDate(date: Dayjs): Promise<HijriMonthRange |
 
 export default function PrayerTimes() {
   const { t } = useTranslation();
-  const { settings, updateSettings } = useAppStore();
+  const { settings, updateSettings, prayerSyncStatus } = useAppStore();
+  const referenceRevision = prayerSyncStatus?.lastSync;
   const [selectedDate, setSelectedDate] = useState(() => dayjs());
   const [viewMode, setViewMode] = useState<PrayerTimesViewMode>('table');
   const [calendarSystem, setCalendarSystem] = useState<PrayerCalendarSystem>('gregorian');
@@ -386,7 +389,7 @@ export default function PrayerTimes() {
     return () => {
       active = false;
     };
-  }, [activeMonth, calendarSystem]);
+  }, [activeMonth, calendarSystem, settings?.prayer, settings?.location, referenceRevision]);
 
   useEffect(() => {
     if (calendarSystem !== 'hijri') {
@@ -440,7 +443,15 @@ export default function PrayerTimes() {
     return () => {
       active = false;
     };
-  }, [calendarSystem, hijriRange, selectedDate, selectedDateKey]);
+  }, [
+    calendarSystem,
+    hijriRange,
+    selectedDate,
+    selectedDateKey,
+    settings?.prayer,
+    settings?.location,
+    referenceRevision,
+  ]);
 
   const setMonth = (month: Dayjs) => {
     setSelectedDate((current) => moveToMonth(current, month.startOf('month')));

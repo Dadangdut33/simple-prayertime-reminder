@@ -64,7 +64,7 @@ tasks:
     cmds:
       - taskkill /F /IM "{{.APP_NAME}}.exe" /T 2>nul || true
       - taskkill /F /IM "wails3.exe" /T 2>nul || true
-      - taskkill /F /IM "vite.exe" /T 2>nul || true
+      - powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort {{.VITE_PORT}} -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }" 2>nul || true
 
   setup:docker:
     summary: Builds Docker image for cross-compilation (~800MB download)

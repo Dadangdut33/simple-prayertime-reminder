@@ -25,10 +25,10 @@ import {
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import NumberField from '../../ui/NumberField';
-import { formatExportRangeLabel } from './helpers';
+import NumberField from '@/components/ui/NumberField';
+import { formatExportRangeLabel } from '@/components/pages/prayer-times/helpers';
 import { useTranslation } from 'react-i18next';
-import i18n from '../../../i18n';
+import i18n from '@/i18n';
 
 type ExportKind = 'csv' | 'excel' | 'calendar-pdf';
 export type CalendarExportTheme = 'midnight' | 'light' | 'parchment';

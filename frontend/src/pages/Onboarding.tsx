@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
   Autocomplete,
@@ -24,15 +24,16 @@ import {
   useTheme,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import * as api from '../bindings';
-import type { CitySearchResult, Settings, ThemePreset } from '../types';
-import { CALCULATION_METHODS } from '../types';
-import { formatCityLabel, formatDigitalClock, getCountryName } from '../utils/helpers';
-import { useAppStore } from '../store/appStore';
-import NumberField from '../components/ui/NumberField';
-import DashboardClockCard from '../components/pages/dashboard/DashboardClockCard';
-import { checkNativeNotificationPermission, openURL, requestNativeNotificationPermission } from '../bindings';
-import { AVAILABLE_LANGUAGES, getLanguageLabel } from '../i18n';
+import * as api from '@/bindings';
+import type { CitySearchResult, Settings, ThemePreset } from '@/types';
+import { CALCULATION_METHODS } from '@/types';
+import { formatCityLabel, formatDigitalClock, getCountryName } from '@/utils/helpers';
+import { useAppStore } from '@/store/appStore';
+import NumberField from '@/components/ui/NumberField';
+import AutoOffsetSettings from '@/components/pages/settings/AutoOffsetSettings';
+import DashboardClockCard from '@/components/pages/dashboard/DashboardClockCard';
+import { checkNativeNotificationPermission, openURL, requestNativeNotificationPermission } from '@/bindings';
+import { AVAILABLE_LANGUAGES, getLanguageLabel } from '@/i18n';
 
 const THEME_PRESETS: { value: ThemePreset; labelKey: string }[] = [
   { value: 'indigo', labelKey: 'onboarding.appearance.presets.indigo' },
@@ -55,6 +56,7 @@ export default function Onboarding() {
   const { settings, updateSettings } = useAppStore();
   const theme = useTheme();
   const [activeStep, setActiveStep] = useState(0);
+  const onboardingScrollRef = useRef<HTMLDivElement>(null);
   const [local, setLocal] = useState<Settings | null>(settings);
   const [saving, setSaving] = useState(false);
   const [nativePermission, setNativePermission] = useState<boolean | null>(null);
@@ -71,6 +73,10 @@ export default function Onboarding() {
       setLocal(settings);
     }
   }, [settings]);
+
+  useEffect(() => {
+    onboardingScrollRef.current?.scrollTo({ top: 0 });
+  }, [activeStep]);
 
   useEffect(() => {
     let active = true;
@@ -219,16 +225,19 @@ export default function Onboarding() {
 
   return (
     <Box
+      ref={onboardingScrollRef}
       sx={{
-        minHeight: '100vh',
+        height: '100%',
+        minHeight: 0,
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         justifyContent: 'center',
+        overflowY: 'auto',
         p: { xs: 2, md: 4 },
         background: `radial-gradient(circle at top left, ${theme.palette.primary.main}26, transparent 55%), radial-gradient(circle at bottom right, ${theme.palette.secondary.main}24, transparent 55%)`,
       }}
     >
-      <Card sx={{ width: 'min(960px, 95vw)', p: { xs: 3, md: 4 }, borderRadius: 2 }}>
+      <Card sx={{ width: 'min(960px, 95vw)', my: 'auto', p: { xs: 3, md: 4 }, borderRadius: 2 }}>
         <Stack spacing={3}>
           <Box>
             <Typography variant="h2">{t('onboarding.title')}</Typography>
@@ -577,6 +586,7 @@ export default function Onboarding() {
                   />
                 </Box>
               )}
+              <AutoOffsetSettings settings={local} onChange={(autoOffset) => setPrayer({ autoOffset })} onboarding />
             </Stack>
           )}
 

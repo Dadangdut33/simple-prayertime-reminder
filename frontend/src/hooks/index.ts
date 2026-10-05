@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { getCountdown } from '../utils/helpers';
+import { getCountdown } from '@/utils/helpers';
 
 /**
  * Live countdown hook — returns an "HH:mm:ss" string that updates every second.

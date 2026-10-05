@@ -64,7 +64,7 @@ jobs:
 
       - name: Install wails3
         run: |
-          go install github.com/wailsapp/wails/v3/cmd/wails3@v3.0.0-beta.17
+          go install github.com/wailsapp/wails/v3/cmd/wails3@v3.0.0-beta.27
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
       - name: Get version
@@ -164,7 +164,7 @@ jobs:
       - name: Install wails3
         shell: pwsh
         run: |
-          go install github.com/wailsapp/wails/v3/cmd/wails3@v3.0.0-beta.17
+          go install github.com/wailsapp/wails/v3/cmd/wails3@v3.0.0-beta.27
           Add-Content $env:GITHUB_PATH "$(go env GOPATH)\\bin"
 
       - name: Build + Package (windows)
@@ -238,7 +238,7 @@ jobs:
 
       - name: Install wails3
         run: |
-          go install github.com/wailsapp/wails/v3/cmd/wails3@v3.0.0-beta.17
+          go install github.com/wailsapp/wails/v3/cmd/wails3@v3.0.0-beta.27
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
       - name: Build + Package (macOS)

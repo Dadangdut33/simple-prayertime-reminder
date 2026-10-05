@@ -1,5 +1,5 @@
 import { Box, Button, FormControlLabel, Switch, ToggleButton, ToggleButtonGroup } from '@mui/material';
-import type { PrayerCalendarSystem, PrayerTimesViewMode } from '../../../types';
+import type { PrayerCalendarSystem, PrayerTimesViewMode } from '@/types';
 import { useTranslation } from 'react-i18next';
 
 interface PrayerTimesControlsProps {

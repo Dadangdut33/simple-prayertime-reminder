@@ -16,11 +16,11 @@ import {
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import type { DaySchedule, HijriCalendarDay, PrayerCalendarSystem } from '../../../types';
-import { formatTime, formatTimeInZone } from '../../../utils/helpers';
-import { buildHijriMap, formatHijriDateShort } from './helpers';
+import type { DaySchedule, HijriCalendarDay, PrayerCalendarSystem } from '@/types';
+import { formatTime, formatTimeInZone } from '@/utils/helpers';
+import { buildHijriMap, formatHijriDateShort } from '@/components/pages/prayer-times/helpers';
 import { useTranslation } from 'react-i18next';
-import i18n from '../../../i18n';
+import i18n from '@/i18n';
 
 interface PrayerTimesTableViewProps {
   activeMonth: Dayjs;

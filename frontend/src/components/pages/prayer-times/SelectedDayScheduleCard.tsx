@@ -1,9 +1,9 @@
 import dayjs from 'dayjs';
 import { Box, Card, Chip, Divider, Skeleton, Typography } from '@mui/material';
 import type { Dayjs } from 'dayjs';
-import type { DaySchedule, HijriDate } from '../../../types';
-import { formatTime, formatTimeInZone, getPrayerList } from '../../../utils/helpers';
-import { formatHijriDateLabel, formatLongGregorianDate, toIsoDate } from './helpers';
+import type { DaySchedule, HijriDate } from '@/types';
+import { formatTime, formatTimeInZone, getPrayerList } from '@/utils/helpers';
+import { formatHijriDateLabel, formatLongGregorianDate, toIsoDate } from '@/components/pages/prayer-times/helpers';
 import { useTranslation } from 'react-i18next';
 
 interface SelectedDayScheduleCardProps {

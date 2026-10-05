@@ -1,6 +1,7 @@
 import { Alert, Box, MenuItem, Select, Typography } from '@mui/material';
-import NumberField from '../../ui/NumberField';
-import { CALCULATION_METHODS, PRAYER_NAMES, type Settings } from '../../../types';
+import NumberField from '@/components/ui/NumberField';
+import AutoOffsetSettings from '@/components/pages/settings/AutoOffsetSettings';
+import { CALCULATION_METHODS, PRAYER_NAMES, type Settings } from '@/types';
 import { useTranslation } from 'react-i18next';
 
 interface PrayerSettingsTabProps {
@@ -125,6 +126,8 @@ export default function PrayerSettingsTab({ local, setPrayer }: PrayerSettingsTa
         </Box>
       )}
 
+      <AutoOffsetSettings settings={local} onChange={(autoOffset) => setPrayer({ autoOffset })} />
+
       <Box
         sx={{
           mt: 2,
@@ -137,6 +140,9 @@ export default function PrayerSettingsTab({ local, setPrayer }: PrayerSettingsTa
           }}
         >
           {t('settings.prayer.offsets')}
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          {t('autoOffset.manualSummary')}
         </Typography>
         <Box
           sx={{

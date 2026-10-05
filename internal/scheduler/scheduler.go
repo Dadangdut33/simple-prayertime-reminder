@@ -11,10 +11,10 @@ import (
 )
 
 const (
-	audioStartTimeout = 5 * time.Second
-	audioStopTimeout  = 15 * time.Minute
-	audioPollInterval = 250 * time.Millisecond
-	ontimeGrace       = 20 * time.Second
+	audioStartTimeout    = 5 * time.Second
+	audioStopTimeout     = 15 * time.Minute
+	audioPollInterval    = 250 * time.Millisecond
+	ontimeGrace          = 20 * time.Second
 	clockMonitorInterval = 30 * time.Second
 	clockJumpThreshold   = 90 * time.Second
 )
@@ -47,34 +47,44 @@ func NewService(p *prayer.Service, a *audio.Service, n *notification.Service) *S
 	}
 }
 
-// Start begins the scheduling loop, which re-evaluates each midnight
+// Start begins scheduling, replacing any previous generation of timers.
 func (svc *Service) Start(cfg settings.Settings) {
-	log.Info("scheduler start")
-	svc.setConfig(cfg)
+	svc.UpdateConfig(cfg)
 	svc.startClockMonitor()
-	go svc.run(cfg)
 }
 
-// Stop halts scheduling
+// Stop cancels the current generation. Each timer retains its own stop channel.
 func (svc *Service) Stop() {
-	log.Info("scheduler stop")
-	close(svc.stopCh)
-	svc.stopCh = make(chan struct{})
+	svc.lifecycleMu.Lock()
+	defer svc.lifecycleMu.Unlock()
+	if svc.stopCh != nil {
+		close(svc.stopCh)
+		svc.stopCh = nil
+	}
 }
 
-// UpdateConfig restarts scheduling with new settings
 func (svc *Service) UpdateConfig(cfg settings.Settings) {
-	log.Info("scheduler update config")
+	svc.lifecycleMu.Lock()
+	defer svc.lifecycleMu.Unlock()
+	svc.restartLocked(cfg)
+}
+
+func (svc *Service) restartLocked(cfg settings.Settings) {
 	svc.setConfig(cfg)
-	select {
-	case <-svc.stopCh: // already stopped, ignore
-	default:
+	if svc.stopCh != nil {
 		close(svc.stopCh)
 	}
 	svc.stopCh = make(chan struct{})
-	go svc.run(cfg)
+	go svc.run(svc.stopCh, cfg)
 }
 
+func (svc *Service) refresh() {
+	svc.lifecycleMu.Lock()
+	defer svc.lifecycleMu.Unlock()
+	if svc.stopCh != nil {
+		svc.restartLocked(svc.getConfig())
+	}
+}
 func (svc *Service) setConfig(cfg settings.Settings) {
 	svc.cfgMu.Lock()
 	svc.cfg = cfg
@@ -115,7 +125,7 @@ func (svc *Service) monitorClockChanges() {
 		if drift > clockJumpThreshold {
 			log.Warn("clock jump detected, rescheduling reminders", "previous", previous, "current", now, "elapsed", elapsed)
 			previous = now
-			svc.UpdateConfig(cfg)
+			svc.refresh()
 			continue
 		}
 
@@ -123,11 +133,11 @@ func (svc *Service) monitorClockChanges() {
 	}
 }
 
-func (svc *Service) run(cfg settings.Settings) {
+func (svc *Service) run(stop <-chan struct{}, cfg settings.Settings) {
 	loc := resolveScheduleLocation(cfg)
 	for {
 		log.Info("scheduler day cycle start")
-		svc.scheduleDayReminders(cfg, loc)
+		svc.scheduleDayReminders(stop, cfg, loc)
 
 		// Wait until next midnight (or stop signal)
 		now := clock.Now().In(loc)
@@ -137,7 +147,7 @@ func (svc *Service) run(cfg settings.Settings) {
 			wait = time.Second
 		}
 		select {
-		case <-svc.stopCh:
+		case <-stop:
 			log.Info("scheduler stopped")
 			return
 		case <-time.After(wait):
@@ -146,7 +156,7 @@ func (svc *Service) run(cfg settings.Settings) {
 	}
 }
 
-func (svc *Service) scheduleDayReminders(cfg settings.Settings, loc *time.Location) {
+func (svc *Service) scheduleDayReminders(stop <-chan struct{}, cfg settings.Settings, loc *time.Location) {
 	sched, err := svc.prayerSvc.GetTodaySchedule()
 	if err != nil {
 		log.Error("schedule load failed", "error", err)
@@ -178,19 +188,19 @@ func (svc *Service) scheduleDayReminders(cfg settings.Settings, loc *time.Locati
 		if beforeTime.After(now) {
 			delay := beforeTime.Sub(now)
 			log.Info("schedule before reminder", "prayer", e.name, "delay", delay)
-			go svc.fireAfterDelay(e, notification.StateBefore, delay, notifCfg, cfg.Language)
+			go svc.fireAfterDelay(stop, e, notification.StateBefore, delay, notifCfg, cfg.Language)
 		}
 
 		// Schedule "on time" event
 		if e.t.After(now) {
 			delay := e.t.Sub(now)
 			log.Info("schedule on-time reminder", "prayer", e.name, "delay", delay)
-			go svc.fireAfterDelay(e, notification.StateOnTime, delay, notifCfg, cfg.Language)
+			go svc.fireAfterDelay(stop, e, notification.StateOnTime, delay, notifCfg, cfg.Language)
 		} else {
 			elapsed := now.Sub(e.t)
 			if elapsed >= 0 && elapsed <= ontimeGrace {
 				log.Info("fire on-time reminder immediately", "prayer", e.name, "elapsed", elapsed)
-				go svc.fireAfterDelay(e, notification.StateOnTime, 0, notifCfg, cfg.Language)
+				go svc.fireAfterDelay(stop, e, notification.StateOnTime, 0, notifCfg, cfg.Language)
 			}
 		}
 
@@ -200,7 +210,7 @@ func (svc *Service) scheduleDayReminders(cfg settings.Settings, loc *time.Locati
 			if afterTime.After(now) {
 				delay := afterTime.Sub(now)
 				log.Info("schedule after reminder", "prayer", e.name, "delay", delay)
-				go svc.fireAfterDelay(e, notification.StateAfter, delay, notifCfg, cfg.Language)
+				go svc.fireAfterDelay(stop, e, notification.StateAfter, delay, notifCfg, cfg.Language)
 			}
 		}
 	}
@@ -283,6 +293,7 @@ func (svc *Service) resetSuppressedForDay(day string) {
 }
 
 func (svc *Service) fireAfterDelay(
+	stop <-chan struct{},
 	entry prayerEntry,
 	state notification.WindowState,
 	delay time.Duration,
@@ -290,9 +301,15 @@ func (svc *Service) fireAfterDelay(
 	language string,
 ) {
 	select {
-	case <-svc.stopCh:
+	case <-stop:
 		return
 	case <-time.After(delay):
+	}
+	// A zero-delay timer and cancellation can become ready together.
+	select {
+	case <-stop:
+		return
+	default:
 	}
 
 	minutesLeft := 0
@@ -307,6 +324,10 @@ func (svc *Service) fireAfterDelay(
 
 	if svc.isSuppressed(entry.name, entry.t) {
 		log.Info("reminder suppressed", "prayer", entry.name, "state", state)
+		return
+	}
+	// Resynchronizing a timetable must not fire an already delivered state again.
+	if !svc.markPrayerTick(entry.name+"|"+string(state), entry.t) {
 		return
 	}
 
@@ -329,16 +350,16 @@ func (svc *Service) fireAfterDelay(
 	if !notifCfg.PersistentReminder && notifCfg.AutoDismissSeconds > 0 {
 		delay := time.Duration(notifCfg.AutoDismissSeconds) * time.Second
 		if svc.shouldWaitForAdhan(state, notifCfg) {
-			go svc.closeAfterAdhan(delay, triggerID)
+			go svc.closeAfterAdhan(stop, delay, triggerID)
 		} else {
-			go svc.closeAfterDelay(delay, triggerID)
+			go svc.closeAfterDelay(stop, delay, triggerID)
 		}
 	}
 }
 
-func (svc *Service) closeAfterDelay(delay time.Duration, triggerID int64) {
+func (svc *Service) closeAfterDelay(stop <-chan struct{}, delay time.Duration, triggerID int64) {
 	select {
-	case <-svc.stopCh:
+	case <-stop:
 		return
 	case <-time.After(delay):
 	}
@@ -354,26 +375,26 @@ func (svc *Service) shouldWaitForAdhan(state notification.WindowState, cfg setti
 	return state == notification.StateOnTime && cfg.PlayAdhan && cfg.AutoDismissAfterAdhan
 }
 
-func (svc *Service) closeAfterAdhan(delay time.Duration, triggerID int64) {
+func (svc *Service) closeAfterAdhan(stop <-chan struct{}, delay time.Duration, triggerID int64) {
 	if svc.audioSvc == nil {
-		svc.closeAfterDelay(delay, triggerID)
+		svc.closeAfterDelay(stop, delay, triggerID)
 		return
 	}
 
-	started := svc.waitForAudioState(true, audioStartTimeout, triggerID)
+	started := svc.waitForAudioState(stop, true, audioStartTimeout, triggerID)
 	if !started {
-		svc.closeAfterDelay(delay, triggerID)
+		svc.closeAfterDelay(stop, delay, triggerID)
 		return
 	}
 
-	_ = svc.waitForAudioState(false, audioStopTimeout, triggerID)
+	_ = svc.waitForAudioState(stop, false, audioStopTimeout, triggerID)
 	if svc.notifSvc != nil && triggerID != 0 {
 		svc.notifSvc.EmitAutoDismissCountdown(triggerID, int(delay/time.Second), false)
 	}
-	svc.closeAfterDelay(delay, triggerID)
+	svc.closeAfterDelay(stop, delay, triggerID)
 }
 
-func (svc *Service) waitForAudioState(target bool, timeout time.Duration, triggerID int64) bool {
+func (svc *Service) waitForAudioState(stop <-chan struct{}, target bool, timeout time.Duration, triggerID int64) bool {
 	deadline := time.Now().Add(timeout)
 	ticker := time.NewTicker(audioPollInterval)
 	defer ticker.Stop()
@@ -389,7 +410,7 @@ func (svc *Service) waitForAudioState(target bool, timeout time.Duration, trigge
 			return false
 		}
 		select {
-		case <-svc.stopCh:
+		case <-stop:
 			return false
 		case <-ticker.C:
 		}

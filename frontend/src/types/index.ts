@@ -188,12 +188,52 @@ export interface PrayerOffsets {
 }
 
 export interface PrayerSettings {
+  autoOffset: AutoOffsetConfig;
   method: string;
   asrMethod: string;
   offsets: PrayerOffsets;
   customFajrAngle: number;
   customIshaAngle: number;
   customMaghribDuration: number;
+}
+
+export interface AutoOffsetConfig {
+  provider: string;
+  cityId: string;
+  cityName: string;
+  regionId: string;
+  regionName: string;
+  enabled: boolean;
+  onStartup: boolean;
+  intervalHours: number;
+  method: number;
+}
+
+export interface PrayerSyncStatus {
+  enabled: boolean;
+  syncing: boolean;
+  todayActive: boolean;
+  lastSync: string;
+  nextSync: string;
+  lastError: string;
+  source: string;
+  apiEndpoint: string;
+  methodName: string;
+  fromDate: string;
+  throughDate: string;
+  todayOffsets: PrayerOffsets;
+}
+
+export interface PrayerReferenceProvider {
+  id: string;
+  name: string;
+  source: string;
+  url: string;
+  regional: boolean;
+  timezones: string[] | null;
+  locationType: string;
+  hasLocationList: boolean;
+  hasRegionSelector: boolean;
 }
 
 export type ClockType = 'digital' | 'analog';

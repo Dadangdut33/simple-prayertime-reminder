@@ -71,6 +71,7 @@ type NextPrayerInfo struct {
 
 // PrayerConfig holds all prayer configuration
 type PrayerConfig struct {
+	AutoOffsetEnabled     bool              `json:"autoOffsetEnabled"`
 	Latitude              float64           `json:"latitude"`
 	Longitude             float64           `json:"longitude"`
 	Elevation             float64           `json:"elevation"`
@@ -88,4 +89,5 @@ type Service struct {
 	cfg       PrayerConfig
 	yearCache map[int][]prayer.Schedule
 	mu        sync.RWMutex
+	online    map[string]DaySchedule
 }

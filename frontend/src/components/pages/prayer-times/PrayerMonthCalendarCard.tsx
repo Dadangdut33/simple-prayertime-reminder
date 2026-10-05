@@ -6,14 +6,14 @@ import { DateCalendar, PickerDay } from '@mui/x-date-pickers';
 import type { PickerDayProps } from '@mui/x-date-pickers/PickerDay';
 import dayjs, { type Dayjs } from 'dayjs';
 import 'dayjs-hijri';
-import type { HijriDate } from '../../../types';
+import type { HijriDate } from '@/types';
 import {
   getCalendarDayPresentation,
   getHijriMonthName,
   getWeekdayHeaders,
   type CalendarMode,
   toIsoDate,
-} from './helpers';
+} from '@/components/pages/prayer-times/helpers';
 
 interface PrayerMonthCalendarCardProps {
   title: string;

@@ -1,19 +1,13 @@
 import { Box } from '@mui/material';
-import DashboardHeader from '../components/pages/dashboard/DashboardHeader';
-import DashboardClockCard from '../components/pages/dashboard/DashboardClockCard';
-import NextPrayerCard from '../components/pages/dashboard/NextPrayerCard';
-import QiblaCard from '../components/pages/dashboard/QiblaCard';
-import ScheduleCard from '../components/pages/dashboard/ScheduleCard';
-import { useClock } from '../hooks';
-import { useAppStore } from '../store/appStore';
+import DashboardHeader from '@/components/pages/dashboard/DashboardHeader';
+import DashboardClockCard from '@/components/pages/dashboard/DashboardClockCard';
+import NextPrayerCard from '@/components/pages/dashboard/NextPrayerCard';
+import QiblaCard from '@/components/pages/dashboard/QiblaCard';
+import ScheduleCard from '@/components/pages/dashboard/ScheduleCard';
+import { useClock } from '@/hooks';
+import { useAppStore } from '@/store/appStore';
 import { useTranslation } from 'react-i18next';
-import {
-  bearingToCompassLabel,
-  clamp,
-  formatDigitalClock,
-  getPrayerDisplayName,
-  getPrayerList,
-} from '../utils/helpers';
+import { bearingToCompassLabel, clamp, formatDigitalClock, getPrayerDisplayName, getPrayerList } from '@/utils/helpers';
 
 export default function Dashboard() {
   const { todaySchedule, nextPrayer, hijriDate, location, qiblaDirection, settings, loading } = useAppStore();

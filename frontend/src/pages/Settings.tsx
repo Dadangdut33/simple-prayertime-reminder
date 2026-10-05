@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Box, Card, Tab, Tabs } from '@mui/material';
-import GeneralSettingsTab from '../components/pages/settings/GeneralSettingsTab';
-import LocationSettingsTab from '../components/pages/settings/LocationSettingsTab';
-import PrayerSettingsTab from '../components/pages/settings/PrayerSettingsTab';
-import AlarmSettingsTab from '../components/pages/settings/AlarmSettingsTab';
-import ResetSettingsDialog from '../components/pages/settings/ResetSettingsDialog';
-import SettingsHeader from '../components/pages/settings/SettingsHeader';
-import { useAppStore } from '../store/appStore';
-import type { Settings } from '../types';
-import { formatDigitalClock } from '../utils/helpers';
+import { Alert, Box, Button, Card, Tab, Tabs } from '@mui/material';
+import GeneralSettingsTab from '@/components/pages/settings/GeneralSettingsTab';
+import LocationSettingsTab from '@/components/pages/settings/LocationSettingsTab';
+import PrayerSettingsTab from '@/components/pages/settings/PrayerSettingsTab';
+import AlarmSettingsTab from '@/components/pages/settings/AlarmSettingsTab';
+import ResetSettingsDialog from '@/components/pages/settings/ResetSettingsDialog';
+import SettingsHeader from '@/components/pages/settings/SettingsHeader';
+import { useAppStore } from '@/store/appStore';
+import type { Settings } from '@/types';
+import { formatDigitalClock } from '@/utils/helpers';
 import { useTranslation } from 'react-i18next';
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
@@ -113,6 +113,17 @@ export default function SettingsPage() {
       }}
     >
       <SettingsHeader saveLabel={saveLabel} saveState={saveState} onReset={() => setResetDialogOpen(true)} />
+      <Alert
+        severity="info"
+        sx={{ mb: 3 }}
+        action={
+          <Button color="inherit" onClick={() => setActiveTab(2)}>
+            {t('autoOffset.configure')}
+          </Button>
+        }
+      >
+        {t('autoOffset.banner')}
+      </Alert>
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs value={activeTab} onChange={(_, value) => setActiveTab(value)}>

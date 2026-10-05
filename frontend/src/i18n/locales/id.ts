@@ -1,6 +1,76 @@
-import reminderQuotes from '../shared/reminder_quotes.json';
+import reminderQuotes from '@/i18n/shared/reminder_quotes.json';
 
 const id = {
+  autoOffset: {
+    aladhan: 'AlAdhan · Perhitungan global',
+    jakim: 'JAKIM · Malaysia / e-Solat',
+    diyanet: 'Diyanet · Türkiye / mirror EzanVakti',
+    muis: 'MUIS · Singapura / data.gov.sg',
+    myquran: 'myQuran · Jadwal Indonesia / Kemenag',
+    province: 'Provinsi',
+    district: 'Distrik',
+    zone: 'Zona salat',
+    providerHints: {
+      aladhan:
+        'Ini adalah metode referensi daring; perhitungan lokal tetap menjadi cadangan luring. Pengaturan Asar Syafii/Hanafi berlaku untuk keduanya.',
+      myquran: 'Jadwal kota Kemenag melalui myQuran, dengan Asar Syafii. Ganti kota pilihan saat bepergian.',
+      jakim:
+        'Jadwal zona resmi JAKIM. Gunakan Asia/Kuala_Lumpur atau Asia/Kuching dan Asar standar. Pilih ulang zona saat bepergian.',
+      diyanet:
+        'Jadwal Diyanet melalui mirror independen EzanVakti, tanpa akun. Khusus Türkiye: gunakan Europe/Istanbul dan Asar standar. Cakupan bergulir; periksa tanggal tersimpan. API langsung Diyanet memerlukan akun yang disetujui.',
+      muis: 'Jadwal resmi MUIS dari API data pemerintah Singapura. Gunakan Asia/Singapore dan Asar standar. Mendukung tahun 2026 ke atas; tahun mendatang bergantung pada publikasi MUIS.',
+    },
+    regionalPrivacy:
+      'Dengan menggunakan fitur ini, koordinat/lokasi dan zona waktu yang dikonfigurasi mungkin dikirim ke penyedia yang dipilih. Sumber:',
+    regionalIncompatible:
+      'Pilih zona waktu wilayah penyedia di Lokasi dan Asar Syafii/standar. Jadwal publikasi memakai ketentuan Asar tetap; gunakan AlAdhan untuk perhitungan Hanafi.',
+    subtitle: 'Sesuaikan dengan jadwal rujukan, dengan cadangan luring.',
+    sourceTitle: 'Sumber jadwal',
+    scheduleTitle: 'Jadwal sinkronisasi',
+    statusTitle: 'Status sinkronisasi',
+    detailsTitle: 'Tentang akurasi, offset manual & privasi',
+    provider: 'Penyedia',
+    city: 'Kota / kabupaten jadwal',
+    cityHint: 'Zona waktu kota: {{timezone}}. Periksa pengaturan Lokasi jika tidak sesuai.',
+    retry: 'Coba lagi',
+    title: 'Penyesuaian otomatis waktu salat',
+    explanation:
+      'Ikuti jadwal regional dengan penyesuaian harian dan penyimpanan luring. Bandingkan referensi dengan masjid setempat.',
+    limitations:
+      'Waktu daring juga merupakan hasil perhitungan dan dapat berbeda dengan masjid atau komunitas setempat. Periksa metode dan lokasi yang dipilih. Untuk tanggal tanpa jadwal unduhan, aplikasi memakai perhitungan lokal.',
+    enable: 'Gunakan penyesuaian otomatis dari jadwal daring',
+    privacy:
+      'Saat diaktifkan, sinkronisasi mengirim koordinat, zona waktu, dan metode Asar yang diatur ke AlAdhan. Tidak memerlukan akun atau kunci API. Sumber:',
+    method: 'Metode referensi daring',
+    regional: 'Metode regional otomatis',
+    startup: 'Sinkronkan setiap aplikasi dimulai',
+    interval: 'Sinkronkan setiap (jam)',
+    intervalHint:
+      '1–720 jam. Gunakan 0 untuk menonaktifkan sinkronisasi berkala. Berjalan selama aplikasi terbuka, termasuk di tray.',
+    manualHint:
+      'Offset manual tetap terpisah dan ditambahkan setelah koreksi otomatis. Koreksi manual sebelumnya mungkin tidak lagi diperlukan. Koreksi unduhan hanya berlaku untuk tanggal dan lokasi yang diatur, termasuk pengingat dan ekspor; jadwal kota dunia tetap memakai perhitungan lokal.',
+    manualSummary:
+      'Ditambahkan setelah jadwal daring atau perhitungan lokal. Periksa offset lama sebelum membandingkan sumber.',
+    onboardingHint:
+      'Pilihan disimpan saat penyiapan selesai. Sinkronisasi awal berjalan setelah penyiapan jika dipilih; jika tidak, gunakan Sinkronkan sekarang di Pengaturan atau tunggu intervalnya.',
+    syncNow: 'Sinkronkan sekarang',
+    syncing: 'Menyinkronkan…',
+    never: 'Belum pernah',
+    minutes: 'mnt',
+    active:
+      'Hari ini memakai jadwal unduhan ditambah offset manual. Tanggal yang tersimpan tetap tersedia secara luring.',
+    localFallback:
+      'Hari ini memakai perhitungan lokal ditambah offset manual. Tidak ada koreksi otomatis yang aktif untuk hari ini.',
+    lastSync: 'Sinkronisasi terakhir yang berhasil: {{time}}',
+    nextSync: 'Percobaan otomatis berikutnya: {{time}}',
+    reference: '{{provider}} · {{method}} · Tanggal tersimpan: {{from}} sampai {{through}}',
+    endpoint: 'URL API: {{url}}',
+    corrections: 'Koreksi otomatis hari ini (menit, sebelum offset manual)',
+    banner:
+      'Jadwal berbeda antarwilayah. Penyesuaian otomatis waktu salat dapat menyelaraskan jadwal dengan referensi daring; bandingkan dengan komunitas setempat.',
+    configure: 'Atur offset otomatis',
+    exportMethod: '{{method}} · Referensi daring untuk tanggal tersimpan; lainnya dihitung lokal',
+  },
   app: {
     name: 'Simple Prayertime Reminder',
     loading: 'Memuat data salat...',
@@ -350,7 +420,7 @@ const id = {
     },
     prayer: {
       disclaimer:
-        'Waktu salat dihitung menggunakan pustaka `go-prayer`. Mohon verifikasi / cek kembali hasilnya dengan waktu salat di masjid atau komunitas setempat Anda.',
+        'Pilih metode perhitungan lokal dan, jika diinginkan, referensi daring. Periksa jadwal dengan masjid atau otoritas setempat.',
       method: 'Metode perhitungan',
       asrMethod: 'Metode Asar',
       offsets: 'Offset waktu salat',

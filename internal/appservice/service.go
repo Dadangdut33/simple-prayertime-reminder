@@ -2,6 +2,7 @@ package appservice
 
 import (
 	"archive/zip"
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -23,6 +24,7 @@ import (
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/logging"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/notification"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/prayer"
+	"github.com/dadangdut33/simple-prayertime-reminder/internal/prayersync"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/qibla"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/scheduler"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/settings"
@@ -30,6 +32,8 @@ import (
 
 // Service is the Wails-facing bridge between the frontend and the Go services.
 type Service struct {
+	runtimeMu             sync.Mutex
+	prayerSync            *prayersync.Manager
 	prayerSvc             *prayer.Service
 	locSvc                *location.Service
 	settingsSvc           *settings.Service
@@ -71,7 +75,7 @@ func New(
 ) *Service {
 	configDir, _ := ConfigDirectory()
 	log.Info("appservice init", "configDir", configDir)
-	return &Service{
+	s := &Service{
 		prayerSvc:             prayerSvc,
 		locSvc:                locSvc,
 		settingsSvc:           settingsSvc,
@@ -80,6 +84,40 @@ func New(
 		reminderStatePath:     filepath.Join(configDir, "reminder_state.json"),
 		testReminderStatePath: filepath.Join(configDir, "reminder_test_state.json"),
 	}
+	s.prayerSync = prayersync.New(prayerSvc, filepath.Join(configDir, "prayer_offsets.json"), func() {
+		s.runtimeMu.Lock()
+		defer s.runtimeMu.Unlock()
+		if s.schedulerSvc != nil {
+			s.schedulerSvc.UpdateConfig(s.settingsSvc.Get())
+		}
+		if s.notifSvc != nil {
+			s.notifSvc.EmitPrayerUpdate("", "")
+		}
+	})
+	cfg := settingsSvc.Get()
+	s.prayerSync.Configure(BuildPrayerConfig(cfg), cfg.Prayer.AutoOffset)
+	return s
+}
+
+// RunPrayerSync runs until the application context is cancelled.
+func RunPrayerSync(ctx context.Context, s *Service) { s.prayerSync.Run(ctx) }
+
+func (s *Service) GetPrayerSyncStatus() prayersync.Status { return s.prayerSync.Status() }
+
+func (s *Service) GetPrayerReferenceProviders() []prayersync.ProviderInfo {
+	return prayersync.Providers()
+}
+
+func (s *Service) GetPrayerTimetableCities(ctx context.Context) ([]prayersync.TimetableCity, error) {
+	return s.prayerSync.TimetableCities(ctx)
+}
+
+func (s *Service) GetPrayerReferenceLocations(ctx context.Context, provider, parent string) ([]prayersync.TimetableCity, error) {
+	return s.prayerSync.ReferenceLocations(ctx, provider, parent)
+}
+
+func (s *Service) SyncPrayerOffsets(ctx context.Context) (prayersync.Status, error) {
+	return s.prayerSync.Sync(ctx)
 }
 
 func (s *Service) SetRuntimeServices(notifSvc *notification.Service, schedulerSvc *scheduler.Service) {
@@ -100,8 +138,9 @@ func SetSettingsChangedHandler(s *Service, handler func(settings.Settings)) {
 
 func BuildPrayerConfig(cfg settings.Settings) prayer.PrayerConfig {
 	return prayer.PrayerConfig{
-		Method:    prayer.CalculationMethod(cfg.Prayer.Method),
-		AsrMethod: prayer.AsrMethod(cfg.Prayer.AsrMethod),
+		AutoOffsetEnabled: cfg.Prayer.AutoOffset.Enabled,
+		Method:            prayer.CalculationMethod(cfg.Prayer.Method),
+		AsrMethod:         prayer.AsrMethod(cfg.Prayer.AsrMethod),
 		Offsets: prayer.PrayerOffsets{
 			Fajr:    cfg.Prayer.Offsets.Fajr,
 			Sunrise: cfg.Prayer.Offsets.Sunrise,
@@ -219,6 +258,11 @@ func (s *Service) GetSettings() (settings.Settings, error) {
 }
 
 func (s *Service) SaveSettings(cfg settings.Settings) error {
+	s.runtimeMu.Lock()
+	defer s.runtimeMu.Unlock()
+	if err := cfg.Prayer.AutoOffset.Validate(); err != nil {
+		return err
+	}
 	previous := s.settingsSvc.Get()
 	if cfg.Location.Timezone == "" {
 		cfg.Location.Timezone = previous.Location.Timezone
@@ -243,6 +287,7 @@ func (s *Service) SaveSettings(cfg settings.Settings) error {
 
 	s.locSvc.SetManual(locationFromSettings(cfg))
 	s.prayerSvc.SetConfig(BuildPrayerConfig(cfg))
+	s.prayerSync.Configure(BuildPrayerConfig(cfg), cfg.Prayer.AutoOffset)
 
 	if s.schedulerSvc != nil {
 		s.schedulerSvc.Stop()
@@ -259,6 +304,8 @@ func (s *Service) SaveSettings(cfg settings.Settings) error {
 }
 
 func (s *Service) ResetSettings() (settings.Settings, error) {
+	s.runtimeMu.Lock()
+	defer s.runtimeMu.Unlock()
 	previous := s.settingsSvc.Get()
 	defaults := settings.DefaultSettings()
 	if defaults.Location.Timezone == "" {
@@ -282,6 +329,7 @@ func (s *Service) ResetSettings() (settings.Settings, error) {
 	cfg := s.settingsSvc.Get()
 	s.locSvc.SetManual(locationFromSettings(cfg))
 	s.prayerSvc.SetConfig(BuildPrayerConfig(cfg))
+	s.prayerSync.Configure(BuildPrayerConfig(cfg), cfg.Prayer.AutoOffset)
 
 	if s.schedulerSvc != nil {
 		s.schedulerSvc.Stop()

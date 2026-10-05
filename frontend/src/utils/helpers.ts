@@ -1,6 +1,6 @@
-import type { DigitalClockFormatPreset, HijriDate } from '../types';
-import { DIGITAL_CLOCK_FORMAT_PRESETS } from '../types';
-import i18n from '../i18n';
+import type { DigitalClockFormatPreset, HijriDate } from '@/types';
+import { DIGITAL_CLOCK_FORMAT_PRESETS } from '@/types';
+import i18n from '@/i18n';
 
 /** Format a date string from the backend (RFC3339) as a local time string */
 export function formatTime(isoOrTimeStr: string, format: '12h' | '24h' = '24h'): string {

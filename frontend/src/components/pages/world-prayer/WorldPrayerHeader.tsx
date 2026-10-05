@@ -2,7 +2,7 @@ import { Box, Button, MenuItem, Select, Typography } from '@mui/material';
 import PublicIcon from '@mui/icons-material/Public';
 import AddIcon from '@mui/icons-material/Add';
 import SortIcon from '@mui/icons-material/Sort';
-import type { WorldPrayerSort } from '../../../types';
+import type { WorldPrayerSort } from '@/types';
 import { useTranslation } from 'react-i18next';
 
 const SORT_OPTIONS: Array<{ value: WorldPrayerSort; labelKey: string }> = [

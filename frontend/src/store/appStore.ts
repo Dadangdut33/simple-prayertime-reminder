@@ -1,7 +1,7 @@
 import { create } from 'zustand';
-import * as api from '../bindings';
-import type { DaySchedule, HijriDate, Location, NextPrayerInfo, Settings, UpdateInfo } from '../types';
-import i18n from '../i18n';
+import * as api from '@/bindings';
+import type { DaySchedule, HijriDate, Location, NextPrayerInfo, PrayerSyncStatus, Settings, UpdateInfo } from '@/types';
+import i18n from '@/i18n';
 import dayjs from 'dayjs';
 import 'dayjs/locale/id';
 
@@ -13,6 +13,7 @@ interface AppState {
   location: Location | null;
   qiblaDirection: number | null;
   settings: Settings | null;
+  prayerSyncStatus: PrayerSyncStatus | null;
 
   // UI state
   loading: boolean;
@@ -37,6 +38,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   location: null,
   qiblaDirection: null,
   settings: null,
+  prayerSyncStatus: null,
   loading: true,
   error: null,
   initialized: false,
@@ -89,12 +91,13 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   refreshPrayerData: async () => {
     try {
-      const [schedule, nextPrayer, hijri] = await Promise.all([
+      const [schedule, nextPrayer, hijri, prayerSyncStatus] = await Promise.all([
         api.getTodaySchedule(),
         api.getNextPrayer(),
         api.getTodayHijri(),
+        api.getPrayerSyncStatus(),
       ]);
-      set({ todaySchedule: schedule, nextPrayer, hijriDate: hijri });
+      set({ todaySchedule: schedule, nextPrayer, hijriDate: hijri, prayerSyncStatus });
     } catch (err) {
       set({ error: String(err) });
     }

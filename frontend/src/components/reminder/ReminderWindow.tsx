@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Box, Button, Card, Tooltip, Typography } from '@mui/material';
 import { BellRing, Bell, CheckCircle2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { WindowState } from '../../types';
+import type { WindowState } from '@/types';
 import type { SxProps, Theme } from '@mui/material/styles';
 
 interface ReminderWindowProps {

@@ -139,8 +139,8 @@ importers:
         specifier: ^4.1.2
         version: 4.1.2(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@wailsio/runtime':
-        specifier: 3.0.0-beta.17
-        version: 3.0.0-beta.17
+        specifier: 3.0.0-beta.27
+        version: 3.0.0-beta.27
       dayjs:
         specifier: ^1.11.23
         version: 1.11.23
@@ -1341,9 +1341,9 @@ packages:
     peerDependencies:
       vite: ^4 || ^5 || ^6 || ^7 || ^8
 
-  '@wailsio/runtime@3.0.0-beta.17':
+  '@wailsio/runtime@3.0.0-beta.27':
     resolution:
-      { integrity: sha512-Q7aL/8PjIQiYYIneeu3a9ximNT4vjTQbjhIWkzKBAu9XkBQlvW8tGOSt+ORCv/S27y/dumlEK1eO71GSJ9E+jA== }
+      { integrity: sha512-QUXfpr04hXzQa/yGavoJTP1UAwpGzvwysoKGwdMIEmyHgwSHtF+k4MfHbV0olRdw0+nbDQtcBM/SkKqb8tvQsw== }
 
   '@wojtekmaj/date-utils@2.0.2':
     resolution:
@@ -3364,7 +3364,7 @@ snapshots:
     transitivePeerDependencies:
       - '@swc/helpers'
 
-  '@wailsio/runtime@3.0.0-beta.17': {}
+  '@wailsio/runtime@3.0.0-beta.27': {}
 
   '@wojtekmaj/date-utils@2.0.2': {}
 

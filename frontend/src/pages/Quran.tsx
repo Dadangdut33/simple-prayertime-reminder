@@ -17,10 +17,10 @@ import BookmarksOutlinedIcon from '@mui/icons-material/BookmarksOutlined';
 import NoteAltOutlinedIcon from '@mui/icons-material/NoteAltOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { useTranslation } from 'react-i18next';
-import BookmarkDialog from '../components/pages/quran/BookmarkDialog';
-import NotesDialog from '../components/pages/quran/NotesDialog';
-import { useQuranData } from '../components/pages/quran/storage';
-import { openURL } from '../bindings';
+import BookmarkDialog from '@/components/pages/quran/BookmarkDialog';
+import NotesDialog from '@/components/pages/quran/NotesDialog';
+import { useQuranData } from '@/components/pages/quran/storage';
+import { openURL } from '@/bindings';
 
 export default function Quran() {
   const { t } = useTranslation();

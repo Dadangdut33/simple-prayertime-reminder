@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"embed"
 	"os"
 	"path/filepath"
@@ -209,6 +210,9 @@ func main() {
 	// Start scheduler
 	logger.Info("starting scheduler")
 	schedulerSvc.Start(cfg)
+	syncContext, stopPrayerSync := context.WithCancel(context.Background())
+	app.OnShutdown(stopPrayerSync)
+	go appservice.RunPrayerSync(syncContext, appSvc)
 
 	// If AutoDetectLocation is true and location is empty, trigger detection async
 	if cfg.Location.AutoDetect && cfg.Location.City == "" {

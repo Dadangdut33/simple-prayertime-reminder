@@ -1,6 +1,6 @@
 import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import type { UpdateInfo } from '../../types';
+import type { UpdateInfo } from '@/types';
 import { useTranslation } from 'react-i18next';
 
 interface UpdateAvailableDialogProps {

@@ -1,23 +1,23 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import './i18n';
-import './index.css';
+import '@/i18n';
+import '@/index.css';
 import 'react-clock/dist/Clock.css';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import App from './App';
-import Dashboard from './pages/Dashboard';
-import PrayerTimes from './pages/PrayerTimes';
-import WorldPrayerTimes from './pages/WorldPrayerTimes';
-import Quran from './pages/Quran';
-import SettingsPage from './pages/Settings';
-import ReminderPage from './pages/Reminder';
-import TestToolsPage from './pages/TestTools';
-import AboutPage from './pages/About';
-import ThemeProvider from './ThemeProvider';
+import App from '@/App';
+import Dashboard from '@/pages/Dashboard';
+import PrayerTimes from '@/pages/PrayerTimes';
+import WorldPrayerTimes from '@/pages/WorldPrayerTimes';
+import Quran from '@/pages/Quran';
+import SettingsPage from '@/pages/Settings';
+import ReminderPage from '@/pages/Reminder';
+import TestToolsPage from '@/pages/TestTools';
+import AboutPage from '@/pages/About';
+import ThemeProvider from '@/ThemeProvider';
 
 const router = createBrowserRouter([
   {

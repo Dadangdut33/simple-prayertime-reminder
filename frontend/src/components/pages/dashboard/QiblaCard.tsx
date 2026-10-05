@@ -1,7 +1,7 @@
 import { Box, Card, Chip, Typography } from '@mui/material';
 import ExploreIcon from '@mui/icons-material/Explore';
 import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
-import type { Location } from '../../../types';
+import type { Location } from '@/types';
 import { Compass as CompassIcon, Navigation } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 

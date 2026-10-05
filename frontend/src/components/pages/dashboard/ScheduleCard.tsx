@@ -1,6 +1,6 @@
 import { Box, Card, Typography } from '@mui/material';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-import { formatTime, formatTimeInZone } from '../../../utils/helpers';
+import { formatTime, formatTimeInZone } from '@/utils/helpers';
 import { useTranslation } from 'react-i18next';
 
 interface PrayerEntry {

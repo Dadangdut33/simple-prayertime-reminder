@@ -1,6 +1,6 @@
 import { Box, Card, Typography } from '@mui/material';
 import Clock from 'react-clock';
-import type { Settings } from '../../../types';
+import type { Settings } from '@/types';
 import { useTranslation } from 'react-i18next';
 
 interface DashboardClockCardProps {

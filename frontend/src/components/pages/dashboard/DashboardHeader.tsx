@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import type { HijriDate, Location } from '../../../types';
-import { formatHijri, formatLongDate } from '../../../utils/helpers';
+import type { HijriDate, Location } from '@/types';
+import { formatHijri, formatLongDate } from '@/utils/helpers';
 import { useTranslation } from 'react-i18next';
 
 interface DashboardHeaderProps {
