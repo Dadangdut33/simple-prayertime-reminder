@@ -280,13 +280,21 @@ jobs:
     runs-on: ubuntu-latest
     needs: [linux, windows, macos]
     steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
       - uses: actions/download-artifact@v8
         with:
           path: dist
+
+      - name: Generate release notes and stage assets
+        run: node scripts/generate-release-notes.mjs "${GITHUB_REF_NAME}" "${GITHUB_REPOSITORY}" dist release-assets
 
       - name: Upload to draft release
         uses: softprops/action-gh-release@v3
         with:
           draft: true
-          files: |
-            dist/**/*
+          name: Release ${{ github.ref_name }}
+          body_path: release-assets/release-notes.md
+          files: release-assets/assets/*
