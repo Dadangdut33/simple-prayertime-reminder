@@ -190,8 +190,7 @@ jobs:
           $version = "${{ steps.version.outputs.app_version }}"
           Write-Host "Version: $version"
           Move-Item -Force "bin\\$app.exe" "bin\\$app-v$version-windows-${{ matrix.arch }}.exe"
-          Move-Item -Force "bin\\$app-amd64-installer.exe" "bin\\$app-v$version-windows-${{ matrix.arch }}-installer.exe"
-          # the packaged version become amd64 somehow?? so we use that name instead
+          Move-Item -Force "bin\\$app-${{ matrix.arch }}-installer.exe" "bin\\$app-v$version-windows-${{ matrix.arch }}-installer.exe"
 
       - uses: actions/upload-artifact@v7
         with:
