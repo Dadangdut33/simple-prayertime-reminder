@@ -8,6 +8,7 @@ import (
 	"runtime"
 	"sync/atomic"
 	"time"
+	_ "time/tzdata"
 
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/appservice"
 	"github.com/dadangdut33/simple-prayertime-reminder/internal/audio"
