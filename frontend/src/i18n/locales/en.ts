@@ -643,6 +643,10 @@ const en = {
     recommendedCommand: 'Recommended command',
     later: 'Later',
     openLatest: 'Open Latest Release',
+    viewRelease: 'View release page',
+    installNow: 'Download and install',
+    preparing: 'Preparing update…',
+    installFailed: 'Unable to install the update: {{error}}',
   },
   worldPrayer: {
     title: 'World Cities Prayer Times',

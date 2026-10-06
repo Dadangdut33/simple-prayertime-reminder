@@ -323,6 +323,7 @@ export class UpdateInfo {
     "updateDetail": string;
     "actionLabel": string;
     "updateCommand": string;
+    "canInstallInApp": boolean;
 
     /** Creates a new UpdateInfo instance. */
     constructor($$source: Partial<UpdateInfo> = {}) {
@@ -352,6 +353,9 @@ export class UpdateInfo {
         }
         if (!("updateCommand" in $$source)) {
             this["updateCommand"] = "";
+        }
+        if (!("canInstallInApp" in $$source)) {
+            this["canInstallInApp"] = false;
         }
 
         Object.assign(this, $$source);

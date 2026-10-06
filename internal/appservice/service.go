@@ -41,6 +41,7 @@ type Service struct {
 	notifSvc              *notification.Service
 	schedulerSvc          *scheduler.Service
 	onSettings            func(settings.Settings)
+	installUpdate         func() error
 	worldPrayerMu         sync.Mutex
 	worldPrayerServices   map[string]*prayer.Service
 	quranMu               sync.Mutex
@@ -134,6 +135,22 @@ func SetSettingsChangedHandler(s *Service, handler func(settings.Settings)) {
 	}
 	s.onSettings = handler
 	log.Info("settings changed handler set")
+}
+
+// SetInstallUpdateHandler connects the update UI to the platform updater.
+func SetInstallUpdateHandler(s *Service, handler func() error) {
+	if s == nil {
+		return
+	}
+	s.installUpdate = handler
+}
+
+// InstallUpdate downloads and stages the latest update for this installation.
+func (s *Service) InstallUpdate() error {
+	if s.installUpdate == nil {
+		return fmt.Errorf("in-app updates are unavailable for this build")
+	}
+	return s.installUpdate()
 }
 
 func BuildPrayerConfig(cfg settings.Settings) prayer.PrayerConfig {

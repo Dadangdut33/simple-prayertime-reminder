@@ -179,6 +179,12 @@ for (const filePath of files) {
   byName.set(fileName, asset);
 }
 
+await writeFile(
+  path.join(assetsRoot, "SHA256SUMS"),
+  `${assets.map(({ digest, fileName }) => `${digest}  ${fileName}`).join("\n")}\n`,
+  "utf8",
+);
+
 const compare = previousTag ? `${previousTag}...${tag}` : tag;
 const changelog = commits.length
   ? commits.map(commitBullet).join("\n")

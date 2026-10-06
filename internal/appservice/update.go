@@ -3,8 +3,9 @@ package appservice
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
@@ -15,18 +16,24 @@ import (
 type releaseInfo struct {
 	Version string
 	URL     string
+	Assets  []releaseAsset
+}
+
+type releaseAsset struct {
+	Name string `json:"name"`
 }
 
 type UpdateInfo struct {
-	CurrentVersion string `json:"currentVersion"`
-	LatestVersion  string `json:"latestVersion"`
-	ReleaseURL     string `json:"releaseUrl"`
-	HasUpdate      bool   `json:"hasUpdate"`
-	InstallMethod  string `json:"installMethod"`
-	UpdateTitle    string `json:"updateTitle"`
-	UpdateDetail   string `json:"updateDetail"`
-	ActionLabel    string `json:"actionLabel"`
-	UpdateCommand  string `json:"updateCommand"`
+	CurrentVersion  string `json:"currentVersion"`
+	LatestVersion   string `json:"latestVersion"`
+	ReleaseURL      string `json:"releaseUrl"`
+	HasUpdate       bool   `json:"hasUpdate"`
+	InstallMethod   string `json:"installMethod"`
+	UpdateTitle     string `json:"updateTitle"`
+	UpdateDetail    string `json:"updateDetail"`
+	ActionLabel     string `json:"actionLabel"`
+	UpdateCommand   string `json:"updateCommand"`
+	CanInstallInApp bool   `json:"canInstallInApp"`
 }
 
 func normalizeSemver(version string) string {
@@ -79,9 +86,10 @@ func fetchLatestRelease() (releaseInfo, error) {
 
 	if releaseResp.StatusCode >= 200 && releaseResp.StatusCode < 300 {
 		var payload struct {
-			TagName string `json:"tag_name"`
-			Name    string `json:"name"`
-			HTMLURL string `json:"html_url"`
+			TagName string         `json:"tag_name"`
+			Name    string         `json:"name"`
+			HTMLURL string         `json:"html_url"`
+			Assets  []releaseAsset `json:"assets"`
 		}
 		if err := json.NewDecoder(releaseResp.Body).Decode(&payload); err != nil {
 			return releaseInfo{}, fmt.Errorf("failed to parse latest release response: %w", err)
@@ -90,6 +98,7 @@ func fetchLatestRelease() (releaseInfo, error) {
 		return releaseInfo{
 			Version: firstNonEmpty(payload.TagName, payload.Name, "unknown"),
 			URL:     firstNonEmpty(payload.HTMLURL, repositoryURL+"/releases"),
+			Assets:  payload.Assets,
 		}, nil
 	}
 
@@ -111,11 +120,9 @@ func fetchLatestRelease() (releaseInfo, error) {
 	defer tagResp.Body.Close()
 
 	if tagResp.StatusCode < 200 || tagResp.StatusCode >= 300 {
-		bodyPreview, _ := io.ReadAll(io.LimitReader(tagResp.Body, 512))
 		return releaseInfo{}, fmt.Errorf(
-			"unable to check GitHub for the latest version (status=%d, body=%q)",
+			"unable to check GitHub for the latest version (status=%d)",
 			tagResp.StatusCode,
-			strings.TrimSpace(string(bodyPreview)),
 		)
 	}
 
@@ -200,8 +207,90 @@ func (s *Service) CheckForUpdates() (UpdateInfo, error) {
 	currentSemver := normalizeSemver(appInfo.Version)
 	latestSemver := normalizeSemver(latest.Version)
 	result.HasUpdate = currentSemver != "" && latestSemver != "" && semver.Compare(currentSemver, latestSemver) < 0
+	result.CanInstallInApp = result.HasUpdate && canInstallInApp(appInfo, latest, runtime.GOOS, runtime.GOARCH)
 
 	return result, nil
+}
+
+func canInstallInApp(appInfo AppInfo, latest releaseInfo, goos, goarch string) bool {
+	if !hasAsset(latest.Assets, "SHA256SUMS") {
+		return false
+	}
+
+	version := strings.TrimPrefix(firstNonEmpty(latest.Version, ""), "v")
+	if version == "" {
+		return false
+	}
+
+	if goos == "windows" && appInfo.InstallMethod == "Windows installer" {
+		if goarch != "amd64" && goarch != "arm64" {
+			return false
+		}
+		installer := fmt.Sprintf("simple-prayertime-reminder-v%s-windows-%s-installer.exe", version, goarch)
+		return hasAsset(latest.Assets, installer)
+	}
+
+	if (goos == "linux" && (appInfo.InstallMethod == "Snap" || appInfo.InstallMethod == "Flatpak" || appInfo.InstallMethod == "AppImage")) ||
+		goarch != "amd64" && goarch != "arm64" {
+		return false
+	}
+
+	platform := goos
+	if platform == "windows" {
+		platform = "windows"
+	}
+	for _, asset := range latest.Assets {
+		name := strings.ToLower(asset.Name)
+		if strings.Contains(name, "-installer.") || strings.HasSuffix(name, ".sig") || isChecksumAsset(name) {
+			continue
+		}
+		if strings.Contains(name, platform) && containsArchitecture(name, goarch) {
+			return executableDirectoryWritable(appInfo.ExecutablePath)
+		}
+	}
+	return false
+}
+
+func hasAsset(assets []releaseAsset, expected string) bool {
+	for _, asset := range assets {
+		if asset.Name == expected {
+			return true
+		}
+	}
+	return false
+}
+
+func isChecksumAsset(name string) bool {
+	return name == "sha256sums" || strings.HasPrefix(name, "sha256sums.") ||
+		strings.HasSuffix(name, ".sha256") || strings.HasSuffix(name, ".sha512") ||
+		strings.HasSuffix(name, ".checksums") || strings.HasSuffix(name, ".sums")
+}
+
+func containsArchitecture(name, arch string) bool {
+	switch arch {
+	case "amd64":
+		return strings.Contains(name, "amd64") || strings.Contains(name, "x86_64") || strings.Contains(name, "x64")
+	case "arm64":
+		return strings.Contains(name, "arm64") || strings.Contains(name, "aarch64")
+	default:
+		return false
+	}
+}
+
+func executableDirectoryWritable(executablePath string) bool {
+	if executablePath == "" {
+		return false
+	}
+	tempFile, err := os.CreateTemp(filepath.Dir(executablePath), ".sprm-update-check-*")
+	if err != nil {
+		return false
+	}
+	tempPath := tempFile.Name()
+	if err := tempFile.Close(); err != nil {
+		_ = os.Remove(tempPath)
+		return false
+	}
+	return os.Remove(tempPath) == nil
 }
 
 // CheckForUpdatesSilent is intended for startup auto-check.

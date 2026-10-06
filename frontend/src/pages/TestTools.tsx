@@ -19,7 +19,6 @@ import { useAppStore } from '@/store/appStore';
 import {
   getDebugTimeInfo,
   getReminderTestSnapshot,
-  openURL,
   searchTimezones,
   syncReminderTestWindow,
   triggerReminderTest,
@@ -207,6 +206,7 @@ export default function TestToolsPage() {
 
   const mockUpdate: UpdateInfo = {
     hasUpdate: true,
+    canInstallInApp: true,
     latestVersion: '2.1.0',
     currentVersion: '2.0.0',
     updateTitle: t('updates.available'),
@@ -292,7 +292,8 @@ export default function TestToolsPage() {
         open={showUpdateDialog}
         update={mockUpdate}
         onClose={() => setShowUpdateDialog(false)}
-        onOpenAction={async () => openURL(mockUpdate.releaseUrl)}
+        onInstallUpdate={async () => {}}
+        onOpenRelease={async () => {}}
       />
 
       <Box

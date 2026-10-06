@@ -298,6 +298,13 @@ export function GetWorldPrayerTimes(cities: settings$0.WorldPrayerCity[]): $Canc
     });
 }
 
+/**
+ * InstallUpdate downloads and stages the latest update for this installation.
+ */
+export function InstallUpdate(): $CancellablePromise<void> {
+    return $Call.ByID(848251527);
+}
+
 export function OpenConfigLocation(): $CancellablePromise<void> {
     return $Call.ByID(1230630530);
 }

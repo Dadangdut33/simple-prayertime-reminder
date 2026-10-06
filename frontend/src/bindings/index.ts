@@ -177,6 +177,8 @@ export const checkForUpdates = (): Promise<UpdateInfo> =>
   AppService.CheckForUpdates() as any;
 export const checkForUpdatesSilent = (): Promise<UpdateInfo> =>
   AppService.CheckForUpdatesSilent() as any;
+export const installUpdate = (): Promise<void> =>
+  AppService.InstallUpdate() as any;
 export const openConfigLocation = (): Promise<void> =>
   AppService.OpenConfigLocation() as any;
 export const openURL = (url: string): Promise<void> =>

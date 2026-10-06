@@ -234,9 +234,8 @@ export default function App() {
           open
           update={updateDialogInfo}
           onClose={() => showUpdateDialog(null)}
-          onOpenAction={async () => {
-            await api.openURL(updateDialogInfo.releaseUrl);
-          }}
+          onInstallUpdate={async () => api.installUpdate()}
+          onOpenRelease={async () => api.openURL(updateDialogInfo.releaseUrl)}
         />
       )}
 

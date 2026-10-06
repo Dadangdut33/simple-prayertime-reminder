@@ -69,6 +69,7 @@ export interface UpdateInfo {
   latestVersion: string;
   releaseUrl: string;
   hasUpdate: boolean;
+  canInstallInApp: boolean;
   installMethod: string;
   updateTitle: string;
   updateDetail: string;

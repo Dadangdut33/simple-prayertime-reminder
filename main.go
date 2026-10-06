@@ -25,6 +25,8 @@ import (
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/events"
 	"github.com/wailsapp/wails/v3/pkg/services/notifications"
+	"github.com/wailsapp/wails/v3/pkg/updater"
+	githubupdater "github.com/wailsapp/wails/v3/pkg/updater/providers/github"
 )
 
 const (
@@ -140,6 +142,21 @@ func main() {
 		},
 	})
 
+	appInfo, infoErr := appSvc.GetAppInfo()
+	if infoErr != nil {
+		logger.Error("update service unavailable: app info failed", "error", infoErr)
+	} else if provider, providerErr := githubupdater.New(githubupdater.Config{
+		Repository:    "dadangdut33/simple-prayertime-reminder",
+		ChecksumAsset: "SHA256SUMS",
+	}); providerErr != nil {
+		logger.Error("update service unavailable: provider setup failed", "error", providerErr)
+	} else if initErr := app.Updater.Init(updater.Config{
+		CurrentVersion: appInfo.Version,
+		Providers:      []updater.Provider{provider},
+	}); initErr != nil {
+		logger.Error("update service unavailable: updater setup failed", "error", initErr)
+	}
+
 	// Notification and Scheduler need app to emit events/manage windows
 	notifSvc := notification.NewService(app, audioSvc, nativeNotifSvc)
 	notifSvc.SetStatePaths(
@@ -173,6 +190,15 @@ func main() {
 	})
 
 	var allowQuit atomic.Bool
+	appservice.SetInstallUpdateHandler(appSvc, func() error {
+		if runtime.GOOS == "windows" && appInfo.InstallMethod == "Windows installer" {
+			return appservice.InstallWindowsUpdate(func() {
+				allowQuit.Store(true)
+				app.Quit()
+			})
+		}
+		return app.Updater.CheckAndInstall(context.Background())
+	})
 	mainWindow.RegisterHook(events.Common.WindowClosing, func(event *application.WindowEvent) {
 		if allowQuit.Load() {
 			return

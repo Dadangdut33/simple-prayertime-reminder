@@ -574,6 +574,10 @@ const id = {
     recommendedCommand: 'Perintah yang direkomendasikan',
     later: 'Nanti',
     openLatest: 'Buka Rilis Terbaru',
+    viewRelease: 'Lihat halaman rilis',
+    installNow: 'Unduh dan pasang',
+    preparing: 'Menyiapkan pembaruan…',
+    installFailed: 'Tidak dapat memasang pembaruan: {{error}}',
   },
   worldPrayer: {
     title: 'Waktu Salat Kota Dunia',
